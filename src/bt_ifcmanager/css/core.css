@@ -1,0 +1,109 @@
+html {
+  font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+  font-size: 0.8em;
+}
+body {
+  font-size: 0.8em;
+  height: 100%;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0.3em;
+}
+hr {
+  clear:both;
+  margin: 0.6em 0.3em;
+  padding: 0;
+  height: 0;
+  border: 0;
+  border-bottom: 1px solid #a0a0a0;
+}
+label {
+  line-height: 2em;
+  float: left;
+  height: 2em;
+  width: 10em;
+  margin: 0;
+  padding: 0.3em;
+}
+input, select {
+  font-size: 1em;
+  height: 2em;
+  width: 100%;
+
+/* render select the same size as other input elements */
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+button {
+  line-height: 2em;
+  font-size: 1em;
+  height: 2em;
+  width: 2em;
+  position: relative;
+  float: right;
+  margin: 0.3em;
+  padding: 0.3em;
+  border: 0;
+  background-image: url("../images/new.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 2em 2em;
+}
+/* make controls float behind labels */
+span, .control-textbox, .control-listbox, .control-autolist {
+  display: block;
+  overflow: hidden;
+  padding: 0.3em;
+}
+h1 {
+  font-size: 1em;
+  font-weight: bold;
+  vertical-align:middle;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  margin-left: 6px;
+  margin-bottom: 0.2em;
+  background-repeat: no-repeat;
+  background-position: right top;
+}
+fieldset {
+  position:relative;
+  margin: 0;
+  padding: 0;
+  margin-top: 2em;
+  border-width: 0;
+  border-top: 1px solid #a0a0a0;
+}
+legend
+{
+    top:-1.7em;
+    left:0.3em;
+    position:absolute;
+    font-weight:bold;
+}
+/* show dropdown arrow on autocomplete */
+.ui-autocomplete-input
+{
+  background-image: url("../images/dropdown.png");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 1.4em 1.6em;
+ }
+/* remove IE -ms-clear pseudo-element from autocomplete */
+ .ui-autocomplete-input::-ms-clear {
+    display: none;
+}
+.ui-autocomplete {
+  max-height: 10em;
+  overflow-y: auto;
+  /* prevent horizontal scrollbar */
+  overflow-x: hidden;
+}
+/* IE 6 doesn't support max-height
+ * we use height instead, but this forces the menu to always be this tall
+ */
+* html .ui-autocomplete {
+  height: 10em;
+}
