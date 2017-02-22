@@ -62,7 +62,7 @@ module BimTools
         
         # inject options list AFTER window is loaded. (?) could be done on initialisation
         PropertiesWindow.window.on( :ready ) { |control, value| # (?) Second argument needed?
-          @name.options( list )
+          update_name
         }
         
         # on click: show complete list
@@ -401,7 +401,7 @@ module BimTools
           end
           list.sort_by!(&:downcase) # alphabetize array ignoring case
           
-          @name.options( list )
+          @name.options( list, 2 )
           if entity
             @name.value = entity.definition.name
           end
