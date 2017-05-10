@@ -52,15 +52,15 @@ module BimTools
     end # export
     
     # returns a hash containing the guids and objects for all component instances in the model
-    def get_guids( ent, guids )
-      ent.entities.each do | ins |
-        if ins.is_a? Sketchup::ComponentInstance
-          guids[ins.guid] = ins
-          get_guids( ins.definition, guids )
-        end
-      end
-      return guids
-    end # get_guids
+    # def get_guids( ent, guids )
+      # ent.entities.each do | ins |
+        # if ins.is_a? Sketchup::ComponentInstance
+          # guids[ins.guid] = ins
+          # get_guids( ins.definition, guids )
+        # end
+      # end
+      # return guids
+    # end # get_guids
     
     # returns an array containing all component instances in the model
     def get_instances( ent, instances )
@@ -68,7 +68,7 @@ module BimTools
         if ins.is_a? Sketchup::ComponentInstance
           
           # store type unless one of following
-          list = ["IfcBuilding", "IfcBuildingStorey", "IfcSite", "IfcSpace"]
+          list = ["IfcBuilding", "IfcSite"]#["IfcBuilding", "IfcBuildingStorey", "IfcSite", "IfcSpace"]
           type = ins.definition.get_attribute "AppliedSchemaTypes", "IFC 2x3"
           unless list.include? type
             instances << ins
@@ -92,6 +92,7 @@ module BimTools
       ifc_objects = Hash.new # collect ifc objects: guid[row]
       su_components = Hash.new # collect sketchup objects without matching GUID: componentdefinition[row]
       representations = Hash.new # collect ifc representation objects
+      object_list = Hash.new # combination of ifc row index and sketchup component instance
       
       # get guids for all component instances from sketchup model
       #guids = Hash.new
@@ -106,10 +107,15 @@ module BimTools
       
       # variable that helps search for representation object
       representation = false
+      
+      # counter for sketchup instance row index
+      su_index = 0
 
+      # open temp_ifc_file
       t = File.open(temp_path, "r")
       f = File.open(file_path, "w")
 
+      # loop temp_ifc_file
       t.each_line{ |line|
         
         # check if line is in header / main / footer
@@ -119,10 +125,33 @@ module BimTools
           @row = line[1..(line.index(' '))].to_i
           
           #check if line contains a guid
-          guid = line[/'([^"]\S{21})'/] # get first set of quotes containing only word characters with length of 21
-          if guid
-            guid.gsub!(/\A'|'\Z/, '') # strip quotes
+          #guid = line[/'([^"]\S{21})'/] # get first set of quotes containing only word characters with length of 21
+          #if guid
+            #guid.gsub!(/\A'|'\Z/, '') # strip quotes
             
+            # match the ifc row with a sketchup instance
+            list = ["IfcBuildingStorey", "IfcSpace", "IfcBeam", "IfcBuildingElementProxy", "IfcColumn", "IfcCurtainWall", "IfcDoor", "IfcFooting", "IfcFurnishingElement", "IfcMember", "IfcPile", "IfcPlate", "IfcRailing", "IfcRamp", "IfcRampFlight", "IfcRoof", "IfcSlab", "IfcStair", "IfcStairFlight", "IfcWall", "IfcWallStandardCase", "IfcWindow"]
+            if list.any? { |type| line.include?(type.upcase) }
+              
+              #if comp_name = line.scan(/'.*?'/)[1] # component name is the second string (between ' )
+                #comp_name.gsub!(/\A'|'\Z/, '') # strip quotes
+            
+                # add elevation to IFCBUILDINGSTOREY
+                if line.include?("IFCBUILDINGSTOREY")
+                  
+                  # Get instance elevation
+                  elevation = instances[ su_index ].transformation.origin.z.to_mm.to_s
+                  
+                  # works only with exactly the current IFC implementation in sketchup                  
+                  line.sub! '0.);', elevation + ");"
+                end
+                
+                object_list[ @row ] = instances[ su_index ]
+                
+                # forward su counter
+                su_index +=1
+              #end
+            end
             
             # check if object type needs a material
             list = ["IfcBeam", "IfcBuildingElementProxy", "IfcColumn", "IfcCurtainWall", "IfcDoor", "IfcFooting", "IfcFurnishingElement", "IfcMember", "IfcPile", "IfcPlate", "IfcRailing", "IfcRamp", "IfcRampFlight", "IfcRoof", "IfcSlab", "IfcStair", "IfcStairFlight", "IfcWall", "IfcWallStandardCase", "IfcWindow"]
@@ -159,7 +188,7 @@ module BimTools
               name = line[/\', #2, (.*?), '/,1]
               line.sub! '$, $, $, $)', name + ", $, $, $)" # (!)Apostrophes in component name should be escaped!
             end
-          elsif representation != false && line.include?("IFCSHAPEREPRESENTATION")
+          if representation != false && line.include?("IFCSHAPEREPRESENTATION")
             
             representations[representation] = @row #sketchup_object.layer
             
@@ -189,24 +218,30 @@ module BimTools
             f.write line
           else # currently in footer
             
-            ifc_names = ifc_objects.values
-            ifc_rows = ifc_objects.keys
-            i = 0
-            j = 0
-            rows = Hash.new
+            # ifc_objects[@row] = comp_name
+            # values = sketchup component names
+            # keys = ifc file row id's as integer
             
-            # combine ifc_object row numbers with su_instances
-            while j < instances.length do
-              if instances[ i ].definition.name == ifc_names[ j ]
-                rows[ifc_rows[ j ]] = instances[ i ]
-                i +=1
-              end
-              j +=1
-            end
+            # ifc_names = ifc_objects.values
+            # ifc_rows = ifc_objects.keys
+            # i = 0
+            # j = 0
+            # rows = Hash.new
+            # # rows:values = sketchup component instances
+            # # rows:keys = ifc file row id's as integer
+            
+            # # combine ifc_object row numbers with su_instances
+            # while j < instances.length do
+              # if instances[ i ].definition.name == ifc_names[ j ]
+                # rows[ifc_rows[ j ]] = instances[ i ]
+                # i +=1
+              # end
+              # j +=1
+            # end
           
             # first add material / classification / layer
-            f.write create_materials( rows )
-            f.write create_layers( representations, rows )
+            f.write create_materials( object_list )
+            f.write create_layers( representations, object_list )
             f.write create_nlsfb_classifications( su_components )
             
             # then copy line
@@ -220,7 +255,7 @@ module BimTools
 
       t.close
       #t.unlink does not work, maybe because of writing from external process?
-      f.close
+      f.close      
     end # fix_export
 
     # currently only writes temporary file
@@ -247,53 +282,6 @@ module BimTools
       file
 
     end # def write_temp
-
-# IfcClassification
-# Attribute	  Type	                    Defined By
-# SOURCE	    IfcLabel (STRING)	        IfcClassification
-# Edition	    IfcLabel (STRING)	        IfcClassification
-# EditionDate	IfcCalendarDate (ENTITY)	IfcClassification
-# Name        IfcLabel (STRING)	        IfcClassification
-
-# IfcClassificationItem
-# Attribute	  Type	                                  Defined By
-# Notation	  IfcClassificationNotationFacet (ENTITY)	IfcClassificationItem
-# ItemOf	    IfcClassification (ENTITY)	            IfcClassificationItem
-# Title	      IfcLabel (STRING)	                      IfcClassificationItem
-
-# IfcRelAssociatesClassification
-# Attribute	              Type	                                    Defined By
-# GlobalId	              IfcGloballyUniqueId (STRING)	            IfcRoot
-# OwnerHistory	          IfcOwnerHistory (ENTITY)	                IfcRoot
-# Name	                  IfcLabel (STRING)	                        IfcRoot
-# Description	            IfcText (STRING)	                        IfcRoot
-# RelatedObjects	        SET OF IfcRoot (ENTITY)	                  IfcRelAssociates
-# RelatingClassification	IfcClassificationNotationSelect (SELECT)	IfcRelAssociatesClassification
-
-# IfcClassificationReference
-# Attribute	        Type	                      Defined By
-# Location	        IfcLabel (STRING)          	IfcExternalReference
-# ItemReference	    IfcIdentifier (STRING) 	    IfcExternalReference
-# Name	            IfcLabel (STRING)	          IfcExternalReference
-# ReferencedSource	IfcClassification (ENTITY)	IfcClassificationReference
-
-
-#188= IFCWALLSTANDARDCASE('3MbZz6WlH1w97t7yUO3_Qu',#15,'Wand-143',$,$,
-#327= IFCCLASSIFICATION('','2013',$,'Nl-Sfb Element');
-#329= IFCCLASSIFICATIONREFERENCE($,'21.10','ALGEMEEN',#327);
-#330= IFCRELASSOCIATESCLASSIFICATION('067Ms7dAkksXbyuNb1ZK6L',#15, 'Nl-Sfb Code Bouwkundig',$,(#188,#992,#1830,#3596,#3688),#329);
-
-
-#800000= IFCPROJECT('1BQZ_FPifBsBGV_qviKsfF',#800015,'MasterFormat','Classification used in North America','Classification Library','MasterFormat 1995 and 2004','',(#210000,#220000),#200000);
-#500000= IFCOWNERHISTORY(#400000,#300000,.READWRITE.,.NOCHANGE.,$,$,$,0);
-#20000= IFCCLASSIFICATION('Construction Specification Institute','2004',$,'MasterFormat',$,$,$);
-#20100= IFCCLASSIFICATIONREFERENCE($,'01','General Requirements',#20000,$);
-#800005= IFCRELASSOCIATESCLASSIFICATION('3LErOcF3f9fBLf$wbPaGUI',#500000,'Product',$,(#800000),#20000);
-
-#87880= IFCFURNITURETYPE('2gRXFgjRn2HPE$YoDLX0$a',#86462,'Cabinet Type C','Vanity Cabinet-Double Door Sink Unit:450 x 450 mm',$,(#87915,#87960,#87964,#87948,#87856,#87879),$,$,$,$);
-
-#87874= IFCRELASSOCIATESCLASSIFICATION('3MIgnnPyP0iQtPYUZOlnsp',$,'ASSOCIATION FROM (23-40 35 17 47 14: Bathroom Casework) to (Cabinet Type C)',$,(#87880,#88028),#87907);
-#87907= IFCCLASSIFICATIONREFERENCE('23-40 35 17 47 14: Bathroom Casework','23-40 35 17 47 14: Bathroom Casework','23-40 35 17 47 14: Bathroom Casework',$);
 
     # guids = Hash: sketchup guids[comonentinstance]
     # ifc_objects = ifc objects Hash: guid[row]
@@ -358,9 +346,6 @@ module BimTools
     end # def create_nlsfb_classifications
 
     def create_materials(hash)
-      #39 = IFCMATERIAL('Silka Kalkzandsteen CS12');
-      #40 = IFCRELASSOCIATESMATERIAL('2fPXKPDEbFtPj5YQ4rzvEE',#2,$,$,(#35),#39);
-
       materials = String.new
       material_list = Hash.new
       associatesmaterial_list = Hash.new
@@ -387,15 +372,12 @@ module BimTools
         
       associatesmaterial_list.each do | material_row, objects_list |
         @row += 1
-        #(!) multiple objects with the same material can be linked with the same IFCRELASSOCIATESMATERIAL
         materials << "#" + @row.to_s + " = IFCRELASSOCIATESMATERIAL('" + new_guid + "',#2,$,$,(#" +  objects_list.join(', #') + "),#" + material_row.to_s + ");\n"
       end
       return materials
     end # def create_materials
 
     def create_layers( representations, rows )
-      #234= IFCPRESENTATIONLAYERASSIGNMENT('Layer',$,(#227),$);
-
       model = Sketchup.active_model
       layers = String.new
       layer_list = Hash.new
