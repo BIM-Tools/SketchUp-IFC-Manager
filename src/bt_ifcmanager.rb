@@ -35,7 +35,7 @@ module BimTools
       PLUGIN_IMAGE_PATH = File.join(PLUGIN_PATH, 'images')
 
       bimserver_extension = SketchupExtension.new("IFC Manager", File.join(PLUGIN_PATH, 'loader.rb'))
-      bimserver_extension.version = '1.0.0'
+      bimserver_extension.version = '1.0.3'
       bimserver_extension.description = 'IFC data manager and exporter for SketchUp.'
       bimserver_extension.creator = 'BIM-Tools'
       bimserver_extension.copyright = '2017'

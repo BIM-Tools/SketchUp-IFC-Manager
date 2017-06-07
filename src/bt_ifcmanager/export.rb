@@ -146,7 +146,10 @@ module BimTools
                   line.sub! '0.);', elevation + ");"
                 end
                 
-                object_list[ @row ] = instances[ su_index ]
+                # check if there are any sketchup instances left
+                if instances[ su_index ]
+                  object_list[ @row ] = instances[ su_index ]
+                end
                 
                 # forward su counter
                 su_index +=1
