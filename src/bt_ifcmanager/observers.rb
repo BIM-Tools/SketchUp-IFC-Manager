@@ -51,6 +51,9 @@ module BimTools
     def onSelectionCleared(selection)
       PropertiesWindow::EntityInfo.update(selection)
     end
+    def onSelectionAdded(selection, entity)
+      PropertiesWindow::EntityInfo.update(selection)
+    end
   end
 
   # observer that updates the window when selected entity changes
