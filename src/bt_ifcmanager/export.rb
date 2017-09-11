@@ -214,7 +214,7 @@ module BimTools
               number = Sketchup.version_number/100000000.floor
               version = version + " 20" + number.to_s
               version = version + " (" + Sketchup.version + ")"
-              line.sub! ", '', 'SketchUp Pro 2015',", ", 'IFC-manager for SketchUp (1.0)', '" + version + "',"
+              line.sub! ", '', 'SketchUp Pro 2015',", ", 'IFC-manager for SketchUp (1.0.4)', '" + version + "',"
             end
             
             # copy line
