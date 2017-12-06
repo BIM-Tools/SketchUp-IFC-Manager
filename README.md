@@ -4,7 +4,7 @@ SketchUp-IFC-Manager is an extension that helps you to add more useful informati
 
 ### Make sure you are using SketchUp PRO version 2016 or 2017!
 The new 2018 version of SketchUp contains a bug that breaks the ability to export to IFC from extensions.
-Rendering this extension useless untill the SketchUp team fizes the bug or I finish the next version, let's see who's first ;-)
+Rendering this extension useless untill the SketchUp team fixes the bug or I finish the next version, let's see who's first ;-)
 
 ## Documentation
 - [Download](https://github.com/BIM-Tools/SketchUp-IFC-Manager/releases)
