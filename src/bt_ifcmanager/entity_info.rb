@@ -41,6 +41,20 @@ module BimTools
         end
       end # def update
 
+      def add_submit()
+        save = SKUI::Button.new( "Save" )
+        
+        save.on( :click ) { |control, value| # (?) Second argument needed?
+          update_type
+          update_nlsfb
+          update_name
+          update_materials
+          update_layers
+        }
+        
+        @section.add_control( save )
+      end # def submit
+
       def add_name( entity )
         if entity.is_a?( Sketchup::ComponentInstance )
           name = entity.definition.name
@@ -49,6 +63,10 @@ module BimTools
         end
         @name = SKUI::Textbox.new( name )
         lbl = SKUI::Label.new( 'Name:', @name )
+        
+        @save_name = SKUI::Button.new( "" )
+        @save_name.width = 20
+        @save_name.height = 20
 
         # get list of used component names
         list = Array.new
@@ -70,6 +88,12 @@ module BimTools
           js_command = "$('#" + control.ui_id + "_ui').autocomplete('search', '');"
           js_command << "$('#" + control.ui_id + "_ui').select();"
           PropertiesWindow.window.webdialog.execute_script(js_command)
+        }
+        
+        @name.on( :keypress) { |control, value| # (?) Second argument needed?
+        puts 'keypresssss'
+        puts control
+        puts value
         }
         
         @name.on( :blur || :textchange ) { |control, value| # (?) Second argument needed?
@@ -102,8 +126,17 @@ module BimTools
           update_name
           PropertiesWindow.update
         }
+        
+        # on click: save
+        @save_name.on( :click ) { |control, value| # (?) Second argument needed?
+          #js_command = "$('#" + control.ui_id + "_ui').next.focus();"
+          js_command = "alert($('#" + control.ui_id + "_ui'));"
+          PropertiesWindow.window.webdialog.execute_script(js_command)
+          puts 'save!!!'
+        }
 
         @section.add_control( lbl )
+        @section.add_control( @save_name )
         @section.add_control( @name )
       end # def add_name
 
@@ -434,6 +467,8 @@ module BimTools
       #add_description( Sketchup.active_model.selection[0] )
       add_materials()
       add_layers()
+      add_submit()
+      
       update(Sketchup.active_model.selection)
     end # module EntityInfo
   end # module PropertiesWindow

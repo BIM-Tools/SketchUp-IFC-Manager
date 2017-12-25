@@ -54,12 +54,18 @@ module BimTools
     require File.join(PLUGIN_PATH, 'load_nlsfb.rb')
     require File.join(PLUGIN_PATH_TOOLS, 'create_component.rb')
     require File.join(PLUGIN_PATH, 'load_materials.rb')
-
+    
+    model = Sketchup.active_model
+    
     # load the NL-SfB classification schema
+    model.start_operation('Load IFC Manager NL-SfB classification schema', true)
     self.load_nlsfb()
+    model.commit_operation
     
     # create default materials
+    model.start_operation('Create IFC Manager default materials', true)
     load_materials()
+    model.commit_operation
 
     # add tools to toolbar
     # Open window button

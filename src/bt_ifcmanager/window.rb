@@ -90,43 +90,6 @@ module BimTools
         self.show
       end
     end # def toggle
-
-    def add_type( parent )
-      entity = Sketchup.active_model.selection[0]
-      if entity.is_a?( Sketchup::ComponentInstance )
-        list = ["Undefined", "IfcBeam", "IfcBuilding", "IfcBuildingElementProxy", "IfcBuildingStorey", "IfcColumn", "IfcCurtainWall", "IfcDoor", "IfcFooting", "IfcFurnishingElement", "IfcMember", "IfcPile", "IfcPlate", "IfcProject", "IfcRailing", "IfcRamp", "IfcRampFlight", "IfcRoof", "IfcSite", "IfcSlab", "IfcSpace", "IfcStair", "IfcStairFlight", "IfcWall", "IfcWallStandardCase", "IfcWindow"]
-
-        lst_dropdown = SKUI::Listbox.new( list )
-        lbl = SKUI::Label.new( 'Type:', lst_dropdown )
-
-        selected = get_ifc_type( entity )
-        if list.include? selected
-          lst_dropdown.value = selected
-        else
-          lst_dropdown.value = "Undefined"
-        end
-
-        # set the selected material as object material
-        lst_dropdown.on( :change ) { |control, value| # (?) Second argument needed?
-          selected = get_ifc_type( entity )
-          if value == "Undefined"
-            unless selected.nil?
-              entity.definition.remove_classification("IFC 2x3", selected)
-            end
-          else
-            entity.definition.add_classification("IFC 2x3", value)
-          end
-
-          PropertiesWindow.close()
-          PropertiesWindow.show()
-        }
-
-        parent.add_control( lbl )
-        parent.add_control( lst_dropdown )
-
-      end
-    end # def add_type
-
    end # module PropertiesWindow
  end # module IfcManager
 end # module BimTools

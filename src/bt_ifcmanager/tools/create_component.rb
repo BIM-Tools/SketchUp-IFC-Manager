@@ -29,12 +29,12 @@ module BimTools
     @large_icon = File.join( PLUGIN_PATH_IMAGE, 'PaintProperties_large.png' )
     @cursor_icon = File.join( PLUGIN_PATH_IMAGE, 'PaintProperties-cursor.png' )
     
-    def add_component_option( ifc_type, name )
+    def add_component_option( ifc_type, name, objecttype=nil )
       UI.add_context_menu_handler do |context_menu|
         selection = Sketchup.active_model.selection
         unless selection.empty?
           context_menu.add_item( 'Create ' + name.capitalize ) {
-            CreateComponent.activate( ifc_type, name )
+            CreateComponent.activate( ifc_type, name, objecttype )
           }
         end
       end
@@ -47,7 +47,7 @@ module BimTools
     
     # The activate method is called by SketchUp when the tool is first selected.
     # it is a good place to put most of your initialization
-    def activate( ifc_type, name )
+    def activate( ifc_type, name, objecttype=nil )
       model = Sketchup.active_model
       entities = model.active_entities
       selection = Sketchup.active_model.selection
@@ -74,7 +74,7 @@ module BimTools
         selection.clear
         selection.add( instance )
       model.commit_operation
-        
+      
       # open edit window
       if IfcManager::PropertiesWindow.window.visible?
         IfcManager::PropertiesWindow.update
