@@ -19,6 +19,9 @@
 #
 #
 
+require_relative 'set.rb'
+require_relative File.join('IFC2X3', 'IfcRelContainedInSpatialStructure.rb')
+
 module BimTools
   module IfcObjectDefinition_su
     

@@ -34,11 +34,6 @@ require_relative File.join('IFC2X3', 'IfcCartesianPoint.rb')
 require_relative File.join('IFC2X3', 'IfcDirection.rb')
 
 require_relative File.join('IFC2X3', 'IfcGeometricRepresentationContext.rb')
-      
-require_relative File.join('IFC2X3', 'IfcRelContainedInSpatialStructure.rb')
-require_relative File.join('IFC2X3', 'IfcRelAggregates.rb')
-
-require_relative File.join('IFC2X3', 'IfcClassification.rb')
 
 module BimTools
  module IfcManager
@@ -182,6 +177,7 @@ module BimTools
         @base_site = BimTools::IFC2X3::IfcSite.new(self, nil)
         @base_site.total_transformation = Geom::Transformation.new
         @base_site.objectplacement = BimTools::IFC2X3::IfcLocalPlacement.new(self, Geom::Transformation.new)
+        @project.add_related_object( @base_site )
       end
       return @base_site
     end # def get_base_site
@@ -219,5 +215,5 @@ module BimTools
       return @base_buildingstorey
     end # def get_base_buildingstorey
   end # class IfcModel
- end # module IfcProject_su
+ end # module IfcManager
 end # module BimTools

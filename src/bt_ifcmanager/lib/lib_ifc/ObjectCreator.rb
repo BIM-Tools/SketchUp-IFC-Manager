@@ -133,9 +133,7 @@ module BimTools
         
         # add spacialstructureelements to the spacialhierarchy
         if ifc_entity.is_a? BimTools::IFC2X3::IfcSpatialStructureElement
-          unless parent_ifc.is_a?(BimTools::IFC2X3::IfcProject) # (?) check unnecessary?
-            parent_ifc.add_related_object( ifc_entity )
-          end
+          parent_ifc.add_related_object( ifc_entity )
         end
         ifc_entity.parent = parent_ifc
       end
@@ -146,7 +144,13 @@ module BimTools
       # create objectplacement for ifc_entity
       # set objectplacement based on transformation
       if ifc_entity
-        ifc_entity.objectplacement = BimTools::IFC2X3::IfcLocalPlacement.new(indexer, su_total_transformation, parent_ifc.objectplacement )
+        if parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
+          parent_objectplacement = nil
+        else
+          parent_objectplacement = parent_ifc.objectplacement
+        end
+        
+        ifc_entity.objectplacement = BimTools::IFC2X3::IfcLocalPlacement.new(indexer, su_total_transformation, parent_objectplacement )
         
         #ifc_entity.objectplacement.set_transformation( 
         #unless parent_ifc.is_a?(BimTools::IFC2X3::IfcProject) # (?) check unnecessary?
@@ -167,12 +171,6 @@ module BimTools
       # er zou in de ifc_total_transformation eigenlijk geen verschaling mogen zitten.
       # wat mag er wel in zitten? wel verdraaiing en verplaatsing.
       
-      #if ifc_entity.objectplacement.ifc_total_transformation == su_total_transformation
-      #  brep_transformation = su_total_transformation * axis_fix
-      #else
-        brep_transformation = ifc_entity.objectplacement.ifc_total_transformation.inverse * su_total_transformation
-      #end
-      
       # find sub-objects (geometry and entities)
       faces = Array.new
       definition.entities.each do | ent |
@@ -183,6 +181,12 @@ module BimTools
         when Sketchup::Face
           faces << ent
         end
+      end
+      
+      unless parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
+        brep_transformation = ifc_entity.objectplacement.ifc_total_transformation.inverse * su_total_transformation
+      else
+        brep_transformation = su_total_transformation
       end
       
       # create geometry from faces

@@ -19,16 +19,11 @@
 #
 #
 
+require_relative File.join('IFC2X3', 'IfcUnitAssignment.rb')
+require_relative File.join('IFC2X3', 'IfcSIUnit.rb')
+
 module BimTools
   module IfcProject_su
-    
-    require_relative File.join('IFC2X3', 'IfcAxis2Placement3D.rb')
-    require_relative File.join('IFC2X3', 'IfcCartesianPoint.rb')
-    require_relative File.join('IFC2X3', 'IfcDirection.rb')
-    require_relative File.join('IFC2X3', 'IfcUnitAssignment.rb')
-    require_relative File.join('IFC2X3', 'IfcSIUnit.rb')
-    require_relative File.join('IFC2X3', 'IfcRelAggregates.rb')
-    
     def initialize(ifc_model, sketchup)
       super
       self.name = "'Default Project'"
