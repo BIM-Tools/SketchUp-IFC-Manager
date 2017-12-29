@@ -48,7 +48,7 @@ module BimTools
       # take the number (0 - 63) and find the matching character in guid64, add the found character to the guid string
       guid << guid64[num.to_i(2)]
     end
-    guid.reverse
+    guid.reverse!
     guid = "'" + guid + "'"
     #return guid
   end
