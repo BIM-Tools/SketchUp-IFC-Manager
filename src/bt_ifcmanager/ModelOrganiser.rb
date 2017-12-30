@@ -25,6 +25,9 @@ module BimTools
     # objects ordered for IFC export
     class ModelOrganiser
       attr_accessor :ifc_structure
+      
+      include IFC2X3
+      
       def initialize( model )
         total_transformation = Geom::Transformation.new
         
@@ -62,11 +65,11 @@ module BimTools
               # if classification is set, then that's the entity
               classification = definition.get_attribute("AppliedSchemaTypes", "IFC 2x3")
               require_relative File.join('IFC2X3', classification + ".rb")
-              obj = eval("BimTools::IFC2X3::" + classification)
+              obj = eval("" + classification)
             rescue
               # if no classification AND parent is a IfcSpatialStructureElement then entity is IfcBuildingElementProxy
-              if parent_ifc.is_a?(BimTools::IFC2X3::IfcSpatialStructureElement)
-                obj = BimTools::IFC2X3::IfcBuildingElementProxy
+              if parent_ifc.is_a?(IfcSpatialStructureElement)
+                obj = IfcBuildingElementProxy
               end
             end
             ##############################

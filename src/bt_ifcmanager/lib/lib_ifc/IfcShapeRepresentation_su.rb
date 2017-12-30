@@ -27,20 +27,11 @@ module BimTools
     def initialize(ifc_model, sketchup)
       super
       if sketchup.is_a? Sketchup::ComponentDefinition
-        
         self.contextofitems = ifc_model.representationcontext
         self.representationidentifier = "'Body'"
         self.representationtype = "'Brep'"
-        self.items = IfcManager::Ifc_Set.new()#[IFC2X3::IfcFacetedBrep.new( ifc_model, sketchup )])
-        
-        # # create seperate representations for all sub-groups and components
-        # sketchup.entities.each do |ent|          
-          # if ent.is_a?(Sketchup::Group) || ent.is_a?(Sketchup::ComponentInstance)
-            # self.items.add(IFC2X3::IfcFacetedBrep.new( ifc_model, ent.definition ))
-          # end
-        # end
-        
+        self.items = IfcManager::Ifc_Set.new()
       end      
-    end # def sketchup
+    end # def initialize
   end # module IfcShapeRepresentation_su
 end # module BimTools

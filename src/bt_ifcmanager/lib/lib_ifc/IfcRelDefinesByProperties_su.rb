@@ -25,6 +25,9 @@ require_relative File.join('IFC2X3', 'IfcPropertySingleValue.rb')
 
 module BimTools
   module IfcRelDefinesByProperties_su
+    
+    include IFC2X3
+    
     def initialize(ifc_model, sketchup)
     
       # (!) this should be automatically created by root!!!
@@ -34,12 +37,12 @@ module BimTools
       self.relatedobjects = IfcManager::Ifc_Set.new()
       if sketchup.is_a?( Sketchup::AttributeDictionary )
         attr_dict = sketchup
-        pset = BimTools::IFC2X3::IfcPropertySet.new( ifc_model, attr_dict )
+        pset = IfcPropertySet.new( ifc_model, attr_dict )
         self.relatingpropertydefinition = pset
         pset.name = "'" + attr_dict.name + "'" unless attr_dict.name.nil?
         pset.hasproperties = IfcManager::Ifc_Set.new()
         attr_dict.each { | key, value |
-          prop = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model, attr_dict )
+          prop = IfcPropertySingleValue.new( ifc_model, attr_dict )
           prop.name = "'" + key + "'"
           prop.nominalvalue = "IFCLABEL('" + value.to_s + "')"
           pset.hasproperties.add( prop )

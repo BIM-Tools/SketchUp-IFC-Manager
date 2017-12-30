@@ -19,28 +19,23 @@
 #
 #
 
+require_relative File.join('IFC2X3', 'IfcPresentationStyleAssignment.rb')
+require_relative File.join('IFC2X3', 'IfcSurfaceStyle.rb')
+require_relative File.join('IFC2X3', 'IfcSurfaceStyleRendering.rb')
+require_relative File.join('IFC2X3', 'IfcColourRgb.rb')
+
 module BimTools
   module IfcStyledItem_su
     
-#83 = IFCSTYLEDITEM(#82, (#84), $);
-#84 = IFCPRESENTATIONSTYLEASSIGNMENT((#85));
-#85 = IFCSURFACESTYLE($, .POSITIVE., (#86));
-#86 = IFCSURFACESTYLESHADING(#87);
-#87 = IFCCOLOURRGB($, 1., 1., 1.);
-#219= IFCSURFACESTYLERENDERING(#218,0.,IFCNORMALISEDRATIOMEASURE(0.81),$,$,$,IFCNORMALISEDRATIOMEASURE(0.09),$,.NOTDEFINED.);
-    
-    require_relative File.join('IFC2X3', 'IfcPresentationStyleAssignment.rb')
-    require_relative File.join('IFC2X3', 'IfcSurfaceStyle.rb')
-    require_relative File.join('IFC2X3', 'IfcSurfaceStyleRendering.rb')
-    require_relative File.join('IFC2X3', 'IfcColourRgb.rb')
+    include IFC2X3
     
     def initialize(ifc_model, brep, material)
       super
       
-      styleassignment = IFC2X3::IfcPresentationStyleAssignment.new( ifc_model, material )
-      surfacestyle = IFC2X3::IfcSurfaceStyle.new( ifc_model, material )
-      surfacestylerendering = IFC2X3::IfcSurfaceStyleRendering.new( ifc_model, material )
-      colourrgb = IFC2X3::IfcColourRgb.new( ifc_model, material )
+      styleassignment = IfcPresentationStyleAssignment.new( ifc_model, material )
+      surfacestyle = IfcSurfaceStyle.new( ifc_model, material )
+      surfacestylerendering = IfcSurfaceStyleRendering.new( ifc_model, material )
+      colourrgb = IfcColourRgb.new( ifc_model, material )
       
       self.item = brep
       self.styles = IfcManager::Ifc_Set.new( [styleassignment] )

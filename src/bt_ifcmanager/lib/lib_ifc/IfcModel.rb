@@ -39,6 +39,8 @@ module BimTools
  module IfcManager
   class IfcModel
     
+    include IFC2X3
+    
     # (?) possible additional methods:
     # - get_ifc_objects(hash ifc->su)
     # - get_su_objects(hash su->ifc)
@@ -117,7 +119,7 @@ module BimTools
     
     # create new IfcProject
     def create_project( su_model )
-      project = BimTools::IFC2X3::IfcProject.new(self)
+      project = IfcProject.new(self)
       project.name = "'" + su_model.name.to_s + "'"
       project.description = "'" + su_model.description.to_s + "'"
       return project
@@ -125,12 +127,12 @@ module BimTools
     
     # Create new IfcOwnerHistory
     def create_ownerhistory()
-      owner_history = BimTools::IFC2X3::IfcOwnerHistory.new( self )
-      owner_history.owninguser = BimTools::IFC2X3::IfcPersonAndOrganization.new( self )
-      owner_history.owninguser.theperson = BimTools::IFC2X3::IfcPerson.new( self )
-      owner_history.owninguser.theorganization = BimTools::IFC2X3::IfcOrganization.new( self )
+      owner_history = IfcOwnerHistory.new( self )
+      owner_history.owninguser = IfcPersonAndOrganization.new( self )
+      owner_history.owninguser.theperson = IfcPerson.new( self )
+      owner_history.owninguser.theorganization = IfcOrganization.new( self )
       owner_history.owninguser.theorganization.name = "'BIM-Tools'"
-      owner_history.owningapplication = BimTools::IFC2X3::IfcApplication.new( self )
+      owner_history.owningapplication = IfcApplication.new( self )
       owner_history.owningapplication.applicationdeveloper = owner_history.owninguser.theorganization
       owner_history.owningapplication.version = "'2.0'"
       owner_history.owningapplication.applicationfullname = "'IFC manager for sketchup'"
@@ -142,13 +144,13 @@ module BimTools
     
     # Create new IfcGeometricRepresentationContext
     def create_representationcontext()
-      representationcontext = IFC2X3::IfcGeometricRepresentationContext.new( self )
+      representationcontext = IfcGeometricRepresentationContext.new( self )
       representationcontext.contexttype = "'Model'"
       representationcontext.coordinatespacedimension = '3'
-      representationcontext.worldcoordinatesystem = IFC2X3::IfcAxis2Placement3D.new( self )
-      representationcontext.worldcoordinatesystem.location = IFC2X3::IfcCartesianPoint.new( self )
+      representationcontext.worldcoordinatesystem = IfcAxis2Placement3D.new( self )
+      representationcontext.worldcoordinatesystem.location = IfcCartesianPoint.new( self )
       representationcontext.worldcoordinatesystem.location.coordinates = '(0., 0., 0.)'
-      representationcontext.truenorth = IFC2X3::IfcDirection.new( self )
+      representationcontext.truenorth = IfcDirection.new( self )
       representationcontext.truenorth.directionratios = IfcManager::Ifc_Set.new(['0., 1., 0.'])
       return representationcontext
     end # def create_representationcontext
@@ -163,7 +165,7 @@ module BimTools
             ObjectCreator.new( self, ent, transformation, @project, @project )
           
             # require_relative File.join('IFC2X3', 'IfcBuildingElementProxy.rb')
-            # entity = BimTools::IFC2X3::IfcBuildingElementProxy.new( self, ent )
+            # entity = IfcBuildingElementProxy.new( self, ent )
             # building_storey_container.relatedelements.add( entity )
           end
         end
@@ -174,9 +176,9 @@ module BimTools
     
     def get_base_site
       unless @base_site
-        @base_site = BimTools::IFC2X3::IfcSite.new(self, nil)
+        @base_site = IfcSite.new(self, nil)
         @base_site.total_transformation = Geom::Transformation.new
-        @base_site.objectplacement = BimTools::IFC2X3::IfcLocalPlacement.new(self, Geom::Transformation.new)
+        @base_site.objectplacement = IfcLocalPlacement.new(self, Geom::Transformation.new)
         @project.add_related_object( @base_site )
       end
       return @base_site
@@ -184,12 +186,12 @@ module BimTools
     
     def get_base_building
       unless @base_building
-        @base_building = BimTools::IFC2X3::IfcBuilding.new(self, nil)
+        @base_building = IfcBuilding.new(self, nil)
         @base_building.total_transformation = Geom::Transformation.new
         unless @base_site # create new site
           get_base_site
         end
-        @base_building.objectplacement = BimTools::IFC2X3::IfcLocalPlacement.new(self, Geom::Transformation.new, @base_site.objectplacement)
+        @base_building.objectplacement = IfcLocalPlacement.new(self, Geom::Transformation.new, @base_site.objectplacement)
         #@base_building.objectplacement.placementrelto = @base_site.objectplacement
         @base_site.add_related_object( @base_building )
       end
@@ -199,7 +201,7 @@ module BimTools
     def get_base_buildingstorey( parent_building )
       unless @base_buildingstorey
         
-        @base_buildingstorey = BimTools::IFC2X3::IfcBuildingStorey.new(self, nil)
+        @base_buildingstorey = IfcBuildingStorey.new(self, nil)
         @base_buildingstorey.total_transformation = Geom::Transformation.new
         if parent_building
           parent_building.add_related_object( @base_buildingstorey )
@@ -210,7 +212,7 @@ module BimTools
           #@base_buildingstorey.objectplacement.placementrelto = @base_building.objectplacement
           @base_building.add_related_object( @base_buildingstorey )
         end
-        @base_buildingstorey.objectplacement = BimTools::IFC2X3::IfcLocalPlacement.new(self, Geom::Transformation.new, @base_building.objectplacement)
+        @base_buildingstorey.objectplacement = IfcLocalPlacement.new(self, Geom::Transformation.new, @base_building.objectplacement)
       end
       return @base_buildingstorey
     end # def get_base_buildingstorey

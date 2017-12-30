@@ -21,11 +21,12 @@
 
 require_relative 'set.rb'
 require_relative File.join('IFC2X3', 'IfcRelContainedInSpatialStructure.rb')
+require_relative File.join('IFC2X3', 'IfcRelAggregates.rb')
 
 module BimTools
   module IfcObjectDefinition_su
     
-    require_relative File.join('IFC2X3', 'IfcRelAggregates.rb')
+    include IFC2X3
     
     def initialize(ifc_model, sketchup)
       super
@@ -37,7 +38,7 @@ module BimTools
       
       # if no ifc_rel_aggregates exists, create one
       unless @ifc_rel_aggregates
-        @ifc_rel_aggregates = IFC2X3::IfcRelAggregates.new(@ifc_model)
+        @ifc_rel_aggregates = IfcRelAggregates.new(@ifc_model)
         @ifc_rel_aggregates.relatingobject = self
         @ifc_rel_aggregates.relatedobjects = BimTools::IfcManager::Ifc_Set.new()
       end
@@ -51,7 +52,7 @@ module BimTools
     
       # if no ifc_rel_contained_in_spatial_structure exists, create one
       unless @ifc_rel_contained_in_spatial_structure
-        @ifc_rel_contained_in_spatial_structure = IFC2X3::IfcRelContainedInSpatialStructure.new(@ifc_model)
+        @ifc_rel_contained_in_spatial_structure = IfcRelContainedInSpatialStructure.new(@ifc_model)
         @ifc_rel_contained_in_spatial_structure.relatingstructure= self
         @ifc_rel_contained_in_spatial_structure.relatedelements = BimTools::IfcManager::Ifc_Set.new()
       end

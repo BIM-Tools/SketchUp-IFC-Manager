@@ -48,6 +48,9 @@ module BimTools
 
   # checks the current definition for ifc objects, and calls itself for all nested items
   class ObjectCreator
+    
+    include IFC2X3
+    
     # def initialize(indexer, su_instance, container, containing_entity, parent_ifc, transformation_from_entity, transformation_from_container, site=nil, site_container=nil, building=nil, building_container=nil, building_storey=nil, building_storey_container=nil)
     def initialize(indexer, su_instance, su_total_transformation, parent_ifc, parent_project, parent_site=nil, parent_building=nil, parent_buildingstorey=nil, parent_space=nil)
       definition = su_instance.definition
@@ -59,42 +62,42 @@ module BimTools
       # Create IFC entity based on the IFC classification in sketchup
       begin
         require_relative File.join('IFC2X3', definition.get_attribute("AppliedSchemaTypes", "IFC 2x3") + ".rb")
-        entity_type = eval("BimTools::IFC2X3::" + definition.get_attribute("AppliedSchemaTypes", "IFC 2x3"))
+        entity_type = eval("" + definition.get_attribute("AppliedSchemaTypes", "IFC 2x3"))
         ifc_entity = entity_type.new(indexer, su_instance)
       rescue
         
         # If not classified as IFC in sketchup AND the parent is an IfcSpatialStructureElement then this is an IfcBuildingElementProxy
-        if parent_ifc.is_a?(BimTools::IFC2X3::IfcSpatialStructureElement) || parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
-          ifc_entity = BimTools::IFC2X3::IfcBuildingElementProxy.new(indexer, su_instance)
+        if parent_ifc.is_a?(IfcSpatialStructureElement) || parent_ifc.is_a?(IfcProject)
+          ifc_entity = IfcBuildingElementProxy.new(indexer, su_instance)
         else # this instance is pure geometry, ifc_entity = nil
           ifc_entity = nil
         end
       end
       
       # find the correct parent in the spacialhierarchy
-      if ifc_entity.is_a? BimTools::IFC2X3::IfcProduct
+      if ifc_entity.is_a? IfcProduct
         
         # check the element type and set the correct parent in the spacialhierarchy
         case ifc_entity.class.to_s
-        when 'BimTools::IFC2X3::IfcSite'
+        when 'IfcSite'
           #indexer.site = true
           parent_site = ifc_entity
           #parent_ifc = parent_project
-        when 'BimTools::IFC2X3::IfcBuilding'
+        when 'IfcBuilding'
           #indexer.building = true
           if parent_site.nil? # create new site
             parent_site = indexer.get_base_site
           end
           parent_building = ifc_entity
           parent_ifc = parent_site
-        when 'BimTools::IFC2X3::IfcBuildingStorey'
+        when 'IfcBuildingStorey'
           #indexer.buildingstorey = true
           if parent_building.nil? # create new building
             parent_building = indexer.get_base_building
           end
           parent_buildingstorey = ifc_entity
           parent_ifc = parent_building
-        when 'BimTools::IFC2X3::IfcSpace'
+        when 'IfcSpace'
           if parent_buildingstorey.nil? # create new buildingstorey
             parent_buildingstorey = indexer.get_base_buildingstorey
           end
@@ -132,7 +135,7 @@ module BimTools
         end
         
         # add spacialstructureelements to the spacialhierarchy
-        if ifc_entity.is_a? BimTools::IFC2X3::IfcSpatialStructureElement
+        if ifc_entity.is_a? IfcSpatialStructureElement
           parent_ifc.add_related_object( ifc_entity )
         end
         ifc_entity.parent = parent_ifc
@@ -144,16 +147,16 @@ module BimTools
       # create objectplacement for ifc_entity
       # set objectplacement based on transformation
       if ifc_entity
-        if parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
+        if parent_ifc.is_a?(IfcProject)
           parent_objectplacement = nil
         else
           parent_objectplacement = parent_ifc.objectplacement
         end
         
-        ifc_entity.objectplacement = BimTools::IFC2X3::IfcLocalPlacement.new(indexer, su_total_transformation, parent_objectplacement )
+        ifc_entity.objectplacement = IfcLocalPlacement.new(indexer, su_total_transformation, parent_objectplacement )
         
         #ifc_entity.objectplacement.set_transformation( 
-        #unless parent_ifc.is_a?(BimTools::IFC2X3::IfcProject) # (?) check unnecessary?
+        #unless parent_ifc.is_a?(IfcProject) # (?) check unnecessary?
         #  ifc_entity.objectplacement.placementrelto = parent_ifc.objectplacement
         #end
       end
@@ -183,7 +186,7 @@ module BimTools
         end
       end
       
-      unless parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
+      unless parent_ifc.is_a?(IfcProject)
         brep_transformation = ifc_entity.objectplacement.ifc_total_transformation.inverse * su_total_transformation
       else
         brep_transformation = su_total_transformation
@@ -191,12 +194,12 @@ module BimTools
       
       # create geometry from faces
       unless faces.empty?
-        brep = IFC2X3::IfcFacetedBrep.new( indexer, faces, brep_transformation )
+        brep = IfcFacetedBrep.new( indexer, faces, brep_transformation )
         ifc_entity.representation.representations.first.items.add( brep )
         
         # add color from su-object material
         if su_instance.material
-          IFC2X3::IfcStyledItem.new( indexer, brep, su_instance.material )
+          IfcStyledItem.new( indexer, brep, su_instance.material )
         end
       end
     end # def initialize
