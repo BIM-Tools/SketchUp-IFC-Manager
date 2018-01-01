@@ -162,7 +162,7 @@ module BimTools
           if ent.is_a?(Sketchup::Group) || ent.is_a?(Sketchup::ComponentInstance)
           
             transformation = Geom::Transformation.new
-            ObjectCreator.new( self, ent, transformation, @project, @project )
+            ObjectCreator.new( self, ent, transformation, @project )
           
             # require_relative File.join('IFC2X3', 'IfcBuildingElementProxy.rb')
             # entity = IfcBuildingElementProxy.new( self, ent )
@@ -173,49 +173,6 @@ module BimTools
       
       return ifc_objects
     end # create_ifc_objects
-    
-    def get_base_site
-      unless @base_site
-        @base_site = IfcSite.new(self, nil)
-        @base_site.total_transformation = Geom::Transformation.new
-        @base_site.objectplacement = IfcLocalPlacement.new(self, Geom::Transformation.new)
-        @project.add_related_object( @base_site )
-      end
-      return @base_site
-    end # def get_base_site
-    
-    def get_base_building
-      unless @base_building
-        @base_building = IfcBuilding.new(self, nil)
-        @base_building.total_transformation = Geom::Transformation.new
-        unless @base_site # create new site
-          get_base_site
-        end
-        @base_building.objectplacement = IfcLocalPlacement.new(self, Geom::Transformation.new, @base_site.objectplacement)
-        #@base_building.objectplacement.placementrelto = @base_site.objectplacement
-        @base_site.add_related_object( @base_building )
-      end
-      return @base_building
-    end # def get_base_building
-    
-    def get_base_buildingstorey( parent_building )
-      unless @base_buildingstorey
-        
-        @base_buildingstorey = IfcBuildingStorey.new(self, nil)
-        @base_buildingstorey.total_transformation = Geom::Transformation.new
-        if parent_building
-          parent_building.add_related_object( @base_buildingstorey )
-        elsif @base_building
-          @base_building.add_related_object( @base_buildingstorey )
-        else
-          get_base_building
-          #@base_buildingstorey.objectplacement.placementrelto = @base_building.objectplacement
-          @base_building.add_related_object( @base_buildingstorey )
-        end
-        @base_buildingstorey.objectplacement = IfcLocalPlacement.new(self, Geom::Transformation.new, @base_building.objectplacement)
-      end
-      return @base_buildingstorey
-    end # def get_base_buildingstorey
   end # class IfcModel
  end # module IfcManager
 end # module BimTools

@@ -25,6 +25,7 @@ require_relative File.join('IFC2X3', 'IfcRelAggregates.rb')
 
 module BimTools
   module IfcObjectDefinition_su
+    attr_reader :decomposes, :default_related_object
     
     include IFC2X3
     
@@ -33,19 +34,46 @@ module BimTools
       @ifc_model = ifc_model
     end # def initialize
     
+    def decomposes()
+      return @decomposes
+    end
+    
     # add child object in the model hierarchy
     def add_related_object( object )
       
-      # if no ifc_rel_aggregates exists, create one
-      unless @ifc_rel_aggregates
-        @ifc_rel_aggregates = IfcRelAggregates.new(@ifc_model)
-        @ifc_rel_aggregates.relatingobject = self
-        @ifc_rel_aggregates.relatedobjects = BimTools::IfcManager::Ifc_Set.new()
+      # if no decomposes exists, create one
+      unless @decomposes
+        @decomposes = IfcRelAggregates.new(@ifc_model)
+        @decomposes.relatingobject = self
+        @decomposes.relatedobjects = BimTools::IfcManager::Ifc_Set.new()
       end
       
       # add child object
-      @ifc_rel_aggregates.relatedobjects.add( object )
+      @decomposes.relatedobjects.add( object )
     end # def add_related_object
+    
+    # return the default child object
+    def get_default_related_object
+      unless @default_related_object
+      
+        # If it does not exist, then create
+        case self
+        when IfcProject
+          puts 'add default site'
+          @default_related_object = IfcSite.new( @ifc_model )
+        when IfcSite
+          puts 'add default building'
+          @default_related_object = IfcBuilding.new( @ifc_model )
+        when IfcBuilding
+          puts 'add default storey'
+          @default_related_object = IfcBuildingStorey.new( @ifc_model )
+        end
+        
+        # add new default object to the model hierarchy
+        add_related_object( @default_related_object )
+      end
+      return @default_related_object
+    end # def get_default_related_object
     
     # add direct child object
     def add_related_element( object )
