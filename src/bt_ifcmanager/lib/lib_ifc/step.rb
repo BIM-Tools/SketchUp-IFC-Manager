@@ -36,6 +36,8 @@ module BimTools
             line << property
           elsif property.is_a? IfcManager::Ifc_Set
             line << property.step
+          elsif property.is_a? IfcManager::Ifc_Type
+            line << property.step
           else
             line << "#" + property.ifc_id.to_s
           end

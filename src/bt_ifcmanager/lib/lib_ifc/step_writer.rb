@@ -89,7 +89,7 @@ module BimTools
     end # def create_data_section
     
     def write( file_path, step_objects )
-      file = File.open(file_path, "w")
+      file = File.open(file_path, "w:ISO-8859-1") #"w") #
       step_objects.each do | object |
         file.write object + ";\n"
       end

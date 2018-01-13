@@ -20,6 +20,9 @@
 #
 
 require_relative 'set.rb'
+require_relative 'IfcLabel.rb'
+require_relative 'IfcIdentifier.rb'
+require_relative 'IfcText.rb'
 require_relative File.join('IFC2X3', 'IfcPropertySet.rb')
 require_relative File.join('IFC2X3', 'IfcPropertySingleValue.rb')
 
@@ -39,12 +42,13 @@ module BimTools
         attr_dict = sketchup
         pset = IfcPropertySet.new( ifc_model, attr_dict )
         self.relatingpropertydefinition = pset
-        pset.name = "'" + attr_dict.name + "'" unless attr_dict.name.nil?
+        pset.name = BimTools::IfcManager::IfcLabel.new( attr_dict.name ) unless attr_dict.name.nil?
         pset.hasproperties = IfcManager::Ifc_Set.new()
         attr_dict.each { | key, value |
           prop = IfcPropertySingleValue.new( ifc_model, attr_dict )
-          prop.name = "'" + key + "'"
-          prop.nominalvalue = "IFCLABEL('" + value.to_s + "')"
+          prop.name = BimTools::IfcManager::IfcIdentifier.new( key ) 
+          prop.nominalvalue = BimTools::IfcManager::IfcLabel.new( value ) # (!) not always IfcLabel
+          prop.nominalvalue.long = true # adding long = true returns a full object string
           pset.hasproperties.add( prop )
         }
       end

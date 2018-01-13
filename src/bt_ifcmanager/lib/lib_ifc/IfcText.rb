@@ -1,6 +1,6 @@
-#  IfcReal.rb
+#  IfcText.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -23,21 +23,22 @@ require_relative 'Ifc_Type.rb'
 
 module BimTools
  module IfcManager
-  class IfcReal < Ifc_Type
+  class IfcText < Ifc_Type
     def initialize( value )
-      if value.is_a? Float
-        @value = value
-      else
-        @value = nil
+      begin
+        @value = value.to_s
+      rescue StandardError, TypeError => e
+        print value + "cannot be converted to a String" + e
       end
     end # def initialize
     def step()
-      val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
+      str_replace = replace_char( @value )
+      val = "'#{str_replace}'"
       if @long
         val = add_long( val )
       end
       return val
     end # def step
-  end # class IfcReal
+  end # class IfcText
  end # module IfcManager
 end # module BimTools

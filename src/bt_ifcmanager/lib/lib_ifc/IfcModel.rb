@@ -20,6 +20,8 @@
 #
 
 require_relative 'set.rb'
+require_relative 'IfcLabel.rb'
+require_relative 'IfcText.rb'
 require_relative 'ObjectCreator.rb'
 require_relative 'step_writer.rb'
 
@@ -120,8 +122,8 @@ module BimTools
     # create new IfcProject
     def create_project( su_model )
       project = IfcProject.new(self)
-      project.name = "'" + su_model.name.to_s + "'"
-      project.description = "'" + su_model.description.to_s + "'"
+      project.name = BimTools::IfcManager::IfcLabel.new( su_model.name )
+      project.description = BimTools::IfcManager::IfcText.new( su_model.description )
       return project
     end # def create_project
     
