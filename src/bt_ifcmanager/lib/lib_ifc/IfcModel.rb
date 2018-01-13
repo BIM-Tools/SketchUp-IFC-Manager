@@ -132,8 +132,9 @@ module BimTools
       owner_history = IfcOwnerHistory.new( self )
       owner_history.owninguser = IfcPersonAndOrganization.new( self )
       owner_history.owninguser.theperson = IfcPerson.new( self )
+      owner_history.owninguser.theperson.familyname = BimTools::IfcManager::IfcLabel.new( "" )
       owner_history.owninguser.theorganization = IfcOrganization.new( self )
-      owner_history.owninguser.theorganization.name = "'BIM-Tools'"
+      owner_history.owninguser.theorganization.name = BimTools::IfcManager::IfcLabel.new( "BIM-Tools" )
       owner_history.owningapplication = IfcApplication.new( self )
       owner_history.owningapplication.applicationdeveloper = owner_history.owninguser.theorganization
       owner_history.owningapplication.version = "'2.0'"

@@ -59,9 +59,7 @@ module BimTools
     
     # adding long = true returns a full object string
     def add_long( string )
-      puts self
-      puts "LONG"
-      puts classname = self.class.name.split('::').last.upcase
+      classname = self.class.name.split('::').last.upcase
       return classname + "(" + string + ")"
     end
   end # class Ifc_Type

@@ -26,6 +26,10 @@ module BimTools
     @related_objects = nil
     attr_accessor :relating_object, :related_objects
     def initialize(ifc_model, sketchup)
+      
+      # set default CompositionType
+      self.compositiontype = ".ELEMENT."
+      
       super
     end # def ifcspatialstructureelement_su
       

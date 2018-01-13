@@ -61,12 +61,18 @@ module BimTools
         when IfcProject
           puts 'add default site'
           @default_related_object = IfcSite.new( @ifc_model )
+          @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Site" )
+          @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Site" )
         when IfcSite
           puts 'add default building'
           @default_related_object = IfcBuilding.new( @ifc_model )
+          @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Building" )
+          @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Building" )
         when IfcBuilding
           puts 'add default storey'
           @default_related_object = IfcBuildingStorey.new( @ifc_model )
+          @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Building Storey" )
+          @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Building Storey" )
         end
         
         # add new default object to the model hierarchy
