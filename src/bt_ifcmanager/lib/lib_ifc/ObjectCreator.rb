@@ -1,6 +1,6 @@
 #  ObjectCreator.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -79,26 +79,31 @@ module BimTools
         # check the element type and set the correct parent in the spacialhierarchy
         case ifc_entity.class.to_s
         when 'BimTools::IFC2X3::IfcSite'
-          #ifc_model.site = true
           parent_ifc = ifc_model.project
           next_parent_site = ifc_entity
         when 'BimTools::IFC2X3::IfcBuilding'
-          #ifc_model.building = true
           if parent_site.nil? # create new site
             parent_site = ifc_model.project.get_default_related_object
           end
           parent_ifc = parent_site
-          puts 'building parent???'
           next_parent_building = ifc_entity
         when 'BimTools::IFC2X3::IfcBuildingStorey'
-          #ifc_model.buildingstorey = true
           if parent_building.nil? # create new building
+            if parent_site.nil? # create new site
+              parent_site = ifc_model.project.get_default_related_object
+            end
             parent_building = parent_site.get_default_related_object
           end
           parent_ifc = parent_building
           next_parent_buildingstorey = ifc_entity
         when 'BimTools::IFC2X3::IfcSpace'
           if parent_buildingstorey.nil? # create new buildingstorey
+            if parent_building.nil? # create new building
+              if parent_site.nil? # create new site
+                parent_site = ifc_model.project.get_default_related_object
+              end
+              parent_building = parent_site.get_default_related_object
+            end
             parent_buildingstorey = parent_building.get_default_related_object
           end
           parent_space = ifc_entity

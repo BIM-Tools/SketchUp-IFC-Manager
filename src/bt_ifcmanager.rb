@@ -1,6 +1,6 @@
 #  bt_ifcmanager.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -35,10 +35,10 @@ module BimTools
       PLUGIN_IMAGE_PATH = File.join(PLUGIN_PATH, 'images')
 
       bimserver_extension = SketchupExtension.new("IFC Manager", File.join(PLUGIN_PATH, 'loader.rb'))
-      bimserver_extension.version = '2.0.0-alpha2'
+      bimserver_extension.version = '2.0.0-beta1'
       bimserver_extension.description = 'IFC data manager and exporter for SketchUp.'
       bimserver_extension.creator = 'BIM-Tools'
-      bimserver_extension.copyright = '2017'
+      bimserver_extension.copyright = '2018'
       Sketchup.register_extension(bimserver_extension, true)
     else
       UI.messagebox "You need at least SketchUp Pro 2016 to use this extension."

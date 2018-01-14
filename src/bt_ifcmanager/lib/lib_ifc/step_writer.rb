@@ -1,6 +1,6 @@
 #  step_writer.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ module BimTools
       step_objects = Array.new
       step_objects << 'HEADER'
       step_objects << "FILE_DESCRIPTION (('ViewDefinition [CoordinationView]'), '2;1')"
-      step_objects << "FILE_NAME ('', '" + timestamp + "', (''), (''), 'IFC-manager for SketchUp (2.0)', '" + originating_system + "', '')"
+      step_objects << "FILE_NAME ('', '" + timestamp + "', (''), (''), 'IFC-manager for SketchUp (2.0.0-beta1)', '" + originating_system + "', '')"
       step_objects << "FILE_SCHEMA (('IFC2X3'))"
       step_objects << 'ENDSEC'
       return step_objects

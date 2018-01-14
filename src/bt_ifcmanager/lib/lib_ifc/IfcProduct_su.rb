@@ -1,6 +1,6 @@
-#  IfcProject.rb
+#  IfcProduct_su.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -46,6 +46,10 @@ module BimTools
         
         # get properties from su object and add them to ifc object
         definition = instance.definition
+        
+        #(?) set name, here? is this a duplicate?
+        self.name = BimTools::IfcManager::IfcLabel.new( definition.name )
+        
         if definition.attribute_dictionaries
           if dict = definition.attribute_dictionaries['IFC 2x3']
             properties.each do |prop|
@@ -100,7 +104,7 @@ module BimTools
         collect_psets( ifc_model, instance.definition )
         collect_classifications( ifc_model, instance.definition )
       end      
-    end # def sketchup
+    end # def initialize
       
     def collect_psets( ifc_model, su_ent )
       if su_ent.attribute_dictionaries

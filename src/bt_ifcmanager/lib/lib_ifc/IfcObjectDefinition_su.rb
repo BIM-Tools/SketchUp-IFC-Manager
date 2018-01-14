@@ -1,6 +1,6 @@
-#  IfcProject.rb
+#  IfcObjectDefinition_su.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -63,17 +63,23 @@ module BimTools
           @default_related_object = IfcSite.new( @ifc_model )
           @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Site" )
           @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Site" )
+          parent_objectplacement = nil
         when IfcSite
           puts 'add default building'
           @default_related_object = IfcBuilding.new( @ifc_model )
           @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Building" )
           @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Building" )
+          parent_objectplacement = self.objectplacement
         when IfcBuilding
           puts 'add default storey'
           @default_related_object = IfcBuildingStorey.new( @ifc_model )
           @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Building Storey" )
           @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Building Storey" )
+          parent_objectplacement = self.objectplacement
         end
+        
+        @default_related_object.parent = self
+        @default_related_object.objectplacement = IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new, parent_objectplacement )
         
         # add new default object to the model hierarchy
         add_related_object( @default_related_object )

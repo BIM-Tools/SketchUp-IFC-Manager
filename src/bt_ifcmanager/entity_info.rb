@@ -1,6 +1,6 @@
 #  entity_info.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -41,19 +41,19 @@ module BimTools
         end
       end # def update
 
-      def add_submit()
-        save = SKUI::Button.new( "Save" )
-        
-        save.on( :click ) { |control, value| # (?) Second argument needed?
-          update_type
-          update_nlsfb
-          update_name
-          update_materials
-          update_layers
-        }
-        
-        @section.add_control( save )
-      end # def submit
+      #def add_submit()
+      #  save = SKUI::Button.new( "Save" )
+      #  
+      #  save.on( :click ) { |control, value| # (?) Second argument needed?
+      #    update_type
+      #    update_nlsfb
+      #    update_name
+      #    update_materials
+      #    update_layers
+      #  }
+      #  
+      #  @section.add_control( save )
+      #end # def submit
 
       def add_name( entity )
         if entity.is_a?( Sketchup::ComponentInstance )
@@ -64,9 +64,9 @@ module BimTools
         @name = SKUI::Textbox.new( name )
         lbl = SKUI::Label.new( 'Name:', @name )
         
-        @save_name = SKUI::Button.new( "" )
-        @save_name.width = 20
-        @save_name.height = 20
+        #@save_name = SKUI::Button.new( "" )
+        #@save_name.width = 20
+        #@save_name.height = 20
 
         # get list of used component names
         list = Array.new
@@ -90,11 +90,11 @@ module BimTools
           PropertiesWindow.window.webdialog.execute_script(js_command)
         }
         
-        @name.on( :keypress) { |control, value| # (?) Second argument needed?
-        puts 'keypresssss'
-        puts control
-        puts value
-        }
+        #@name.on( :keypress) { |control, value| # (?) Second argument needed?
+        #puts 'keypresssss'
+        #puts control
+        #puts value
+        #}
         
         @name.on( :blur || :textchange ) { |control, value| # (?) Second argument needed?
           model = Sketchup.active_model
@@ -128,15 +128,15 @@ module BimTools
         }
         
         # on click: save
-        @save_name.on( :click ) { |control, value| # (?) Second argument needed?
-          #js_command = "$('#" + control.ui_id + "_ui').next.focus();"
-          js_command = "alert($('#" + control.ui_id + "_ui'));"
-          PropertiesWindow.window.webdialog.execute_script(js_command)
-          puts 'save!!!'
-        }
+        #@save_name.on( :click ) { |control, value| # (?) Second argument needed?
+        #  #js_command = "$('#" + control.ui_id + "_ui').next.focus();"
+        #  js_command = "alert($('#" + control.ui_id + "_ui'));"
+        #  PropertiesWindow.window.webdialog.execute_script(js_command)
+        #  puts 'save!!!'
+        #}
 
         @section.add_control( lbl )
-        @section.add_control( @save_name )
+        #@section.add_control( @save_name )
         @section.add_control( @name )
       end # def add_name
 
@@ -323,6 +323,18 @@ module BimTools
         @section.add_control( @layers )
 
       end # def add_layers
+      
+      # def add_provisionforvoid
+      
+        # properties = ['Shape','Width','Height','Diameter','Depth','System']
+        # properties.each do |prop|
+          # txt = SKUI::Textbox.new()
+          # lbl = SKUI::Label.new( prop + ":", prop )
+          # @section.add_control( lbl )
+          # @section.add_control( txt )
+        # end
+      
+      # end
 
       def add_nlsfb( entity )
         entity = Sketchup.active_model.selection[0]
@@ -467,7 +479,8 @@ module BimTools
       #add_description( Sketchup.active_model.selection[0] )
       add_materials()
       add_layers()
-      add_submit()
+      #add_submit()
+      #add_provisionforvoid()
       
       update(Sketchup.active_model.selection)
     end # module EntityInfo
