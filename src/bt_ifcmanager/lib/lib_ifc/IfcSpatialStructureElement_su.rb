@@ -1,4 +1,4 @@
-#  IfcProject.rb
+#  IfcSpatialStructureElement_su.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
 #

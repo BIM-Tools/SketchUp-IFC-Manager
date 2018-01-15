@@ -79,7 +79,20 @@ module BimTools
         end
         
         @default_related_object.parent = self
-        @default_related_object.objectplacement = IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new, parent_objectplacement )
+        if parent_objectplacement
+          transformation = parent_objectplacement.ifc_total_transformation
+        else
+          transformation = Geom::Transformation.new
+        end
+        @default_related_object.objectplacement = IfcLocalPlacement.new(@ifc_model, transformation, parent_objectplacement )
+        
+        # set elevation for buildingstorey
+        # (?) is this the best place to define building storey elevation?
+        # could be better set from within IfcBuildingStorey?
+        if @default_related_object.is_a?( IfcBuildingStorey )
+          elevation = @default_related_object.objectplacement.ifc_total_transformation.origin.z.to_mm
+          @default_related_object.elevation = BimTools::IfcManager::IfcLengthMeasure.new( elevation )
+        end
         
         # add new default object to the model hierarchy
         add_related_object( @default_related_object )

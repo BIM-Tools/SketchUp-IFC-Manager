@@ -32,7 +32,7 @@
 # parent_building = ifc building above this one in the hierarchy
 # parent_site = ifc site above this one in the hierarchy
 
-
+require_relative 'IfcLengthMeasure.rb'
 require_relative File.join('IFC2X3', 'IfcSpatialStructureElement.rb')
 require_relative File.join('IFC2X3', 'IfcSite.rb')
 require_relative File.join('IFC2X3', 'IfcBuilding.rb')
@@ -213,13 +213,21 @@ module BimTools
       # create objectplacement for ifc_entity
       # set objectplacement based on transformation
       if ifc_entity
-        if parent_ifc.is_a?(IfcProject)
+        if parent_ifc.is_a?( IfcProject )
           parent_objectplacement = nil
         else
           parent_objectplacement = parent_ifc.objectplacement
         end
         
         ifc_entity.objectplacement = IfcLocalPlacement.new(ifc_model, su_total_transformation, parent_objectplacement )
+        
+        # set elevation for buildingstorey
+        # (?) is this the best place to define building storey elevation?
+        # could be better set from within IfcBuildingStorey?
+        if ifc_entity.is_a?( IfcBuildingStorey )
+          elevation = ifc_entity.objectplacement.ifc_total_transformation.origin.z.to_mm
+          ifc_entity.elevation = BimTools::IfcManager::IfcLengthMeasure.new( elevation )
+        end
         
         #ifc_entity.objectplacement.set_transformation( 
         #unless parent_ifc.is_a?(IfcProject) # (?) check unnecessary?

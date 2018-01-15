@@ -190,7 +190,10 @@ module BimTools
               entity.definition.remove_classification("IFC 2x3", selected)
             end
           else
-            entity.definition.add_classification("IFC 2x3", control.value)
+            unless entity.definition.add_classification("IFC 2x3", control.value)
+			  notification = UI::Notification.new(IFCMANAGER_EXTENSION, "Unable to save IFC entity type. Is the IFC classification system loaded?")
+              notification.show
+			end
           end
 
           PropertiesWindow.update

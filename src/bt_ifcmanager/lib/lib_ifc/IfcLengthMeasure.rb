@@ -1,6 +1,6 @@
-#  IfcReal.rb
+#  IfcLengthMeasure.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,25 +19,11 @@
 #
 #
 
-require_relative 'Ifc_Type.rb'
+require_relative 'IfcReal.rb'
 
 module BimTools
  module IfcManager
-  class IfcReal < Ifc_Type
-    def initialize( value )
-      begin
-        @value = value.to_f
-      rescue StandardError, TypeError => e
-        print value + "cannot be converted to a Float" + e
-      end
-    end # def initialize
-    def step()
-      val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
-      if @long
-        val = add_long( val )
-      end
-      return val
-    end # def step
-  end # class IfcReal
+  class IfcLengthMeasure < IfcReal
+  end # class IfcLengthMeasure
  end # module IfcManager
 end # module BimTools
