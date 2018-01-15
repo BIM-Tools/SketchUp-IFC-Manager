@@ -44,36 +44,41 @@ module BimTools
         vertices = Hash.new
         su_faces.each do |ent|
           if ent.is_a? Sketchup::Face
-            ent.vertices.each do |vert|
-              unless vertices[vert]
-                vertices[vert] = IfcCartesianPoint.new( ifc_model, vert.position.transform(su_transformation))
-              end
-            end
-            face = IfcFace.new( ifc_model )
-            face.bounds = IfcManager::Ifc_Set.new()
-            faces << face
             
-            
-            # collect all loops/bounds for su face
-            ent.loops.each do | loop |
-              points = Array.new
-              
-              # differenciate between inner and outer loops/bounds
-              if loop == ent.outer_loop
-                bound = IfcFaceOuterBound.new( ifc_model )
-              else
-                bound = IfcFaceBound.new( ifc_model )
+            #skip hidden faces
+            #(!) add option to export hidden objects
+            unless ent.hidden?
+              ent.vertices.each do |vert|
+                unless vertices[vert]
+                  vertices[vert] = IfcCartesianPoint.new( ifc_model, vert.position.transform(su_transformation))
+                end
               end
+              face = IfcFace.new( ifc_model )
+              face.bounds = IfcManager::Ifc_Set.new()
+              faces << face
               
-              # add loop/bound to face
-              face.bounds.add bound
-              loop.vertices.each do |vert|
-                points << vertices[vert]
+              
+              # collect all loops/bounds for su face
+              ent.loops.each do | loop |
+                points = Array.new
+                
+                # differenciate between inner and outer loops/bounds
+                if loop == ent.outer_loop
+                  bound = IfcFaceOuterBound.new( ifc_model )
+                else
+                  bound = IfcFaceBound.new( ifc_model )
+                end
+                
+                # add loop/bound to face
+                face.bounds.add bound
+                loop.vertices.each do |vert|
+                  points << vertices[vert]
+                end
+                polyloop = IfcPolyLoop.new( ifc_model )
+                bound.bound = polyloop
+                bound.orientation = '.T.' # (?) always true?
+                polyloop.polygon = IfcManager::Ifc_Set.new( points )
               end
-              polyloop = IfcPolyLoop.new( ifc_model )
-              bound.bound = polyloop
-              bound.orientation = '.T.' # (?) always true?
-              polyloop.polygon = IfcManager::Ifc_Set.new( points )
             end
           end
         end

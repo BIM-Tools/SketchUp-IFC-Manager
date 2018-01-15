@@ -164,9 +164,13 @@ module BimTools
         sketchup_objects.entities.each do | ent |
           if ent.is_a?(Sketchup::Group) || ent.is_a?(Sketchup::ComponentInstance)
           
-            transformation = Geom::Transformation.new
-            ObjectCreator.new( self, ent, transformation, @project )
-          
+            # skip hidden objects
+            #(?) add option to export hidden objects
+            unless ent.hidden?
+              transformation = Geom::Transformation.new
+              ObjectCreator.new( self, ent, transformation, @project )
+            end
+            
             # require_relative File.join('IFC2X3', 'IfcBuildingElementProxy.rb')
             # entity = IfcBuildingElementProxy.new( self, ent )
             # building_storey_container.relatedelements.add( entity )
