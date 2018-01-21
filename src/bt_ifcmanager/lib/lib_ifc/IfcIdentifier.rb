@@ -26,12 +26,11 @@ module BimTools
   class IfcIdentifier < Ifc_Type
     def initialize( value )
       begin
-        @value = value.to_s
+      
+        # IfcIdentifier may not be longer than 255 characters
+        @value = value.to_s[0..254]
       rescue StandardError, TypeError => e
-        print value + "cannot be converted to a String" + e
-        
-        # (!) Identifier may not be longer than 255 characters
-        
+        print "cannot be converted to a String" + e.to_s
       end
     end # def initialize
     def step()

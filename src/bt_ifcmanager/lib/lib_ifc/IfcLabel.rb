@@ -26,12 +26,11 @@ module BimTools
   class IfcLabel < Ifc_Type
     def initialize( value )
       begin
-        @value = value.to_s
+        
+        # IfcLabel may not be longer than 255 characters
+        @value = value.to_s[0..254]
       rescue StandardError, TypeError => e
-        print value + "cannot be converted to a String" + e
-        
-        # (!) Label may not be longer than 255 characters
-        
+        print "cannot be converted to a String" + e.to_s
       end
     end # def initialize
     

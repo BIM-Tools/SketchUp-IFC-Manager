@@ -54,6 +54,14 @@ module BimTools
         end
         str_replace = string.gsub($!.error_char, replace_char)
       end
+      
+      # replace all end of lines and quotes
+      str_replace = str_replace.gsub("\\", '\X\\\5c')
+      str_replace = str_replace.gsub("`", '\X\\\60')
+      str_replace = str_replace.gsub("'", '\X\\\91')
+      str_replace = str_replace.gsub("’", '\X\\\92')
+      str_replace = str_replace.gsub(/\n/, '\X\\\0d')
+      
       return str_replace
     end
     
