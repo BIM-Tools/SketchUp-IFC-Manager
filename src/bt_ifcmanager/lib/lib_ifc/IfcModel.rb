@@ -54,7 +54,21 @@ module BimTools
     
     # creates an IFC model based on given su model
     # (?) could be enhanced to also accept other sketchup objects
-    def initialize( su_model )
+    def initialize( su_model, options = {} )
+      
+      defaults = {
+        :ifc_entities     => true, # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], true means all
+        :hidden           => false, # include hidden sketchup objects
+        :all_attributes   => false, # add all SketchUp attributes as IfcPropertySets
+        :classifications  => true, # add all SketchUp classifications
+        :layers           => true, # create IfcPresentationLayerAssignments
+        :materials        => true, # create IfcMaterials
+        :styles           => true, # create IfcStyledItems
+        :fast_guid        => false # create simplified guids
+      }
+      active_options = defaults.merge( options )
+      @options = active_options
+      
       @su_model = su_model
       @ifc_id = 0
       @export_summary = Hash.new

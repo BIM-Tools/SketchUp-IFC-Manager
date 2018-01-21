@@ -37,6 +37,17 @@ module BimTools
       
       su_model = Sketchup.active_model
       
+      options = {
+        #:ifc_entities     => true,   # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], true means all
+        #:hidden           => false,  # include hidden sketchup objects
+        #:all_attributes   => false,  # add all SketchUp attributes as IfcPropertySets
+        #:classifications  => true,   # add all SketchUp classifications
+        #:layers           => true,   # create IfcPresentationLayerAssignments
+        #:materials        => true,   # create IfcMaterials
+        #:styles           => true,   # create IfcStyledItems
+        #:fast_guid        => false   # create simplified guids
+      }
+      
       # update all IFC name fields with the component definition name
       # (?) is this necessary, or should this already be 100% correct at the time of export?
       su_model.start_operation('Update IFC data', true)
@@ -49,7 +60,7 @@ module BimTools
       end
       
       # create new IfcModel
-      ifc_model = IfcModel.new( su_model )
+      ifc_model = IfcModel.new( su_model, options )
       
       # get total time
       puts "finished creating IFC entities: " + (Time.now - timer).to_s
