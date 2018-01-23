@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :secondrepeatfactor
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcTwoDirectionRepeatFactor
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["RepeatFactor", "SecondRepeatFactor"]
+      return [:RepeatFactor, :SecondRepeatFactor]
     end # def properties
   end # class IfcTwoDirectionRepeatFactor
  end # module IFC2X3

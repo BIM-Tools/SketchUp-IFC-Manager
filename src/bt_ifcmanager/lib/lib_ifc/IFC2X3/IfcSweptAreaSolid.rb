@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :sweptarea, :position
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcSweptAreaSolid
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["SweptArea", "Position"]
+      return [:SweptArea, :Position]
     end # def properties
   end # class IfcSweptAreaSolid
  end # module IFC2X3

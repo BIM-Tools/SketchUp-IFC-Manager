@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :curvefont, :curvewidth, :curvecolour
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcCurveStyle
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "CurveFont", "CurveWidth", "CurveColour"]
+      return [:Name, :CurveFont, :CurveWidth, :CurveColour]
     end # def properties
   end # class IfcCurveStyle
  end # module IFC2X3

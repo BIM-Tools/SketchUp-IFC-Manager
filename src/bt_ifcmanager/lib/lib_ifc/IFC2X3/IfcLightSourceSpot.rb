@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :orientation, :concentrationexponent, :spreadangle, :beamwidthangle
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcLightSourceSpot
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "LightColour", "AmbientIntensity", "Intensity", "Position", "Radius", "ConstantAttenuation", "DistanceAttenuation", "QuadricAttenuation", "Orientation", "ConcentrationExponent", "SpreadAngle", "BeamWidthAngle"]
+      return [:Name, :LightColour, :AmbientIntensity, :Intensity, :Position, :Radius, :ConstantAttenuation, :DistanceAttenuation, :QuadricAttenuation, :Orientation, :ConcentrationExponent, :SpreadAngle, :BeamWidthAngle]
     end # def properties
   end # class IfcLightSourceSpot
  end # module IFC2X3

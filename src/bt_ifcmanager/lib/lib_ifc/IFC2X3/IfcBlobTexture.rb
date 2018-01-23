@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :rasterformat, :rastercode
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcBlobTexture
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["RepeatS", "RepeatT", "TextureType", "TextureTransform", "RasterFormat", "RasterCode"]
+      return [:RepeatS, :RepeatT, :TextureType, :TextureTransform, :RasterFormat, :RasterCode]
     end # def properties
   end # class IfcBlobTexture
  end # module IFC2X3

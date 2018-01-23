@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :intent, :relatingconstraint
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcRelAssociatesConstraint
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["GlobalId", "OwnerHistory", "Name", "Description", "RelatedObjects", "Intent", "RelatingConstraint"]
+      return [:GlobalId, :OwnerHistory, :Name, :Description, :RelatedObjects, :Intent, :RelatingConstraint]
     end # def properties
   end # class IfcRelAssociatesConstraint
  end # module IFC2X3

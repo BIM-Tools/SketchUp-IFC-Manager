@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :depth, :width, :thickness, :filletradius, :edgeradius, :legslope, :centreofgravityinx, :centreofgravityiny
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcLShapeProfileDef
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["ProfileType", "ProfileName", "Position", "Depth", "Width", "Thickness", "FilletRadius", "EdgeRadius", "LegSlope", "CentreOfGravityInX", "CentreOfGravityInY"]
+      return [:ProfileType, :ProfileName, :Position, :Depth, :Width, :Thickness, :FilletRadius, :EdgeRadius, :LegSlope, :CentreOfGravityInX, :CentreOfGravityInY]
     end # def properties
   end # class IfcLShapeProfileDef
  end # module IFC2X3

@@ -24,15 +24,12 @@ require_relative File.join('IFC2X3', 'IfcShapeRepresentation.rb')
 
 module BimTools
   module IfcProductDefinitionShape_su
-    
-    include IFC2X3
-    
     def initialize(ifc_model, sketchup)
       super
       if sketchup.is_a? Sketchup::ComponentDefinition
         
         # set representation based on definition
-        self.representations = IfcManager::Ifc_List.new([IfcShapeRepresentation.new( ifc_model , sketchup)])
+        @representations = IfcManager::Ifc_List.new([BimTools::IFC2X3::IfcShapeRepresentation.new( ifc_model , sketchup)])
       end
     end # def sketchup
   end # module IfcProductDefinitionShape_su

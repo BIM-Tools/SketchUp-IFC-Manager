@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :predefinedtype, :nominaldiameter, :crosssectionarea, :tensionforce, :prestress, :frictioncoefficient, :anchorageslip, :mincurvatureradius
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcTendon
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["GlobalId", "OwnerHistory", "Name", "Description", "ObjectType", "ObjectPlacement", "Representation", "Tag", "SteelGrade", "PredefinedType", "NominalDiameter", "CrossSectionArea", "TensionForce", "PreStress", "FrictionCoefficient", "AnchorageSlip", "MinCurvatureRadius"]
+      return [:GlobalId, :OwnerHistory, :Name, :Description, :ObjectType, :ObjectPlacement, :Representation, :Tag, :SteelGrade, :PredefinedType, :NominalDiameter, :CrossSectionArea, :TensionForce, :PreStress, :FrictionCoefficient, :AnchorageSlip, :MinCurvatureRadius]
     end # def properties
   end # class IfcTendon
  end # module IFC2X3

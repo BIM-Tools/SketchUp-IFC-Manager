@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :thickness
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcCenterLineProfileDef
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["ProfileType", "ProfileName", "Curve", "Thickness"]
+      return [:ProfileType, :ProfileName, :Curve, :Thickness]
     end # def properties
   end # class IfcCenterLineProfileDef
  end # module IFC2X3

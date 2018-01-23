@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :liningdepth, :liningthickness, :transomthickness, :mullionthickness, :firsttransomoffset, :secondtransomoffset, :firstmullionoffset, :secondmullionoffset, :shapeaspectstyle
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcWindowLiningProperties
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["GlobalId", "OwnerHistory", "Name", "Description", "LiningDepth", "LiningThickness", "TransomThickness", "MullionThickness", "FirstTransomOffset", "SecondTransomOffset", "FirstMullionOffset", "SecondMullionOffset", "ShapeAspectStyle"]
+      return [:GlobalId, :OwnerHistory, :Name, :Description, :LiningDepth, :LiningThickness, :TransomThickness, :MullionThickness, :FirstTransomOffset, :SecondTransomOffset, :FirstMullionOffset, :SecondMullionOffset, :ShapeAspectStyle]
     end # def properties
   end # class IfcWindowLiningProperties
  end # module IFC2X3

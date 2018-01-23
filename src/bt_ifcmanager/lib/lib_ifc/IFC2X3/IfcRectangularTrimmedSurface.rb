@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :basissurface, :u1, :v1, :u2, :v2, :usense, :vsense
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcRectangularTrimmedSurface
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["BasisSurface", "U1", "V1", "U2", "V2", "Usense", "Vsense"]
+      return [:BasisSurface, :U1, :V1, :U2, :V2, :Usense, :Vsense]
     end # def properties
   end # class IfcRectangularTrimmedSurface
  end # module IFC2X3

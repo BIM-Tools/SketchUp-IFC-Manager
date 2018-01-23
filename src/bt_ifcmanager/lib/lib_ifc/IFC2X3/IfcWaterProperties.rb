@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :ispotable, :hardness, :alkalinityconcentration, :acidityconcentration, :impuritiescontent, :phlevel, :dissolvedsolidscontent
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcWaterProperties
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Material", "IsPotable", "Hardness", "AlkalinityConcentration", "AcidityConcentration", "ImpuritiesContent", "PHLevel", "DissolvedSolidsContent"]
+      return [:Material, :IsPotable, :Hardness, :AlkalinityConcentration, :AcidityConcentration, :ImpuritiesContent, :PHLevel, :DissolvedSolidsContent]
     end # def properties
   end # class IfcWaterProperties
  end # module IFC2X3

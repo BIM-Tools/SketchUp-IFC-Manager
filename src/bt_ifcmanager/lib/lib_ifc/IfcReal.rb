@@ -19,11 +19,9 @@
 #
 #
 
-require_relative 'Ifc_Type.rb'
-
 module BimTools
  module IfcManager
-  class IfcReal < Ifc_Type
+  class IfcReal
     def initialize( value )
       begin
         @value = value.to_f

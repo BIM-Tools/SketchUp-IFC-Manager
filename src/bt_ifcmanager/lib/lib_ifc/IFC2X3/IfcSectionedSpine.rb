@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :spinecurve, :crosssections, :crosssectionpositions
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcSectionedSpine
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["SpineCurve", "CrossSections", "CrossSectionPositions"]
+      return [:SpineCurve, :CrossSections, :CrossSectionPositions]
     end # def properties
   end # class IfcSectionedSpine
  end # module IFC2X3

@@ -28,12 +28,13 @@ module BimTools
     # Old method: faster, but not a correct IfcGloballyUniqueId, just a random number
     # the leading 0 is added because the first character is only 1 bit and can only contain a 0,1,2 or 3.
     # while all other characters are 6 bits (64 possible values)
-    #guid = '';21.times{|i|guid<<'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$'[rand(64)]}
-    #guid = "'0" + guid + "'"
+    guid = '';21.times{|i|guid<<'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$'[rand(64)]}
+    first = rand(0...3).to_s
+    guid = "#{first}#{guid}"
     
     # possible characters in GUID
-    guid64 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$'
-    guid = ""
+    #guid64 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$'
+    #guid = ""
     
     # SecureRandom.uuid: creates a 128 bit UUID hex string
     # tr('-', ''): removes the dashes from the hex string
@@ -43,13 +44,13 @@ module BimTools
     # unpack('b*'): converts the binary number to a bit string (128 0's and 1's) and places it into an array
     # [0]: gets the first (and only) value from the array
     # to_s.scan(/.{1,6}/m): chops the string into pieces 6 characters(bits) with the leftover on the end.
-    [SecureRandom.uuid.tr('-', '')].pack('H*').unpack('b*')[0].to_s.scan(/.{1,6}/m).each do |num|
-    
-      # take the number (0 - 63) and find the matching character in guid64, add the found character to the guid string
-      guid << guid64[num.to_i(2)]
-    end
-    guid.reverse!
-    guid = "'" + guid + "'"
+    #[SecureRandom.uuid.tr('-', '')].pack('H*').unpack('b*')[0].to_s.scan(/.{1,6}/m).each do |num|
+    #
+    #  # take the number (0 - 63) and find the matching character in guid64, add the found character to the guid string
+    #  guid << guid64[num.to_i(2)]
+    #end
+    #guid.reverse!
+    return "'#{guid}'"
     #return guid
   end
  end # module IfcManager

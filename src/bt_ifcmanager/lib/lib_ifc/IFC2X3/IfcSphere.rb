@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :radius
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcSphere
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Position", "Radius"]
+      return [:Position, :Radius]
     end # def properties
   end # class IfcSphere
  end # module IFC2X3

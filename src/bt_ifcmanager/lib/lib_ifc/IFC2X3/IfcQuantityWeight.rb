@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :weightvalue
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcQuantityWeight
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "Description", "Unit", "WeightValue"]
+      return [:Name, :Description, :Unit, :WeightValue]
     end # def properties
   end # class IfcQuantityWeight
  end # module IFC2X3

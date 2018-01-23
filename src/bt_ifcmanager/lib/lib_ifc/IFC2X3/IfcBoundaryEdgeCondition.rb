@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :linearstiffnessbylengthx, :linearstiffnessbylengthy, :linearstiffnessbylengthz, :rotationalstiffnessbylengthx, :rotationalstiffnessbylengthy, :rotationalstiffnessbylengthz
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcBoundaryEdgeCondition
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "LinearStiffnessByLengthX", "LinearStiffnessByLengthY", "LinearStiffnessByLengthZ", "RotationalStiffnessByLengthX", "RotationalStiffnessByLengthY", "RotationalStiffnessByLengthZ"]
+      return [:Name, :LinearStiffnessByLengthX, :LinearStiffnessByLengthY, :LinearStiffnessByLengthZ, :RotationalStiffnessByLengthX, :RotationalStiffnessByLengthY, :RotationalStiffnessByLengthZ]
     end # def properties
   end # class IfcBoundaryEdgeCondition
  end # module IFC2X3

@@ -41,8 +41,6 @@ module BimTools
  module IfcManager
   class IfcModel
     
-    include IFC2X3
-    
     # (?) possible additional methods:
     # - get_ifc_objects(hash ifc->su)
     # - get_su_objects(hash su->ifc)
@@ -135,7 +133,7 @@ module BimTools
     
     # create new IfcProject
     def create_project( su_model )
-      project = IfcProject.new(self)
+      project = BimTools::IFC2X3::IfcProject.new(self)
       project.name = BimTools::IfcManager::IfcLabel.new( su_model.name )
       project.description = BimTools::IfcManager::IfcText.new( su_model.description )
       return project
@@ -143,13 +141,13 @@ module BimTools
     
     # Create new IfcOwnerHistory
     def create_ownerhistory()
-      owner_history = IfcOwnerHistory.new( self )
-      owner_history.owninguser = IfcPersonAndOrganization.new( self )
-      owner_history.owninguser.theperson = IfcPerson.new( self )
+      owner_history = BimTools::IFC2X3::IfcOwnerHistory.new( self )
+      owner_history.owninguser = BimTools::IFC2X3::IfcPersonAndOrganization.new( self )
+      owner_history.owninguser.theperson = BimTools::IFC2X3::IfcPerson.new( self )
       owner_history.owninguser.theperson.familyname = BimTools::IfcManager::IfcLabel.new( "" )
-      owner_history.owninguser.theorganization = IfcOrganization.new( self )
+      owner_history.owninguser.theorganization = BimTools::IFC2X3::IfcOrganization.new( self )
       owner_history.owninguser.theorganization.name = BimTools::IfcManager::IfcLabel.new( "BIM-Tools" )
-      owner_history.owningapplication = IfcApplication.new( self )
+      owner_history.owningapplication = BimTools::IFC2X3::IfcApplication.new( self )
       owner_history.owningapplication.applicationdeveloper = owner_history.owninguser.theorganization
       owner_history.owningapplication.version = "'2.0'"
       owner_history.owningapplication.applicationfullname = "'IFC manager for sketchup'"
@@ -161,13 +159,13 @@ module BimTools
     
     # Create new IfcGeometricRepresentationContext
     def create_representationcontext()
-      representationcontext = IfcGeometricRepresentationContext.new( self )
+      representationcontext = BimTools::IFC2X3::IfcGeometricRepresentationContext.new( self )
       representationcontext.contexttype = "'Model'"
       representationcontext.coordinatespacedimension = '3'
-      representationcontext.worldcoordinatesystem = IfcAxis2Placement3D.new( self )
-      representationcontext.worldcoordinatesystem.location = IfcCartesianPoint.new( self )
+      representationcontext.worldcoordinatesystem = BimTools::IFC2X3::IfcAxis2Placement3D.new( self )
+      representationcontext.worldcoordinatesystem.location = BimTools::IFC2X3::IfcCartesianPoint.new( self )
       representationcontext.worldcoordinatesystem.location.coordinates = '(0., 0., 0.)'
-      representationcontext.truenorth = IfcDirection.new( self )
+      representationcontext.truenorth = BimTools::IFC2X3::IfcDirection.new( self )
       representationcontext.truenorth.directionratios = IfcManager::Ifc_Set.new(['0., 1., 0.'])
       return representationcontext
     end # def create_representationcontext

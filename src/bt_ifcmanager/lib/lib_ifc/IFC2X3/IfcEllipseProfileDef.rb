@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :semiaxis1, :semiaxis2
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcEllipseProfileDef
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["ProfileType", "ProfileName", "Position", "SemiAxis1", "SemiAxis2"]
+      return [:ProfileType, :ProfileName, :Position, :SemiAxis1, :SemiAxis2]
     end # def properties
   end # class IfcEllipseProfileDef
  end # module IFC2X3

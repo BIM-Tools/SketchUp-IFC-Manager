@@ -28,8 +28,7 @@ module BimTools
     def initialize(ifc_model, sketchup)
       
       # set default CompositionType
-      self.compositiontype = ".ELEMENT."
-      
+      @compositiontype = ".ELEMENT."
       super
     end # def ifcspatialstructureelement_su
       

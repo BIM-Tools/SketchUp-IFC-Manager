@@ -26,9 +26,6 @@ require_relative File.join('IFC2X3', 'IfcRelAggregates.rb')
 module BimTools
   module IfcObjectDefinition_su
     attr_reader :decomposes, :default_related_object
-    
-    include IFC2X3
-    
     def initialize(ifc_model, sketchup)
       super
       @ifc_model = ifc_model
@@ -43,7 +40,7 @@ module BimTools
       
       # if no decomposes exists, create one
       unless @decomposes
-        @decomposes = IfcRelAggregates.new(@ifc_model)
+        @decomposes = BimTools::IFC2X3::IfcRelAggregates.new(@ifc_model)
         @decomposes.relatingobject = self
         @decomposes.relatedobjects = BimTools::IfcManager::Ifc_Set.new()
       end
@@ -58,24 +55,24 @@ module BimTools
       
         # If it does not exist, then create
         case self
-        when IfcProject
+        when BimTools::IFC2X3::IfcProject
           puts 'add default site'
-          @default_related_object = IfcSite.new( @ifc_model )
+          @default_related_object = BimTools::IFC2X3::IfcSite.new( @ifc_model )
           @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Site" )
           @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Site" )
           parent_objectplacement = nil
-        when IfcSite
+        when BimTools::IFC2X3::IfcSite
           puts 'add default building'
-          @default_related_object = IfcBuilding.new( @ifc_model )
+          @default_related_object = BimTools::IFC2X3::IfcBuilding.new( @ifc_model )
           @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Building" )
           @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Building" )
-          parent_objectplacement = self.objectplacement
-        when IfcBuilding
+          parent_objectplacement = @objectplacement
+        when BimTools::IFC2X3::IfcBuilding
           puts 'add default storey'
-          @default_related_object = IfcBuildingStorey.new( @ifc_model )
+          @default_related_object = BimTools::IFC2X3::IfcBuildingStorey.new( @ifc_model )
           @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Building Storey" )
           @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Building Storey" )
-          parent_objectplacement = self.objectplacement
+          parent_objectplacement = @objectplacement
         end
         
         @default_related_object.parent = self
@@ -84,12 +81,12 @@ module BimTools
         else
           transformation = Geom::Transformation.new
         end
-        @default_related_object.objectplacement = IfcLocalPlacement.new(@ifc_model, transformation, parent_objectplacement )
+        @default_related_object.objectplacement = BimTools::IFC2X3::IfcLocalPlacement.new(@ifc_model, transformation, parent_objectplacement )
         
         # set elevation for buildingstorey
         # (?) is this the best place to define building storey elevation?
         # could be better set from within IfcBuildingStorey?
-        if @default_related_object.is_a?( IfcBuildingStorey )
+        if @default_related_object.is_a?( BimTools::IFC2X3::IfcBuildingStorey )
           elevation = @default_related_object.objectplacement.ifc_total_transformation.origin.z.to_mm
           @default_related_object.elevation = BimTools::IfcManager::IfcLengthMeasure.new( elevation )
         end
@@ -105,7 +102,7 @@ module BimTools
     
       # if no ifc_rel_contained_in_spatial_structure exists, create one
       unless @ifc_rel_contained_in_spatial_structure
-        @ifc_rel_contained_in_spatial_structure = IfcRelContainedInSpatialStructure.new(@ifc_model)
+        @ifc_rel_contained_in_spatial_structure = BimTools::IFC2X3::IfcRelContainedInSpatialStructure.new(@ifc_model)
         @ifc_rel_contained_in_spatial_structure.relatingstructure= self
         @ifc_rel_contained_in_spatial_structure.relatedelements = BimTools::IfcManager::Ifc_Set.new()
       end

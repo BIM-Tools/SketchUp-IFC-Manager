@@ -30,11 +30,11 @@ module BimTools
     include Step 
     include IfcCartesianPoint_su
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcCartesianPoint
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Coordinates"]
+      return [:Coordinates]
     end # def properties
   end # class IfcCartesianPoint
  end # module IFC2X3

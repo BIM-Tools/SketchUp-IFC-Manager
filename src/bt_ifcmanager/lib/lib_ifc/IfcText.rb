@@ -28,7 +28,7 @@ module BimTools
       begin
         @value = value.to_s
       rescue StandardError, TypeError => e
-        print value + "cannot be converted to a String" + e
+        print "#{value} cannot be converted to a String #{e}"
       end
     end # def initialize
     def step()

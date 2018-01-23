@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :thickness, :ribheight, :ribwidth, :ribspacing, :direction
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcRibPlateProfileProperties
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["ProfileName", "ProfileDefinition", "Thickness", "RibHeight", "RibWidth", "RibSpacing", "Direction"]
+      return [:ProfileName, :ProfileDefinition, :Thickness, :RibHeight, :RibWidth, :RibSpacing, :Direction]
     end # def properties
   end # class IfcRibPlateProfileProperties
  end # module IFC2X3

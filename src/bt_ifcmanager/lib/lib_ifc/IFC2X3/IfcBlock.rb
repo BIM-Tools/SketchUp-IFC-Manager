@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :xlength, :ylength, :zlength
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcBlock
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Position", "XLength", "YLength", "ZLength"]
+      return [:Position, :XLength, :YLength, :ZLength]
     end # def properties
   end # class IfcBlock
  end # module IFC2X3

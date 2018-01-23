@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :telephonenumbers, :facsimilenumbers, :pagernumber, :electronicmailaddresses, :wwwhomepageurl
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcTelecomAddress
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Purpose", "Description", "UserDefinedPurpose", "TelephoneNumbers", "FacsimileNumbers", "PagerNumber", "ElectronicMailAddresses", "WWWHomePageURL"]
+      return [:Purpose, :Description, :UserDefinedPurpose, :TelephoneNumbers, :FacsimileNumbers, :PagerNumber, :ElectronicMailAddresses, :WWWHomePageURL]
     end # def properties
   end # class IfcTelecomAddress
  end # module IFC2X3

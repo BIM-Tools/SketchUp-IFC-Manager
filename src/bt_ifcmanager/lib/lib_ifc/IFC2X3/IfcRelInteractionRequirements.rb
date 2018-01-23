@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :dailyinteraction, :importancerating, :locationofinteraction, :relatedspaceprogram, :relatingspaceprogram
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcRelInteractionRequirements
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["GlobalId", "OwnerHistory", "Name", "Description", "DailyInteraction", "ImportanceRating", "LocationOfInteraction", "RelatedSpaceProgram", "RelatingSpaceProgram"]
+      return [:GlobalId, :OwnerHistory, :Name, :Description, :DailyInteraction, :ImportanceRating, :LocationOfInteraction, :RelatedSpaceProgram, :RelatingSpaceProgram]
     end # def properties
   end # class IfcRelInteractionRequirements
  end # module IFC2X3

@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :nominalvalue, :unit
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcPropertySingleValue
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "Description", "NominalValue", "Unit"]
+      return [:Name, :Description, :NominalValue, :Unit]
     end # def properties
   end # class IfcPropertySingleValue
  end # module IFC2X3

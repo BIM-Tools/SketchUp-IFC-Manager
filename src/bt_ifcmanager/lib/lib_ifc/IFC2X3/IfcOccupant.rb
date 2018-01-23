@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :predefinedtype
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcOccupant
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["GlobalId", "OwnerHistory", "Name", "Description", "ObjectType", "TheActor", "PredefinedType"]
+      return [:GlobalId, :OwnerHistory, :Name, :Description, :ObjectType, :TheActor, :PredefinedType]
     end # def properties
   end # class IfcOccupant
  end # module IFC2X3

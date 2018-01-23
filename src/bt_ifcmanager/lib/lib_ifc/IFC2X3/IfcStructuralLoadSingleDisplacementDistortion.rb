@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :distortion
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcStructuralLoadSingleDisplacementDistortion
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "DisplacementX", "DisplacementY", "DisplacementZ", "RotationalDisplacementRX", "RotationalDisplacementRY", "RotationalDisplacementRZ", "Distortion"]
+      return [:Name, :DisplacementX, :DisplacementY, :DisplacementZ, :RotationalDisplacementRX, :RotationalDisplacementRY, :RotationalDisplacementRZ, :Distortion]
     end # def properties
   end # class IfcStructuralLoadSingleDisplacementDistortion
  end # module IFC2X3

@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :warpingstiffness
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcBoundaryNodeConditionWarping
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "LinearStiffnessX", "LinearStiffnessY", "LinearStiffnessZ", "RotationalStiffnessX", "RotationalStiffnessY", "RotationalStiffnessZ", "WarpingStiffness"]
+      return [:Name, :LinearStiffnessX, :LinearStiffnessY, :LinearStiffnessZ, :RotationalStiffnessX, :RotationalStiffnessY, :RotationalStiffnessZ, :WarpingStiffness]
     end # def properties
   end # class IfcBoundaryNodeConditionWarping
  end # module IFC2X3

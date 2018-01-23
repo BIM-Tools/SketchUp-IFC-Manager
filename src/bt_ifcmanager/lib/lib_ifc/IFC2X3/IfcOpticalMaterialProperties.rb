@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :visibletransmittance, :solartransmittance, :thermalirtransmittance, :thermaliremissivityback, :thermaliremissivityfront, :visiblereflectanceback, :visiblereflectancefront, :solarreflectancefront, :solarreflectanceback
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcOpticalMaterialProperties
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Material", "VisibleTransmittance", "SolarTransmittance", "ThermalIrTransmittance", "ThermalIrEmissivityBack", "ThermalIrEmissivityFront", "VisibleReflectanceBack", "VisibleReflectanceFront", "SolarReflectanceFront", "SolarReflectanceBack"]
+      return [:Material, :VisibleTransmittance, :SolarTransmittance, :ThermalIrTransmittance, :ThermalIrEmissivityBack, :ThermalIrEmissivityFront, :VisibleReflectanceBack, :VisibleReflectanceFront, :SolarReflectanceFront, :SolarReflectanceBack]
     end # def properties
   end # class IfcOpticalMaterialProperties
  end # module IFC2X3

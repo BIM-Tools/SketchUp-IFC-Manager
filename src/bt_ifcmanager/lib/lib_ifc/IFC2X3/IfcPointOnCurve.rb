@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :basiscurve, :pointparameter
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcPointOnCurve
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["BasisCurve", "PointParameter"]
+      return [:BasisCurve, :PointParameter]
     end # def properties
   end # class IfcPointOnCurve
  end # module IFC2X3

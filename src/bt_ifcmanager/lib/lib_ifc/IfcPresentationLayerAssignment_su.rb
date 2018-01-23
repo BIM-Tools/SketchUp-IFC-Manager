@@ -26,8 +26,8 @@ module BimTools
     def initialize(ifc_model, sketchup)
       if sketchup.is_a?( Sketchup::Layer )
         su_layer = sketchup
-        self.name = "'" + su_layer.name + "'"
-        self.assigneditems = IfcManager::Ifc_Set.new()
+        @name = "'#{su_layer.name}'"
+        @assigneditems = IfcManager::Ifc_Set.new()
       end
     end # def sketchup
   end # module IfcPresentationLayerAssignment_su

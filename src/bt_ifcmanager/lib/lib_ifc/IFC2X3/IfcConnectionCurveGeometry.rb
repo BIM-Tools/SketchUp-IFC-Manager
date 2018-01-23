@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :curveonrelatingelement, :curveonrelatedelement
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcConnectionCurveGeometry
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["CurveOnRelatingElement", "CurveOnRelatedElement"]
+      return [:CurveOnRelatingElement, :CurveOnRelatedElement]
     end # def properties
   end # class IfcConnectionCurveGeometry
  end # module IFC2X3

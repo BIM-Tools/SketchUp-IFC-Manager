@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :edgegeometry, :samesense
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcEdgeCurve
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["EdgeStart", "EdgeEnd", "EdgeGeometry", "SameSense"]
+      return [:EdgeStart, :EdgeEnd, :EdgeGeometry, :SameSense]
     end # def properties
   end # class IfcEdgeCurve
  end # module IFC2X3

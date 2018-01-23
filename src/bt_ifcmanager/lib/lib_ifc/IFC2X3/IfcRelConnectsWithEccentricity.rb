@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :connectionconstraint
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcRelConnectsWithEccentricity
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["GlobalId", "OwnerHistory", "Name", "Description", "RelatingStructuralMember", "RelatedStructuralConnection", "AppliedCondition", "AdditionalConditions", "SupportedLength", "ConditionCoordinateSystem", "ConnectionConstraint"]
+      return [:GlobalId, :OwnerHistory, :Name, :Description, :RelatingStructuralMember, :RelatedStructuralConnection, :AppliedCondition, :AdditionalConditions, :SupportedLength, :ConditionCoordinateSystem, :ConnectionConstraint]
     end # def properties
   end # class IfcRelConnectsWithEccentricity
  end # module IFC2X3

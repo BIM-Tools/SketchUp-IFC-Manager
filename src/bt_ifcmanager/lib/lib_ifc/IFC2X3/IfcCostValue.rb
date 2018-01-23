@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :costtype, :condition
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcCostValue
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "Description", "AppliedValue", "UnitBasis", "ApplicableDate", "FixedUntilDate", "CostType", "Condition"]
+      return [:Name, :Description, :AppliedValue, :UnitBasis, :ApplicableDate, :FixedUntilDate, :CostType, :Condition]
     end # def properties
   end # class IfcCostValue
  end # module IFC2X3

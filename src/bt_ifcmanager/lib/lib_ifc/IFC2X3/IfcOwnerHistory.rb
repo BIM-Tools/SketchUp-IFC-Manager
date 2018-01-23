@@ -27,10 +27,10 @@ module BimTools
     attr_accessor :ifc_id, :owninguser, :owningapplication, :state, :changeaction, :lastmodifieddate, :lastmodifyinguser, :lastmodifyingapplication, :creationdate
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcOwnerHistory
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
     end # def initialize 
     def properties()
-      return ["OwningUser", "OwningApplication", "State", "ChangeAction", "LastModifiedDate", "LastModifyingUser", "LastModifyingApplication", "CreationDate"]
+      return [:OwningUser, :OwningApplication, :State, :ChangeAction, :LastModifiedDate, :LastModifyingUser, :LastModifyingApplication, :CreationDate]
     end # def properties
   end # class IfcOwnerHistory
  end # module IFC2X3

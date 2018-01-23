@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :spaceprogramidentifier, :maxrequiredarea, :minrequiredarea, :requestedlocation, :standardrequiredarea
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcSpaceProgram
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["GlobalId", "OwnerHistory", "Name", "Description", "ObjectType", "SpaceProgramIdentifier", "MaxRequiredArea", "MinRequiredArea", "RequestedLocation", "StandardRequiredArea"]
+      return [:GlobalId, :OwnerHistory, :Name, :Description, :ObjectType, :SpaceProgramIdentifier, :MaxRequiredArea, :MinRequiredArea, :RequestedLocation, :StandardRequiredArea]
     end # def properties
   end # class IfcSpaceProgram
  end # module IFC2X3

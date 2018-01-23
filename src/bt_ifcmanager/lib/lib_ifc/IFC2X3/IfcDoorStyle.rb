@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :operationtype, :constructiontype, :parametertakesprecedence, :sizeable
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcDoorStyle
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["GlobalId", "OwnerHistory", "Name", "Description", "ApplicableOccurrence", "HasPropertySets", "RepresentationMaps", "Tag", "OperationType", "ConstructionType", "ParameterTakesPrecedence", "Sizeable"]
+      return [:GlobalId, :OwnerHistory, :Name, :Description, :ApplicableOccurrence, :HasPropertySets, :RepresentationMaps, :Tag, :OperationType, :ConstructionType, :ParameterTakesPrecedence, :Sizeable]
     end # def properties
   end # class IfcDoorStyle
  end # module IFC2X3

@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :benchmarkvalues, :resultvalues, :objectivequalifier, :userdefinedqualifier
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcObjective
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "Description", "ConstraintGrade", "ConstraintSource", "CreatingActor", "CreationTime", "UserDefinedGrade", "BenchmarkValues", "ResultValues", "ObjectiveQualifier", "UserDefinedQualifier"]
+      return [:Name, :Description, :ConstraintGrade, :ConstraintSource, :CreatingActor, :CreationTime, :UserDefinedGrade, :BenchmarkValues, :ResultValues, :ObjectiveQualifier, :UserDefinedQualifier]
     end # def properties
   end # class IfcObjective
  end # module IFC2X3

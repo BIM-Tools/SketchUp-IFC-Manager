@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :role
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcDimensionCurveTerminator
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Item", "Styles", "Name", "AnnotatedCurve", "Role"]
+      return [:Item, :Styles, :Name, :AnnotatedCurve, :Role]
     end # def properties
   end # class IfcDimensionCurveTerminator
  end # module IFC2X3

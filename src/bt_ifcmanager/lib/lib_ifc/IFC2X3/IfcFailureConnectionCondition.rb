@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :tensionfailurex, :tensionfailurey, :tensionfailurez, :compressionfailurex, :compressionfailurey, :compressionfailurez
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcFailureConnectionCondition
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "TensionFailureX", "TensionFailureY", "TensionFailureZ", "CompressionFailureX", "CompressionFailureY", "CompressionFailureZ"]
+      return [:Name, :TensionFailureX, :TensionFailureY, :TensionFailureZ, :CompressionFailureX, :CompressionFailureY, :CompressionFailureZ]
     end # def properties
   end # class IfcFailureConnectionCondition
  end # module IFC2X3

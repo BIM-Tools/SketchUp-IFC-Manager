@@ -27,10 +27,10 @@ module BimTools
     attr_accessor :ifc_id, :approvedproperties, :approval
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcApprovalPropertyRelationship
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
     end # def initialize 
     def properties()
-      return ["ApprovedProperties", "Approval"]
+      return [:ApprovedProperties, :Approval]
     end # def properties
   end # class IfcApprovalPropertyRelationship
  end # module IFC2X3

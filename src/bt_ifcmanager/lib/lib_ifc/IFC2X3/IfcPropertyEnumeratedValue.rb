@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :enumerationvalues, :enumerationreference
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcPropertyEnumeratedValue
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "Description", "EnumerationValues", "EnumerationReference"]
+      return [:Name, :Description, :EnumerationValues, :EnumerationReference]
     end # def properties
   end # class IfcPropertyEnumeratedValue
  end # module IFC2X3

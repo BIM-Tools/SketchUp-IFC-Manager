@@ -28,24 +28,21 @@ require_relative File.join('IFC2X3', 'IfcPropertySingleValue.rb')
 
 module BimTools
   module IfcRelDefinesByProperties_su
-    
-    include IFC2X3
-    
     def initialize(ifc_model, sketchup)
     
       # (!) this should be automatically created by root!!!
-      self.globalid = IfcManager::new_guid
-      self.ownerhistory = ifc_model.owner_history
+      @globalid = IfcManager::new_guid
+      @ownerhistory = ifc_model.owner_history
       
-      self.relatedobjects = IfcManager::Ifc_Set.new()
+      @relatedobjects = IfcManager::Ifc_Set.new()
       if sketchup.is_a?( Sketchup::AttributeDictionary )
         attr_dict = sketchup
-        pset = IfcPropertySet.new( ifc_model, attr_dict )
-        self.relatingpropertydefinition = pset
+        pset = BimTools::IFC2X3::IfcPropertySet.new( ifc_model, attr_dict )
+        @relatingpropertydefinition = pset
         pset.name = BimTools::IfcManager::IfcLabel.new( attr_dict.name ) unless attr_dict.name.nil?
         pset.hasproperties = IfcManager::Ifc_Set.new()
         attr_dict.each { | key, value |
-          prop = IfcPropertySingleValue.new( ifc_model, attr_dict )
+          prop = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model, attr_dict )
           prop.name = BimTools::IfcManager::IfcIdentifier.new( key ) 
           prop.nominalvalue = BimTools::IfcManager::IfcLabel.new( value ) # (!) not always IfcLabel
           prop.nominalvalue.long = true # adding long = true returns a full object string

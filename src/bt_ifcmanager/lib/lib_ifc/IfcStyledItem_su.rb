@@ -26,19 +26,16 @@ require_relative File.join('IFC2X3', 'IfcColourRgb.rb')
 
 module BimTools
   module IfcStyledItem_su
-    
-    include IFC2X3
-    
     def initialize(ifc_model, brep, material)
       super
       
-      styleassignment = IfcPresentationStyleAssignment.new( ifc_model, material )
-      surfacestyle = IfcSurfaceStyle.new( ifc_model, material )
-      surfacestylerendering = IfcSurfaceStyleRendering.new( ifc_model, material )
-      colourrgb = IfcColourRgb.new( ifc_model, material )
+      styleassignment = BimTools::IFC2X3::IfcPresentationStyleAssignment.new( ifc_model, material )
+      surfacestyle = BimTools::IFC2X3::IfcSurfaceStyle.new( ifc_model, material )
+      surfacestylerendering = BimTools::IFC2X3::IfcSurfaceStyleRendering.new( ifc_model, material )
+      colourrgb = BimTools::IFC2X3::IfcColourRgb.new( ifc_model, material )
       
-      self.item = brep
-      self.styles = IfcManager::Ifc_Set.new( [styleassignment] )
+      @item = brep
+      @styles = IfcManager::Ifc_Set.new( [styleassignment] )
       
       styleassignment.styles = IfcManager::Ifc_Set.new( [surfacestyle] )
       

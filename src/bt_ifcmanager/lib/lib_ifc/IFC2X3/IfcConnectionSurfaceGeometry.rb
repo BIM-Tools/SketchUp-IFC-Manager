@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :surfaceonrelatingelement, :surfaceonrelatedelement
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcConnectionSurfaceGeometry
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["SurfaceOnRelatingElement", "SurfaceOnRelatedElement"]
+      return [:SurfaceOnRelatingElement, :SurfaceOnRelatedElement]
     end # def properties
   end # class IfcConnectionSurfaceGeometry
  end # module IFC2X3

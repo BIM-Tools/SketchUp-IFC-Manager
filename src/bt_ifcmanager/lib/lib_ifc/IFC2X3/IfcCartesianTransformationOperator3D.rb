@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :axis3
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcCartesianTransformationOperator3D
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Axis1", "Axis2", "LocalOrigin", "Scale", "Axis3"]
+      return [:Axis1, :Axis2, :LocalOrigin, :Scale, :Axis3]
     end # def properties
   end # class IfcCartesianTransformationOperator3D
  end # module IFC2X3

@@ -30,11 +30,11 @@ module BimTools
     include Step 
     include IfcFacetedBrep_su
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcFacetedBrep
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Outer"]
+      return [:Outer]
     end # def properties
   end # class IfcFacetedBrep
  end # module IFC2X3

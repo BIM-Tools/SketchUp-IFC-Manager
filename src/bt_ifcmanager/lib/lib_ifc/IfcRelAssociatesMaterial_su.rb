@@ -24,19 +24,16 @@ require_relative 'set.rb'
 
 module BimTools
   module IfcRelAssociatesMaterial_su
-    
-    include IFC2X3
-    
     def initialize(ifc_model, sketchup)
     
       # (!) this should be automatically created by root!!!
-      self.globalid = IfcManager::new_guid
-      self.ownerhistory = ifc_model.owner_history
+      @globalid = IfcManager::new_guid
+      @ownerhistory = ifc_model.owner_history
       
       if sketchup.is_a?( Sketchup::Material )
         su_material = sketchup
-        @relatingmaterial = IfcMaterial.new( ifc_model )
-        @relatingmaterial.name = "'" + su_material.display_name + "'"
+        @relatingmaterial = BimTools::IFC2X3::IfcMaterial.new( ifc_model )
+        @relatingmaterial.name = "'#{su_material.display_name}'"
         @relatedobjects = IfcManager::Ifc_Set.new()
       end
     end # def sketchup

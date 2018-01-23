@@ -30,11 +30,11 @@ module BimTools
     include Step 
     include IfcProductDefinitionShape_su
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcProductDefinitionShape
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "Description", "Representations"]
+      return [:Name, :Description, :Representations]
     end # def properties
   end # class IfcProductDefinitionShape
  end # module IFC2X3

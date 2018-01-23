@@ -27,10 +27,10 @@ module BimTools
     attr_accessor :ifc_id, :hourcomponent, :minutecomponent, :secondcomponent, :zone, :daylightsavingoffset
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcLocalTime
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
     end # def initialize 
     def properties()
-      return ["HourComponent", "MinuteComponent", "SecondComponent", "Zone", "DaylightSavingOffset"]
+      return [:HourComponent, :MinuteComponent, :SecondComponent, :Zone, :DaylightSavingOffset]
     end # def properties
   end # class IfcLocalTime
  end # module IFC2X3

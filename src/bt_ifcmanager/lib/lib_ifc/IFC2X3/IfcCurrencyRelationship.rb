@@ -27,10 +27,10 @@ module BimTools
     attr_accessor :ifc_id, :relatingmonetaryunit, :relatedmonetaryunit, :exchangerate, :ratedatetime, :ratesource
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcCurrencyRelationship
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
     end # def initialize 
     def properties()
-      return ["RelatingMonetaryUnit", "RelatedMonetaryUnit", "ExchangeRate", "RateDateTime", "RateSource"]
+      return [:RelatingMonetaryUnit, :RelatedMonetaryUnit, :ExchangeRate, :RateDateTime, :RateSource]
     end # def properties
   end # class IfcCurrencyRelationship
  end # module IFC2X3

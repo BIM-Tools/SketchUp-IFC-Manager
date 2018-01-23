@@ -27,10 +27,10 @@ module BimTools
     attr_accessor :ifc_id, :id, :name, :description, :roles, :addresses
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcOrganization
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
     end # def initialize 
     def properties()
-      return ["Id", "Name", "Description", "Roles", "Addresses"]
+      return [:Id, :Name, :Description, :Roles, :Addresses]
     end # def properties
   end # class IfcOrganization
  end # module IFC2X3

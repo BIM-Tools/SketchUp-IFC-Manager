@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :applicablevalueratio, :thermalloadsource, :propertysource, :sourcedescription, :maximumvalue, :minimumvalue, :thermalloadtimeseriesvalues, :userdefinedthermalloadsource, :userdefinedpropertysource, :thermalloadtype
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcSpaceThermalLoadProperties
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["GlobalId", "OwnerHistory", "Name", "Description", "ApplicableValueRatio", "ThermalLoadSource", "PropertySource", "SourceDescription", "MaximumValue", "MinimumValue", "ThermalLoadTimeSeriesValues", "UserDefinedThermalLoadSource", "UserDefinedPropertySource", "ThermalLoadType"]
+      return [:GlobalId, :OwnerHistory, :Name, :Description, :ApplicableValueRatio, :ThermalLoadSource, :PropertySource, :SourceDescription, :MaximumValue, :MinimumValue, :ThermalLoadTimeSeriesValues, :UserDefinedThermalLoadSource, :UserDefinedPropertySource, :ThermalLoadType]
     end # def properties
   end # class IfcSpaceThermalLoadProperties
  end # module IFC2X3

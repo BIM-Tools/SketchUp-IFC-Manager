@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :actualstart, :earlystart, :latestart, :schedulestart, :actualfinish, :earlyfinish, :latefinish, :schedulefinish, :scheduleduration, :actualduration, :remainingtime, :freefloat, :totalfloat, :iscritical, :statustime, :startfloat, :finishfloat, :completion
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcScheduleTimeControl
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["GlobalId", "OwnerHistory", "Name", "Description", "ObjectType", "ActualStart", "EarlyStart", "LateStart", "ScheduleStart", "ActualFinish", "EarlyFinish", "LateFinish", "ScheduleFinish", "ScheduleDuration", "ActualDuration", "RemainingTime", "FreeFloat", "TotalFloat", "IsCritical", "StatusTime", "StartFloat", "FinishFloat", "Completion"]
+      return [:GlobalId, :OwnerHistory, :Name, :Description, :ObjectType, :ActualStart, :EarlyStart, :LateStart, :ScheduleStart, :ActualFinish, :EarlyFinish, :LateFinish, :ScheduleFinish, :ScheduleDuration, :ActualDuration, :RemainingTime, :FreeFloat, :TotalFloat, :IsCritical, :StatusTime, :StartFloat, :FinishFloat, :Completion]
     end # def properties
   end # class IfcScheduleTimeControl
  end # module IFC2X3

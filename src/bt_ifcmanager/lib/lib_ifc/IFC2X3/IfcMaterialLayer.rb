@@ -27,10 +27,10 @@ module BimTools
     attr_accessor :ifc_id, :material, :layerthickness, :isventilated
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcMaterialLayer
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
     end # def initialize 
     def properties()
-      return ["Material", "LayerThickness", "IsVentilated"]
+      return [:Material, :LayerThickness, :IsVentilated]
     end # def properties
   end # class IfcMaterialLayer
  end # module IFC2X3

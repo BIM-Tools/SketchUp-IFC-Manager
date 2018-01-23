@@ -24,15 +24,12 @@ require_relative File.join('IFC2X3', 'IfcAxis2Placement3D.rb')
 module BimTools
   module IfcLocalPlacement_su
     attr_accessor :transformation, :ifc_total_transformation
-    
-    include IFC2X3
-    
     def initialize(ifc_model, su_total_transformation, placementrelto=nil )
       super
       @ifc_model = ifc_model
       
       # set parent placement
-      if placementrelto.is_a? IfcLocalPlacement
+      if placementrelto.is_a? BimTools::IFC2X3::IfcLocalPlacement
         @placementrelto = placementrelto
       end
       
@@ -53,19 +50,18 @@ module BimTools
       
       @ifc_total_transformation = scale.inverse * su_total_transformation * axis_fix
       
-      if self.placementrelto
-        @transformation = @ifc_total_transformation * self.placementrelto.ifc_total_transformation.inverse
+      if @placementrelto
+        @transformation = @ifc_total_transformation * @placementrelto.ifc_total_transformation.inverse
       else
         # puts 'no placementrelto for object'
         @transformation = @ifc_total_transformation
       end
         
       # set relativeplacement
-      self.relativeplacement = IfcAxis2Placement3D.new( @ifc_model, @transformation )
-      self.relativeplacement.location = IfcCartesianPoint.new( @ifc_model, @transformation.origin )
-      self.relativeplacement.axis = IfcDirection.new( @ifc_model, @transformation.zaxis )
-      self.relativeplacement.refdirection = IfcDirection.new( @ifc_model, @transformation.xaxis )
-    
+      @relativeplacement = BimTools::IFC2X3::IfcAxis2Placement3D.new( @ifc_model, @transformation )
+      @relativeplacement.location = BimTools::IFC2X3::IfcCartesianPoint.new( @ifc_model, @transformation.origin )
+      @relativeplacement.axis = BimTools::IFC2X3::IfcDirection.new( @ifc_model, @transformation.zaxis )
+      @relativeplacement.refdirection = BimTools::IFC2X3::IfcDirection.new( @ifc_model, @transformation.xaxis )
     end
   end # module IfcLocalPlacement_su
 end # module BimTools

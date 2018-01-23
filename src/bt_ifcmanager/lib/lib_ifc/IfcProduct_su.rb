@@ -31,9 +31,6 @@ require_relative File.join('IFC2X3', 'IfcRelAssociatesClassification.rb')
 module BimTools
   module IfcProduct_su
     attr_accessor :su_object, :parent, :total_transformation
-    
-    include IFC2X3
-    
     @su_object = nil
     @parent = nil
     
@@ -48,13 +45,13 @@ module BimTools
         definition = instance.definition
         
         #(?) set name, here? is this a duplicate?
-        self.name = BimTools::IfcManager::IfcLabel.new( definition.name )
+        @name = BimTools::IfcManager::IfcLabel.new( definition.name )
         
         if definition.attribute_dictionaries
           if dict = definition.attribute_dictionaries['IFC 2x3']
             properties.each do |prop|
-              if prop_dict = dict.attribute_dictionaries[prop]
-                sub_dict = prop_dict.attribute_dictionaries[prop]
+              if prop_dict = dict.attribute_dictionaries[prop.to_s]
+                sub_dict = prop_dict.attribute_dictionaries[prop.to_s]
                 
                 # (!) this needs improvement using a typecheck
                 text = prop_dict.get_attribute( "IfcText", "value" )
@@ -62,11 +59,11 @@ module BimTools
                 length = prop_dict.get_attribute( "IfcLengthMeasure", "value" )
                 
                 if text != nil && text != ""
-                  send(prop.downcase + "=", "'" + text + "'")
+                  send("#{prop.downcase}=", "'#{text}'")
                 elsif label != nil && label != ""
-                  send(prop.downcase + "=", "'" + label + "'")
+                  send("#{prop.downcase}=", "'#{label}'")
                 elsif length != nil && length != ""
-                  send(prop.downcase + "=", length.to_f.to_s)
+                  send("#{prop.downcase}=", length.to_f.to_s)
                 end
               end
             end
@@ -74,7 +71,7 @@ module BimTools
         end
 
         # set representation based on definition
-        self.representation = IfcProductDefinitionShape.new(ifc_model, sketchup.definition)
+        @representation = BimTools::IFC2X3::IfcProductDefinitionShape.new(ifc_model, sketchup.definition)
         
         # set material if sketchup instance has a material
         if instance.material
@@ -83,7 +80,7 @@ module BimTools
           unless ifc_model.materials[instance.material.display_name]
             
             # create new materialassociation
-            ifc_model.materials[instance.material.display_name] = IfcRelAssociatesMaterial.new(ifc_model, instance.material)
+            ifc_model.materials[instance.material.display_name] = BimTools::IFC2X3::IfcRelAssociatesMaterial.new(ifc_model, instance.material)
           end
           
           #add self to materialassociation
@@ -95,11 +92,11 @@ module BimTools
         unless ifc_model.layers[instance.layer.name]
           
           # create new IfcPresentationLayerAssignment
-          ifc_model.layers[instance.layer.name] = IfcPresentationLayerAssignment.new(ifc_model, instance.layer)
+          ifc_model.layers[instance.layer.name] = BimTools::IFC2X3::IfcPresentationLayerAssignment.new(ifc_model, instance.layer)
         end
         
         #add self to IfcPresentationLayerAssignment
-        ifc_model.layers[instance.layer.name].assigneditems.add( self.representation.representations.first )
+        ifc_model.layers[instance.layer.name].assigneditems.add( @representation.representations.first )
         
         collect_psets( ifc_model, instance.definition )
         collect_classifications( ifc_model, instance.definition )
@@ -113,7 +110,7 @@ module BimTools
           # get_properties and create propertysets for all nested attribute dictionaries
           # except for classifications
           unless attr_dict.name == "AppliedSchemaTypes" || ifc_model.su_model.classifications[ attr_dict.name ]
-            reldef = IfcRelDefinesByProperties.new( ifc_model, attr_dict )
+            reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, attr_dict )
             reldef.relatedobjects.add( self )
             collect_psets( ifc_model, attr_dict )
           end
@@ -136,7 +133,7 @@ module BimTools
     
     # # create any classification except for IFC
     # unless schema.name == 'IFC 2x3'
-      # classification = IfcClassification.new( self )
+      # classification = BimTools::IFC2X3::IfcClassification.new( self )
       # classification.source = ''
       # classification.edition = ''
       # classification.name = "'" + schema.name + "'"
@@ -146,7 +143,7 @@ module BimTools
       # if schema.name == 'NL-SfB 2005, tabel 1'
         # classification.source = "'BIM-Loket'"
         # classification.edition = "'2005'"
-        # unicode = IfcClassification.new( self )
+        # unicode = BimTools::IFC2X3::IfcClassification.new( self )
         # unicode.source = "'http://www.csiorg.net/uniformat'"
         # unicode.edition = "'1998'"
         # unicode.name = "'Uniformat'"
@@ -165,14 +162,14 @@ module BimTools
               if ifc_model.classifications.include?( attr_dict.name )
                 cls = ifc_model.classifications[attr_dict.name]
               else
-                cls = IfcClassification.new( ifc_model )
+                cls = BimTools::IFC2X3::IfcClassification.new( ifc_model )
                 cls.source = "'BIM Loket'"
                 cls.edition = "'2005'"
                 #cls.editiondate
-                cls.name = "'" + attr_dict.name + "'"
+                cls.name = "'#{attr_dict.name}'"
                 
                 # vico hack: store a copy of NL-SfB as unicode
-                unicode_cls = IfcClassification.new( ifc_model )
+                unicode_cls = BimTools::IFC2X3::IfcClassification.new( ifc_model )
                 unicode_cls.source = "'http://www.csiorg.net/uniformat'"
                 unicode_cls.edition = "'1998'"
                 #unicode_cls.editiondate
@@ -189,17 +186,17 @@ module BimTools
                 if code && tekst
                   ifc_classification_reference = cls.ifc_classification_references[ code ]
                   unless ifc_classification_reference
-                    ifc_classification_reference = IfcClassificationReference.new( ifc_model )
+                    ifc_classification_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
                     #ifc_classification_reference.location = ''
-                    ifc_classification_reference.itemreference = "'" + code + "'"
-                    ifc_classification_reference.name = "'" + tekst + "'"
+                    ifc_classification_reference.itemreference = "'#{code}'"
+                    ifc_classification_reference.name = "'#{tekst}'"
                     ifc_classification_reference.referencedsource = cls
                     
                     # add ifc_classification_reference to the list of references in the classification
                     cls.ifc_classification_references[ code ] = ifc_classification_reference
                     
                     # create IfcRelAssociatesClassification
-                    assoc = IfcRelAssociatesClassification.new( ifc_model )
+                    assoc = BimTools::IFC2X3::IfcRelAssociatesClassification.new( ifc_model )
                     #assoc.name = ''
                     #assoc.description = ''
                     assoc.relatedobjects = BimTools::IfcManager::Ifc_Set.new( [self] )
@@ -207,12 +204,12 @@ module BimTools
                     ifc_classification_reference.ifc_rel_associates_classification = assoc
                     
                     # vico hack: store a copy of NL-SfB as unicode
-                    unicode_reference = IfcClassificationReference.new( ifc_model )
+                    unicode_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
                     unicode_reference.location = "'http://www.csiorg.net/uniformat'"
-                    unicode_reference.itemreference = "'" + code + "'"
-                    unicode_reference.name = "'" + tekst + "'"
+                    unicode_reference.itemreference = "'#{code}'"
+                    unicode_reference.name = "'#{tekst}'"
                     unicode_reference.referencedsource = unicode_cls
-                    unicode_assoc = IfcRelAssociatesClassification.new( ifc_model )
+                    unicode_assoc = BimTools::IFC2X3::IfcRelAssociatesClassification.new( ifc_model )
                     unicode_assoc.name = "'Uniformat Classification'"
                     #unicode_assoc.description = ''
                     unicode_assoc.relatedobjects = IfcManager::Ifc_Set.new( [self] )

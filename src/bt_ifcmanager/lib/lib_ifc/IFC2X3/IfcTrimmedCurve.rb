@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :basiscurve, :trim1, :trim2, :senseagreement, :masterrepresentation
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcTrimmedCurve
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["BasisCurve", "Trim1", "Trim2", "SenseAgreement", "MasterRepresentation"]
+      return [:BasisCurve, :Trim1, :Trim2, :SenseAgreement, :MasterRepresentation]
     end # def properties
   end # class IfcTrimmedCurve
  end # module IFC2X3

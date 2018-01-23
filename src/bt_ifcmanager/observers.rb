@@ -76,10 +76,10 @@ module BimTools
   
   class IMAppObserver < Sketchup::AppObserver
     def onNewModel(model)
-      self.switch_model()
+      switch_model()
     end
     def onOpenModel(model)
-      self.switch_model()
+      switch_model()
     end
     
     # actions when switching/loading models

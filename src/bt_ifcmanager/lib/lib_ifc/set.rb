@@ -38,12 +38,11 @@ module BimTools
     end # def add
     def step()
       line = String.new
-      line << "(" 
       @items.each do |item|
         if item.is_a? String
           line << item
         else
-          line << "#" + item.ifc_id.to_s
+          line << "##{item.ifc_id.to_s}"
         end
         
         #skip the , for the last element
@@ -51,9 +50,7 @@ module BimTools
           line << ", "
         end
       end
-      line << ")"
-      return line
-      
+      return "(#{line})"
     end # def step
     
   end # class Ifc_Set

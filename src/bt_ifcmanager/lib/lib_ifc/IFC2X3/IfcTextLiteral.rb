@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :literal, :placement, :path
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcTextLiteral
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Literal", "Placement", "Path"]
+      return [:Literal, :Placement, :Path]
     end # def properties
   end # class IfcTextLiteral
  end # module IFC2X3

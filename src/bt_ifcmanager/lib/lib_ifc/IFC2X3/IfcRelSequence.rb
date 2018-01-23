@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :relatingprocess, :relatedprocess, :timelag, :sequencetype
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcRelSequence
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["GlobalId", "OwnerHistory", "Name", "Description", "RelatingProcess", "RelatedProcess", "TimeLag", "SequenceType"]
+      return [:GlobalId, :OwnerHistory, :Name, :Description, :RelatingProcess, :RelatedProcess, :TimeLag, :SequenceType]
     end # def properties
   end # class IfcRelSequence
  end # module IFC2X3

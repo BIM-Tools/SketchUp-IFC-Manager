@@ -27,10 +27,10 @@ module BimTools
     attr_accessor :ifc_id, :textindent, :textalign, :textdecoration, :letterspacing, :wordspacing, :texttransform, :lineheight
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcTextStyleTextModel
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
     end # def initialize 
     def properties()
-      return ["TextIndent", "TextAlign", "TextDecoration", "LetterSpacing", "WordSpacing", "TextTransform", "LineHeight"]
+      return [:TextIndent, :TextAlign, :TextDecoration, :LetterSpacing, :WordSpacing, :TextTransform, :LineHeight]
     end # def properties
   end # class IfcTextStyleTextModel
  end # module IFC2X3

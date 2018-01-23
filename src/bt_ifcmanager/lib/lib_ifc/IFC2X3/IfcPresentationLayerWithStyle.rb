@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :layeron, :layerfrozen, :layerblocked, :layerstyles
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcPresentationLayerWithStyle
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "Description", "AssignedItems", "Identifier", "LayerOn", "LayerFrozen", "LayerBlocked", "LayerStyles"]
+      return [:Name, :Description, :AssignedItems, :Identifier, :LayerOn, :LayerFrozen, :LayerBlocked, :LayerStyles]
     end # def properties
   end # class IfcPresentationLayerWithStyle
  end # module IFC2X3

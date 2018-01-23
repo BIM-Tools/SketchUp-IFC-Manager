@@ -27,10 +27,10 @@ module BimTools
     attr_accessor :ifc_id, :relatedapproval, :relatingapproval, :description, :name
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcApprovalRelationship
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
     end # def initialize 
     def properties()
-      return ["RelatedApproval", "RelatingApproval", "Description", "Name"]
+      return [:RelatedApproval, :RelatingApproval, :Description, :Name]
     end # def properties
   end # class IfcApprovalRelationship
  end # module IFC2X3

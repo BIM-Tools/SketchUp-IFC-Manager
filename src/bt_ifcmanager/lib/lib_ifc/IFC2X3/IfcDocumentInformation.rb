@@ -27,10 +27,10 @@ module BimTools
     attr_accessor :ifc_id, :documentid, :name, :description, :documentreferences, :purpose, :intendeduse, :scope, :revision, :documentowner, :editors, :creationtime, :lastrevisiontime, :electronicformat, :validfrom, :validuntil, :confidentiality, :status
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcDocumentInformation
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
     end # def initialize 
     def properties()
-      return ["DocumentId", "Name", "Description", "DocumentReferences", "Purpose", "IntendedUse", "Scope", "Revision", "DocumentOwner", "Editors", "CreationTime", "LastRevisionTime", "ElectronicFormat", "ValidFrom", "ValidUntil", "Confidentiality", "Status"]
+      return [:DocumentId, :Name, :Description, :DocumentReferences, :Purpose, :IntendedUse, :Scope, :Revision, :DocumentOwner, :Editors, :CreationTime, :LastRevisionTime, :ElectronicFormat, :ValidFrom, :ValidUntil, :Confidentiality, :Status]
     end # def properties
   end # class IfcDocumentInformation
  end # module IFC2X3

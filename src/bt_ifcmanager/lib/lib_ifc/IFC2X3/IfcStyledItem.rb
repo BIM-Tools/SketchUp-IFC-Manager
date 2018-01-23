@@ -30,11 +30,11 @@ module BimTools
     include Step 
     include IfcStyledItem_su
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcStyledItem
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Item", "Styles", "Name"]
+      return [:Item, :Styles, :Name]
     end # def properties
   end # class IfcStyledItem
  end # module IFC2X3

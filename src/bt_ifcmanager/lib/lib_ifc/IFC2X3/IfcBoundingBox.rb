@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :corner, :xdim, :ydim, :zdim
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcBoundingBox
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Corner", "XDim", "YDim", "ZDim"]
+      return [:Corner, :XDim, :YDim, :ZDim]
     end # def properties
   end # class IfcBoundingBox
  end # module IFC2X3

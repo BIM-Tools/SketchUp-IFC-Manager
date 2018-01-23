@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :basiscurve, :distance, :selfintersect
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcOffsetCurve2D
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["BasisCurve", "Distance", "SelfIntersect"]
+      return [:BasisCurve, :Distance, :SelfIntersect]
     end # def properties
   end # class IfcOffsetCurve2D
  end # module IFC2X3

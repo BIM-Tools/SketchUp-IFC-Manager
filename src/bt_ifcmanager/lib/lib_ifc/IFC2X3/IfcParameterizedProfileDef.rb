@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :position
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcParameterizedProfileDef
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["ProfileType", "ProfileName", "Position"]
+      return [:ProfileType, :ProfileName, :Position]
     end # def properties
   end # class IfcParameterizedProfileDef
  end # module IFC2X3

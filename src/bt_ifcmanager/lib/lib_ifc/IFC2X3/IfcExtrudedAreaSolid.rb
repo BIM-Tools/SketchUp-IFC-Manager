@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :extrudeddirection, :depth
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcExtrudedAreaSolid
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["SweptArea", "Position", "ExtrudedDirection", "Depth"]
+      return [:SweptArea, :Position, :ExtrudedDirection, :Depth]
     end # def properties
   end # class IfcExtrudedAreaSolid
  end # module IFC2X3

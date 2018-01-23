@@ -27,10 +27,10 @@ module BimTools
     attr_accessor :ifc_id, :referencedtimeseries, :timeseriesreferences
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcTimeSeriesReferenceRelationship
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
     end # def initialize 
     def properties()
-      return ["ReferencedTimeSeries", "TimeSeriesReferences"]
+      return [:ReferencedTimeSeries, :TimeSeriesReferences]
     end # def properties
   end # class IfcTimeSeriesReferenceRelationship
  end # module IFC2X3

@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :specificheatcapacity, :n20content, :cocontent, :co2content
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcProductsOfCombustionProperties
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Material", "SpecificHeatCapacity", "N20Content", "COContent", "CO2Content"]
+      return [:Material, :SpecificHeatCapacity, :N20Content, :COContent, :CO2Content]
     end # def properties
   end # class IfcProductsOfCombustionProperties
  end # module IFC2X3

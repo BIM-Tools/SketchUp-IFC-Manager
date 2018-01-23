@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :outercurve
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcArbitraryClosedProfileDef
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["ProfileType", "ProfileName", "OuterCurve"]
+      return [:ProfileType, :ProfileName, :OuterCurve]
     end # def properties
   end # class IfcArbitraryClosedProfileDef
  end # module IFC2X3

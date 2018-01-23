@@ -26,20 +26,16 @@ module BimTools
     def step()
       
       line = String.new
-      line << "#" + self.ifc_id.to_s
-      line << " = " + self.class.name.split('::').last.upcase + "("
       properties = properties()
       properties.each do |property_name|
         property = self.send(property_name.downcase)
         if property
           if property.is_a? String
             line << property
-          elsif property.is_a? IfcManager::Ifc_Set
-            line << property.step
-          elsif property.is_a? IfcManager::Ifc_Type
+          elsif property.is_a?(IfcManager::Ifc_Set) || property.is_a?(IfcManager::Ifc_Type) || property.is_a?(IfcManager::IfcReal)
             line << property.step
           else
-            line << "#" + property.ifc_id.to_s
+            line << "##{property.ifc_id.to_s}"
           end
         else
           line << "$"
@@ -50,8 +46,7 @@ module BimTools
           line << ", "
         end
       end
-      line << ")"
-      return line
+      return "##{@ifc_id.to_s} = #{self.class.name.split('::').last.upcase}(#{line})"
     end # step
  end # module Step
 end # module BimTools

@@ -59,7 +59,7 @@ module BimTools
     
     # load the NL-SfB classification schema
     model.start_operation('Load IFC Manager NL-SfB classification schema', true)
-    self.load_nlsfb()
+    load_nlsfb()
     model.commit_operation
     
     # create default materials

@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :linearforcex, :linearforcey, :linearforcez, :linearmomentx, :linearmomenty, :linearmomentz
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcStructuralLoadLinearForce
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "LinearForceX", "LinearForceY", "LinearForceZ", "LinearMomentX", "LinearMomentY", "LinearMomentZ"]
+      return [:Name, :LinearForceX, :LinearForceY, :LinearForceZ, :LinearMomentX, :LinearMomentY, :LinearMomentZ]
     end # def properties
   end # class IfcStructuralLoadLinearForce
  end # module IFC2X3

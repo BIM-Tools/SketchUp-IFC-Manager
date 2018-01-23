@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :compressivestrength, :maxaggregatesize, :admixturesdescription, :workability, :protectiveporeratio, :waterimpermeability
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcMechanicalConcreteMaterialProperties
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Material", "DynamicViscosity", "YoungModulus", "ShearModulus", "PoissonRatio", "ThermalExpansionCoefficient", "CompressiveStrength", "MaxAggregateSize", "AdmixturesDescription", "Workability", "ProtectivePoreRatio", "WaterImpermeability"]
+      return [:Material, :DynamicViscosity, :YoungModulus, :ShearModulus, :PoissonRatio, :ThermalExpansionCoefficient, :CompressiveStrength, :MaxAggregateSize, :AdmixturesDescription, :Workability, :ProtectivePoreRatio, :WaterImpermeability]
     end # def properties
   end # class IfcMechanicalConcreteMaterialProperties
  end # module IFC2X3

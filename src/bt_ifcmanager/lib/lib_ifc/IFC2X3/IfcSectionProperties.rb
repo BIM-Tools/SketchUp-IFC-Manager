@@ -27,10 +27,10 @@ module BimTools
     attr_accessor :ifc_id, :sectiontype, :startprofile, :endprofile
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcSectionProperties
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
     end # def initialize 
     def properties()
-      return ["SectionType", "StartProfile", "EndProfile"]
+      return [:SectionType, :StartProfile, :EndProfile]
     end # def properties
   end # class IfcSectionProperties
  end # module IFC2X3

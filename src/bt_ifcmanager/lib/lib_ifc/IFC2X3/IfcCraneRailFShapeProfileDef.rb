@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :overallheight, :headwidth, :radius, :headdepth2, :headdepth3, :webthickness, :basedepth1, :basedepth2, :centreofgravityiny
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcCraneRailFShapeProfileDef
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["ProfileType", "ProfileName", "Position", "OverallHeight", "HeadWidth", "Radius", "HeadDepth2", "HeadDepth3", "WebThickness", "BaseDepth1", "BaseDepth2", "CentreOfGravityInY"]
+      return [:ProfileType, :ProfileName, :Position, :OverallHeight, :HeadWidth, :Radius, :HeadDepth2, :HeadDepth3, :WebThickness, :BaseDepth1, :BaseDepth2, :CentreOfGravityInY]
     end # def properties
   end # class IfcCraneRailFShapeProfileDef
  end # module IFC2X3

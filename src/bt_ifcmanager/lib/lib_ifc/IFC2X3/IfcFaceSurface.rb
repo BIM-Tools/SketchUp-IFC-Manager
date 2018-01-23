@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :facesurface, :samesense
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcFaceSurface
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Bounds", "FaceSurface", "SameSense"]
+      return [:Bounds, :FaceSurface, :SameSense]
     end # def properties
   end # class IfcFaceSurface
  end # module IFC2X3

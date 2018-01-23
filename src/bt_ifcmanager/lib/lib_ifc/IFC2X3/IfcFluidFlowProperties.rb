@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :propertysource, :flowconditiontimeseries, :velocitytimeseries, :flowratetimeseries, :fluid, :pressuretimeseries, :userdefinedpropertysource, :temperaturesinglevalue, :wetbulbtemperaturesinglevalue, :wetbulbtemperaturetimeseries, :temperaturetimeseries, :flowratesinglevalue, :flowconditionsinglevalue, :velocitysinglevalue, :pressuresinglevalue
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcFluidFlowProperties
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["GlobalId", "OwnerHistory", "Name", "Description", "PropertySource", "FlowConditionTimeSeries", "VelocityTimeSeries", "FlowrateTimeSeries", "Fluid", "PressureTimeSeries", "UserDefinedPropertySource", "TemperatureSingleValue", "WetBulbTemperatureSingleValue", "WetBulbTemperatureTimeSeries", "TemperatureTimeSeries", "FlowrateSingleValue", "FlowConditionSingleValue", "VelocitySingleValue", "PressureSingleValue"]
+      return [:GlobalId, :OwnerHistory, :Name, :Description, :PropertySource, :FlowConditionTimeSeries, :VelocityTimeSeries, :FlowrateTimeSeries, :Fluid, :PressureTimeSeries, :UserDefinedPropertySource, :TemperatureSingleValue, :WetBulbTemperatureSingleValue, :WetBulbTemperatureTimeSeries, :TemperatureTimeSeries, :FlowrateSingleValue, :FlowConditionSingleValue, :VelocitySingleValue, :PressureSingleValue]
     end # def properties
   end # class IfcFluidFlowProperties
  end # module IFC2X3

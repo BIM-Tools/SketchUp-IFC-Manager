@@ -32,7 +32,7 @@ module BimTools
         y = sketchup.y.to_f*25.4
         z = sketchup.z.to_f*25.4
         
-        self.coordinates = "(" + IfcManager::IfcReal.new(x).step + ", " + IfcManager::IfcReal.new(y).step + ", " + IfcManager::IfcReal.new(z).step + ")"
+        @coordinates = "(#{IfcManager::IfcReal.new(x).step}, #{IfcManager::IfcReal.new(y).step}, #{IfcManager::IfcReal.new(z).step})"
       end
       
     end # def sketchup

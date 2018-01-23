@@ -27,10 +27,10 @@ module BimTools
     attr_accessor :ifc_id, :textures
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcSurfaceStyleWithTextures
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
     end # def initialize 
     def properties()
-      return ["Textures"]
+      return [:Textures]
     end # def properties
   end # class IfcSurfaceStyleWithTextures
  end # module IFC2X3

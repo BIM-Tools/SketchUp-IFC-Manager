@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :orientation
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcLightSourceDirectional
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["Name", "LightColour", "AmbientIntensity", "Intensity", "Orientation"]
+      return [:Name, :LightColour, :AmbientIntensity, :Intensity, :Orientation]
     end # def properties
   end # class IfcLightSourceDirectional
  end # module IFC2X3

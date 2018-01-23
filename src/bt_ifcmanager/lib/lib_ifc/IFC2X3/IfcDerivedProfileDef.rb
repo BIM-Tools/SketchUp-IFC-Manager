@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :parentprofile, :operator, :label
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcDerivedProfileDef
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["ProfileType", "ProfileName", "ParentProfile", "Operator", "Label"]
+      return [:ProfileType, :ProfileName, :ParentProfile, :Operator, :Label]
     end # def properties
   end # class IfcDerivedProfileDef
  end # module IFC2X3

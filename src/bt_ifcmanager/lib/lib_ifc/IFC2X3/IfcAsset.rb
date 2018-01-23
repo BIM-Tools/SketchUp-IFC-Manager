@@ -28,11 +28,11 @@ module BimTools
     attr_accessor :ifc_id, :assetid, :originalvalue, :currentvalue, :totalreplacementcost, :owner, :user, :responsibleperson, :incorporationdate, :depreciatedvalue
     include Step 
     def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) unless self.class < IfcAsset
+      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
     end # def initialize 
     def properties()
-      return ["GlobalId", "OwnerHistory", "Name", "Description", "ObjectType", "AssetID", "OriginalValue", "CurrentValue", "TotalReplacementCost", "Owner", "User", "ResponsiblePerson", "IncorporationDate", "DepreciatedValue"]
+      return [:GlobalId, :OwnerHistory, :Name, :Description, :ObjectType, :AssetID, :OriginalValue, :CurrentValue, :TotalReplacementCost, :Owner, :User, :ResponsiblePerson, :IncorporationDate, :DepreciatedValue]
     end # def properties
   end # class IfcAsset
  end # module IFC2X3
