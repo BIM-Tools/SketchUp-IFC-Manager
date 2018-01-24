@@ -26,6 +26,9 @@ module BimTools
     require File.join(PLUGIN_PATH, 'update_ifc_fields.rb')
 
     def export( file_path )
+      require File.join(PLUGIN_PATH, 'lib', 'progressbar.rb')
+      
+      pb = ProgressBar.new(4,"Exporting to IFC...")
       
       # start timer
       timer = Time.now
@@ -53,6 +56,8 @@ module BimTools
       su_model.start_operation('Update IFC data', true)
       update_ifc_fields( su_model )
       su_model.commit_operation
+      
+      pb.update(1)
 
       # make sure file_path ends in "ifc"
       unless file_path.split('.').last == "ifc"
@@ -62,15 +67,21 @@ module BimTools
       # create new IfcModel
       ifc_model = IfcModel.new( su_model, options )
       
+      pb.update(2)
+      
       # get total time
       puts "finished creating IFC entities: " + (Time.now - timer).to_s
       
       # export model to IFC step file
       ifc_model.export( file_path )
       
+      pb.update(3)
+      
       # get total time
       time = Time.now - timer
       puts "finished export: " + time.to_s
+      
+      pb.update(4)
       
       show_summary( ifc_model.export_summary, file_path, time )
     end # export
