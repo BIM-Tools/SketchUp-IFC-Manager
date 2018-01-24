@@ -59,7 +59,7 @@ module BimTools
       # Create IFC entity based on the IFC classification in sketchup
       begin
         require_relative File.join('IFC2X3', definition.get_attribute("AppliedSchemaTypes", "IFC 2x3"))
-        entity_type = eval(definition.get_attribute("AppliedSchemaTypes", "IFC 2x3"))
+        entity_type = eval("BimTools::IFC2X3::#{definition.get_attribute("AppliedSchemaTypes", "IFC 2x3")}")
         ifc_entity = entity_type.new(ifc_model, su_instance)
       rescue
         
