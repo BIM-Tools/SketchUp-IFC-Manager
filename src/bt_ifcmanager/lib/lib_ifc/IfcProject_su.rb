@@ -50,5 +50,10 @@ module BimTools
       @unitsincontext.units.add( m3 )
     end # def initialize
     
+    # add export summary for IfcProducts
+    def step
+      @ifc_model.summary_add(self.class.name.split('::').last)
+      super
+    end
   end # module IfcProject_su
 end # module BimTools

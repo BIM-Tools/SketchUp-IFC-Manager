@@ -60,7 +60,14 @@ module BimTools
       begin
         require_relative File.join('IFC2X3', definition.get_attribute("AppliedSchemaTypes", "IFC 2x3"))
         entity_type = eval("BimTools::IFC2X3::#{definition.get_attribute("AppliedSchemaTypes", "IFC 2x3")}")
-        ifc_entity = entity_type.new(ifc_model, su_instance)
+        
+        # merge this project with the default project
+        #(?) what if there are multiple projects defined?
+        if entity_type == BimTools::IFC2X3::IfcProject
+          ifc_entity = ifc_model.project
+        else
+          ifc_entity = entity_type.new(ifc_model, su_instance)
+        end
       rescue
         
         # If not classified as IFC in sketchup AND the parent is an IfcSpatialStructureElement then this is an IfcBuildingElementProxy
@@ -217,7 +224,10 @@ module BimTools
           parent_objectplacement = parent_ifc.objectplacement
         end
         
-        ifc_entity.objectplacement = BimTools::IFC2X3::IfcLocalPlacement.new(ifc_model, su_total_transformation, parent_objectplacement )
+        # set object placement, except for the IfcProject which does not have an objectplacement
+        unless ifc_entity.is_a?(BimTools::IFC2X3::IfcProject)
+          ifc_entity.objectplacement = BimTools::IFC2X3::IfcLocalPlacement.new(ifc_model, su_total_transformation, parent_objectplacement )
+        end
         
         # set elevation for buildingstorey
         # (?) is this the best place to define building storey elevation?
@@ -267,7 +277,7 @@ module BimTools
         end
       end
       
-      unless parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
+      unless ifc_entity.is_a?(BimTools::IFC2X3::IfcProject) || parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
         brep_transformation = ifc_entity.objectplacement.ifc_total_transformation.inverse * su_total_transformation
       else
         brep_transformation = su_total_transformation
