@@ -48,7 +48,7 @@ module BimTools
     # - add_ifc_object
     
     attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications, :classificationassociations
-    attr_reader :su_model, :project, :ifc_objects, :export_summary
+    attr_reader :su_model, :project, :ifc_objects, :export_summary, :options
     
     # creates an IFC model based on given su model
     # (?) could be enhanced to also accept other sketchup objects
@@ -176,9 +176,8 @@ module BimTools
         sketchup_objects.entities.each do | ent |
           if ent.is_a?(Sketchup::Group) || ent.is_a?(Sketchup::ComponentInstance)
           
-            # skip hidden objects
-            #(?) add option to export hidden objects
-            unless ent.hidden?
+            # skip hidden objects if skip-hidden option is set
+            unless @options[:hidden] == false && ent.hidden?
               transformation = Geom::Transformation.new
               ObjectCreator.new( self, ent, transformation, @project )
             end

@@ -263,17 +263,17 @@ module BimTools
       # find sub-objects (geometry and entities)
       faces = Array.new
       definition.entities.each do | ent |
-        case ent
-        when Sketchup::Group, Sketchup::ComponentInstance
-          
-          # skip hidden objects
-          #(?) add option to export hidden objects
-          unless ent.hidden?
-            # ObjectCreator.new( ifc_model, ent, container, containing_entity, parent_ifc, transformation_from_entity, transformation_from_container)
-            ObjectCreator.new(ifc_model, ent, su_total_transformation, ifc_entity, parent_site, parent_building, parent_buildingstorey, parent_space)
+        
+        # skip hidden objects if skip-hidden option is set
+        unless ifc_model.options[:hidden] == false && ent.hidden?
+          case ent
+          when Sketchup::Group, Sketchup::ComponentInstance
+              # ObjectCreator.new( ifc_model, ent, container, containing_entity, parent_ifc, transformation_from_entity, transformation_from_container)
+              ObjectCreator.new(ifc_model, ent, su_total_transformation, ifc_entity, parent_site, parent_building, parent_buildingstorey, parent_space)
+
+          when Sketchup::Face
+            faces << ent
           end
-        when Sketchup::Face
-          faces << ent
         end
       end
       

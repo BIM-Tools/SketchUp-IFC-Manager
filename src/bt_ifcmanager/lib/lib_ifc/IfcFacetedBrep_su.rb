@@ -41,41 +41,36 @@ module BimTools
         vertices = Hash.new
         su_faces.each do |ent|
           if ent.is_a? Sketchup::Face
+            ent.vertices.each do |vert|
+              unless vertices[vert]
+                vertices[vert] = BimTools::IFC2X3::IfcCartesianPoint.new( ifc_model, vert.position.transform(su_transformation))
+              end
+            end
+            face = BimTools::IFC2X3::IfcFace.new( ifc_model )
+            face.bounds = IfcManager::Ifc_Set.new()
+            faces << face
             
-            #skip hidden faces
-            #(!) add option to export hidden objects
-            unless ent.hidden?
-              ent.vertices.each do |vert|
-                unless vertices[vert]
-                  vertices[vert] = BimTools::IFC2X3::IfcCartesianPoint.new( ifc_model, vert.position.transform(su_transformation))
-                end
-              end
-              face = BimTools::IFC2X3::IfcFace.new( ifc_model )
-              face.bounds = IfcManager::Ifc_Set.new()
-              faces << face
+            
+            # collect all loops/bounds for su face
+            ent.loops.each do | loop |
+              points = Array.new
               
-              
-              # collect all loops/bounds for su face
-              ent.loops.each do | loop |
-                points = Array.new
-                
-                # differenciate between inner and outer loops/bounds
-                if loop == ent.outer_loop
-                  bound = BimTools::IFC2X3::IfcFaceOuterBound.new( ifc_model )
-                else
-                  bound = BimTools::IFC2X3::IfcFaceBound.new( ifc_model )
-                end
-                
-                # add loop/bound to face
-                face.bounds.add bound
-                loop.vertices.each do |vert|
-                  points << vertices[vert]
-                end
-                polyloop = BimTools::IFC2X3::IfcPolyLoop.new( ifc_model )
-                bound.bound = polyloop
-                bound.orientation = '.T.' # (?) always true?
-                polyloop.polygon = IfcManager::Ifc_Set.new( points )
+              # differenciate between inner and outer loops/bounds
+              if loop == ent.outer_loop
+                bound = BimTools::IFC2X3::IfcFaceOuterBound.new( ifc_model )
+              else
+                bound = BimTools::IFC2X3::IfcFaceBound.new( ifc_model )
               end
+              
+              # add loop/bound to face
+              face.bounds.add bound
+              loop.vertices.each do |vert|
+                points << vertices[vert]
+              end
+              polyloop = BimTools::IFC2X3::IfcPolyLoop.new( ifc_model )
+              bound.bound = polyloop
+              bound.orientation = '.T.' # (?) always true?
+              polyloop.polygon = IfcManager::Ifc_Set.new( points )
             end
           end
         end
