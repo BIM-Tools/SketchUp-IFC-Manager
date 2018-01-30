@@ -55,7 +55,7 @@ module BimTools
     def initialize( su_model, options = {} )
       
       defaults = {
-        :ifc_entities     => true, # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], true means all
+        :ifc_entities     => false, # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
         :hidden           => false, # include hidden sketchup objects
         :all_attributes   => false, # add all SketchUp attributes as IfcPropertySets
         :classifications  => true, # add all SketchUp classifications

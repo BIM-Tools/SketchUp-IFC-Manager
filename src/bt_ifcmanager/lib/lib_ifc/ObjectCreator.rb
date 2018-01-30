@@ -50,32 +50,39 @@ module BimTools
     
     # def initialize(ifc_model, su_instance, container, containing_entity, parent_ifc, transformation_from_entity, transformation_from_container, site=nil, site_container=nil, building=nil, building_container=nil, building_storey=nil, building_storey_container=nil)
     def initialize(ifc_model, su_instance, su_total_transformation, parent_ifc, parent_site=nil, parent_building=nil, parent_buildingstorey=nil, parent_space=nil)
-      definition = su_instance.definition
+      @skip_entity = false
+      definition = su_instance.definition      
+      ent_type_name = definition.get_attribute("AppliedSchemaTypes", "IFC 2x3")
       
-      #temporary translator 
-      
-      # create IfcEntity
-      
-      # Create IFC entity based on the IFC classification in sketchup
-      begin
-        require_relative File.join('IFC2X3', definition.get_attribute("AppliedSchemaTypes", "IFC 2x3"))
-        entity_type = eval("BimTools::IFC2X3::#{definition.get_attribute("AppliedSchemaTypes", "IFC 2x3")}")
+      # check if entity_type is part of the entity list that needs exporting
+      if ifc_model.options[:ifc_entities] == false || ifc_model.options[:ifc_entities].include?( ent_type_name )
         
-        # merge this project with the default project
-        #(?) what if there are multiple projects defined?
-        if entity_type == BimTools::IFC2X3::IfcProject
-          ifc_entity = ifc_model.project
-        else
-          ifc_entity = entity_type.new(ifc_model, su_instance)
+        # Create IFC entity based on the IFC classification in sketchup
+        begin
+          require_relative File.join('IFC2X3', ent_type_name)
+          entity_type = eval("BimTools::IFC2X3::#{ent_type_name}")
+          
+          
+          # merge this project with the default project
+          #(?) what if there are multiple projects defined?
+          if entity_type == BimTools::IFC2X3::IfcProject
+            ifc_entity = ifc_model.project
+          else
+            ifc_entity = entity_type.new(ifc_model, su_instance)
+          end
+        rescue
+          
+          # If not classified as IFC in sketchup AND the parent is an IfcSpatialStructureElement then this is an IfcBuildingElementProxy
+          if parent_ifc.is_a?(BimTools::IFC2X3::IfcSpatialStructureElement) || parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
+            ifc_entity = BimTools::IFC2X3::IfcBuildingElementProxy.new(ifc_model, su_instance)
+          else # this instance is pure geometry, ifc_entity = nil
+            ifc_entity = nil
+          end
         end
-      rescue
+      else
         
-        # If not classified as IFC in sketchup AND the parent is an IfcSpatialStructureElement then this is an IfcBuildingElementProxy
-        if parent_ifc.is_a?(BimTools::IFC2X3::IfcSpatialStructureElement) || parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
-          ifc_entity = BimTools::IFC2X3::IfcBuildingElementProxy.new(ifc_model, su_instance)
-        else # this instance is pure geometry, ifc_entity = nil
-          ifc_entity = nil
-        end
+        # mark this entity's geometry to be skipped
+        @skip_entity = true
       end
       
       # find the correct parent in the spacialhierarchy
@@ -272,7 +279,9 @@ module BimTools
               ObjectCreator.new(ifc_model, ent, su_total_transformation, ifc_entity, parent_site, parent_building, parent_buildingstorey, parent_space)
 
           when Sketchup::Face
-            faces << ent
+            unless @skip_entity
+              faces << ent
+            end
           end
         end
       end
