@@ -98,21 +98,38 @@ module BimTools
         #add self to IfcPresentationLayerAssignment
         ifc_model.layers[instance.layer.name].assigneditems.add( @representation.representations.first )
         
-        collect_psets( ifc_model, instance.definition )
+        if ifc_model.options[:attributes]
+          ifc_model.options[:attributes].each do | attr_dict_name |
+            collect_psets( ifc_model, instance.definition.attribute_dictionary( attr_dict_name ) )
+            collect_psets( ifc_model, instance.attribute_dictionary( attr_dict_name ) )
+          end
+        else
+          if instance.definition.attribute_dictionaries
+            instance.definition.attribute_dictionaries.each do | attr_dict |
+              collect_psets( ifc_model, attr_dict )
+            end
+          end
+          if instance.attribute_dictionaries
+            instance.attribute_dictionaries.each do | attr_dict |
+              collect_psets( ifc_model, attr_dict )
+            end
+          end
+        end
         collect_classifications( ifc_model, instance.definition )
       end      
     end # def initialize
       
-    def collect_psets( ifc_model, su_ent )
-      if su_ent.attribute_dictionaries
-        su_ent.attribute_dictionaries.each do | attr_dict |
-        
-          # get_properties and create propertysets for all nested attribute dictionaries
-          # except for classifications
-          unless attr_dict.name == "AppliedSchemaTypes" || ifc_model.su_model.classifications[ attr_dict.name ]
-            reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, attr_dict )
-            reldef.relatedobjects.add( self )
-            collect_psets( ifc_model, attr_dict )
+    def collect_psets( ifc_model, attr_dict )
+      if attr_dict.is_a? Sketchup::AttributeDictionary
+        # get_properties and create propertysets for all nested attribute dictionaries
+        # except for classifications
+        unless attr_dict.name == "AppliedSchemaTypes" || ifc_model.su_model.classifications[ attr_dict.name ]
+          reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, attr_dict )
+          reldef.relatedobjects.add( self )
+          if attr_dict.attribute_dictionaries
+            attr_dict.attribute_dictionaries.each do | sub_attr_dict |
+              collect_psets( ifc_model, sub_attr_dict )
+            end
           end
         end
       end
