@@ -107,3 +107,6 @@ legend
 * html .ui-autocomplete {
   height: 10em;
 }
+.enter {
+  background-image: url("../images/enter.png");
+}

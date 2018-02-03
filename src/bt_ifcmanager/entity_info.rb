@@ -41,20 +41,6 @@ module BimTools
         end
       end # def update
 
-      #def add_submit()
-      #  save = SKUI::Button.new( "Save" )
-      #  
-      #  save.on( :click ) { |control, value| # (?) Second argument needed?
-      #    update_type
-      #    update_nlsfb
-      #    update_name
-      #    update_materials
-      #    update_layers
-      #  }
-      #  
-      #  @section.add_control( save )
-      #end # def submit
-
       def add_name( entity )
         if entity.is_a?( Sketchup::ComponentInstance )
           name = entity.definition.name
@@ -63,10 +49,7 @@ module BimTools
         end
         @name = SKUI::Textbox.new( name )
         lbl = SKUI::Label.new( 'Name:', @name )
-        
-        #@save_name = SKUI::Button.new( "" )
-        #@save_name.width = 20
-        #@save_name.height = 20
+        @name.tab_index = 3
 
         # get list of used component names
         list = Array.new
@@ -77,6 +60,13 @@ module BimTools
 
         # get the name name for entity
         @name.value = name
+        
+        @enter_n = SKUI::Button.new( "" )
+        @enter_n.width = 20 
+        @enter_n.height = 20
+        @enter_n.css_class = 'enter'
+        @enter_n.tooltip = 'Save'
+        @enter_n.tab_index = 8
         
         # inject options list AFTER window is loaded. (?) could be done on initialisation
         PropertiesWindow.window.on( :ready ) { |control, value| # (?) Second argument needed?
@@ -89,12 +79,6 @@ module BimTools
           js_command << "$('#" + control.ui_id + "_ui').select();"
           PropertiesWindow.window.webdialog.execute_script(js_command)
         }
-        
-        #@name.on( :keypress) { |control, value| # (?) Second argument needed?
-        #puts 'keypresssss'
-        #puts control
-        #puts value
-        #}
         
         @name.on( :blur || :textchange ) { |control, value| # (?) Second argument needed?
           model = Sketchup.active_model
@@ -127,16 +111,14 @@ module BimTools
           PropertiesWindow.update
         }
         
-        # on click: save
-        #@save_name.on( :click ) { |control, value| # (?) Second argument needed?
-        #  #js_command = "$('#" + control.ui_id + "_ui').next.focus();"
-        #  js_command = "alert($('#" + control.ui_id + "_ui'));"
-        #  PropertiesWindow.window.webdialog.execute_script(js_command)
-        #  puts 'save!!!'
-        #}
+        # on click: change focus = save
+        @enter_n.on( :click ) { |control, value| # (?) Second argument needed?
+          js_command = "$('##{control.ui_id}').focus();"
+          PropertiesWindow.window.webdialog.execute_script(js_command)
+        }
 
         @section.add_control( lbl )
-        #@section.add_control( @save_name )
+        @section.add_control( @enter_n )
         @section.add_control( @name )
       end # def add_name
 
@@ -148,14 +130,27 @@ module BimTools
         end
         @description = SKUI::Textbox.new( description )
         lbl = SKUI::Label.new( 'Description:', @description )
+        
+        @enter_d = SKUI::Button.new( "" )
+        @enter_d.width = 20 
+        @enter_d.height = 20
+        @enter_d.css_class = 'enter'
+        @enter_d.tooltip = 'Save'
 
         # set the selected material as object material
         @description.on( :blur || :textchange ) { |control, value| # (?) Second argument needed?
           entity = Sketchup.active_model.selection[0]
           entity.definition.description = control.value
         }
+        
+        # on click: change focus = save
+        @enter_d.on( :click ) { |control, value| # (?) Second argument needed?
+          js_command = "$('##{control.ui_id}').focus();"
+          PropertiesWindow.window.webdialog.execute_script(js_command)
+        }
 
         @section.add_control( lbl )
+        @section.add_control( @enter_d )
         @section.add_control( @description )
 
       end # def add_description
@@ -166,9 +161,17 @@ module BimTools
 
         @type = SKUI::Textbox.new( get_ifc_type( entity ) )
         lbl = SKUI::Label.new( 'IFC entity:', @type )
+        @type.tab_index = 1
 
         # get the type name for entity
         @type.value = get_ifc_type( entity )
+        
+        @enter_t = SKUI::Button.new( "" )
+        @enter_t.width = 20 
+        @enter_t.height = 20
+        @enter_t.css_class = 'enter'
+        @enter_t.tooltip = 'Save'
+        @enter_t.tab_index = 6
         
         # inject options list AFTER window is loaded. (?) could be done on initialisation
         PropertiesWindow.window.on( :ready ) { |control, value| # (?) Second argument needed?
@@ -181,7 +184,7 @@ module BimTools
           js_command << "$('#" + control.ui_id + "_ui').select();"
           PropertiesWindow.window.webdialog.execute_script(js_command)
         }
-
+        
         @type.on( :blur || :textchange ) { |control, value| # (?) Second argument needed?
           entity = Sketchup.active_model.selection[0]
           selected = get_ifc_type( entity )
@@ -198,8 +201,15 @@ module BimTools
 
           PropertiesWindow.update
         }
+        
+        # on click: change focus = save
+        @enter_t.on( :click ) { |control, value| # (?) Second argument needed?
+          js_command = "$('##{control.ui_id}').focus();"
+          PropertiesWindow.window.webdialog.execute_script(js_command)
+        }
 
         @section.add_control( lbl )
+        @section.add_control( @enter_t )
         @section.add_control( @type )
       end # def add_type
 
@@ -213,10 +223,20 @@ module BimTools
 
         @materials = SKUI::Textbox.new( value )
         lbl = SKUI::Label.new( 'Material:', @materials )
+        @materials.tab_index = 4
         
         @new_material = SKUI::Button.new( "" )
         @new_material.width = 20
         @new_material.height = 20
+        @new_material.tooltip = 'Create new material'
+        @new_material.tab_index = 9
+        
+        @enter_m = SKUI::Button.new( "" )
+        @enter_m.width = 20 
+        @enter_m.height = 20
+        @enter_m.css_class = 'enter'
+        @enter_m.tooltip = 'Save'
+        @enter_m.tab_index = 10
         
         # inject options list AFTER window is loaded. (?) could be done on initialisation
         PropertiesWindow.window.on( :ready ) { |control, value| # (?) Second argument needed?
@@ -259,8 +279,15 @@ module BimTools
             PropertiesWindow.update
           end
         }
-
+        
+        # on click: change focus = save
+        @enter_m.on( :click ) { |control, value| # (?) Second argument needed?
+          js_command = "$('##{control.ui_id}').focus();"
+          PropertiesWindow.window.webdialog.execute_script(js_command)
+        }
+        
         @section.add_control( lbl )
+        @section.add_control( @enter_m )
         @section.add_control( @new_material )
         @section.add_control( @materials )
 
@@ -278,9 +305,19 @@ module BimTools
         @new_layer = SKUI::Button.new( "" )
         @new_layer.width = 20 
         @new_layer.height = 20
+        @new_layer.tooltip = 'Create new layer'
+        @new_layer.tab_index = 11
 
         @layers = SKUI::Textbox.new( value )
         lbl = SKUI::Label.new( 'Layer:', @layers )
+        @layers.tab_index = 5
+        
+        @enter_l = SKUI::Button.new( "" )
+        @enter_l.width = 20 
+        @enter_l.height = 20
+        @enter_l.css_class = 'enter'
+        @enter_l.tooltip = 'Save'
+        @enter_l.tab_index = 12
         
         # inject options list AFTER window is loaded. (?) could be done on initialisation
         PropertiesWindow.window.on( :ready ) { |control, value| # (?) Second argument needed?
@@ -320,8 +357,15 @@ module BimTools
             PropertiesWindow.update
           end
         }
+        
+        # on click: change focus = save
+        @enter_l.on( :click ) { |control, value| # (?) Second argument needed?
+          js_command = "$('##{control.ui_id}').focus();"
+          PropertiesWindow.window.webdialog.execute_script(js_command)
+        }
 
         @section.add_control( lbl )
+        @section.add_control( @enter_l )
         @section.add_control( @new_layer )
         @section.add_control( @layers )
 
@@ -346,12 +390,18 @@ module BimTools
 
         @nlsfb = SKUI::Textbox.new( get_nlsfb_type( entity ) )
         lbl = SKUI::Label.new( 'NL/SfB classification:', @nlsfb )
+        @nlsfb.tab_index = 2
 
         # get the type name for entity
         @nlsfb.value = get_nlsfb_type( entity )
-        
-        # set tooltip
         @nlsfb.tooltip = 'Type a few characters to see possible values'
+        
+        @enter_nlsfb = SKUI::Button.new( "" )
+        @enter_nlsfb.width = 20 
+        @enter_nlsfb.height = 20
+        @enter_nlsfb.css_class = 'enter'
+        @enter_nlsfb.tooltip = 'Save'
+        @enter_nlsfb.tab_index = 7
         
         # inject options list AFTER window is loaded. (?) could be done on initialisation
         PropertiesWindow.window.on( :ready ) { |control, value| # (?) Second argument needed?
@@ -378,8 +428,15 @@ module BimTools
 
           PropertiesWindow.update
         }
-
+        
+        # on click: change focus = save
+        @enter_nlsfb.on( :click ) { |control, value| # (?) Second argument needed?
+          js_command = "$('##{control.ui_id}').focus();"
+          PropertiesWindow.window.webdialog.execute_script(js_command)
+        }
+        
         @section.add_control( lbl )
+        @section.add_control( @enter_nlsfb )
         @section.add_control( @nlsfb )
 
 
