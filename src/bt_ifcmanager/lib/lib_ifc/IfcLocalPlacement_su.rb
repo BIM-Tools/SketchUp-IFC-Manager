@@ -51,7 +51,7 @@ module BimTools
       @ifc_total_transformation = scale.inverse * su_total_transformation * axis_fix
       
       if @placementrelto
-        @transformation = @ifc_total_transformation * @placementrelto.ifc_total_transformation.inverse
+        @transformation = @placementrelto.ifc_total_transformation.inverse * @ifc_total_transformation
       else
         # puts 'no placementrelto for object'
         @transformation = @ifc_total_transformation
