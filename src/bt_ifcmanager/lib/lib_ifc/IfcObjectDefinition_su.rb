@@ -49,6 +49,14 @@ module BimTools
       @decomposes.relatedobjects.add( object )
     end # def add_related_object
     
+    def non_default_related_objects()
+      if @decomposes
+        return @decomposes.relatedobjects.items - [@default_related_object]
+      else
+        return Array.new
+      end
+    end
+    
     # return the default child object
     def get_default_related_object
       unless @default_related_object

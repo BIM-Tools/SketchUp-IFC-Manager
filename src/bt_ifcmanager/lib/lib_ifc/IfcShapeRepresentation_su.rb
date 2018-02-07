@@ -26,12 +26,10 @@ module BimTools
   module IfcShapeRepresentation_su
     def initialize(ifc_model, sketchup)
       super
-      if sketchup.is_a? Sketchup::ComponentDefinition
-        @contextofitems = ifc_model.representationcontext
-        @representationidentifier = "'Body'"
-        @representationtype = "'Brep'"
-        @items = IfcManager::Ifc_Set.new()
-      end      
+      @contextofitems = ifc_model.representationcontext
+      @representationidentifier = "'Body'"
+      @representationtype = "'Brep'"
+      @items = IfcManager::Ifc_Set.new()
     end # def initialize
   end # module IfcShapeRepresentation_su
 end # module BimTools

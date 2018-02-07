@@ -26,11 +26,9 @@ module BimTools
   module IfcProductDefinitionShape_su
     def initialize(ifc_model, sketchup)
       super
-      if sketchup.is_a? Sketchup::ComponentDefinition
-        
-        # set representation based on definition
-        @representations = IfcManager::Ifc_List.new([BimTools::IFC2X3::IfcShapeRepresentation.new( ifc_model , sketchup)])
-      end
+      
+      # set representation based on definition
+      @representations = IfcManager::Ifc_List.new([BimTools::IFC2X3::IfcShapeRepresentation.new( ifc_model , sketchup)])
     end # def sketchup
   end # module IfcProductDefinitionShape_su
 end # module BimTools

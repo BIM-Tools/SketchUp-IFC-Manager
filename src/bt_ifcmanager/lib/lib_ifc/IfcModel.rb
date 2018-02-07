@@ -173,22 +173,44 @@ module BimTools
     # create IFC objects for all su instances
     def create_ifc_objects( sketchup_objects )
       if sketchup_objects.is_a? Sketchup::Model
+        faces = Array.new
         sketchup_objects.entities.each do | ent |
-          if ent.is_a?(Sketchup::Group) || ent.is_a?(Sketchup::ComponentInstance)
-          
-            # skip hidden objects if skip-hidden option is set
-            unless @options[:hidden] == false && ent.hidden?
+        
+          # skip hidden objects if skip-hidden option is set
+          unless @options[:hidden] == false && ent.hidden?
+            case ent
+            when Sketchup::Group, Sketchup::ComponentInstance
               transformation = Geom::Transformation.new
               ObjectCreator.new( self, ent, transformation, @project )
+            when Sketchup::Face
+              faces << ent
             end
-            
-            # require_relative File.join('IFC2X3', 'IfcBuildingElementProxy.rb')
-            # entity = IfcBuildingElementProxy.new( self, ent )
-            # building_storey_container.relatedelements.add( entity )
           end
         end
+        
+        # create IfcBuildingelementProxy from all 'loose' faces combined
+        unless faces.empty?
+          ifc_entity = BimTools::IFC2X3::IfcBuildingElementProxy.new(self, nil)
+          ifc_entity.representation = BimTools::IFC2X3::IfcProductDefinitionShape.new(self, nil)
+          brep = BimTools::IFC2X3::IfcFacetedBrep.new( self, faces, Geom::Transformation.new )
+          ifc_entity.representation.representations.first.items.add( brep )
+          
+          if self.project.non_default_related_objects.length == 0 #   if no IfcSite defined
+            parent_ifc = self.project.get_default_related_object #      parent is default site
+            if parent_ifc.non_default_related_objects.length == 0 #   if no IfcBuilding defined
+              parent_ifc = parent_ifc.get_default_related_object #      parent is default building
+              if parent_ifc.non_default_related_objects.length == 0 # if no IfcBuildingStorey defined
+                parent_ifc = parent_ifc.get_default_related_object #    parent is default buildingstorey
+              end
+            end
+          else
+            parent_ifc = self.project.non_default_related_objects[0]
+          end
+          
+          # add this element to the IfcModel
+          parent_ifc.add_related_element( ifc_entity )
+        end
       end
-      
       return ifc_objects
     end # create_ifc_objects
   end # class IfcModel

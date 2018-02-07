@@ -62,7 +62,6 @@ module BimTools
           require_relative File.join('IFC2X3', ent_type_name)
           entity_type = eval("BimTools::IFC2X3::#{ent_type_name}")
           
-          
           # merge this project with the default project
           #(?) what if there are multiple projects defined?
           if entity_type == BimTools::IFC2X3::IfcProject
@@ -124,52 +123,41 @@ module BimTools
           if parent_space
             parent_ifc = parent_space
           else
-            
-            # get parents number of sub objects
-            if parent_ifc.decomposes
-              total_related_objects = parent_ifc.decomposes.relatedobjects.items.length
-            else
-              total_related_objects = 0
-            end
-            
+          
+            # (!) Problem here is that an object is always added to the default container if it's defined before any other containers are found/created
             case parent_ifc.class.to_s
             when 'BimTools::IFC2X3::IfcProject'
               
               # check if this parent project contains 'non-default' sites
               # if this is the case then place ifc_entity directly into the first site (?) First site ok? or better use a new default site?
-              # if not, then create a default site, building and storey as container for this ifc_entity
-              
-              # if a default_related_object exists, reduce total_related_objects with 1
-              if parent_ifc.default_related_object
-                total_related_objects -= 1
-              end
-              
-              if total_related_objects > 0
-                parent_site = parent_ifc.decomposes.relatedobjects.items[0]
-                parent_ifc = parent_site
+              # if not, then create a default site...
+              if ifc_model.project.non_default_related_objects.length == 0 #   if no IfcSite defined
+                parent_ifc = ifc_model.project.get_default_related_object #      parent is default site
+                parent_site = parent_ifc
+                if parent_ifc.non_default_related_objects.length == 0 #   if no IfcBuilding defined
+                  parent_ifc = parent_ifc.get_default_related_object #      parent is default building
+                  parent_building = parent_ifc
+                  if parent_ifc.non_default_related_objects.length == 0 # if no IfcBuildingStorey defined
+                    parent_ifc = parent_ifc.get_default_related_object #    parent is default buildingstorey
+                    parent_buildingstorey = parent_ifc
+                  end
+                end
               else
-                parent_site = ifc_model.project.get_default_related_object
-                parent_building = parent_site.get_default_related_object
-                parent_buildingstorey = parent_building.get_default_related_object
-                parent_ifc = parent_buildingstorey
+                parent_ifc = parent_ifc.non_default_related_objects[0]
               end
             when 'BimTools::IFC2X3::IfcSite'
               
               # check if this parent site contains 'non-default' buildings
               # if this is the case then place ifc_entity directly into the site
-              # if not, then create a default building as container for this site
+              # if not, then create a default building as container for this site...
               
-              # if a default_related_object exists, reduce total_related_objects with 1
-              if parent_ifc.default_related_object
-                total_related_objects -= 1
-              end
-              
-              if total_related_objects > 0
-                parent_building = nil
-              else
-                parent_building = parent_site.get_default_related_object
-                parent_buildingstorey = parent_building.get_default_related_object
-                parent_ifc = parent_buildingstorey
+              if parent_ifc.non_default_related_objects.length == 0 #   if no IfcBuilding defined
+                parent_ifc = parent_ifc.get_default_related_object #      parent is default building
+                parent_building = parent_ifc
+                if parent_ifc.non_default_related_objects.length == 0 # if no IfcBuildingStorey defined
+                  parent_ifc = parent_ifc.get_default_related_object #    parent is default buildingstorey
+                  parent_buildingstorey = parent_ifc
+                end
               end
             when 'BimTools::IFC2X3::IfcBuilding'
               
@@ -177,16 +165,9 @@ module BimTools
               # if this is the case then place ifc_entity directly inside the building
               # if not, then create a default buildingstorey as container for this building
               
-              # if a default_related_object exists, reduce total_related_objects with 1
-              if parent_ifc.default_related_object
-                total_related_objects -= 1
-              end
-              
-              if total_related_objects > 0
-                parent_buildingstorey = nil
-              else
-                parent_buildingstorey = parent_ifc.get_default_related_object
-                parent_ifc = parent_buildingstorey
+              if parent_ifc.non_default_related_objects.length == 0 # if no IfcBuildingStorey defined
+                parent_ifc = parent_ifc.get_default_related_object #    parent is default buildingstorey
+                parent_buildingstorey = parent_ifc
               end
             when 'BimTools::IFC2X3::IfcBuildingStorey'
               parent_buildingstorey = parent_ifc
@@ -275,8 +256,8 @@ module BimTools
         unless ifc_model.options[:hidden] == false && ent.hidden?
           case ent
           when Sketchup::Group, Sketchup::ComponentInstance
-              # ObjectCreator.new( ifc_model, ent, container, containing_entity, parent_ifc, transformation_from_entity, transformation_from_container)
-              ObjectCreator.new(ifc_model, ent, su_total_transformation, ifc_entity, parent_site, parent_building, parent_buildingstorey, parent_space)
+            # ObjectCreator.new( ifc_model, ent, container, containing_entity, parent_ifc, transformation_from_entity, transformation_from_container)
+            ObjectCreator.new(ifc_model, ent, su_total_transformation, ifc_entity, parent_site, parent_building, parent_buildingstorey, parent_space)
 
           when Sketchup::Face
             unless @skip_entity
