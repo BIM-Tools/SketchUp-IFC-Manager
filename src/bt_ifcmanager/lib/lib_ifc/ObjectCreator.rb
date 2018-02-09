@@ -49,9 +49,10 @@ module BimTools
   class ObjectCreator
     
     # def initialize(ifc_model, su_instance, container, containing_entity, parent_ifc, transformation_from_entity, transformation_from_container, site=nil, site_container=nil, building=nil, building_container=nil, building_storey=nil, building_storey_container=nil)
-    def initialize(ifc_model, su_instance, su_total_transformation, parent_ifc, parent_site=nil, parent_building=nil, parent_buildingstorey=nil, parent_space=nil)
+    def initialize(ifc_model, su_instance, su_total_transformation, parent_ifc, parent_site=nil, parent_building=nil, parent_buildingstorey=nil, parent_space=nil, su_material=nil)
       @skip_entity = false
-      definition = su_instance.definition      
+      definition = su_instance.definition   
+      su_material = su_instance.material if su_instance.material      
       ent_type_name = definition.get_attribute("AppliedSchemaTypes", "IFC 2x3")
       
       # check if entity_type is part of the entity list that needs exporting
@@ -257,7 +258,7 @@ module BimTools
           case ent
           when Sketchup::Group, Sketchup::ComponentInstance
             # ObjectCreator.new( ifc_model, ent, container, containing_entity, parent_ifc, transformation_from_entity, transformation_from_container)
-            ObjectCreator.new(ifc_model, ent, su_total_transformation, ifc_entity, parent_site, parent_building, parent_buildingstorey, parent_space)
+            ObjectCreator.new(ifc_model, ent, su_total_transformation, ifc_entity, parent_site, parent_building, parent_buildingstorey, parent_space, su_material)
 
           when Sketchup::Face
             unless @skip_entity
@@ -278,10 +279,11 @@ module BimTools
         brep = BimTools::IFC2X3::IfcFacetedBrep.new( ifc_model, faces, brep_transformation )
         ifc_entity.representation.representations.first.items.add( brep )
         
-        # add color from su-object material
-        if su_instance.material
-          BimTools::IFC2X3::IfcStyledItem.new( ifc_model, brep, su_instance.material )
+        # add color from su-object material, or a su_parent's
+        if su_material.nil?
+          su_material = faces[0].material unless faces[0].material.nil?
         end
+        BimTools::IFC2X3::IfcStyledItem.new( ifc_model, brep, su_material )
       end
     end # def initialize
   end # class ObjectCreator

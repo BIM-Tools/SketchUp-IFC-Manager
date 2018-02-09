@@ -26,7 +26,7 @@ require_relative File.join('IFC2X3', 'IfcColourRgb.rb')
 
 module BimTools
   module IfcStyledItem_su
-    def initialize(ifc_model, brep, material)
+    def initialize(ifc_model, brep, material=nil)
       super
       
       styleassignment = BimTools::IFC2X3::IfcPresentationStyleAssignment.new( ifc_model, material )
@@ -43,13 +43,25 @@ module BimTools
       surfacestyle.styles = IfcManager::Ifc_Set.new( [surfacestylerendering] )
       
       surfacestylerendering.surfacecolour = colourrgb
-      surfacestylerendering.transparency = material.alpha.to_s
       surfacestylerendering.reflectancemethod = '.NOTDEFINED.'
       
-      # add color values, converted from 0/255 to fraction
-      colourrgb.red = (material.color.red.to_f / 255).to_s
-      colourrgb.green = (material.color.green.to_f / 255).to_s
-      colourrgb.blue = (material.color.blue.to_f / 255).to_s
+      if material
+      
+        # add transparency, converted from Sketchup's alpha value
+        surfacestylerendering.transparency = (1 - material.alpha ).to_s
+        
+        # add color values, converted from 0/255 to fraction
+        colourrgb.red = (material.color.red.to_f / 255).to_s
+        colourrgb.green = (material.color.green.to_f / 255).to_s
+        colourrgb.blue = (material.color.blue.to_f / 255).to_s
+      else
+      
+        # (?) use default values == white
+        surfacestylerendering.transparency = "0"
+        colourrgb.red = "255"
+        colourrgb.green = "255"
+        colourrgb.blue = "255"
+      end
       
     end # def initialize
     

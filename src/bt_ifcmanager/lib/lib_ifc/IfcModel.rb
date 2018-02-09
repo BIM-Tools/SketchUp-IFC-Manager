@@ -209,6 +209,14 @@ module BimTools
           
           # add this element to the IfcModel
           parent_ifc.add_related_element( ifc_entity )
+        
+          # add color from su-object material, or a su_parent's
+          if faces[0].material.nil?
+            su_material = nil
+          else
+            su_material = faces[0].material
+          end
+          BimTools::IFC2X3::IfcStyledItem.new( self, brep, su_material )
         end
       end
       return ifc_objects
