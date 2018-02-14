@@ -1,4 +1,4 @@
-#  IfcReal.rb
+#  IfcBoolean.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
 #
@@ -19,30 +19,29 @@
 #
 #
 
+require_relative 'Ifc_Type.rb'
+
 module BimTools
  module IfcManager
-  class IfcReal
-    attr_accessor :long
+  class IfcBoolean < Ifc_Type
     def initialize( value )
-      begin
-        @value = value.to_f
-      rescue StandardError, TypeError => e
-        print value + "cannot be converted to a Float" + e
-      end
+      @value = true?(value) # (!) type check? error when not explicitly string false?
     end # def initialize
     def step()
-      val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
+      if @value
+        val = ".T."
+      else
+        val = ".F."
+      end
       if @long
         val = add_long( val )
       end
       return val
     end # def step
     
-    # adding long = true returns a full object string
-    def add_long( string )
-      classname = self.class.name.split('::').last.upcase
-      return "#{classname}(#{string})"
+    def true?(obj)
+      obj.to_s == "true"
     end
-  end # class IfcReal
+  end # class IfcBoolean
  end # module IfcManager
 end # module BimTools

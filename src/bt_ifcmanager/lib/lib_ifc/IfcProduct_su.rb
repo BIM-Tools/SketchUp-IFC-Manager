@@ -48,22 +48,37 @@ module BimTools
         @name = BimTools::IfcManager::IfcLabel.new( definition.name )
         
         if definition.attribute_dictionaries
-          if dict = definition.attribute_dictionaries['IFC 2x3']
-            properties.each do |prop|
-              if prop_dict = dict.attribute_dictionaries[prop.to_s]
-                sub_dict = prop_dict.attribute_dictionaries[prop.to_s]
+          if definition.attribute_dictionaries['IFC 2x3']
+            if props_ifc = definition.attribute_dictionaries['IFC 2x3'].attribute_dictionaries
+              props_ifc.each do |prop_dict|
+                prop = prop_dict.name
+                prop_sym = prop.to_sym
+                if properties.include? prop_sym
+                  #prop_dict = props_ifc[prop.to_s]
+                  #sub_dict = prop_dict.attribute_dictionaries[prop.to_s]
+                  
+                  
+                  # (!) this needs improvement using a typecheck
+                  text = prop_dict.get_attribute( "IfcText", "value" )
+                  label = prop_dict.get_attribute( "IfcLabel", "value" )
+                  length = prop_dict.get_attribute( "IfcLengthMeasure", "value" )
+                  
+                  if text != nil && text != ""
+                    send("#{prop.downcase}=", "'#{text}'")
+                  elsif label != nil && label != ""
+                    send("#{prop.downcase}=", "'#{label}'")
+                  elsif length != nil && length != ""
+                    send("#{prop.downcase}=", length.to_f.to_s)
+                  end
+                else
                 
-                # (!) this needs improvement using a typecheck
-                text = prop_dict.get_attribute( "IfcText", "value" )
-                label = prop_dict.get_attribute( "IfcLabel", "value" )
-                length = prop_dict.get_attribute( "IfcLengthMeasure", "value" )
                 
-                if text != nil && text != ""
-                  send("#{prop.downcase}=", "'#{text}'")
-                elsif label != nil && label != ""
-                  send("#{prop.downcase}=", "'#{label}'")
-                elsif length != nil && length != ""
-                  send("#{prop.downcase}=", length.to_f.to_s)
+                
+                
+                  if prop_dict.attribute_dictionaries && prop_dict.name != "instanceAttributes"
+                    reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, prop_dict )
+                    reldef.relatedobjects.add( self )
+                  end
                 end
               end
             end
