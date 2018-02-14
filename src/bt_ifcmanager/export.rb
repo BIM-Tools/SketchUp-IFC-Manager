@@ -23,6 +23,8 @@ require_relative File.join('lib', 'lib_ifc', 'IfcModel.rb')
 
 module BimTools
   module IfcManager
+    require 'net/http'
+    require 'uri'
     require File.join(PLUGIN_PATH, 'update_ifc_fields.rb')
 
     def export( file_path )
@@ -84,6 +86,21 @@ module BimTools
       pb.update(4)
       
       show_summary( ifc_model.export_summary, file_path, time )
+      
+      # write log
+      begin
+        
+        # run in seperate thread to prevent waiting
+        Thread.new do
+          uri = URI.parse("http://www.bim4sketchup.org/log.php")
+          http = Net::HTTP.new(uri.host, uri.port)
+          request = Net::HTTP::Post.new(uri.request_uri)
+          request.set_form_data({"version" => VERSION, "extension" => "Sketchup IFC Manager"})
+          http.request(request)
+        end
+      rescue
+        puts "failed writing log."
+      end
     end # export
     def show_summary( hash, file_path, time )
       css = File.join(PLUGIN_PATH_CSS, 'sketchup.css')
