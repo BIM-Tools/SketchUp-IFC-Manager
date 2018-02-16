@@ -76,7 +76,7 @@ module BimTools
         # on click: show complete list
         @name.on( :click ) { |control, value| # (?) Second argument needed?
           js_command = "$('#" + control.ui_id + "_ui').autocomplete('search', '');"
-          js_command << "$('#" + control.ui_id + "_ui').select();"
+          #js_command << "$('#" + control.ui_id + "_ui').select();"
           PropertiesWindow.window.webdialog.execute_script(js_command)
         }
         
