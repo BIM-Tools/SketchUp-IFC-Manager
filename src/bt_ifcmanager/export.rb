@@ -28,6 +28,10 @@ module BimTools
     require File.join(PLUGIN_PATH, 'update_ifc_fields.rb')
 
     def export( file_path )
+      if @summary_dialog
+        @summary_dialog.close
+      end
+      
       require File.join(PLUGIN_PATH, 'lib', 'progressbar.rb')
       
       pb = ProgressBar.new(4,"Exporting to IFC...")
@@ -87,6 +91,8 @@ module BimTools
       
       show_summary( ifc_model.export_summary, file_path, time )
       
+      #UI.openURL( file_path ) 
+      
       # write log
       begin
         
@@ -111,7 +117,7 @@ module BimTools
       html << "\n To file '" + file_path + "'\n"
       html << "\n Taking a total number of " + time.to_s + " seconds\n"
       html << "</textarea></body></html>"
-      dialog = UI::HtmlDialog.new(
+      @summary_dialog = UI::HtmlDialog.new(
       {
         :dialog_title => "Export results",
         :scrollable => false,
@@ -122,8 +128,8 @@ module BimTools
         :top => 100,
         :style => UI::HtmlDialog::STYLE_UTILITY
       })
-      dialog.set_html( html )
-      dialog.show
+      @summary_dialog.set_html( html )
+      @summary_dialog.show
     end
   end # module IfcManager
 end # module BimTools

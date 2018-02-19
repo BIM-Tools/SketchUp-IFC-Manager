@@ -53,26 +53,27 @@ module BimTools
       selection = Sketchup.active_model.selection
       
       model.start_operation('Create IFC Component', true)
-        
-        # collect selected entities in an Array
-        selected = Array.new
-        selection.each { |ent| selected << ent}
-        
-        # create temporary group
-        group = entities.add_group( selected )
-        
-        # convert group to component instance
-        instance = group.to_component
-        
-        # set component name
-        instance.definition.name = model.definitions.unique_name( name.downcase )
-        
-        # set IFC type
-        instance.definition.add_classification("IFC 2x3", ifc_type)
-        
-        # set group as selected entity
-        selection.clear
-        selection.add( instance )
+      
+      # collect selected entities in an Array
+      selected = Array.new
+      selection.each { |ent| selected << ent}
+      
+      # create temporary group
+      group = entities.add_group( selected )
+      
+      # convert group to component instance
+      instance = group.to_component
+      
+      # set component name
+      instance.definition.name = model.definitions.unique_name( name.downcase )
+      
+      # set IFC type
+      instance.definition.add_classification("IFC 2x3", ifc_type)
+      
+      # set group as selected entity
+      selection.clear
+      selection.add( instance )
+      
       model.commit_operation
       
       # open edit window

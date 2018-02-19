@@ -149,7 +149,7 @@ module BimTools
       owner_history.owninguser.theorganization.name = BimTools::IfcManager::IfcLabel.new( "BIM-Tools" )
       owner_history.owningapplication = BimTools::IFC2X3::IfcApplication.new( self )
       owner_history.owningapplication.applicationdeveloper = owner_history.owninguser.theorganization
-      owner_history.owningapplication.version = "'2.0'"
+      owner_history.owningapplication.version = VERSION
       owner_history.owningapplication.applicationfullname = "'IFC manager for sketchup'"
       owner_history.owningapplication.applicationidentifier = "'su_ifcmanager'"
       owner_history.changeaction = '.ADDED.'
@@ -211,6 +211,7 @@ module BimTools
           parent_ifc.add_related_element( ifc_entity )
         
           # add color from su-object material, or a su_parent's
+          # if no material found, check first face in group for a material and if true, use that.
           if faces[0].material.nil?
             su_material = nil
           else

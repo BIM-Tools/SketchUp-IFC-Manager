@@ -279,10 +279,12 @@ module BimTools
         brep = BimTools::IFC2X3::IfcFacetedBrep.new( ifc_model, faces, brep_transformation )
         ifc_entity.representation.representations.first.items.add( brep )
         
+        # if no material present, use material from first face?
+        #if su_material.nil?
+        #  su_material = faces[0].material unless faces[0].material.nil?
+        #end
+        
         # add color from su-object material, or a su_parent's
-        if su_material.nil?
-          su_material = faces[0].material unless faces[0].material.nil?
-        end
         BimTools::IFC2X3::IfcStyledItem.new( ifc_model, brep, su_material )
       end
     end # def initialize
