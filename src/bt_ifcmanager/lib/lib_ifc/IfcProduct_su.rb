@@ -84,6 +84,11 @@ module BimTools
             end
           end
         end
+        
+        # (!) fill predefinedtype, needs more work
+        if @predefinedtype.nil?
+          @predefinedtype = '.NOTDEFINED.'
+        end
 
         # set representation based on definition
         @representation = BimTools::IFC2X3::IfcProductDefinitionShape.new(ifc_model, sketchup.definition)
