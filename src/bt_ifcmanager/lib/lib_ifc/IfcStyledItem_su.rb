@@ -57,10 +57,10 @@ module BimTools
       else
       
         # (?) use default values == white
-        surfacestylerendering.transparency = "0"
-        colourrgb.red = "255"
-        colourrgb.green = "255"
-        colourrgb.blue = "255"
+        surfacestylerendering.transparency = "0.0"
+        colourrgb.red = "1.0"
+        colourrgb.green = "1.0"
+        colourrgb.blue = "1.0"
       end
       
     end # def initialize
