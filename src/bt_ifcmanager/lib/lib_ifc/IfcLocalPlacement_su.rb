@@ -43,12 +43,16 @@ module BimTools
       
       # strip out scaling
       t = su_total_transformation.to_a
-      sx = Geom::Vector3d.new([t[0],t[4],t[8]])
-      sy = Geom::Vector3d.new([t[1],t[5],t[9]])
-      sz = Geom::Vector3d.new([t[2],t[6],t[10]])
-      scale = Geom::Transformation.scaling(sx.length, sy.length, sz.length)
+      #sx = Geom::Vector3d.new([t[0],t[4],t[8]])
+      #sy = Geom::Vector3d.new([t[1],t[5],t[9]])
+      #sz = Geom::Vector3d.new([t[2],t[6],t[10]])
+      #scale = Geom::Transformation.scaling(sx.length, sy.length, sz.length)
+      x = t[0..2].normalize # is the xaxis
+      y = t[4..6].normalize # is the yaxis
+      z = t[8..10].normalize # is the zaxis
+      no_scale = Geom::Transformation.axes(su_total_transformation.origin, x, y, z)
       
-      @ifc_total_transformation = scale.inverse * su_total_transformation * axis_fix
+      @ifc_total_transformation = no_scale * axis_fix
       
       if @placementrelto
         @transformation = @placementrelto.ifc_total_transformation.inverse * @ifc_total_transformation
