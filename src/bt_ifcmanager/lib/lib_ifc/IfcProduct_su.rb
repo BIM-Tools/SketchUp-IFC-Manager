@@ -90,17 +90,20 @@ module BimTools
         
         # set material if sketchup instance has a material
         if instance.material
-          
-          #check if materialassociation exists
-          unless ifc_model.materials[instance.material.display_name]
-            
-            # create new materialassociation
-            ifc_model.materials[instance.material.display_name] = BimTools::IFC2X3::IfcRelAssociatesMaterial.new(ifc_model, instance.material)
-          end
-          
-          #add self to materialassociation
-          ifc_model.materials[instance.material.display_name].relatedobjects.add( self )
+          material_name = instance.material.display_name
+        else
+          material_name = "Default"
         end
+          
+        #check if materialassociation exists
+        unless ifc_model.materials[material_name]
+          
+          # create new materialassociation
+          ifc_model.materials[material_name] = BimTools::IFC2X3::IfcRelAssociatesMaterial.new(ifc_model, material_name)
+        end
+        
+        #add self to materialassociation
+        ifc_model.materials[material_name].relatedobjects.add( self )
         
         # set layer
         #check if IfcPresentationLayerAssignment exists

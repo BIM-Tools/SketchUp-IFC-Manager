@@ -29,13 +29,11 @@ module BimTools
       # (!) this should be automatically created by root!!!
       @globalid = IfcManager::new_guid
       @ownerhistory = ifc_model.owner_history
+      material_name = sketchup
       
-      if sketchup.is_a?( Sketchup::Material )
-        su_material = sketchup
-        @relatingmaterial = BimTools::IFC2X3::IfcMaterial.new( ifc_model )
-        @relatingmaterial.name = "'#{su_material.display_name}'"
-        @relatedobjects = IfcManager::Ifc_Set.new()
-      end
+      @relatingmaterial = BimTools::IFC2X3::IfcMaterial.new( ifc_model )
+      @relatingmaterial.name = "'#{material_name}'"
+      @relatedobjects = IfcManager::Ifc_Set.new()
     end # def sketchup
   end # module IfcRelAssociatesMaterial_su
 end # module BimTools
