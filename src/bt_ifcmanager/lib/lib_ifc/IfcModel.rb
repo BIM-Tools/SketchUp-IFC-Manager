@@ -149,7 +149,7 @@ module BimTools
       owner_history.owninguser.theorganization.name = BimTools::IfcManager::IfcLabel.new( "BIM-Tools" )
       owner_history.owningapplication = BimTools::IFC2X3::IfcApplication.new( self )
       owner_history.owningapplication.applicationdeveloper = owner_history.owninguser.theorganization
-      owner_history.owningapplication.version = VERSION
+      owner_history.owningapplication.version = "'#{VERSION}'"
       owner_history.owningapplication.applicationfullname = "'IFC manager for sketchup'"
       owner_history.owningapplication.applicationidentifier = "'su_ifcmanager'"
       owner_history.changeaction = '.ADDED.'
