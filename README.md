@@ -10,4 +10,5 @@ Rendering this extension useless untill the SketchUp team fixes the bug or I fin
 - [Download](https://github.com/BIM-Tools/SketchUp-IFC-Manager/releases)
 - [Wiki](https://github.com/BIM-Tools/SketchUp-IFC-Manager/wiki)
 - Read the ILS for SketchUp [PDF documentation](/ILS_Native_SketchUp_v2-0_ILS.pdf)
-- Watch the [video tutorial](https://vimeo.com/256742066)
+- Watch the [video tutorial of the IFC manager plugin](https://vimeo.com/256742066)
+- Watch the [video tutorial of the paint properties tool](https://vimeo.com/256742112)
