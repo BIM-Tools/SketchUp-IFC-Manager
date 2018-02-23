@@ -56,7 +56,8 @@ module BimTools
       ent_type_name = definition.get_attribute("AppliedSchemaTypes", "IFC 2x3")
       
       # check if entity_type is part of the entity list that needs exporting
-      if ifc_model.options[:ifc_entities] == false || ifc_model.options[:ifc_entities].include?( ent_type_name )
+      # also continue if NOT an IFC entity but the parent object IS an entity
+      if ifc_model.options[:ifc_entities] == false || ifc_model.options[:ifc_entities].include?( ent_type_name ) || ( ent_type_name.nil? && parent_ifc.is_a?(BimTools::IFC2X3::IfcProduct) && !parent_ifc.is_a?(BimTools::IFC2X3::IfcSpatialStructureElement))
         
         # Create IFC entity based on the IFC classification in sketchup
         begin

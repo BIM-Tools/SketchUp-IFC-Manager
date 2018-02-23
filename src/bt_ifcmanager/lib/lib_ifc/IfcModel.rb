@@ -64,8 +64,7 @@ module BimTools
         :styles           => true,                                   # create IfcStyledItems
         :fast_guid        => false                                   # create simplified guids
       }
-      active_options = defaults.merge( options )
-      @options = active_options
+      @options = defaults.merge( options )
       
       @su_model = su_model
       @ifc_id = 0
