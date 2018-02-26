@@ -27,6 +27,7 @@ require_relative File.join('IFC2X3', 'IfcRelDefinesByProperties.rb')
 require_relative File.join('IFC2X3', 'IfcClassification.rb')
 require_relative File.join('IFC2X3', 'IfcClassificationReference.rb')
 require_relative File.join('IFC2X3', 'IfcRelAssociatesClassification.rb')
+require_relative File.join('dynamic_attributes.rb')
 
 module BimTools
   module IfcProduct_su
@@ -39,10 +40,10 @@ module BimTools
       super
       if sketchup.is_a?(Sketchup::Group) || sketchup.is_a?(Sketchup::ComponentInstance)
       
-        instance = sketchup
+        @su_object = sketchup
         
         # get properties from su object and add them to ifc object
-        definition = instance.definition
+        definition = @su_object.definition
         
         #(?) set name, here? is this a duplicate?
         @name = BimTools::IfcManager::IfcLabel.new( definition.name )
@@ -75,7 +76,7 @@ module BimTools
                 
                 
                 
-                  if prop_dict.attribute_dictionaries && prop_dict.name != "instanceAttributes"
+                  if prop_dict.attribute_dictionaries && prop_dict.name != "@su_objectAttributes"
                     reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, prop_dict )
                     reldef.relatedobjects.add( self )
                   end
@@ -93,9 +94,9 @@ module BimTools
         # set representation based on definition
         @representation = BimTools::IFC2X3::IfcProductDefinitionShape.new(ifc_model, sketchup.definition)
         
-        # set material if sketchup instance has a material
-        if instance.material
-          material_name = instance.material.display_name
+        # set material if sketchup @su_object has a material
+        if @su_object.material
+          material_name = @su_object.material.display_name
         else
           material_name = "Default"
         end
@@ -112,34 +113,39 @@ module BimTools
         
         # set layer
         #check if IfcPresentationLayerAssignment exists
-        unless ifc_model.layers[instance.layer.name]
+        unless ifc_model.layers[@su_object.layer.name]
           
           # create new IfcPresentationLayerAssignment
-          ifc_model.layers[instance.layer.name] = BimTools::IFC2X3::IfcPresentationLayerAssignment.new(ifc_model, instance.layer)
+          ifc_model.layers[@su_object.layer.name] = BimTools::IFC2X3::IfcPresentationLayerAssignment.new(ifc_model, @su_object.layer)
         end
         
         #add self to IfcPresentationLayerAssignment
-        ifc_model.layers[instance.layer.name].assigneditems.add( @representation.representations.first )
+        ifc_model.layers[@su_object.layer.name].assigneditems.add( @representation.representations.first )
         
         if ifc_model.options[:attributes]
           ifc_model.options[:attributes].each do | attr_dict_name |
-            collect_psets( ifc_model, instance.definition.attribute_dictionary( attr_dict_name ) )
-            collect_psets( ifc_model, instance.attribute_dictionary( attr_dict_name ) )
+            collect_psets( ifc_model, @su_object.definition.attribute_dictionary( attr_dict_name ) )
+            collect_psets( ifc_model, @su_object.attribute_dictionary( attr_dict_name ) )
           end
         else
-          if instance.definition.attribute_dictionaries
-            instance.definition.attribute_dictionaries.each do | attr_dict |
+          if @su_object.definition.attribute_dictionaries
+            @su_object.definition.attribute_dictionaries.each do | attr_dict |
               collect_psets( ifc_model, attr_dict )
             end
           end
-          if instance.attribute_dictionaries
-            instance.attribute_dictionaries.each do | attr_dict |
+          if @su_object.attribute_dictionaries
+            @su_object.attribute_dictionaries.each do | attr_dict |
               collect_psets( ifc_model, attr_dict )
             end
           end
         end
-        collect_classifications( ifc_model, instance.definition )
-      end      
+        collect_classifications( ifc_model, definition )
+        
+        # collect dynamic component attributes if export option is set
+        if ifc_model.options[:dynamic_attributes]
+          BimTools::DynamicAttributes::get_dynamic_attributes( ifc_model, self )
+        end
+      end
     end # def initialize
       
     def collect_psets( ifc_model, attr_dict )
