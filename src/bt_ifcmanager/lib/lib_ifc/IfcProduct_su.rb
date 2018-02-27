@@ -58,6 +58,16 @@ module BimTools
                   #prop_dict = props_ifc[prop.to_s]
                   #sub_dict = prop_dict.attribute_dictionaries[prop.to_s]
                   
+                  # workaround for objects with additional nesting levels
+                  # like: path = ["IFC 2x3", "IfcWindow", "OverallWidth", "IfcPositiveLengthMeasure", "IfcLengthMeasure"]
+                  # (!) needs improvement
+                  if prop_dict.attribute_dictionaries
+                    prop_dict.attribute_dictionaries.each do |dict|
+                      unless dict.name == "instanceAttributes"
+                        prop_dict = dict
+                      end
+                    end
+                  end
                   
                   # (!) this needs improvement using a typecheck
                   text = prop_dict.get_attribute( "IfcText", "value" )
