@@ -255,7 +255,7 @@ module BimTools
       definition.entities.each do | ent |
         
         # skip hidden objects if skip-hidden option is set
-        unless ifc_model.options[:hidden] == false && ent.hidden?
+        unless ifc_model.options[:hidden] == false && (ent.hidden? || !ent.layer.visible? )
           case ent
           when Sketchup::Group, Sketchup::ComponentInstance
             # ObjectCreator.new( ifc_model, ent, container, containing_entity, parent_ifc, transformation_from_entity, transformation_from_container)

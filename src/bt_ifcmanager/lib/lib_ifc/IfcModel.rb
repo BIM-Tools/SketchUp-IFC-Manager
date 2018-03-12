@@ -177,7 +177,7 @@ module BimTools
         sketchup_objects.entities.each do | ent |
         
           # skip hidden objects if skip-hidden option is set
-          unless @options[:hidden] == false && ent.hidden?
+          unless @options[:hidden] == false && (ent.hidden? || !ent.layer.visible?)
             case ent
             when Sketchup::Group, Sketchup::ComponentInstance
               transformation = Geom::Transformation.new
