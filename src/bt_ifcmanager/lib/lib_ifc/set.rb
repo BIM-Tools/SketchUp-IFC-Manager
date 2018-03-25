@@ -37,18 +37,21 @@ module BimTools
       return @items.first
     end # def add
     def step()
-      line = String.new
-      @items.each do |item|
-        if item.is_a? String
-          line << item
+      line = String.new      
+      $i = 0
+      $num = @items.length
+      while $i < $num  do
+        if @items[$i].is_a? String
+          line << @items[$i]
         else
-          line << "##{item.ifc_id.to_s}"
+          line << "##{@items[$i].ifc_id.to_s}"
         end
         
         #skip the , for the last element
-        unless item == @items.last
+        unless $i == $num - 1
           line << ", "
         end
+        $i +=1
       end
       return "(#{line})"
     end # def step
