@@ -5,6 +5,6 @@ SketchUp-IFC-Manager is an extension that helps you to add more useful informati
 ## Documentation
 - [Download](https://github.com/BIM-Tools/SketchUp-IFC-Manager/releases)
 - [Wiki](https://github.com/BIM-Tools/SketchUp-IFC-Manager/wiki)
-- Read the ILS for SketchUp [PDF documentation](/ILS_Native_SketchUp_v2-0_ILS.pdf)
+- Read the ILS for SketchUp [PDF documentation](/ILS_Native_SketchUp_v2-1_ILS.pdf)
 - Watch the [video tutorial of the IFC manager plugin](https://vimeo.com/256742066)
 - Watch the [video tutorial of the paint properties tool](https://vimeo.com/256742112)
