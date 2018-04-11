@@ -22,10 +22,17 @@
 # This method loads the NL-SfB classification schema
 module BimTools
  module IfcManager
-  def load_nlsfb()
+  def load_nlsfb() # (!) should be load_classifications?
     unless Sketchup.active_model.classifications["NL-SfB"]
       c = Sketchup.active_model.classifications
       file = File.join(PLUGIN_PATH_LIB, 'NL-SfB 2005 tabel 1.skc')
+      c.load_schema(file) if !file.nil?
+    end
+    
+    # also check if IFC2X3 is loaded
+    unless Sketchup.active_model.classifications["IFC 2x3"]
+      c = Sketchup.active_model.classifications
+      file = Sketchup.find_support_file('IFC 2x3.skc', 'Classifications')
       c.load_schema(file) if !file.nil?
     end
   end # def load_nlsfb
