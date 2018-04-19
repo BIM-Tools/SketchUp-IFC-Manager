@@ -24,9 +24,10 @@ require_relative File.join('IFC2X3', 'IfcSIUnit.rb')
 
 module BimTools
   module IfcProject_su
+    attr_accessor :su_object
     def initialize(ifc_model, sketchup)
       super
-      @name = "'Default Project'"
+      self.su_object=(sketchup)
       @ifc_model = ifc_model
       
       # IfcUnitAssignment
@@ -49,6 +50,27 @@ module BimTools
       m3.name = '.CUBIC_METRE.'
       @unitsincontext.units.add( m3 )
     end # def initialize
+    
+    def su_object=(sketchup)
+      @name = "Default Project"
+      @description = "Description of Default Project"
+      if sketchup.is_a?(Sketchup::Group) || sketchup.is_a?(Sketchup::ComponentInstance)
+        @su_object = sketchup
+        
+        # get properties from su object and add them to ifc object
+        unless @su_object.definition.name.nil? || @su_object.definition.name == ""
+          @name = BimTools::IfcManager::IfcLabel.new( @su_object.definition.name )
+          @description = BimTools::IfcManager::IfcLabel.new( @su_object.definition.description )
+        end
+      else
+        unless @ifc_model.su_model.name.nil? || @ifc_model.su_model.name == ""
+          @name = @ifc_model.su_model.name
+          @description = @ifc_model.su_model.description
+        end
+      end
+      #@name = BimTools::IfcManager::IfcLabel.new( name )
+      #@description = BimTools::IfcManager::IfcText.new( description )
+    end
     
     # add export summary for IfcProducts
     def step

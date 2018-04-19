@@ -63,11 +63,12 @@ module BimTools
         begin
           require_relative File.join('IFC2X3', ent_type_name)
           entity_type = eval("BimTools::IFC2X3::#{ent_type_name}")
-          
-          # merge this project with the default project
+        
+          # if a IfcProject then add su_object to the existing project
           #(?) what if there are multiple projects defined?
           if entity_type == BimTools::IFC2X3::IfcProject
-            ifc_entity = ifc_model.project
+            ifc_model.project.su_object = su_instance
+            ifc_entity = nil
           else
             ifc_entity = entity_type.new(ifc_model, su_instance)
           end
@@ -276,7 +277,7 @@ module BimTools
       end
       
       # create geometry from faces
-      unless faces.empty?
+      unless faces.empty? || ifc_entity.is_a?(BimTools::IFC2X3::IfcProject) #(?) skip any geometry placed inside IfcProject object?
         brep = BimTools::IFC2X3::IfcFacetedBrep.new( ifc_model, faces, brep_transformation )
         ifc_entity.representation.representations.first.items.add( brep )
         

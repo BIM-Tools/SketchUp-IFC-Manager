@@ -134,9 +134,6 @@ module BimTools
     # create new IfcProject
     def create_project( su_model )
       project = BimTools::IFC2X3::IfcProject.new(self)
-      project.name = BimTools::IfcManager::IfcLabel.new( su_model.name )
-      project.description = BimTools::IfcManager::IfcText.new( su_model.description )
-      return project
     end # def create_project
     
     # Create new IfcOwnerHistory
