@@ -52,8 +52,8 @@ module BimTools
     end # def initialize
     
     def su_object=(sketchup)
-      @name = "Default Project"
-      @description = "Description of Default Project"
+      @name = BimTools::IfcManager::IfcLabel.new( "Default Project" )
+      @description = BimTools::IfcManager::IfcLabel.new( "Description of Default Project" )
       if sketchup.is_a?(Sketchup::Group) || sketchup.is_a?(Sketchup::ComponentInstance)
         @su_object = sketchup
         
@@ -64,8 +64,8 @@ module BimTools
         end
       else
         unless @ifc_model.su_model.name.nil? || @ifc_model.su_model.name == ""
-          @name = @ifc_model.su_model.name
-          @description = @ifc_model.su_model.description
+          @name = BimTools::IfcManager::IfcLabel.new( @ifc_model.su_model.name )
+          @description = BimTools::IfcManager::IfcLabel.new( @ifc_model.su_model.description )
         end
       end
       #@name = BimTools::IfcManager::IfcLabel.new( name )
