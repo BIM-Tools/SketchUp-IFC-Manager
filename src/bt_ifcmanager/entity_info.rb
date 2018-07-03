@@ -508,7 +508,7 @@ module BimTools
           
           @name.options( list, 2 )
           if entity
-            @name.value = entity.definition.name
+            @name.value = entity.name
           end
         end
       end # def update_name
