@@ -51,13 +51,19 @@ module BimTools
     require File.join(PLUGIN_PATH, 'window.rb')
     require File.join(PLUGIN_PATH, 'export.rb')
     require File.join(PLUGIN_PATH_TOOLS, 'paint_properties.rb')
-    require File.join(PLUGIN_PATH, 'load_nlsfb.rb')
+    require File.join(PLUGIN_PATH, 'load_din276.rb') #(mp) added DIN 276-1
+	require File.join(PLUGIN_PATH, 'load_nlsfb.rb')
     require File.join(PLUGIN_PATH_TOOLS, 'create_component.rb')
     require File.join(PLUGIN_PATH, 'load_materials.rb')
     
     model = Sketchup.active_model
     
-    # load the NL-SfB classification schema
+    #(mp) load the DIN 276-1 classification schema
+    model.start_operation('Load IFC Manager DIN 276-1 classification schema', true)
+    load_din276()
+    model.commit_operation
+	
+	# load the nlsfb classification schema
     model.start_operation('Load IFC Manager NL-SfB classification schema', true)
     load_nlsfb()
     model.commit_operation
