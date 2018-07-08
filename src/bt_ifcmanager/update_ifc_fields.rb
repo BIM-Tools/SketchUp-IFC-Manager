@@ -37,7 +37,7 @@ module BimTools
           # overwrite the IFC label for name with the component name
            
           unless comIns.name == ""
-	   entity.set_classification_value(path, comIns.name) # (?) does every IFC type in sketchup have a name?
+	    entity.set_classification_value(path, comIns.name) # (?) does every IFC type in sketchup have a name?
           else 
            entity.set_classification_value(path, entity.name)
           }
