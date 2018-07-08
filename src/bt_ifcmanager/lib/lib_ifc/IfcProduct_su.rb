@@ -46,7 +46,11 @@ module BimTools
         definition = @su_object.definition
         
         #(?) set name, here? is this a duplicate?
-        @name = BimTools::IfcManager::IfcLabel.new( @su_object.name )
+        unless @su_object.name == ""
+          @name = BimTools::IfcManager::IfcLabel.new( @su_object.name )
+        else 
+          @name = BimTools::IfcManager::IfcLabel.new( definition.name )
+        end
         
         if definition.attribute_dictionaries
           if definition.attribute_dictionaries['IFC 2x3']
