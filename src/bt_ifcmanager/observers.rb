@@ -88,8 +88,9 @@ module BimTools
       # when new model is loaded, close window (?) instantaneous re-open does not work?
       PropertiesWindow.close
       
-      # also load nlsfb classifications and default materials into new model
-      IfcManager.load_nlsfb()
+      # also load din276 and nlsfb classifications and default materials into new model
+      IfcManager.load_din276() #(mp) added DIN 276-1
+	  IfcManager.load_nlsfb()
       IfcManager.load_materials()
     end
   end
