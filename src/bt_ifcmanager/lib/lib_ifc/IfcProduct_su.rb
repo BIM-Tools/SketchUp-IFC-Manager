@@ -55,38 +55,26 @@ module BimTools
                 prop = prop_dict.name
                 prop_sym = prop.to_sym
                 if properties.include? prop_sym
-                  #prop_dict = props_ifc[prop.to_s]
-                  #sub_dict = prop_dict.attribute_dictionaries[prop.to_s]
                   
-                  # workaround for objects with additional nesting levels
+                  # get data for objects with additional nesting levels
                   # like: path = ["IFC 2x3", "IfcWindow", "OverallWidth", "IfcPositiveLengthMeasure", "IfcLengthMeasure"]
-                  # (!) needs improvement
-                  if prop_dict.attribute_dictionaries
-                    prop_dict.attribute_dictionaries.each do |dict|
-                      unless dict.name == "instanceAttributes"
-                        prop_dict = dict
-                      end
+                  val_dict = return_value_dict( prop_dict )
+                  if value = val_dict["value"]
+                    
+                    # create the proper type based on the dictionary name
+                    case val_dict.name
+                    when "IfcText"
+                      send("#{prop.downcase}=", "'#{val_dict["value"]}'")
+                    when "IfcLabel"
+                      send("#{prop.downcase}=", "'#{val_dict["value"]}'")
+                    when "IfcIdentifier"
+                      send("#{prop.downcase}=", "'#{val_dict["value"]}'")
+                    when "IfcLengthMeasure"
+                      send("#{prop.downcase}=", val_dict["value"].to_f.to_s)
                     end
                   end
-                  
-                  # (!) this needs improvement using a typecheck
-                  text = prop_dict.get_attribute( "IfcText", "value" )
-                  label = prop_dict.get_attribute( "IfcLabel", "value" )
-                  length = prop_dict.get_attribute( "IfcLengthMeasure", "value" )
-                  
-                  if text != nil && text != ""
-                    send("#{prop.downcase}=", "'#{text}'")
-                  elsif label != nil && label != ""
-                    send("#{prop.downcase}=", "'#{label}'")
-                  elsif length != nil && length != ""
-                    send("#{prop.downcase}=", length.to_f.to_s)
-                  end
                 else
-                
-                
-                
-                
-                  if prop_dict.attribute_dictionaries && prop_dict.name != "@su_objectAttributes"
+                  if prop_dict.attribute_dictionaries && prop_dict.name != "instanceAttributes"
                     reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, prop_dict )
                     reldef.relatedobjects.add( self )
                   end
@@ -157,7 +145,22 @@ module BimTools
         end
       end
     end # def initialize
+    
+    # find the dictionary containing "value" field
+    def return_value_dict( dict )
       
+      # if a field "value" exists then we are at the data level and data can be retrieved, otherwise dig deeper
+      if dict["value"]
+        return dict
+      else
+        dict.attribute_dictionaries.each do | sub_dict |
+          unless sub_dict.name == "instanceAttributes"
+            return return_value_dict( sub_dict )
+          end
+        end
+      end
+    end # def return_value_dict
+    
     def collect_psets( ifc_model, attr_dict )
       if attr_dict.is_a? Sketchup::AttributeDictionary
         # get_properties and create propertysets for all nested attribute dictionaries
