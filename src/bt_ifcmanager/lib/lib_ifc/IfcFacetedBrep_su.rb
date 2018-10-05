@@ -56,7 +56,7 @@ module BimTools
               points = Array.new
               
               # differenciate between inner and outer loops/bounds
-              if loop == ent.outer_loop
+              if loop.outer?
                 bound = BimTools::IFC2X3::IfcFaceOuterBound.new( ifc_model )
               else
                 bound = BimTools::IFC2X3::IfcFaceBound.new( ifc_model )
@@ -67,6 +67,31 @@ module BimTools
               loop.vertices.each do |vert|
                 points << vertices[vert]
               end
+              # unless su_transformation.xaxis * su_transformation.yaxis * su_transformation.zaxis
+                # points.reverse!
+              # end
+              ta = su_transformation.to_a
+              ta.delete_at(3)
+              ta.delete_at(7)
+              ta.delete_at(11)
+              ta.delete_at(12)
+              ta.delete_at(13)
+              ta.delete_at(14)
+              ta.delete_at(15)
+              # multiply all transformation values to see if the result is negative(and the component is flipped)
+              # then reverse the face loop
+              if su_transformation.xaxis * su_transformation.yaxis % su_transformation.zaxis < 0#su_transformation.to_a.reject(&:zero?).inject(:*) <0
+                points.reverse!
+              #else
+              #puts 'n'
+              end
+              
+              # def self.get_vertex_order(positions, face_normal)
+                # calculated_normal = (positions[1] - positions[0]).cross( (positions[2] - positions[0]) )
+                # order = [0, 1, 2]
+                # order.reverse! if calculated_normal.dot(face_normal) < 0
+                # order
+              # end
               polyloop = BimTools::IFC2X3::IfcPolyLoop.new( ifc_model )
               bound.bound = polyloop
               bound.orientation = '.T.' # (?) always true?

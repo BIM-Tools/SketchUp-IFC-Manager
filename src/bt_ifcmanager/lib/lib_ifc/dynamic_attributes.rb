@@ -29,7 +29,8 @@ module BimTools
  module DynamicAttributes
   def self.get_dynamic_attributes( ifc_model, ifc_object )
     
-    definition = ifc_object.su_object.definition
+    instance = ifc_object.su_object
+    definition = instance.definition
     pset_hash = Hash.new
     qty_hash = Hash.new
     
@@ -39,67 +40,77 @@ module BimTools
       
         # collect "main" fields --> keys NOT beginning with "_"
         unless key.start_with?('_')
-          # get all corresponding data fields
-          label = attr_dict["_#{key}_formlabel"]
-          units = attr_dict["_#{key}_units"]
-          name = attr_dict["_#{key}_label"]
-          #value = value
           
-          name_parts = name.split("_")
-          pset_name = "#{name_parts[0]}_#{name_parts[1]}"
-          prop_name = name_parts.last
-          
-          case name_parts[0]
-          when "Pset", "pset"
+          # check if field is visible
+          if ["VIEW", "LIST", "TEXTBOX"].include? attr_dict["_#{key}_access"] 
             
-            # create new PropertySet with name pset_name
-            unless pset_hash[pset_name]
-              reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, nil )
-              reldef.relatedobjects.add( ifc_object )
-              pset = BimTools::IFC2X3::IfcPropertySet.new( ifc_model, attr_dict )
-              pset.name = BimTools::IfcManager::IfcLabel.new( pset_name )
-              pset.hasproperties = IfcManager::Ifc_Set.new()
-              reldef.relatingpropertydefinition = pset
-              pset_hash[pset_name] = pset
+            # get all corresponding data fields
+            label = attr_dict["_#{key}_formlabel"]
+            units = attr_dict["_#{key}_units"]
+            name = attr_dict["_#{key}_label"]
+            units = attr_dict["_#{key}_formulaunits"]
+            
+            name_parts = name.split("_")
+            pset_name = "#{name_parts[0]}_#{name_parts[1]}"
+            prop_name = name_parts.last
+            
+            case name_parts[0]
+            when "Pset", "pset", "CPset", "cpset"
+              
+              # create new PropertySet with name pset_name
+              unless pset_hash[pset_name]
+                reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, nil )
+                reldef.relatedobjects.add( ifc_object )
+                pset = BimTools::IFC2X3::IfcPropertySet.new( ifc_model, attr_dict )
+                pset.name = BimTools::IfcManager::IfcLabel.new( pset_name )
+                pset.hasproperties = IfcManager::Ifc_Set.new()
+                reldef.relatingpropertydefinition = pset
+                pset_hash[pset_name] = pset
+              end
+              
+              # create Property with name prop_name
+              property = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model )
+              property.name = BimTools::IfcManager::IfcLabel.new( prop_name )
+              property.nominalvalue = get_dynamic_attribute_value( instance, key )
+              property.nominalvalue.long = true
+              pset_hash[pset_name].hasproperties.add( property )
+            when "Qty", "BaseQuantities"
+              unless qty_hash[key]
+                # create new QuantitySet with name key
+              end
+            else
+              # create new PropertySet with name "SU_DynamicAttributes"
+              unless pset_hash["SU_DynamicAttributes"]
+                reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, nil )
+                reldef.relatedobjects.add( ifc_object )
+                pset = BimTools::IFC2X3::IfcPropertySet.new( ifc_model, attr_dict )
+                pset.name = BimTools::IfcManager::IfcLabel.new( "SU_DynamicAttributes" )
+                pset.hasproperties = IfcManager::Ifc_Set.new()
+                reldef.relatingpropertydefinition = pset
+                pset_hash["SU_DynamicAttributes"] = pset
+              end
+              
+              # create Property with name prop_name
+              property = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model )
+              property.name = BimTools::IfcManager::IfcLabel.new( prop_name )
+              property.nominalvalue = get_dynamic_attribute_value( instance, key )
+              property.nominalvalue.long = true
+              pset_hash["SU_DynamicAttributes"].hasproperties.add( property )
             end
-            
-            # create Property with name prop_name
-            property = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model )
-            property.name = BimTools::IfcManager::IfcLabel.new( prop_name )
-            property.nominalvalue = get_dynamic_attribute_value( attr_dict, key )
-            property.nominalvalue.long = true
-            pset_hash[pset_name].hasproperties.add( property )
-          when "Qty", "BaseQuantities"
-            unless qty_hash[key]
-              # create new QuantitySet with name key
-            end
-          else
-            
-            # create new PropertySet with name "SU_DynamicAttributes"
-            unless pset_hash["SU_DynamicAttributes"]
-              reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, nil )
-              reldef.relatedobjects.add( ifc_object )
-              pset = BimTools::IFC2X3::IfcPropertySet.new( ifc_model, attr_dict )
-              pset.name = BimTools::IfcManager::IfcLabel.new( "SU_DynamicAttributes" )
-              pset.hasproperties = IfcManager::Ifc_Set.new()
-              reldef.relatingpropertydefinition = pset
-              pset_hash["SU_DynamicAttributes"] = pset
-            end
-            
-            # create Property with name prop_name
-            property = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model )
-            property.name = BimTools::IfcManager::IfcLabel.new( prop_name )
-            property.nominalvalue = get_dynamic_attribute_value( attr_dict, key )
-            property.nominalvalue.long = true
-            pset_hash["SU_DynamicAttributes"].hasproperties.add( property )
           end
         end
       }
     end
   end # def get_dynamic_attributes
   
-  def self.get_dynamic_attribute_value( dict, key )
-    value = dict[key]
+  def self.get_dynamic_attribute_value( instance, key )
+    dict = instance.definition.attribute_dictionary "dynamic_attributes"
+    instance_dict = instance.attribute_dictionary "dynamic_attributes"
+              
+    # if instance value is empty, then use definition value
+    unless value = instance_dict[key]
+      value = dict[key]
+    end
     
     # exception: Default fields lenx, leny and lenz are always "DEFAULT" meaning Length
     if ["lenx","leny","lenz"].include? key
