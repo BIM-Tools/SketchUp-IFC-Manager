@@ -212,6 +212,74 @@ module BimTools
   # }
   # return classifications
 # end # def create_classifications
+
+          #(mp) added if loop to temporarily allow only DIN 276-1 classification
+          if attr_dict.name == 'DIN 276-1' # unless attr_dict.name == 'IFC 2x3'
+            if su_model.classifications[ attr_dict.name ]
+              
+              # Create classifications if they don't exist
+              if ifc_model.classifications.include?( attr_dict.name )
+                cls = ifc_model.classifications[attr_dict.name]
+              else
+                cls = BimTools::IFC2X3::IfcClassification.new( ifc_model )
+                cls.source = "'DIN Deutsches Institut für Normung e.V.'"
+                cls.edition = "'2008-12'"
+                #cls.editiondate
+                cls.name = "'DIN 276-1:2008-12'"
+                
+                # vico hack: store a copy of DIN 276-1 as unicode
+                unicode_cls = BimTools::IFC2X3::IfcClassification.new( ifc_model )
+                unicode_cls.source = "'http://www.csiorg.net/uniformat'"
+                unicode_cls.edition = "'1998'"
+                #unicode_cls.editiondate
+                unicode_cls.name = "'Uniformat'"
+              end
+              
+              # retrieve classification value from su object
+              type = definition.get_attribute('AppliedSchemaTypes', attr_dict.name)
+              if type
+                code = definition.get_classification_value([attr_dict.name, type, 'din_code'])
+                text = definition.get_classification_value([attr_dict.name, type, 'din_text'])
+                
+                # only create IfcClassificationReference if component has the code and text values for the classification
+                if code && text
+                  ifc_classification_reference = cls.ifc_classification_references[ code ]
+                  unless ifc_classification_reference
+                    ifc_classification_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
+                    #ifc_classification_reference.location = ''
+                    ifc_classification_reference.itemreference = "'#{code}'"
+                    ifc_classification_reference.name = "'#{text}'"
+                    ifc_classification_reference.referencedsource = cls
+                    
+                    # add ifc_classification_reference to the list of references in the classification
+                    cls.ifc_classification_references[ code ] = ifc_classification_reference
+                    
+                    # create IfcRelAssociatesClassification
+                    assoc = BimTools::IFC2X3::IfcRelAssociatesClassification.new( ifc_model )
+                    #assoc.name = ''
+                    #assoc.description = ''
+                    assoc.relatedobjects = BimTools::IfcManager::Ifc_Set.new( [self] )
+                    assoc.relatingclassification = ifc_classification_reference
+                    ifc_classification_reference.ifc_rel_associates_classification = assoc
+                    
+                    # vico hack: store a copy of DIN 276-1 as unicode
+                    unicode_din_text = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
+                    unicode_din_text.location = "'http://www.csiorg.net/uniformat'"
+                    unicode_din_text.itemreference = "'#{code}'"
+                    unicode_din_text.name = "'#{text}'"
+                    unicode_din_text.referencedsource = unicode_cls
+                    unicode_assoc = BimTools::IFC2X3::IfcRelAssociatesClassification.new( ifc_model )
+                    unicode_assoc.name = "'DIN 276-1:2008-12, Uniformat Classification'"
+                    #unicode_assoc.description = ''
+                    unicode_assoc.relatedobjects = IfcManager::Ifc_Set.new( [self] )
+                    unicode_assoc.relatingclassification = unicode_din_text
+                    unicode_din_text.ifc_rel_associates_classification = unicode_assoc
+                    
+                  end
+                end
+              end
+            end
+          end #(mp) end of DIN 276-1 loop
           
           # temporarily allow only nlsfb classification
           if attr_dict.name == 'NL-SfB 2005, tabel 1' # unless attr_dict.name == 'IFC 2x3'
