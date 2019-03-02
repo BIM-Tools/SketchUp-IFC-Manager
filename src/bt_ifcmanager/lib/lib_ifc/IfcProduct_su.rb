@@ -150,7 +150,7 @@ module BimTools
     def return_value_dict( dict )
       
       # if a field "value" exists then we are at the data level and data can be retrieved, otherwise dig deeper
-      if dict["value"]
+      if dict.keys.include?("value")
         return dict
       else
         dict.attribute_dictionaries.each do | sub_dict |
