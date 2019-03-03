@@ -21,9 +21,7 @@
 
 module BimTools
   module IfcRoot_su
-    def initialize(ifc_model, sketchup=nil)
-      require_relative('IfcGloballyUniqueId.rb')
-      @globalid = IfcManager::new_guid
+    def initialize( ifc_model, sketchup = nil )
       @ownerhistory = ifc_model.owner_history
     end # def sketchup
   end # module IfcRoot_su
