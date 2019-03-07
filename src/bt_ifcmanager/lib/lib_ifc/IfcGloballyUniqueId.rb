@@ -19,6 +19,8 @@
 #
 #
 
+# (!) Note: securerandom takes very long to load
+require 'securerandom'
 
 module BimTools
  module IfcManager
@@ -67,7 +69,20 @@ module BimTools
     
     # combine guid with parent guid
     def combined_guid( sketchup_guid, parent_guid )
-      return (sketchup_guid.to_i(16) ^ parent_guid.to_i(16)).to_s(16).rjust(32, '0')
+      guid = (sketchup_guid.to_i(16) ^ parent_guid.to_i(16)).to_s(16).rjust(32, '0')
+      
+      # The digit at position 1 above is always "4"
+      # set the four most significant bits of the 7th byte to 0100'B, so the high nibble is "4"
+      guid[12] = "4"
+      
+      # and the digit at position 2 is always one of "8", "9", "A" or "B".
+      # set the two most significant bits of the 9th byte to 10'B, so the high nibble will be one of "8", "9", "A", or "B".
+      h_val = guid[16]
+      b_val = [h_val].pack('H*').unpack('B*')[0]
+      b_val[0] = "1"
+      b_val[1] = "0"
+      guid[16] = [b_val].pack('B*').unpack('H*')[0]
+      return guid
     end # def combined_guid
     
     # convert IfcGloballyUniqueId into unformatted hex number
@@ -118,9 +133,6 @@ module BimTools
       #guid = '';21.times{|i|guid<<'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$'[rand(64)]}
       #first = rand(0...3).to_s
       #guid = "#{first}#{guid}"
-      
-      # require placed here because it takes extremely long to load, so only load when really necessary
-      require 'securerandom'
       
       # SecureRandom.uuid: creates a 128 bit UUID hex string
       # convert to hex
