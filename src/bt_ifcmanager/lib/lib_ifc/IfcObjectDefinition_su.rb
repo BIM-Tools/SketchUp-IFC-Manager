@@ -70,10 +70,12 @@ module BimTools
           @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Site" )
 
           # set geolocation
-          @default_related_object.set_latlong
-          @default_related_object.reflatitude = @default_related_object.latitude
-          @default_related_object.reflongitude = @default_related_object.longtitude
-          @default_related_object.refelevation = @default_related_object.elevation
+          if Sketchup.active_model.georeferenced?
+            @default_related_object.set_latlong
+            @default_related_object.reflatitude = @default_related_object.latitude
+            @default_related_object.reflongitude = @default_related_object.longtitude
+            @default_related_object.refelevation = @default_related_object.elevation
+          end
           parent_objectplacement = nil
         when BimTools::IFC2X3::IfcSite
           puts 'add default building'

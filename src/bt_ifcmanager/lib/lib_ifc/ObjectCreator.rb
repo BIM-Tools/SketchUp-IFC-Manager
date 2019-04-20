@@ -32,15 +32,16 @@
 # parent_building = ifc building above this one in the hierarchy
 # parent_site = ifc site above this one in the hierarchy
 
-require_relative 'IfcLengthMeasure.rb'
-require_relative File.join('IFC2X3', 'IfcSpatialStructureElement.rb')
-require_relative File.join('IFC2X3', 'IfcSite.rb')
-require_relative File.join('IFC2X3', 'IfcBuilding.rb')
-require_relative File.join('IFC2X3', 'IfcBuildingStorey.rb')
-require_relative File.join('IFC2X3', 'IfcBuildingElementProxy.rb')
-require_relative File.join('IFC2X3', 'IfcLocalPlacement.rb')
-require_relative File.join('IFC2X3', 'IfcFacetedBrep.rb')
-require_relative File.join('IFC2X3', 'IfcStyledItem.rb')
+require_relative( "IfcGloballyUniqueId.rb" )
+require_relative( "IfcLengthMeasure.rb" )
+require_relative( File.join( "IFC2X3", "IfcSpatialStructureElement.rb" ))
+require_relative( File.join( "IFC2X3", "IfcSite.rb" ))
+require_relative( File.join( "IFC2X3", "IfcBuilding.rb" ))
+require_relative( File.join( "IFC2X3", "IfcBuildingStorey.rb" ))
+require_relative( File.join( "IFC2X3", "IfcBuildingElementProxy.rb" ))
+require_relative( File.join( "IFC2X3", "IfcLocalPlacement.rb" ))
+require_relative( File.join( "IFC2X3", "IfcFacetedBrep.rb" ))
+require_relative( File.join( "IFC2X3", "IfcStyledItem.rb" ))
 
 module BimTools
  module IfcManager
@@ -49,11 +50,17 @@ module BimTools
   class ObjectCreator
     
     # def initialize(ifc_model, su_instance, container, containing_entity, parent_ifc, transformation_from_entity, transformation_from_container, site=nil, site_container=nil, building=nil, building_container=nil, building_storey=nil, building_storey_container=nil)
-    def initialize(ifc_model, su_instance, su_total_transformation, parent_ifc, parent_site=nil, parent_building=nil, parent_buildingstorey=nil, parent_space=nil, su_material=nil)
+    def initialize(ifc_model, su_instance, su_total_transformation, parent_ifc, parent_site=nil, parent_building=nil, parent_buildingstorey=nil, parent_space=nil, su_material=nil, parent_hex_guid=nil)
       @skip_entity = false
       definition = su_instance.definition   
       su_material = su_instance.material if su_instance.material      
       ent_type_name = definition.get_attribute("AppliedSchemaTypes", "IFC 2x3")
+      
+      # set GUID based on optional parent GUID
+      guid = IfcGloballyUniqueId.new( su_instance )
+      if parent_hex_guid
+        guid.set_parent_guid( parent_hex_guid )
+      end
       
       # check if entity_type is part of the entity list that needs exporting
       # also continue if NOT an IFC entity but the parent object IS an entity
@@ -61,7 +68,7 @@ module BimTools
         
         # Create IFC entity based on the IFC classification in sketchup
         begin
-          require_relative File.join('IFC2X3', ent_type_name)
+          require_relative File.join("IFC2X3", ent_type_name)
           entity_type = eval("BimTools::IFC2X3::#{ent_type_name}")
         
           # if a IfcProject then add su_object to the existing project
@@ -71,12 +78,14 @@ module BimTools
             ifc_entity = nil
           else
             ifc_entity = entity_type.new(ifc_model, su_instance)
+            ifc_entity.globalid = guid
           end
         rescue
           
           # If not classified as IFC in sketchup AND the parent is an IfcSpatialStructureElement then this is an IfcBuildingElementProxy
           if parent_ifc.is_a?(BimTools::IFC2X3::IfcSpatialStructureElement) || parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
             ifc_entity = BimTools::IFC2X3::IfcBuildingElementProxy.new(ifc_model, su_instance)
+            ifc_entity.globalid = guid
           else # this instance is pure geometry, ifc_entity = nil
             ifc_entity = nil
           end
@@ -92,16 +101,16 @@ module BimTools
         
         # check the element type and set the correct parent in the spacialhierarchy
         case ifc_entity.class.to_s
-        when 'BimTools::IFC2X3::IfcSite'
+        when "BimTools::IFC2X3::IfcSite"
           parent_ifc = ifc_model.project
           next_parent_site = ifc_entity
-        when 'BimTools::IFC2X3::IfcBuilding'
+        when "BimTools::IFC2X3::IfcBuilding"
           if parent_site.nil? # create new site
             parent_site = ifc_model.project.get_default_related_object
           end
           parent_ifc = parent_site
           next_parent_building = ifc_entity
-        when 'BimTools::IFC2X3::IfcBuildingStorey'
+        when "BimTools::IFC2X3::IfcBuildingStorey"
           if parent_building.nil? # create new building
             if parent_site.nil? # create new site
               parent_site = ifc_model.project.get_default_related_object
@@ -110,7 +119,7 @@ module BimTools
           end
           parent_ifc = parent_building
           next_parent_buildingstorey = ifc_entity
-        when 'BimTools::IFC2X3::IfcSpace'
+        when "BimTools::IFC2X3::IfcSpace"
           if parent_buildingstorey.nil? # create new buildingstorey
             if parent_building.nil? # create new building
               if parent_site.nil? # create new site
@@ -129,7 +138,7 @@ module BimTools
           
             # (!) Problem here is that an object is always added to the default container if it's defined before any other containers are found/created
             case parent_ifc.class.to_s
-            when 'BimTools::IFC2X3::IfcProject'
+            when "BimTools::IFC2X3::IfcProject"
               
               # check if this parent project contains 'non-default' sites
               # if this is the case then place ifc_entity directly into the first site (?) First site ok? or better use a new default site?
@@ -148,7 +157,7 @@ module BimTools
               else
                 parent_ifc = parent_ifc.non_default_related_objects[0]
               end
-            when 'BimTools::IFC2X3::IfcSite'
+            when "BimTools::IFC2X3::IfcSite"
               
               # check if this parent site contains 'non-default' buildings
               # if this is the case then place ifc_entity directly into the site
@@ -162,7 +171,7 @@ module BimTools
                   parent_buildingstorey = parent_ifc
                 end
               end
-            when 'BimTools::IFC2X3::IfcBuilding'
+            when "BimTools::IFC2X3::IfcBuilding"
               
               # check if this parent building contains 'non-default' buildingstoreys
               # if this is the case then place ifc_entity directly inside the building
@@ -172,9 +181,9 @@ module BimTools
                 parent_ifc = parent_ifc.get_default_related_object #    parent is default buildingstorey
                 parent_buildingstorey = parent_ifc
               end
-            when 'BimTools::IFC2X3::IfcBuildingStorey'
+            when "BimTools::IFC2X3::IfcBuildingStorey"
               parent_buildingstorey = parent_ifc
-            when 'BimTools::IFC2X3::IfcSpace'
+            when "BimTools::IFC2X3::IfcSpace"
               parent_space = parent_ifc
             
             # when parent is not a spacialstructureelement
@@ -260,7 +269,7 @@ module BimTools
           case ent
           when Sketchup::Group, Sketchup::ComponentInstance
             # ObjectCreator.new( ifc_model, ent, container, containing_entity, parent_ifc, transformation_from_entity, transformation_from_container)
-            ObjectCreator.new(ifc_model, ent, su_total_transformation, ifc_entity, parent_site, parent_building, parent_buildingstorey, parent_space, su_material)
+            ObjectCreator.new(ifc_model, ent, su_total_transformation, ifc_entity, parent_site, parent_building, parent_buildingstorey, parent_space, su_material, guid.to_s)
 
           when Sketchup::Face
             unless @skip_entity

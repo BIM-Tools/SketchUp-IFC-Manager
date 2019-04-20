@@ -27,7 +27,7 @@ module BimTools
     def initialize(ifc_model, sketchup)
     
       # (!) this should be automatically created by root!!!
-      @globalid = IfcManager::new_guid
+      @globalid = IfcManager::IfcGloballyUniqueId.new()
       @ownerhistory = ifc_model.owner_history
       material_name = sketchup
       

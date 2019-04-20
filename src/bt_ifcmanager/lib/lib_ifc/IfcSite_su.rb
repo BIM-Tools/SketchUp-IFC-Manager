@@ -31,13 +31,17 @@ module BimTools
       end
     end
     def latitude
-      return lat_long_ifc(@latlong[1])
+      if @latlong
+        return lat_long_ifc(@latlong[1])
+      end
     end
     def longtitude
-      return lat_long_ifc(@latlong[0])
+      if @latlong
+        return lat_long_ifc(@latlong[0])
+      end
     end
     def elevation
-      if Sketchup.active_model.georeferenced?
+      if @latlong
         return BimTools::IfcManager::IfcLengthMeasure.new( @latlong[2] )
       end
     end

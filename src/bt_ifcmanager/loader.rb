@@ -21,6 +21,9 @@
 
 # Main loader for IfcManager plugin
 
+# (!) Note: securerandom takes very long to load
+require 'securerandom'
+
 module BimTools  
   module IfcManager
   
