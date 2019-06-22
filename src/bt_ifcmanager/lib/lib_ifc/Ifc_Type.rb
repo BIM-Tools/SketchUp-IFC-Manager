@@ -23,46 +23,29 @@ module BimTools
  module IfcManager
   class Ifc_Type
     attr_accessor :long
-    def replace_char( string )
-      
-      # check for characters in the string that cannot be converted to STEP and replace them
-      ec = Encoding::Converter.new("UTF-8", "ISO-8859-1")
-      begin
-        str_replace = ec.convert( string )
-      rescue Encoding::UndefinedConversionError
-        #puts $!.error_char.dump
-        #p $!.error_char.encoding
-        #puts $!.error_char.unpack('H*').to_s
-        #str_replace = string.gsub($!.error_char, "\X\\" + $!.error_char.unpack('H*').to_s)
-        #str_replace = str_replace.inspect # escape all special characters, double quotes?
-        
-        # replace some common charecters with the correct STEP code, otherwise with "?"
-        # could be improved by using the correct byte hex code to generate the replacement
-        # http://www.buildingsmart-tech.org/implementation/get-started/string-encoding
-        # http://www.fileformat.info/info/charset/ISO-8859-1/list.htm
-        case $!.error_char
-        when "\\"
-          replace_char = '\X\\\5c'
-        when "`"
-          replace_char = '\X\\\60'
-        when "'"
-          replace_char = '\X\\\91'
-        when "’"
-          replace_char = '\X\\\92'
-        else
-          replace_char = '?'
+
+    # https://technical.buildingsmart.org/wp-content/uploads/2018/05/IFC2x-Model-Implementation-Guide-V2-0b.pdf
+    # page 19 and 20
+    def replace_char( in_string )
+      out_string = ""
+      a_char_numbers = in_string.unpack('U*')
+      i = 0
+      while i < a_char_numbers.length do
+        case a_char_numbers[i]
+        when (0..31), 39, 92 # \X\code , 39 is the ansii number for the quote character ' , and 92 is \
+          out_string << "\\X\\#{("%02x" % a_char_numbers[i]).upcase}"
+        when 32..127
+          out_string << a_char_numbers[i]
+        when 128..255 # \S\code
+          out_string << "\\S\\" << a_char_numbers[i] - 128
+        when 256..65535 # \X2\code\X0\
+          out_string << "\\X2\\#{("%04x" % a_char_numbers[i]).upcase}\\X0\\"
+        else # \X4\code\X0\
+          out_string << "\\X4\\#{("%08x" % a_char_numbers[i]).upcase}\\X0\\"
         end
-        str_replace = string.gsub($!.error_char, replace_char)
+        i += 1
       end
-      
-      # replace all end of lines and quotes
-      str_replace = str_replace.gsub("\\", '\X\\\5c')
-      str_replace = str_replace.gsub("`", '\X\\\60')
-      str_replace = str_replace.gsub("'", '\X\\\91')
-      str_replace = str_replace.gsub("’", '\X\\\92')
-      str_replace = str_replace.gsub(/\n/, '\X\\\0d')
-      
-      return str_replace
+      return out_string
     end
     
     # adding long = true returns a full object string
