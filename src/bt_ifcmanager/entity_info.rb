@@ -157,7 +157,7 @@ module BimTools
 
       def add_type( entity )
 
-        list = ["IfcBeam", "IfcBuilding", "IfcBuildingElementProxy", "IfcBuildingStorey", "IfcColumn", "IfcCurtainWall", "IfcDoor", "IfcFooting", "IfcFurnishingElement", "IfcMember", "IfcPile", "IfcPlate", "IfcRailing", "IfcRamp", "IfcRampFlight", "IfcRoof", "IfcSite", "IfcSlab", "IfcSpace", "IfcStair", "IfcStairFlight", "IfcWall", "IfcWallStandardCase", "IfcWindow"]
+        list = ["IfcBeam", "IfcBuilding", "IfcBuildingElementProxy", "IfcBuildingStorey", "IfcColumn", "IfcCurtainWall", "IfcDoor", "IfcFooting", "IfcFurnishingElement", "IfcMember", "IfcPile", "IfcPlate", "IfcProject", "IfcRailing", "IfcRamp", "IfcRampFlight", "IfcRoof", "IfcSite", "IfcSlab", "IfcSpace", "IfcStair", "IfcStairFlight", "IfcWall", "IfcWallStandardCase", "IfcWindow"]
 
         @type = SKUI::Textbox.new( get_ifc_type( entity ) )
         lbl = SKUI::Label.new( 'IFC entity:', @type )
