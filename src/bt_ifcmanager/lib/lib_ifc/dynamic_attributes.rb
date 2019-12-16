@@ -47,48 +47,24 @@ module BimTools
           name = attr_dict["_#{key}_label"]
           units = attr_dict["_#{key}_formulaunits"]
           
-          name_parts = name.split("_")
-          pset_name = "#{name_parts[0]}_#{name_parts[1]}"
-          prop_name = name_parts.last
-          
-          case name_parts[0]
-          when "Pset", "pset", "CPset", "cpset"
+          # only write propertyset when label is set
+          if name
+            name_parts = name.split("_")
+            pset_name = "#{name_parts[0]}_#{name_parts[1]}"
+            prop_name = name_parts.last
             
-            # create new PropertySet with name pset_name
-            unless pset_hash[pset_name]
-              reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, nil )
-              reldef.relatedobjects.add( ifc_object )
-              pset = BimTools::IFC2X3::IfcPropertySet.new( ifc_model, attr_dict )
-              pset.name = BimTools::IfcManager::IfcLabel.new( pset_name )
-              pset.hasproperties = IfcManager::Ifc_Set.new()
-              reldef.relatingpropertydefinition = pset
-              pset_hash[pset_name] = pset
-            end
-            
-            # create Property with name prop_name
-            property = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model )
-            property.name = BimTools::IfcManager::IfcLabel.new( prop_name )
-            property.nominalvalue = get_dynamic_attribute_value( instance, key )
-            property.nominalvalue.long = true
-            pset_hash[pset_name].hasproperties.add( property )
-          when "Qty", "BaseQuantities"
-            unless qty_hash[key]
-              # create new QuantitySet with name key
-            end
-          else
-          
-            # check if field is visible
-            if ["VIEW", "LIST", "TEXTBOX"].include? attr_dict["_#{key}_access"]
-          
-              # create new PropertySet with name "SU_DynamicAttributes"
-              unless pset_hash["SU_DynamicAttributes"]
+            case name_parts[0]
+            when "Pset", "pset", "CPset", "cpset"
+              
+              # create new PropertySet with name pset_name
+              unless pset_hash[pset_name]
                 reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, nil )
                 reldef.relatedobjects.add( ifc_object )
                 pset = BimTools::IFC2X3::IfcPropertySet.new( ifc_model, attr_dict )
-                pset.name = BimTools::IfcManager::IfcLabel.new( "SU_DynamicAttributes" )
+                pset.name = BimTools::IfcManager::IfcLabel.new( pset_name )
                 pset.hasproperties = IfcManager::Ifc_Set.new()
                 reldef.relatingpropertydefinition = pset
-                pset_hash["SU_DynamicAttributes"] = pset
+                pset_hash[pset_name] = pset
               end
               
               # create Property with name prop_name
@@ -96,7 +72,34 @@ module BimTools
               property.name = BimTools::IfcManager::IfcLabel.new( prop_name )
               property.nominalvalue = get_dynamic_attribute_value( instance, key )
               property.nominalvalue.long = true
-              pset_hash["SU_DynamicAttributes"].hasproperties.add( property )
+              pset_hash[pset_name].hasproperties.add( property )
+            when "Qty", "BaseQuantities"
+              unless qty_hash[key]
+                # create new QuantitySet with name key
+              end
+            else
+            
+              # check if field is visible
+              if ["VIEW", "LIST", "TEXTBOX"].include? attr_dict["_#{key}_access"]
+            
+                # create new PropertySet with name "SU_DynamicAttributes"
+                unless pset_hash["SU_DynamicAttributes"]
+                  reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, nil )
+                  reldef.relatedobjects.add( ifc_object )
+                  pset = BimTools::IFC2X3::IfcPropertySet.new( ifc_model, attr_dict )
+                  pset.name = BimTools::IfcManager::IfcLabel.new( "SU_DynamicAttributes" )
+                  pset.hasproperties = IfcManager::Ifc_Set.new()
+                  reldef.relatingpropertydefinition = pset
+                  pset_hash["SU_DynamicAttributes"] = pset
+                end
+                
+                # create Property with name prop_name
+                property = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model )
+                property.name = BimTools::IfcManager::IfcLabel.new( prop_name )
+                property.nominalvalue = get_dynamic_attribute_value( instance, key )
+                property.nominalvalue.long = true
+                pset_hash["SU_DynamicAttributes"].hasproperties.add( property )
+              end
             end
           end
         end
