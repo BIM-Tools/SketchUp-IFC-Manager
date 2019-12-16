@@ -51,11 +51,11 @@ module BimTools
       # get originating_system
       originating_system = "SketchUp"
       if Sketchup.is_pro?
-        originating_system = originating_system + " Pro"
+        originating_system = originating_system << " Pro"
       end
       number = Sketchup.version_number/100000000.floor
-      originating_system = originating_system + " 20" + number.to_s
-      originating_system = originating_system + " (" + Sketchup.version + ")"
+      originating_system = originating_system << " 20" << number.to_s
+      originating_system = originating_system << " (" << Sketchup.version << ")"
           
       step_objects = Array.new
       step_objects << 'HEADER'
@@ -91,7 +91,7 @@ module BimTools
     def write( file_path, step_objects )
       file = File.open(file_path, "w:ISO-8859-1") #"w") #
       step_objects.each do | object |
-        file.write object + ";\n"
+        file.write object << ";\n"
       end
       file.close
     end # def write

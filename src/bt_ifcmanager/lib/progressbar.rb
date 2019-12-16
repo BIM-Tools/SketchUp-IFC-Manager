@@ -58,7 +58,7 @@ def update(iteration)
   else 
     # divide the elapsed time by the pct complete, then multiple that by 100, then add that to the 
     # start time, and that is the expected end time.  
-    end_time = Time.at(((((Time.now-@time1).to_f)/pct)*100 + @time1.to_f).to_i).strftime("%c") 
+    end_time = Time.at(((((Time.now-@time1).to_f)/pct)*100 << @time1.to_f).to_i).strftime("%c") 
     end ; 
   pct_pos = [pct/2,1].max ;
   current_block = @@initial_block[0,pct_pos-1] << @@progresschar << @@initial_block[pct_pos,@@initial_block.length]

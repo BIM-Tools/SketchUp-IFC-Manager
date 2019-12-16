@@ -76,7 +76,7 @@ module BimTools
       pb.update(2)
       
       # get total time
-      puts "finished creating IFC entities: " + (Time.now - timer).to_s
+      puts "finished creating IFC entities: " << (Time.now - timer).to_s
       
       # export model to IFC step file
       ifc_model.export( file_path )
@@ -85,7 +85,7 @@ module BimTools
       
       # get total time
       time = Time.now - timer
-      puts "finished export: " + time.to_s
+      puts "finished export: " << time.to_s
       
       pb.update(4)
       
@@ -110,12 +110,12 @@ module BimTools
     end # export
     def show_summary( hash, file_path, time )
       css = File.join(PLUGIN_PATH_CSS, 'sketchup.css')
-      html = "<html><head><link rel='stylesheet' type='text/css' href='" + css + "'></head><body><textarea readonly>IFC Entities exported:\n\n"
+      html = "<html><head><link rel='stylesheet' type='text/css' href='" << css << "'></head><body><textarea readonly>IFC Entities exported:\n\n"
       hash.each_pair do | key, value |
-        html << value.to_s + " " + key.to_s + "\n"
+        html << value.to_s << " " << key.to_s << "\n"
       end
-      html << "\n To file '" + file_path + "'\n"
-      html << "\n Taking a total number of " + time.to_s + " seconds\n"
+      html << "\n To file '" << file_path << "'\n"
+      html << "\n Taking a total number of " << time.to_s << " seconds\n"
       html << "</textarea></body></html>"
       @summary_dialog = UI::HtmlDialog.new(
       {

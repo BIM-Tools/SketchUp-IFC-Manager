@@ -27,7 +27,7 @@ module BimTools
       begin
         @value = value.to_f
       rescue StandardError, TypeError => e
-        print value + "cannot be converted to a Float" + e
+        print value << "cannot be converted to a Float" << e
       end
     end # def initialize
     def step()

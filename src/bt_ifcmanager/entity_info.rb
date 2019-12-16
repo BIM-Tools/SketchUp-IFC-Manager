@@ -28,7 +28,7 @@ module BimTools
 
       def update(selection)
         if selection.length == 1 && selection[0].is_a?( Sketchup::ComponentInstance )
-          @section.rename( "Component (" + Sketchup.active_model.selection[0].definition.count_used_instances.to_s + " in model)" )
+          @section.rename( "Component (" << Sketchup.active_model.selection[0].definition.count_used_instances.to_s << " in model)" )
           update_type
           update_nlsfb
           update_name
@@ -75,8 +75,8 @@ module BimTools
         
         # on click: show complete list
         @name.on( :click ) { |control, value| # (?) Second argument needed?
-          js_command = "$('#" + control.ui_id + "_ui').autocomplete('search', '');"
-          #js_command << "$('#" + control.ui_id + "_ui').select();"
+          js_command = "$('#" << control.ui_id << "_ui').autocomplete('search', '');"
+          #js_command << "$('#" << control.ui_id << "_ui').select();"
           PropertiesWindow.window.webdialog.execute_script(js_command)
         }
         
@@ -180,8 +180,8 @@ module BimTools
         
         # on click: show complete list
         @type.on( :click ) { |control, value| # (?) Second argument needed?
-          js_command = "$('#" + control.ui_id + "_ui').autocomplete('search', '');"
-          js_command << "$('#" + control.ui_id + "_ui').select();"
+          js_command = "$('#" << control.ui_id << "_ui').autocomplete('search', '');"
+          js_command << "$('#" << control.ui_id << "_ui').select();"
           PropertiesWindow.window.webdialog.execute_script(js_command)
         }
         
@@ -245,8 +245,8 @@ module BimTools
         
         # on click: show complete list
         @materials.on( :click ) { |control, value| # (?) Second argument needed?
-          js_command = "$('#" + control.ui_id + "_ui').autocomplete('search', '');"
-          js_command << "$('#" + control.ui_id + "_ui').select();"
+          js_command = "$('#" << control.ui_id << "_ui').autocomplete('search', '');"
+          js_command << "$('#" << control.ui_id << "_ui').select();"
           PropertiesWindow.window.webdialog.execute_script(js_command)
         }
 
@@ -260,7 +260,7 @@ module BimTools
         
         # on click: create new material
         @new_material.on( :click ) { |control, value| # (?) Second argument needed?
-          js_command = "$('#" + control.ui_id + "_ui').autocomplete('search', '');"
+          js_command = "$('#" << control.ui_id << "_ui').autocomplete('search', '');"
           PropertiesWindow.window.webdialog.execute_script(js_command)
           
           input = UI.inputbox(["Name:"], [""], "Create material...")
@@ -326,8 +326,8 @@ module BimTools
         
         # on click: show complete list
         @layers.on( :click ) { |control, value| # (?) Second argument needed?
-          js_command = "$('#" + control.ui_id + "_ui').autocomplete('search', '');"
-          js_command << "$('#" + control.ui_id + "_ui').select();"
+          js_command = "$('#" << control.ui_id << "_ui').autocomplete('search', '');"
+          js_command << "$('#" << control.ui_id << "_ui').select();"
           PropertiesWindow.window.webdialog.execute_script(js_command)
         }
 
@@ -340,7 +340,7 @@ module BimTools
         
         # on click: create new layer
         @new_layer.on( :click ) { |control, value| # (?) Second argument needed?
-          js_command = "$('#" + control.ui_id + "_ui').autocomplete('search', '');"
+          js_command = "$('#" << control.ui_id << "_ui').autocomplete('search', '');"
           PropertiesWindow.window.webdialog.execute_script(js_command)
           
           input = UI.inputbox(["Name:"], [""], "Create layer...")
@@ -376,7 +376,7 @@ module BimTools
         # properties = ['Shape','Width','Height','Diameter','Depth','System']
         # properties.each do |prop|
           # txt = SKUI::Textbox.new()
-          # lbl = SKUI::Label.new( prop + ":", prop )
+          # lbl = SKUI::Label.new( prop << ":", prop )
           # @section.add_control( lbl )
           # @section.add_control( txt )
         # end
@@ -410,8 +410,8 @@ module BimTools
         
         # on click: show complete list
         @nlsfb.on( :click ) { |control, value| # (?) Second argument needed?
-          js_command = "$('#" + control.ui_id + "_ui').autocomplete('search', '');"
-          js_command << "$('#" + control.ui_id + "_ui').select();"
+          js_command = "$('#" << control.ui_id << "_ui').autocomplete('search', '');"
+          js_command << "$('#" << control.ui_id << "_ui').select();"
           PropertiesWindow.window.webdialog.execute_script(js_command)
         }
 

@@ -64,7 +64,7 @@ module BimTools
             begin
               # if classification is set, then that's the entity
               classification = definition.get_attribute("AppliedSchemaTypes", "IFC 2x3")
-              require_relative File.join('IFC2X3', classification + ".rb")
+              require_relative File.join('IFC2X3', classification << ".rb")
               obj = eval(classification)
             rescue
               # if no classification AND parent is a IfcSpatialStructureElement then entity is IfcBuildingElementProxy

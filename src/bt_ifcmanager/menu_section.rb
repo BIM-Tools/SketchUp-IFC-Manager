@@ -46,7 +46,7 @@ module BimTools
           control.visible = true
         end
         id = @group.ui_id
-        @window.bridge.call( "$('#" + id + "').css('height', 'auto')" )
+        @window.bridge.call( "$('#" << id << "').css('height', 'auto')" )
       end # def maximize
 
       def rename( name )
@@ -55,7 +55,7 @@ module BimTools
 
       def add_control( control, name=nil )
         unless name.nil?
-          label = SKUI::Label.new( name.capitalize + ':', control )
+          label = SKUI::Label.new( name.capitalize << ':', control )
           @group.add_control( label )
         end
         @group.add_control( control )

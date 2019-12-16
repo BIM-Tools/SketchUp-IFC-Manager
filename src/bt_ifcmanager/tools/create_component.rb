@@ -33,7 +33,7 @@ module BimTools
       UI.add_context_menu_handler do |context_menu|
         selection = Sketchup.active_model.selection
         unless selection.empty?
-          context_menu.add_item( 'Create ' + name.capitalize ) {
+          context_menu.add_item( 'Create ' << name.capitalize ) {
             CreateComponent.activate( ifc_type, name, objecttype )
           }
         end

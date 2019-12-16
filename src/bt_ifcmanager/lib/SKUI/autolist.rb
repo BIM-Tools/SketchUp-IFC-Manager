@@ -55,7 +55,7 @@ module SKUI
     end
     
     def id()
-      return "#" + ui_id + "_ui"
+      return "#" << ui_id << "_ui"
     end
     
     def items=( list = [] )
