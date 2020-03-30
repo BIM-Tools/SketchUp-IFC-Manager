@@ -222,17 +222,10 @@ module BimTools
                 cls = ifc_model.classifications[attr_dict.name]
               else
                 cls = BimTools::IFC2X3::IfcClassification.new( ifc_model )
-                cls.source = "'DIN Deutsches Institut für Normung e.V.'"
-                cls.edition = "'2008-12'"
+                cls.source = BimTools::IfcManager::IfcLabel.new("DIN Deutsches Institut für Normung e.V.")
+                cls.edition = BimTools::IfcManager::IfcLabel.new("2008-12")
                 #cls.editiondate
-                cls.name = "'DIN 276-1:2008-12'"
-                
-                # vico hack: store a copy of DIN 276-1 as unicode
-                unicode_cls = BimTools::IFC2X3::IfcClassification.new( ifc_model )
-                unicode_cls.source = "'http://www.csiorg.net/uniformat'"
-                unicode_cls.edition = "'1998'"
-                #unicode_cls.editiondate
-                unicode_cls.name = "'Uniformat'"
+                cls.name = BimTools::IfcManager::IfcLabel.new("DIN 276-1:2008-12")
               end
               
               # retrieve classification value from su object
@@ -262,19 +255,6 @@ module BimTools
                     assoc.relatingclassification = ifc_classification_reference
                     ifc_classification_reference.ifc_rel_associates_classification = assoc
                     
-                    # vico hack: store a copy of DIN 276-1 as unicode
-                    unicode_din_text = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
-                    unicode_din_text.location = "'http://www.csiorg.net/uniformat'"
-                    unicode_din_text.itemreference = "'#{code}'"
-                    unicode_din_text.name = "'#{text}'"
-                    unicode_din_text.referencedsource = unicode_cls
-                    unicode_assoc = BimTools::IFC2X3::IfcRelAssociatesClassification.new( ifc_model )
-                    unicode_assoc.name = "'DIN 276-1:2008-12, Uniformat Classification'"
-                    #unicode_assoc.description = ''
-                    unicode_assoc.relatedobjects = IfcManager::Ifc_Set.new( [self] )
-                    unicode_assoc.relatingclassification = unicode_din_text
-                    unicode_din_text.ifc_rel_associates_classification = unicode_assoc
-                    
                   end
                 end
               end
@@ -290,17 +270,17 @@ module BimTools
                 cls = ifc_model.classifications[attr_dict.name]
               else
                 cls = BimTools::IFC2X3::IfcClassification.new( ifc_model )
-                cls.source = "'BIM Loket'"
-                cls.edition = "'2005'"
+                cls.source = BimTools::IfcManager::IfcLabel.new("BIM Loket")
+                cls.edition = BimTools::IfcManager::IfcLabel.new("2005")
                 #cls.editiondate
-                cls.name = "'#{attr_dict.name}'"
+                cls.name = BimTools::IfcManager::IfcLabel.new( attr_dict.name )
                 
                 # vico hack: store a copy of NL-SfB as unicode
                 unicode_cls = BimTools::IFC2X3::IfcClassification.new( ifc_model )
-                unicode_cls.source = "'http://www.csiorg.net/uniformat'"
-                unicode_cls.edition = "'1998'"
+                unicode_cls.source = BimTools::IfcManager::IfcLabel.new("http://www.csiorg.net/uniformat")
+                unicode_cls.edition = BimTools::IfcManager::IfcLabel.new("1998")
                 #unicode_cls.editiondate
-                unicode_cls.name = "'Uniformat'"
+                unicode_cls.name = BimTools::IfcManager::IfcLabel.new("Uniformat")
               end
               
               # retrieve classification value from su object

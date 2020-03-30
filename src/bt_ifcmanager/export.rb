@@ -26,36 +26,29 @@ module BimTools
     require 'net/http'
     require 'uri'
     require File.join(PLUGIN_PATH, 'update_ifc_fields.rb')
+    require File.join(PLUGIN_PATH, 'lib', 'progressbar.rb')
 
     def export( file_path )
-      if @summary_dialog
-        @summary_dialog.close
-      end
-      
-      require File.join(PLUGIN_PATH, 'lib', 'progressbar.rb')
-      
-      pb = ProgressBar.new(4,"Exporting to IFC...")
-      
-      # start timer
-      timer = Time.now
+      su_model = Sketchup.active_model
       
       # check if it's possible to write IFC files
       unless Sketchup.is_pro?
         raise "You need SketchUp PRO to create IFC-files"
       end
+
+      # close previous export summary if still open
+      if @summary_dialog
+        @summary_dialog.close
+      end
+
+      # create new progressbar
+      pb = ProgressBar.new(4,"Exporting to IFC...")
       
-      su_model = Sketchup.active_model
-      
-      options = {
-        #:ifc_entities     => false,                                  # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
-        #:hidden           => false,                                  # include hidden sketchup objects
-        #:attributes       => ['SU_DefinitionSet', 'SU_InstanceSet'], # include specific attribute dictionaries given in array as IfcPropertySets, like ['SU_DefinitionSet', 'SU_InstanceSet'], false means all
-        #:classifications  => true,                                   # add all SketchUp classifications
-        #:layers           => true,                                   # create IfcPresentationLayerAssignments
-        #:materials        => true,                                   # create IfcMaterials
-        #:styles           => true,                                   # create IfcStyledItems
-        #:fast_guid        => false                                   # create simplified guids
-      }
+      # start timer
+      timer = Time.now
+
+      # get export options
+      options = Settings.export
       
       # update all IFC name fields with the component definition name
       # (?) is this necessary, or should this already be 100% correct at the time of export?
@@ -67,7 +60,7 @@ module BimTools
 
       # make sure file_path ends in "ifc"
       unless file_path.split('.').last == "ifc"
-        file_path << '.ifc' # (!) creates duplicate extentions when extention exists
+        file_path << '.ifc'
       end
       
       # create new IfcModel

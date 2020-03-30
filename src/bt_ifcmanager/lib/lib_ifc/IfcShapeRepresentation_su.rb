@@ -24,11 +24,11 @@ require_relative File.join('IFC2X3', 'IfcFacetedBrep.rb')
 
 module BimTools
   module IfcShapeRepresentation_su
-    def initialize(ifc_model, sketchup)
+    def initialize( ifc_model, sketchup, representationtype="'Brep'", representationidentifier="'Body'" )
       super
       @contextofitems = ifc_model.representationcontext
-      @representationidentifier = "'Body'"
-      @representationtype = "'Brep'"
+      @representationidentifier = representationidentifier
+      @representationtype = representationtype
       @items = IfcManager::Ifc_Set.new()
     end # def initialize
   end # module IfcShapeRepresentation_su

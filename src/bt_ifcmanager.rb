@@ -28,20 +28,21 @@ module BimTools
   PLUGIN_ROOT_PATH = File.dirname(__FILE__) unless defined? PLUGIN_ROOT_PATH
 
   module IfcManager
-    VERSION = '2.2.2'.freeze
+
+    # Version and release information.
+    VERSION = '3.0.0'.freeze
     
     # load plugin only if SketchUp version is PRO
     if Sketchup.is_pro? && Sketchup.version_number>1600000000
       PLUGIN_PATH       = File.join(PLUGIN_ROOT_PATH, 'bt_ifcmanager')
       PLUGIN_IMAGE_PATH = File.join(PLUGIN_PATH, 'images')
 
-      ifcmanager_extension = SketchupExtension.new("IFC Manager", File.join(PLUGIN_PATH, 'loader.rb'))
-      ifcmanager_extension.version = VERSION
-      ifcmanager_extension.description = 'IFC data manager and exporter for SketchUp.'
-      ifcmanager_extension.creator = 'BIM-Tools'
-      ifcmanager_extension.copyright = '2019'
-      Sketchup.register_extension(ifcmanager_extension, true)
-      IFCMANAGER_EXTENSION = ifcmanager_extension
+      IFCMANAGER_EXTENSION = SketchupExtension.new("IFC Manager", File.join(PLUGIN_PATH, 'loader.rb'))
+      IFCMANAGER_EXTENSION.version = VERSION
+      IFCMANAGER_EXTENSION.description = 'IFC data manager and exporter for SketchUp.'
+      IFCMANAGER_EXTENSION.creator = 'BIM-Tools'
+      IFCMANAGER_EXTENSION.copyright = '2020'
+      Sketchup.register_extension(IFCMANAGER_EXTENSION, true)
     else
       UI.messagebox "You need at least SketchUp Pro 2016 to use this extension."
     end

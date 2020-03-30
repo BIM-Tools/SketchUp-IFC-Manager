@@ -1,0 +1,284 @@
+---
+- (100) GRUNDSTUECK
+- (110) Grundstueckswert
+- (120) Grundstuecksnebenkosten
+- (121) Vermessungsgebuehren
+- (122) Gerichtsgebuehren
+- (123) Notariatsgebuehren
+- (124) Maklerprovisionen
+- (125) Grunderwerbssteuer
+- (126) Wertermittlungen, Untersuchungen
+- (127) Genehmigungsgebuehren
+- (128) Bodenordnung, Grenzregulierung
+- (129) Grundstuecksnebenkosten, sonstiges
+- (130) Freimachen
+- (131) Abfindungen
+- (132) Abloesen dinglicher Rechte
+- (139) Freimachen, sonstiges
+- (200) HERRICHTEN UND ERSCHLIESSEN
+- (210) Herrichten
+- (211) Sicherungsmassnahmen
+- (212) Abbruchmassnahmen
+- (213) Altlastenbeseitigung
+- (214) Herrichten der Gelaendeoberflaeche
+- (219) Herrichten, sonstiges
+- (220) Oeffentliche Erschliessung
+- (221) Abwasserentsorgung
+- (222) Wasserversorgung
+- (223) Gasversorgung
+- (224) Fernwaermeversorgung
+- (225) Stromversorgung
+- (226) Telekommunikation
+- (227) Verkehrserschliessung
+- (228) Abfallentsorgung
+- (229) Oeffentliche Erschliessung, sonstiges
+- (230) Nichtoeffentliche Erschliessung
+- (240) Ausgleichsabgaben
+- (250) Uebergangsmassnahmen
+- (251) Provisorien
+- (252) Auslagerungen
+- (300) BAUWERK — BAUKONSTRUKTIONEN
+- (310) Baugrube
+- (311) Baugrubenherstellung
+- (312) Baugrubenumschliessung
+- (313) Wasserhaltung
+- (319) Baugrube, sonstiges
+- (320) Gruendung
+- (321) Baugrundverbesserung
+- (322) Flachgruendungen
+- (323) Tiefgruendungen
+- (324) Unterboeden und Bodenplatten
+- (325) Bodenbelaege
+- (326) Bauwerksabdichtungen
+- (327) Draenagen
+- (329) Gruendung, sonstiges
+- (330) Aussenwaende
+- (331) Tragende Aussenwaende
+- (332) Nichttragende Aussenwaende
+- (333) Aussenstuetzen
+- (334) Aussentueren und -fenster
+- (335) Aussenwandbekleidungen, aussen
+- (336) Aussenwandbekleidungen, innen
+- (337) Elementierte Aussenwaende
+- (338) Sonnenschutz
+- (339) Aussenwaende, sonstiges
+- (340) Innenwaende
+- (341) Tragende Innenwaende
+- (342) Nichttragende Innenwaende
+- (343) Innenstuetzen
+- (344) Innentueren und -fenster
+- (345) Innenwandbekleidungen
+- (346) Elementierte Innenwaende
+- (349) Innenwaende, sonstiges
+- (350) Decken
+- (351) Deckenkonstruktionen
+- (352) Deckenbelaege
+- (353) Deckenbekleidungen
+- (359) Decken, sonstiges
+- (360) Daecher
+- (361) Dachkonstruktionen
+- (362) Dachfenster, Dachoeffnungen
+- (363) Dachbelaege
+- (364) Dachbekleidungen
+- (369) Daecher, sonstiges
+- (370) Baukonstruktive Einbauten
+- (371) Allgemeine Einbauten
+- (372) Besondere Einbauten
+- (379) Baukonstruktive Einbauten, sonstiges
+- (390) Sonstige Massnahmen fuer Baukonstruktionen
+- (391) Baustelleneinrichtung
+- (392) Gerueste
+- (393) Sicherungsmassnahmen
+- (394) Abbruchmassnahmen
+- (395) Instandsetzungen
+- (396) Materialentsorgung
+- (397) Zusaetzliche Massnahmen
+- (398) Provisorische Baukonstruktionen
+- (399) Sonstige Massnahmen fuer Baukonstruktionen, sonstige
+- (400) BAUWERK — TECHNISCHE ANLAGEN
+- (410) Abwasser-, Wasser-, Gasanlagen
+- (411) Abwasseranlagen
+- (412) Wasseranlagen
+- (413) Gasanlagen
+- (419) Abwasser-, Wasser-, Gasanlagen, sonstiges
+- (420) Waermeversorgungsanlagen
+- (421) Waermeerzeugungsanlagen
+- (422) Waermeverteilnetze
+- (423) Raumheizflaechen
+- (429) Waermeversorgungsanlagen, sonstiges
+- (430) Lufttechnische Anlagen
+- (431) Lueftungsanlagen
+- (432) Teilklimaanlagen
+- (433) Klimaanlagen
+- (434) Kaelteanlagen
+- (439) Lufttechnische Anlagen, sonstiges
+- (440) Starkstromanlagen
+- (441) Hoch- und Mittelspannungsanlagen
+- (442) Eigenstromversorgungsanlagen
+- (443) Niederspannungsschaltanlagen
+- (444) Niederspannungsinstallationsanlagen
+- (445) Beleuchtungsanlagen
+- (446) Blitzschutz- und Erdungsanlagen
+- (449) Starkstromanlagen, sonstiges
+- (450) Fernmelde- und informationstechnische Anlagen
+- (451) Telekommunikationsanlagen
+- (452) Such- und Signalanlagen
+- (453) Zeitdienstanlagen
+- (454) Elektroakustische Anlagen
+- (455) Fernseh- und Antennenanlagen
+- (456) Gefahrenmelde- und Alarmanlagen
+- (457) Uebertragungsnetze
+- (459) Fernmelde- und informationstechnische Anlagen, sonstiges
+- (460) Foerderanlagen
+- (461) Aufzugsanlagen
+- (462) Fahrtreppen, Fahrsteige
+- (463) Befahranlagen
+- (464) Transportanlagen
+- (465) Krananlagen
+- (469) Foerderanlagen, sonstiges
+- (470) Nutzungsspezifische Anlagen
+- (471) Kuechentechnische Anlagen
+- (472) Waescherei- und Reinigungsanlagen
+- (473) Medienversorgungsanlagen
+- (474) Medizin- und labortechnische Anlagen
+- (475) Feuerloeschanlagen
+- (476) Badetechnische Anlagen
+- (477) Prozesswaerme-, kaelte- und -luftanlagen
+- (478) Entsorgungsanlagen
+- (479) Nutzungsspezifische Anlagen, sonstiges
+- (480) Gebaeudeautomation
+- (481) Automationssysteme
+- (482) Schaltschraenke
+- (483) Management- und Bedieneinrichtungen
+- (484) Raumautomationssysteme
+- (485) Uebertragungsnetze
+- (489) Gebaeudeautomation, sonstiges
+- (490) Sonstige Massnahmen fuer technische Anlagen
+- (491) Baustelleneinrichtung
+- (492) Gerueste
+- (493) Sicherungsmassnahmen
+- (494) Abbruchmassnahmen
+- (495) Instandsetzungen
+- (496) Materialentsorgung
+- (497) Zusaetzliche Massnahmen
+- (498) Provisorische technische Anlagen
+- (499) Sonstige Massnahmen fuer technische Anlagen, sonstiges
+- (500) AUSSENANLAGEN
+- (510) Gelaendeflaechen
+- (511) Oberbodenarbeiten
+- (512) Bodenarbeiten
+- (519) Gelaendeflaechen, sonstiges
+- (520) Befestigte Flaechen
+- (521) Wege
+- (522) Strassen
+- (523) Plaetze, Hoefe
+- (524) Stellplaetze
+- (525) Sportplatzflaechen
+- (526) Spielplatzflaechen
+- (527) Gleisanlagen
+- (529) Befestigte Flaechen, sonstiges
+- (530) Baukonstruktionen in Aussenanlagen
+- (531) Einfriedungen
+- (532) Schutzkonstruktionen
+- (533) Mauern, Waende
+- (534) Rampen, Treppen, Tribuenen
+- (535) Ueberdachungen
+- (536) Bruecken, Stege
+- (537) Kanal- und Schachtbauanlagen
+- (538) Wasserbauliche Anlagen
+- (539) Baukonstruktionen in Aussenanlagen, sonstiges
+- (540) Technische Anlagen in Aussenanlagen
+- (541) Abwasseranlagen
+- (542) Wasseranlagen
+- (543) Gasanlagen
+- (544) Waermeversorgungsanlagen
+- (545) Lufttechnische Anlagen
+- (546) Starkstromanlagen
+- (547) Fernmelde- und informationstechnische Anlagen
+- (548) Nutzungsspezifische Anlagen
+- (549) Technische Anlagen in Aussenanlagen, sonstiges
+- (550) Einbauten in Aussenanlagen
+- (551) Allgemeine Einbauten
+- (552) Besondere Einbauten
+- (559) Einbauten in Aussenanlagen, sonstiges
+- (560) Wasserflaechen
+- (561) Abdichtungen
+- (562) Bepflanzungen
+- (569) Wasserflaechen, sonstiges
+- (570) Pflanz- und Saatflaechen
+- (571) Oberbodenarbeiten
+- (572) Vegetationstechnische Bodenbearbeitung
+- (573) Sicherungsbauweisen
+- (574) Pflanzen
+- (575) Rasen und Ansaaten
+- (576) Begruenung unterbauter Flaechen
+- (579) Pflanz- und Saatflaechen, sonstiges
+- (590) Sonstige Aussenanlagen
+- (591) Baustelleneinrichtung
+- (592) Gerueste
+- (593) Sicherungsmassnahmen
+- (594) Abbruchmassnahmen
+- (595) Instandsetzungen
+- (596) Materialentsorgung
+- (597) Zusaetzliche Massnahmen
+- (598) Provisorische Aussenanlagen
+- (599) Sonstige Massnahmen fuer Aussenanlagen, sonstiges
+- (600) AUSSTATTUNG UND KUNSTWERKE
+- (610) Ausstattung
+- (611) Allgemeine Ausstattung
+- (612) Besondere Ausstattung
+- (619) Ausstattung, sonstiges
+- (620) Kunstwerke
+- (621) Kunstobjekte
+- (622) Kuenstlerisch gestaltete Bauteile des Bauwerks
+- (623) Kuenstlerisch gestaltete Bauteile der Aussenanlagen
+- (624) der Aussenanlagen
+- (629) Kunstwerke, sonstiges
+- (700) BAUNEBENKOSTEN
+- (710) Bauherrenaufgaben
+- (711) Projektleitung
+- (712) Bedarfsplanung
+- (713) Projektsteuerung
+- (719) Bauherrenaufgaben, sonstiges
+- (720) Vorbereitung der Objektplanung
+- (721) Untersuchungen
+- (722) Wertermittlungen
+- (723) Staedtebauliche Leistungen
+- (724) Landschaftsplanerische Leistungen
+- (725) Wettbewerbe
+- (729) Vorbereitung der Objektplanung, sonstiges
+- (730) Architekten- und Ingenieurleistungen
+- (731) Gebaeudeplanung
+- (732) Freianlagenplanung
+- (733) Planung der raumbildenden Ausbauten
+- (734) Planung der Ingenieurbauwerke und Verkehrsanlagen
+- (735) Tragwerksplanung
+- (736) Planung der technischen Ausruestung
+- (739) Architekten- und Ingenieurleistungen, sonstiges
+- (740) Gutachten und Beratung
+- (741) Thermische Bauphysik
+- (742) Schallschutz und Raumakustik
+- (743) Bodenmechanik, Erd- und Grundbau
+- (744) Vermessung
+- (745) Lichttechnik, Tageslichttechnik
+- (746) Brandschutz
+- (747) Sicherheits- und Gesundheitsschutz
+- (748) Umweltschutz, Altlasten
+- (749) Gutachten und Beratung, sonstiges
+- (750) Kuenstlerische Leistungen
+- (751) Kunstwettbewerbe
+- (752) Honorare
+- (759) Kuenstlerische Leistungen, sonstiges
+- (760) Finanzierungskosten
+- (761) Finanzierungsbeschaffung
+- (762) Fremdkapitalzinsen
+- (763) Eigenkapitalzinsen
+- (769) Finanzierungskosten, sonstiges
+- (770) Allgemeine Baunebenkosten
+- (771) Pruefung, Genehmigungen, Abnahmen
+- (772) Bewirtschaftungskosten
+- (773) Bemusterungskosten
+- (774) Betriebskosten nach der Abnahme
+- (775) Versicherungen
+- (779) Allgemeine Baunebenkosten, sonstiges
+- (790) Sonstige Baunebenkosten

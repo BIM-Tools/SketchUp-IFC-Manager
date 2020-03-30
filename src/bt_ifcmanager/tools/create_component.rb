@@ -77,11 +77,11 @@ module BimTools
       model.commit_operation
       
       # open edit window
-      if IfcManager::PropertiesWindow.window.visible?
-        IfcManager::PropertiesWindow.update
+      if IfcManager::PropertiesWindow.window && IfcManager::PropertiesWindow.window.visible?
+        IfcManager::PropertiesWindow.set_html
+      else
+        IfcManager::PropertiesWindow.show
       end
-      IfcManager::PropertiesWindow.show
-      
       return instance
     end
   end # module CreateComponent

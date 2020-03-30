@@ -26,50 +26,47 @@ module BimTools
       Sketchup.add_observer(IMAppObserver.new)
       @sel_observer = IMSelectionObserver.new
       @ent_observer = IMEntitiesObserver.new
-      #@model_observer = IMModelObserver.new
+      @app_observer = IMAppObserver.new
     end
-    def start()
 
-      # Attach the observers.
-      # (!) disable when menu closed!
-      Sketchup.active_model.selection.add_observer( @sel_observer )
-      Sketchup.active_model.entities.add_observer( @ent_observer ) # (?) always the active entities object?
-      #Sketchup.active_model.add_observer( @model_observer )
+    # Attach observers on menu open
+    def start()
+      Sketchup.active_model.selection.add_observer(@sel_observer)
+      Sketchup.active_model.entities.add_observer(@ent_observer) # (?) always the active entities object?
+      Sketchup.active_model.selection.add_observer(@app_observer)
     end # def start
+
+    # Remove observers on menu close
     def stop()
-      Sketchup.active_model.selection.remove_observer( @sel_observer )
-      Sketchup.active_model.entities.remove_observer( @ent_observer ) # (?) always the active entities object?
-      #Sketchup.active_model.remove_observer( @model_observer )
+      Sketchup.active_model.selection.remove_observer(@sel_observer)
+      Sketchup.active_model.entities.remove_observer(@ent_observer) # (?) always the active entities object?
+      Sketchup.active_model.selection.remove_observer(@app_observer)
     end # def stop
   end # class Observers
 
   # observer that updates the window on selection change
   class IMSelectionObserver < Sketchup::SelectionObserver
     def onSelectionBulkChange(selection)
-      PropertiesWindow::EntityInfo.update(selection)
+      PropertiesWindow.set_html()
     end
     def onSelectionCleared(selection)
-      PropertiesWindow::EntityInfo.update(selection)
+      PropertiesWindow.set_html()
     end
-    def onSelectionAdded(selection, entity)
-      PropertiesWindow::EntityInfo.update(selection)
+    def onSelectionAdded(selection,entity)
+      PropertiesWindow.set_html()
     end
   end
 
   # observer that updates the window when selected entity changes
   class IMEntitiesObserver < Sketchup::EntitiesObserver
-    def onElementModified(entities, entity)
-      if Sketchup.active_model.selection.length == 1
-        if entity == Sketchup.active_model.selection[0]
-          PropertiesWindow::EntityInfo.update( Sketchup.active_model.selection )
-        end
+    def onElementModified(entities,entity)
+      if Sketchup.active_model.selection.include?(entity)
+        PropertiesWindow.set_html()
       end
     end
-    def onElementAdded(entities, entity)
-      if Sketchup.active_model.selection.length == 1
-        if entity == Sketchup.active_model.selection[0]
-          PropertiesWindow::EntityInfo.update( Sketchup.active_model.selection )
-        end
+    def onElementAdded(entities,entity)
+      if entity.deleted? || Sketchup.active_model.selection.include?(entity)
+        PropertiesWindow.set_html()
       end
     end
   end
@@ -87,21 +84,12 @@ module BimTools
       
       # when new model is loaded, close window (?) instantaneous re-open does not work?
       PropertiesWindow.close
+      PropertiesWindow.create
       
-      # also load din276 and nlsfb classifications and default materials into new model
-      IfcManager.load_din276() #(mp) added DIN 276-1
-	  IfcManager.load_nlsfb()
-      IfcManager.load_materials()
+      # also load classifications and default materials into new model
+      Settings.load_classifications
+      Settings.load_materials()
     end
   end
-  
-  #class IMModelObserver < Sketchup::ModelObserver
-  # update menu when component is opened
-  # (!) does not work when using inspector
-  #  def onActivePathChanged( model )
-  #    PropertiesWindow::EntityInfo.update( Sketchup.active_model.selection )
-  #  end
-  #end
-
  end # module IfcManager
 end # module BimTools

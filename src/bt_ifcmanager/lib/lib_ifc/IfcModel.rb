@@ -55,15 +55,16 @@ module BimTools
     def initialize( su_model, options = {} )
       
       defaults = {
-        :ifc_entities       => false,                                  # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
-        :hidden             => false,                                  # include hidden sketchup objects
-        :attributes         => ['SU_DefinitionSet', 'SU_InstanceSet'], # include specific attribute dictionaries given in array as IfcPropertySets, like ['SU_DefinitionSet', 'SU_InstanceSet'], false means all
-        :classifications    => true,                                   # add all SketchUp classifications
-        :layers             => true,                                   # create IfcPresentationLayerAssignments
-        :materials          => true,                                   # create IfcMaterials
-        :styles             => true,                                   # create IfcStyledItems
-        :fast_guid          => false,                                  # create simplified guids
-        :dynamic_attributes => true                                    # export dynamic component data
+        ifc_entities:       false,                                  # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
+        hidden:             false,                                  # include hidden sketchup objects
+        attributes:         ['SU_DefinitionSet', 'SU_InstanceSet'], # include specific attribute dictionaries given in array as IfcPropertySets, like ['SU_DefinitionSet', 'SU_InstanceSet'], false means all
+        classifications:    true,                                   # add all SketchUp classifications
+        layers:             true,                                   # create IfcPresentationLayerAssignments
+        materials:          true,                                   # create IfcMaterials
+        styles:             true,                                   # create IfcStyledItems
+        fast_guid:          false,                                  # create simplified guids
+        dynamic_attributes: true,                                   # export dynamic component data
+        mapped_items:       true
       }
       @options = defaults.merge( options )
       
@@ -78,6 +79,9 @@ module BimTools
       
       # create empty array that will contain all IFC objects
       @ifc_objects = Array.new
+
+      # create empty hash that will contaon all Mapped Representations (Component Definitions)
+      @mapped_representations = Hash.new
       
       # create IfcOwnerHistory for all IFC objects
       @owner_history = create_ownerhistory()
@@ -98,6 +102,16 @@ module BimTools
     def add( ifc_object )
       @ifc_objects << ifc_object
       return new_id()
+    end # def add
+    
+    # add object to mapped representations Hash
+    def add_mapped_representation( su_definition, ifc_object )
+      @mapped_representations[ su_definition ] = ifc_object
+    end # def add
+    
+    # get mapped representation for component definition
+    def mapped_representation?( su_definition )
+      return @mapped_representations[ su_definition ]
     end # def add
     
     def new_id()
