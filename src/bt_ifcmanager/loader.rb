@@ -57,12 +57,11 @@ module BimTools
     require File.join(PLUGIN_PATH, 'settings.rb')
     Settings.load()
 
-    require File.join(PLUGIN_PATH, 'properties.rb')
     require File.join(PLUGIN_PATH, 'window.rb')
-    # require File.join(PLUGIN_PATH, 'window_oud.rb')
     require File.join(PLUGIN_PATH, 'export.rb')
     require File.join(PLUGIN_PATH_TOOLS, 'paint_properties.rb')
     require File.join(PLUGIN_PATH_TOOLS, 'create_component.rb')
+    
     # add tools to toolbar  
     # Open window button
     btn_ifc_window = UI::Command.new('Show IFC properties') {

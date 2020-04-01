@@ -37,6 +37,7 @@
 #   default_materials:   false  # {'beton'=>[142, 142, 142],'hout'=>[129, 90, 35],'staal'=>[198, 198, 198],'gips'=>[255, 255, 255],'zink'=>[198, 198, 198],'hsb'=>[204, 161, 0],'metselwerk'=>[102, 51, 0],'steen'=>[142, 142, 142],'zetwerk'=>[198, 198, 198],'tegel'=>[255, 255, 255],'aluminium'=>[198, 198, 198],'kunststof'=>[255, 255, 255],'rvs'=>[198, 198, 198],'pannen'=>[30, 30, 30],'bitumen'=>[30, 30, 30],'epdm'=>[30, 30, 30],'isolatie'=>[255, 255, 50],'kalkzandsteen'=>[255, 255, 255],'metalstud'=>[198, 198, 198],'gibo'=>[255, 255, 255],'glas'=>[204, 255, 255],'multiplex'=>[255, 216, 101],'cementdekvloer'=>[198, 198, 198]}
 
 require 'yaml'
+require "cgi"
 
 module BimTools
  module IfcManager
@@ -86,7 +87,6 @@ module BimTools
     end # def save
 
     def set_classification(classification_name)
-      # s_classification = classification_name.gsub(/[^0-9A-Za-z]/, '')
       @classifications[classification_name] = true
       unless @options[:load][:classifications].key? classification_name
         @options[:load][:classifications][classification_name] = true
@@ -94,7 +94,6 @@ module BimTools
     end
 
     def unset_classification(classification_name)
-      # s_classification = classification_name.gsub(/[^0-9A-Za-z]/, '')
       @classifications[classification_name] = false
       if @options[:load][:classifications].include? classification_name
         @options[:load][:classifications][classification_name] = false
@@ -106,7 +105,6 @@ module BimTools
       if @options[:load][:classifications].is_a? Hash
         @options[:load][:classifications].each_pair do |classification_name, load|
           if(load == true || load == false)
-            # s_classification = classification_name.gsub(/[^0-9A-Za-z]/, '')
             @classifications[classification_name] = load
           end
         end
@@ -126,10 +124,10 @@ module BimTools
             classifications = model.classifications
             file = File.join(PLUGIN_PATH_CLASSIFICATIONS, classification_name + ".skc")
             
-            # # If not in plugin lib folder then check support files
-            # unless file
-            #   file = Sketchup.find_support_file(classification + ".skc", "Classifications")
-            # end
+            # If not in plugin lib folder then check support files
+            unless file
+              file = Sketchup.find_support_file(classification + ".skc", "Classifications")
+            end
             if file
               classifications.load_schema(file) if !file.nil?
             else
@@ -211,34 +209,31 @@ module BimTools
       })
       set_html()
       @dialog.add_action_callback("save_settings") { |action_context, s_form_data|
-        nlsfb = false
-        din = false
-        materials = false
+        update_classifications = []
 
-        a_form_data = s_form_data.split('&')
+        a_form_data = CGI.unescape(s_form_data).split('&')
         a_form_data.each do |s_setting|
           a_setting = s_setting.split('=')
-          if a_setting[1] == "NL-SfB+2005%2C+tabel+1"
-            nlsfb = true
-          end
-          if a_setting[1] == "DIN+276-1"
-            din = true
-          end
+          
           if a_setting[0] == "materials"
-            materials = true
+            @template_materials = true
+          else
+            update_classifications << a_setting[1]
           end
         end
-        if nlsfb
-          self.set_classification("NL-SfB 2005, tabel 1")
-        else
-          self.unset_classification("NL-SfB 2005, tabel 1")
+        @classifications.each_key do |classification_name|
+        puts "cnamey"
+        puts classification_name
+          if update_classifications.include? classification_name
+          puts "add"
+            self.set_classification(classification_name)
+          else
+          puts "remove"
+            self.unset_classification(classification_name)
+          end
         end
-        if din
-          self.set_classification("DIN 276-1")
-        else
-          self.unset_classification("DIN 276-1")
-        end
-        @template_materials = materials
+        puts "update"
+        puts update_classifications
         self.save()
       }
       @dialog.show

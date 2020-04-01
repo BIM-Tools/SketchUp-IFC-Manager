@@ -19,9 +19,10 @@
 #
 #
 
-require_relative File.join('IfcLengthMeasure.rb')
-require_relative File.join('IfcLabel.rb')
-require_relative File.join('IfcReal.rb')
+require_relative 'set.rb'
+require_relative 'IfcLengthMeasure.rb'
+require_relative 'IfcLabel.rb'
+require_relative 'IfcReal.rb'
 
 # method that collects all dynamic component attributes in the given objects and creates IfcPropertySets and Quantities
  
