@@ -45,7 +45,7 @@ module BimTools
     extend self
     attr_accessor :visible
     attr_reader :classifications
-    @template_materials = true
+    @template_materials = false
     @settings_file = File.join(PLUGIN_PATH, "settings.yml")
     @classifications = Hash.new
     # @css = File.join(PLUGIN_PATH_CSS, 'sketchup.css')
@@ -210,30 +210,26 @@ module BimTools
       set_html()
       @dialog.add_action_callback("save_settings") { |action_context, s_form_data|
         update_classifications = []
+        @template_materials = false
 
         a_form_data = CGI.unescape(s_form_data).split('&')
         a_form_data.each do |s_setting|
           a_setting = s_setting.split('=')
           
           if a_setting[0] == "materials"
+            puts "materials"
             @template_materials = true
           else
             update_classifications << a_setting[1]
           end
         end
         @classifications.each_key do |classification_name|
-        puts "cnamey"
-        puts classification_name
           if update_classifications.include? classification_name
-          puts "add"
             self.set_classification(classification_name)
           else
-          puts "remove"
             self.unset_classification(classification_name)
           end
         end
-        puts "update"
-        puts update_classifications
         self.save()
       }
       @dialog.show
@@ -275,7 +271,7 @@ module BimTools
       if @template_materials
         materials_checked = "checked"
       else
-        checked = ""
+        materials_checked = ""
       end
       html << "
             <label class=\"radio-inline\"><input type=\"checkbox\" name=\"materials\" value=\"materials\" #{materials_checked}> Template materials</label>"
