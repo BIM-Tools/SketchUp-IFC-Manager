@@ -71,7 +71,9 @@ module BimTools
               property = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model )
               property.name = BimTools::IfcManager::IfcLabel.new( prop_name )
               property.nominalvalue = get_dynamic_attribute_value( instance, key )
-              property.nominalvalue.long = true
+              if property.nominalvalue
+                property.nominalvalue.long = true
+              end
               pset_hash[pset_name].hasproperties.add( property )
             when "Qty", "BaseQuantities"
               unless qty_hash[key]
@@ -97,7 +99,9 @@ module BimTools
                 property = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model )
                 property.name = BimTools::IfcManager::IfcLabel.new( prop_name )
                 property.nominalvalue = get_dynamic_attribute_value( instance, key )
-                property.nominalvalue.long = true
+                if property.nominalvalue
+                  property.nominalvalue.long = true
+                end
                 pset_hash["SU_DynamicAttributes"].hasproperties.add( property )
               end
             end
