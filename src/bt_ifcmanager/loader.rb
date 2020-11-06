@@ -67,8 +67,8 @@ module BimTools
     btn_ifc_window = UI::Command.new('Show IFC properties') {
       PropertiesWindow.toggle
     }
-    btn_ifc_window.small_icon = File.join(PLUGIN_PATH_IMAGE, "IfcEdit" + ICON_TYPE)
-    btn_ifc_window.large_icon = File.join(PLUGIN_PATH_IMAGE, "IfcEdit" + ICON_TYPE)
+    btn_ifc_window.small_icon = File.join(PLUGIN_PATH_IMAGE, "IfcEdit" << ICON_TYPE)
+    btn_ifc_window.large_icon = File.join(PLUGIN_PATH_IMAGE, "IfcEdit" << ICON_TYPE)
     btn_ifc_window.tooltip = "Show IFC properties"
     btn_ifc_window.status_bar_text = "Edit IFC properties"
 
@@ -84,7 +84,7 @@ module BimTools
       if File.basename(model_path) == ""
         filename = "Untitled.ifc" # (?) translate?
       else
-        filename = File.basename(model_path, ".*") + ".ifc"
+        filename = File.basename(model_path, ".*") << ".ifc"
       end
 
       # get model directory name
@@ -98,8 +98,8 @@ module BimTools
         export( export_path )
       end
     }
-    btn_ifc_export.small_icon = File.join(PLUGIN_PATH_IMAGE, "IfcExport" + ICON_TYPE)
-    btn_ifc_export.large_icon = File.join(PLUGIN_PATH_IMAGE, "IfcExport" + ICON_TYPE)
+    btn_ifc_export.small_icon = File.join(PLUGIN_PATH_IMAGE, "IfcExport" << ICON_TYPE)
+    btn_ifc_export.large_icon = File.join(PLUGIN_PATH_IMAGE, "IfcExport" << ICON_TYPE)
     btn_ifc_export.tooltip = 'Export model to IFC'
     btn_ifc_export.status_bar_text = 'Export model to IFC'
 

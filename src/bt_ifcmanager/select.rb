@@ -27,10 +27,10 @@ module BimTools
     end
     def add_selectbox( name )
       js_command = String.new
-      js_command << "$( 'body' ).append( '<label for=\"" + name + "\">" + name + "</label> ');"
-      js_command << "$( 'body' ).append( '<span><select id=\"" + name + "\" name=\"" + name + "\"></span> ');"
-      #js_command << "$( '#" + name + "' ).attr('name','" + name + "');"
-      #js_command << "$( '#" + name + "' ).val('FFFFFFFFFFFFFFFFFFF');"
+      js_command << "$( 'body' ).append( '<label for=\"" << name << "\">" << name << "</label> ');"
+      js_command << "$( 'body' ).append( '<span><select id=\"" << name << "\" name=\"" << name << "\"></span> ');"
+      #js_command << "$( '#" << name << "' ).attr('name','" << name << "');"
+      #js_command << "$( '#" << name << "' ).val('FFFFFFFFFFFFFFFFFFF');"
       @window.execute_script( js_command )
     end # add_input_text
   end # class select

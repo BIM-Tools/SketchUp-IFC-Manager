@@ -173,8 +173,12 @@ module BimTools
               target.set_attribute source_dict.name, key, value # create the same dictionary in target
             }
 
-            target_dict = target.attribute_dictionary source_dict.name
-            clone_attributes( source_dict, target_dict ) # recursively check all possible child dictionaries
+            target_dict = target.attribute_dictionary(source_dict.name, true)
+            if target_dict
+              clone_attributes( source_dict, target_dict ) # recursively check all possible child dictionaries
+            else
+              puts "Unable to copy: " << source_dict.name
+            end
           end
         end
       end

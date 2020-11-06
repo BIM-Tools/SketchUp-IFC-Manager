@@ -91,7 +91,7 @@ module BimTools
       length = 2
       ifc_guid.each_char do | char |
         n = GUID64.index( char.to_s )
-        bin = bin +  n.to_s( 2 ).rjust( length, "0" )
+        bin = bin << n.to_s( 2 ).rjust( length, "0" )
         length = 6
       end
       return [bin].pack('B*').unpack('H*')[0]

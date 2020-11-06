@@ -195,7 +195,7 @@ module BimTools
       # classification = BimTools::IFC2X3::IfcClassification.new( self )
       # classification.source = ''
       # classification.edition = ''
-      # classification.name = "'" + schema.name + "'"
+      # classification.name = "'" << schema.name << "'"
       # classifications << classification
       
       # # special options for nlsfb
