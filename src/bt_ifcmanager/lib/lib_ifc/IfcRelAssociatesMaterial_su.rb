@@ -32,7 +32,7 @@ module BimTools
       material_name = sketchup
       
       @relatingmaterial = BimTools::IFC2X3::IfcMaterial.new( ifc_model )
-      @relatingmaterial.name = "'#{material_name}'"
+      @relatingmaterial.name = BimTools::IfcManager::IfcLabel.new( material_name )
       @relatedobjects = IfcManager::Ifc_Set.new()
     end # def sketchup
   end # module IfcRelAssociatesMaterial_su

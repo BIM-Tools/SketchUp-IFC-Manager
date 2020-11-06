@@ -24,6 +24,7 @@ require_relative 'Ifc_Type.rb'
 module BimTools
  module IfcManager
   class IfcLabel < Ifc_Type
+    attr_reader :value
     def initialize( value )
       begin
         

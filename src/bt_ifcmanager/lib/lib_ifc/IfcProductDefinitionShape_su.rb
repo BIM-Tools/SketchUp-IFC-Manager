@@ -24,7 +24,7 @@ require_relative File.join('IFC2X3', 'IfcShapeRepresentation.rb')
 
 module BimTools
   module IfcProductDefinitionShape_su
-
+    attr_accessor :globalid
     # @parameter ifc_model [IfcManager::IfcModel]
     # @parameter sketchup [Sketchup::ComponentDefinition]
     def initialize(ifc_model, sketchup)
@@ -32,14 +32,14 @@ module BimTools
 
       # Check if Mapped representation should be used
       if (ifc_model.options[:mapped_items]) && (sketchup.count_instances > 1)
-        representationtype = "'MappedRepresentation'"
+        representationtype = BimTools::IfcManager::IfcLabel.new( "MappedRepresentation" )
       else
-        representationtype = "'Brep'"
+        representationtype = BimTools::IfcManager::IfcLabel.new( "Brep" )
       end
 
       # set representation based on definition
       representation = BimTools::IFC2X3::IfcShapeRepresentation.new( ifc_model , sketchup, representationtype)
       @representations = IfcManager::Ifc_List.new([representation])
-    end # def sketchup
+    end # def initialize
   end # module IfcProductDefinitionShape_su
 end # module BimTools
