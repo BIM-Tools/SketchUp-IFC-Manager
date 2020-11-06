@@ -20,6 +20,7 @@
 #
 
 require_relative(File.join('..', 'step.rb'))
+require_relative(File.join('..', 'IfcJson.rb'))
 require_relative(File.join('..', 'IfcPresentationLayerAssignment_su.rb'))
 
 module BimTools
@@ -27,6 +28,7 @@ module BimTools
   class IfcPresentationLayerAssignment
     attr_accessor :ifc_id, :name, :description, :assigneditems, :identifier
     include Step 
+    include IfcJson 
     include IfcPresentationLayerAssignment_su
     def initialize( ifc_model, sketchup=nil, *args ) 
       @ifc_id = ifc_model.add( self ) if @ifc_id.nil?

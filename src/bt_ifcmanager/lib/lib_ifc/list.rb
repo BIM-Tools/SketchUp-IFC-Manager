@@ -55,6 +55,26 @@ module BimTools
       end
       return "(#{line})"
     end # def step
+
+    def to_json(arg=nil)
+      string = "["
+      $i = 0
+      $num = @items.length
+      while $i < $num  do
+        json = @items[$i].to_json
+        unless json == ""
+          
+          #skip the , for the first element
+          unless $i == 0
+            string << ","
+          end
+
+          string << json
+        end
+        $i +=1
+      end
+      return string << "]"
+    end # def to_json
   end # class Ifc_List
  end # module IfcManager
 end # module BimTools

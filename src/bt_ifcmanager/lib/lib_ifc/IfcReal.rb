@@ -43,6 +43,10 @@ module BimTools
       classname = self.class.name.split('::').last.upcase
       return "#{classname}(#{string})"
     end
+
+    def to_json(arg=nil)
+      return (@value).inspect   
+    end # def to_json
   end # class IfcReal
  end # module IfcManager
 end # module BimTools

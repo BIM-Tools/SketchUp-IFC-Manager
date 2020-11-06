@@ -20,6 +20,7 @@
 #
 
 require_relative(File.join('..', 'step.rb'))
+require_relative(File.join('..', 'IfcJson.rb'))
 require_relative('IfcPhysicalQuantity.rb')
 
 module BimTools
@@ -27,6 +28,7 @@ module BimTools
   class IfcPhysicalComplexQuantity < IfcPhysicalQuantity
     attr_accessor :ifc_id, :hasquantities, :discrimination, :quality, :usage
     include Step 
+    include IfcJson 
     def initialize( ifc_model, sketchup=nil, *args ) 
       @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super

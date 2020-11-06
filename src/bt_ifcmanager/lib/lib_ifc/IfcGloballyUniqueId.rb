@@ -54,6 +54,10 @@ module BimTools
       return @hex_guid
     end # def to_s
     
+    def to_json(arg=nil)
+      return "\"#{@hex_guid[0..7]}-#{@hex_guid[8..11]}-#{@hex_guid[12..15]}-#{@hex_guid[16..19]}-#{@hex_guid[20..31]}\""
+    end # def to_s
+    
     # recognize guid type and reformat to unformatted hex version
     def unformat_guid( guid )
       

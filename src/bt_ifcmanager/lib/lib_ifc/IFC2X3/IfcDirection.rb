@@ -20,6 +20,7 @@
 #
 
 require_relative(File.join('..', 'step.rb'))
+require_relative(File.join('..', 'IfcJson.rb'))
 require_relative(File.join('..', 'IfcDirection_su.rb'))
 require_relative('IfcGeometricRepresentationItem.rb')
 
@@ -28,6 +29,7 @@ module BimTools
   class IfcDirection < IfcGeometricRepresentationItem
     attr_accessor :ifc_id, :directionratios
     include Step 
+    include IfcJson 
     include IfcDirection_su
     def initialize( ifc_model, sketchup=nil, *args ) 
       @ifc_id = ifc_model.add( self ) if @ifc_id.nil?

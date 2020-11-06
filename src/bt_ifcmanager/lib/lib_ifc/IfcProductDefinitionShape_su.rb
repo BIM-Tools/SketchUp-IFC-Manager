@@ -41,5 +41,26 @@ module BimTools
       representation = BimTools::IFC2X3::IfcShapeRepresentation.new( ifc_model , sketchup, representationtype)
       @representations = IfcManager::Ifc_List.new([representation])
     end # def initialize
+    def to_json(arg=nil)
+      if self.representations
+
+        # only include non empty properties
+        value = self.representations
+        if value.items
+          items_json = []
+          value.items.each do |item|
+            items_json << {
+              "type" => self.class.name.split('::Ifc').last,
+              "ref" => "error"#item.globalid
+            }
+          end
+          return items_json.to_json()
+        else
+          return nil
+        end
+      else
+        return nil
+      end
+    end # to_json
   end # module IfcProductDefinitionShape_su
 end # module BimTools

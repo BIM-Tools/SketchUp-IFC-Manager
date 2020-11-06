@@ -35,5 +35,12 @@ module BimTools
       @relatingmaterial.name = BimTools::IfcManager::IfcLabel.new( material_name )
       @relatedobjects = IfcManager::Ifc_Set.new()
     end # def sketchup
+    def to_json(arg=nil)
+      if @relatingmaterial
+        return {"RelatingMaterial" => relatingmaterial.name}
+      else
+        return nil
+      end
+    end # to_json
   end # module IfcRelAssociatesMaterial_su
 end # module BimTools

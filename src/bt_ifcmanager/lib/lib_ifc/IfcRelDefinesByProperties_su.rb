@@ -38,42 +38,40 @@ module BimTools
       # (!) this should be automatically created by root!!!
       @globalid = IfcManager::IfcGloballyUniqueId.new()
       @ownerhistory = ifc_model.owner_history
-      
+      @isdefinedby = IfcManager::Ifc_Set.new()
       @relatedobjects = IfcManager::Ifc_Set.new()
       if sketchup.is_a?( Sketchup::AttributeDictionary )
         attr_dict = sketchup
         if attr_dict.name == "BaseQuantities" # export as elementquantities
           
-          qty = BimTools::IFC2X3::IfcElementQuantity.new( ifc_model, attr_dict )
-          @relatingpropertydefinition = qty
-          qty.name = BimTools::IfcManager::IfcLabel.new( attr_dict.name ) unless attr_dict.name.nil?
-          qty.quantities = IfcManager::Ifc_Set.new()
+          @relatingpropertydefinition = BimTools::IFC2X3::IfcElementQuantity.new( ifc_model, attr_dict )
+          @relatingpropertydefinition.name = BimTools::IfcManager::IfcLabel.new( attr_dict.name ) unless attr_dict.name.nil?
+          @relatingpropertydefinition.quantities = IfcManager::Ifc_Set.new()
           attr_dict.attribute_dictionaries.each { | dict |
             case dict.name
             when "Area", "GrossArea"
               prop = BimTools::IFC2X3::IfcQuantityArea.new( ifc_model, attr_dict )
               prop.name = BimTools::IfcManager::IfcIdentifier.new( dict.name )
-              prop.areavalue = BimTools::IfcManager::IfcReal.new( dict['value'] ) # real should be IfcLengthMeasure
-              qty.quantities.add( prop )
+              prop.areavalue = BimTools::IfcManager::IfcLengthMeasure.new( dict['value'] )
+              @relatingpropertydefinition.quantities.add( prop )
             when "Volume"
               prop = BimTools::IFC2X3::IfcQuantityVolume.new( ifc_model, attr_dict )
               prop.name = BimTools::IfcManager::IfcIdentifier.new( dict.name )
-              prop.volumevalue = BimTools::IfcManager::IfcReal.new( dict['value'] ) # real should be IfcLengthMeasure
-              qty.quantities.add( prop )
+              prop.volumevalue = BimTools::IfcManager::IfcLengthMeasure.new( dict['value'] )
+              @relatingpropertydefinition.quantities.add( prop )
             when "Width", "Height", "Depth", "Perimeter"
               prop = BimTools::IFC2X3::IfcQuantityLength.new( ifc_model, attr_dict )
               prop.name = BimTools::IfcManager::IfcIdentifier.new( dict.name )
-              prop.lengthvalue = BimTools::IfcManager::IfcReal.new( dict['value'] ) # real should be IfcLengthMeasure
-              qty.quantities.add( prop )
+              prop.lengthvalue = BimTools::IfcManager::IfcLengthMeasure.new( dict['value'] )
+              @relatingpropertydefinition.quantities.add( prop )
             #else
             end
           }
           
         else # export as propertyset
-          pset = BimTools::IFC2X3::IfcPropertySet.new( ifc_model, attr_dict )
-          @relatingpropertydefinition = pset
-          pset.name = BimTools::IfcManager::IfcLabel.new( attr_dict.name ) unless attr_dict.name.nil?
-          pset.hasproperties = IfcManager::Ifc_Set.new()
+          @relatingpropertydefinition = BimTools::IFC2X3::IfcPropertySet.new( ifc_model, attr_dict )
+          @relatingpropertydefinition.name = BimTools::IfcManager::IfcLabel.new( attr_dict.name ) unless attr_dict.name.nil?
+          @relatingpropertydefinition.hasproperties = IfcManager::Ifc_Set.new()
           if attr_dict.length == 0 && attr_dict.attribute_dictionaries
             attr_dict.attribute_dictionaries.each { | dict |
               
@@ -92,19 +90,62 @@ module BimTools
                 prop.nominalvalue = BimTools::IfcManager::IfcLabel.new( dict['value'] ) # (!) not always IfcLabel
               end
               prop.nominalvalue.long = true # adding long = true returns a full object string, necessary for propertyset
-              pset.hasproperties.add( prop )
+              @relatingpropertydefinition.hasproperties.add( prop )
             }
           else
             attr_dict.each { | key, value |
-              prop = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model, attr_dict )
-              prop.name = BimTools::IfcManager::IfcIdentifier.new( key )
-              prop.nominalvalue = BimTools::IfcManager::IfcLabel.new( value ) # (!) not always IfcLabel
-              prop.nominalvalue.long = true # adding long = true returns a full object string
-              pset.hasproperties.add( prop )
+              # unless value.nil? || value==""
+                prop = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model, attr_dict )
+                prop.name = BimTools::IfcManager::IfcIdentifier.new( key )
+                prop.nominalvalue = BimTools::IfcManager::IfcLabel.new( value ) # (!) not always IfcLabel
+                prop.nominalvalue.long = true # adding long = true returns a full object string
+                @relatingpropertydefinition.hasproperties.add( prop )
+              # end
             }
           end
         end
       end
-    end # def sketchup
+    end # def initialize
+    def to_json(arg=nil)
+      if @relatingpropertydefinition && @relatingpropertydefinition.hasproperties
+        items_json = Hash.new
+        properties = @relatingpropertydefinition.hasproperties
+        properties.items.each do |propertySingleValue|
+          value = propertySingleValue.nominalvalue.to_json
+          if value != '""'
+            items_json[propertySingleValue.name] = propertySingleValue.nominalvalue
+          end
+        end
+        if items_json.size != 0
+          return items_json.to_json
+        else
+          return ""
+        end
+      else
+        return nil
+      end
+    end # to_json
+    def to_hash(arg=nil)
+      if @relatingpropertydefinition && @relatingpropertydefinition.hasproperties
+        items_json = Hash.new
+        properties = @relatingpropertydefinition.hasproperties
+        properties.items.each do |propertySingleValue|
+          value = propertySingleValue.nominalvalue.to_json
+          if value != '""'
+            items_json[propertySingleValue.name] = propertySingleValue.nominalvalue
+          end
+        end
+        puts "EMPTY"
+        puts items_json.size
+        if items_json.size != 0
+          return items_json
+        else
+          return nil
+        end
+      else
+        puts "EMPTY"
+        return nil
+      end
+    end # to_hash
   end # module IfcRelDefinesByProperties_su
 end # module BimTools

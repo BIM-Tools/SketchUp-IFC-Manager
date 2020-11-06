@@ -20,6 +20,7 @@
 #
 
 require_relative(File.join('..', 'step.rb'))
+require_relative(File.join('..', 'IfcJson.rb'))
 require_relative(File.join('..', 'IfcProject_su.rb'))
 require_relative('IfcObject.rb')
 
@@ -28,6 +29,7 @@ module BimTools
   class IfcProject < IfcObject
     attr_accessor :ifc_id, :longname, :phase, :representationcontexts, :unitsincontext
     include Step 
+    include IfcJson 
     include IfcProject_su
     def initialize( ifc_model, sketchup=nil, *args ) 
       @ifc_id = ifc_model.add( self ) if @ifc_id.nil?

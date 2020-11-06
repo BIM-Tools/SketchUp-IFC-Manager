@@ -58,8 +58,8 @@ module BimTools
       
       pb.update(1)
 
-      # make sure file_path ends in "ifc"
-      unless file_path.split('.').last == "ifc"
+      # make sure file_path ends in "ifc" or "json"
+      unless (File.extname(file_path).downcase == ".ifc") || (File.extname(file_path).downcase == ".json")
         file_path << '.ifc'
       end
       
@@ -71,8 +71,9 @@ module BimTools
       # get total time
       puts "finished creating IFC entities: " + (Time.now - timer).to_s
       
-      # export model to IFC step file
-      ifc_model.export( file_path )
+      # export model to IFC file
+      file_ext = File.extname(file_path).delete('.')
+      ifc_model.export( file_path, file_ext )
       
       pb.update(3)
       

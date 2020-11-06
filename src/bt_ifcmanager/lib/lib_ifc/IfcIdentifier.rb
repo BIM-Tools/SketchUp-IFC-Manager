@@ -45,6 +45,10 @@ module BimTools
     def to_s()
       return @value   
     end # def to_s
+
+    def to_json(arg=nil)
+      return (@value).inspect   
+    end # def to_json
   end # class IfcIdentifier
  end # module IfcManager
 end # module BimTools

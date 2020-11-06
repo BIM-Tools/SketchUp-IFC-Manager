@@ -38,6 +38,10 @@ module BimTools
       end
       return val
     end # def step
+
+    def to_json(arg=nil)
+      return (@value).inspect   
+    end # def to_json
     
     def true?(obj)
       obj.to_s == "true"

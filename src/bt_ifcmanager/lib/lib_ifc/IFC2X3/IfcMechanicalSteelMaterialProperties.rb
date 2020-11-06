@@ -20,6 +20,7 @@
 #
 
 require_relative(File.join('..', 'step.rb'))
+require_relative(File.join('..', 'IfcJson.rb'))
 require_relative('IfcMechanicalMaterialProperties.rb')
 
 module BimTools
@@ -27,6 +28,7 @@ module BimTools
   class IfcMechanicalSteelMaterialProperties < IfcMechanicalMaterialProperties
     attr_accessor :ifc_id, :yieldstress, :ultimatestress, :ultimatestrain, :hardeningmodule, :proportionalstress, :plasticstrain, :relaxations
     include Step 
+    include IfcJson 
     def initialize( ifc_model, sketchup=nil, *args ) 
       @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super

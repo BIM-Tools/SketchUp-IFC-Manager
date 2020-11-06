@@ -39,6 +39,10 @@ module BimTools
       end
       return val
     end # def step
+
+    def to_json(v=nil)
+      return (@value).inspect   
+    end
   end # class IfcText
  end # module IfcManager
 end # module BimTools

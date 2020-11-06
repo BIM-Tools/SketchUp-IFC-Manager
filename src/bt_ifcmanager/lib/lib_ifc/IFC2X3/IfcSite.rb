@@ -20,6 +20,7 @@
 #
 
 require_relative(File.join('..', 'step.rb'))
+require_relative(File.join('..', 'IfcJson.rb'))
 require_relative(File.join('..', 'IfcSite_su.rb'))
 require_relative('IfcSpatialStructureElement.rb')
 
@@ -27,7 +28,8 @@ module BimTools
  module IFC2X3
   class IfcSite < IfcSpatialStructureElement
     attr_accessor :ifc_id, :reflatitude, :reflongitude, :refelevation, :landtitlenumber, :siteaddress
-    include Step
+    include Step 
+    include IfcJson 
     include IfcSite_su
     def initialize( ifc_model, sketchup=nil, *args ) 
       @ifc_id = ifc_model.add( self ) if @ifc_id.nil?

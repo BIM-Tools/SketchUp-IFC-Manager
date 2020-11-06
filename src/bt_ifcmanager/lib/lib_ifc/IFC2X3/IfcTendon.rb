@@ -20,6 +20,7 @@
 #
 
 require_relative(File.join('..', 'step.rb'))
+require_relative(File.join('..', 'IfcJson.rb'))
 require_relative('IfcReinforcingElement.rb')
 
 module BimTools
@@ -27,6 +28,7 @@ module BimTools
   class IfcTendon < IfcReinforcingElement
     attr_accessor :ifc_id, :predefinedtype, :nominaldiameter, :crosssectionarea, :tensionforce, :prestress, :frictioncoefficient, :anchorageslip, :mincurvatureradius
     include Step 
+    include IfcJson 
     def initialize( ifc_model, sketchup=nil, *args ) 
       @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super

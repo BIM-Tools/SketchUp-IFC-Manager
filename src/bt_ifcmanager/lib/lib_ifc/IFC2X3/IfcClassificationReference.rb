@@ -20,6 +20,7 @@
 #
 
 require_relative(File.join('..', 'step.rb'))
+require_relative(File.join('..', 'IfcJson.rb'))
 require_relative(File.join('..', 'IfcClassificationReference_su.rb'))
 require_relative('IfcExternalReference.rb')
 
@@ -28,6 +29,7 @@ module BimTools
   class IfcClassificationReference < IfcExternalReference
     attr_accessor :ifc_id, :referencedsource
     include Step 
+    include IfcJson 
     include IfcClassificationReference_su
     def initialize( ifc_model, sketchup=nil, *args ) 
       @ifc_id = ifc_model.add( self ) if @ifc_id.nil?

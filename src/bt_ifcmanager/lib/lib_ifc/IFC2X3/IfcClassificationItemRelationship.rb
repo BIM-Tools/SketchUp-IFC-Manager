@@ -20,12 +20,14 @@
 #
 
 require_relative(File.join('..', 'step.rb'))
+require_relative(File.join('..', 'IfcJson.rb'))
 
 module BimTools
  module IFC2X3
   class IfcClassificationItemRelationship
     attr_accessor :ifc_id, :relatingitem, :relateditems
     include Step 
+    include IfcJson 
     def initialize( ifc_model, sketchup=nil, *args ) 
       @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
     end # def initialize 

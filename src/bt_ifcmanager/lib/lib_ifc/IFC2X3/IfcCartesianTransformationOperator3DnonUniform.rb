@@ -20,6 +20,7 @@
 #
 
 require_relative(File.join('..', 'step.rb'))
+require_relative(File.join('..', 'IfcJson.rb'))
 require_relative('IfcCartesianTransformationOperator3D.rb')
 
 module BimTools
@@ -27,6 +28,7 @@ module BimTools
   class IfcCartesianTransformationOperator3DnonUniform < IfcCartesianTransformationOperator3D
     attr_accessor :ifc_id, :scale2, :scale3
     include Step 
+    include IfcJson 
     def initialize( ifc_model, sketchup=nil, *args ) 
       @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
       super
