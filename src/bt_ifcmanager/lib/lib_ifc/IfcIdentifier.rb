@@ -41,6 +41,10 @@ module BimTools
       end
       return val
     end # def step
+
+    def to_s()
+      return @value   
+    end # def to_s
   end # class IfcIdentifier
  end # module IfcManager
 end # module BimTools

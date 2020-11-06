@@ -1,0 +1,53 @@
+body {
+  height: 100%;
+  overflow: hidden;
+}
+p {
+  font-size: 0.8em;
+}
+.input-group > .select2 {
+  flex: 1 1 auto;
+  width: auto;
+}
+.select2-container .select2-selection--single, .input-group-append{
+  border: 1px solid #ced4da !important;
+  border-radius: .25rem;
+  height: initial !important;
+}
+.select2-selection__arrow{
+  height: 24px !important;
+}
+.select2-selection__rendered{
+  margin: 1px !important;
+  height: initial !important;
+  line-height: initial !important;
+  padding: .375rem .75rem !important;
+}
+/* 
+select2 select2-container select2-container--default select2-container--below */
+.input-group span {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+.input-group-append {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+.btn{
+  background: none;
+  line-height: initial !important;
+  height: initial !important;
+  font-weight: bold;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background-color: #c2def5 !important;
+  color: black !important;
+}
+.select2-container--classic .select2-selection--single:focus {
+  border: 1px solid #c2def5; 
+}
+
+.select2-container--classic .select2-selection--multiple:focus {
+  border: 1px solid #c2def5; 
+}

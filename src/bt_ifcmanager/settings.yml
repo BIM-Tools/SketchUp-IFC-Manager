@@ -1,0 +1,111 @@
+---
+:export:
+  :ifc_entities: false
+  :hidden: false
+  :attributes:
+  - SU_DefinitionSet
+  - SU_InstanceSet
+  :classifications: true
+  :layers: true
+  :materials: true
+  :styles: true
+  :fast_guid: false
+  :dynamic_attributes: true
+:load:
+  :classifications:
+    NL-SfB 2005, tabel 1: true
+    DIN 276-1: false
+  :materials: false
+:material_list:
+  beton:
+  - 142
+  - 142
+  - 142
+  hout:
+  - 129
+  - 90
+  - 35
+  staal:
+  - 198
+  - 198
+  - 198
+  gips:
+  - 255
+  - 255
+  - 255
+  zink:
+  - 198
+  - 198
+  - 198
+  hsb:
+  - 204
+  - 161
+  - 0
+  metselwerk:
+  - 102
+  - 51
+  - 0
+  steen:
+  - 142
+  - 142
+  - 142
+  zetwerk:
+  - 198
+  - 198
+  - 198
+  tegel:
+  - 255
+  - 255
+  - 255
+  aluminium:
+  - 198
+  - 198
+  - 198
+  kunststof:
+  - 255
+  - 255
+  - 255
+  rvs:
+  - 198
+  - 198
+  - 198
+  pannen:
+  - 30
+  - 30
+  - 30
+  bitumen:
+  - 30
+  - 30
+  - 30
+  epdm:
+  - 30
+  - 30
+  - 30
+  isolatie:
+  - 255
+  - 255
+  - 50
+  kalkzandsteen:
+  - 255
+  - 255
+  - 255
+  metalstud:
+  - 198
+  - 198
+  - 198
+  gibo:
+  - 255
+  - 255
+  - 255
+  glas:
+  - 204
+  - 255
+  - 255
+  multiplex:
+  - 255
+  - 216
+  - 101
+  cementdekvloer:
+  - 198
+  - 198
+  - 198

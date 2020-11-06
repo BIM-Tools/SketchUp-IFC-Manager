@@ -28,7 +28,11 @@ module BimTools
       if sketchup.is_a? Geom::Vector3d
         
         # round values
-        @directionratios = "(#{IfcManager::IfcReal.new(sketchup.x).step}, #{IfcManager::IfcReal.new(sketchup.y).step}, #{IfcManager::IfcReal.new(sketchup.z).step})"
+        @directionratios = IfcManager::Ifc_Set.new([
+          IfcManager::IfcReal.new(sketchup.x).step,
+          IfcManager::IfcReal.new(sketchup.y).step,
+          IfcManager::IfcReal.new(sketchup.z).step
+        ])
       end
       
     end # def sketchup

@@ -1,0 +1,26 @@
+input{
+  height: 2rem;
+  vertical-align: middle;
+  padding: 2rem;
+}
+label{
+  height: 2rem;
+  padding: 0;
+  margin-bottom: 0;
+}
+.btn{
+  padding-right: 2rem;
+  padding-left: 2rem;
+}
+.btn-sketchup{
+  height: 2rem;
+  line-height: 1;
+  background-color: #e1e1e1;
+  border-color: #adadad;
+  padding-right: 2rem;
+  padding-left: 2rem;
+}
+.btn-sketchup:hover {
+  background-color: #e5f1fb;
+  border-color: #0078d7;
+}

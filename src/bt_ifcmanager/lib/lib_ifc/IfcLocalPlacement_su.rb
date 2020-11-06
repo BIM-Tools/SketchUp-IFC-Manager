@@ -57,10 +57,9 @@ module BimTools
       if @placementrelto
         @transformation = @placementrelto.ifc_total_transformation.inverse * @ifc_total_transformation
       else
-        # puts 'no placementrelto for object'
         @transformation = @ifc_total_transformation
       end
-        
+      
       # set relativeplacement
       @relativeplacement = BimTools::IFC2X3::IfcAxis2Placement3D.new( @ifc_model, @transformation )
       @relativeplacement.location = BimTools::IFC2X3::IfcCartesianPoint.new( @ifc_model, @transformation.origin )

@@ -32,10 +32,10 @@ module BimTools
         if property
           if property.is_a? String
             line << property
-          elsif property.is_a?(IfcManager::IfcGloballyUniqueId) || property.is_a?(IfcManager::Ifc_Set) || property.is_a?(IfcManager::Ifc_Type) || property.is_a?(IfcManager::IfcReal)
+          elsif property.is_a?(IfcManager::IfcGloballyUniqueId) || property.is_a?(IfcManager::Ifc_List) ||  property.is_a?(IfcManager::Ifc_Set) || property.is_a?(IfcManager::Ifc_Type) || property.is_a?(IfcManager::IfcReal)
             line << property.step
           else
-            line << "##{property.ifc_id.to_s}"
+            line << "##{property.ifc_id}"
           end
         else
           line << "$"
@@ -43,10 +43,10 @@ module BimTools
         
         #skip the , for the last element
         unless property_name == properties.last
-          line << ", "
+          line << ","
         end
       end
-      return "##{@ifc_id.to_s} = #{self.class.name.split('::').last.upcase}(#{line})"
+      return "##{@ifc_id}= #{self.class.name.split('::').last.upcase}(#{line})"
     end # step
  end # module Step
 end # module BimTools

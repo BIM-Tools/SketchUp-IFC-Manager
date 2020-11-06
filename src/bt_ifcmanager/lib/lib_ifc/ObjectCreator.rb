@@ -42,6 +42,9 @@ require_relative( File.join( "IFC2X3", "IfcBuildingElementProxy.rb" ))
 require_relative( File.join( "IFC2X3", "IfcLocalPlacement.rb" ))
 require_relative( File.join( "IFC2X3", "IfcFacetedBrep.rb" ))
 require_relative( File.join( "IFC2X3", "IfcStyledItem.rb" ))
+require_relative( File.join( "IFC2X3", "IfcMappedItem.rb" ))
+require_relative( File.join( "IFC2X3", "IfcRepresentationMap.rb" ))
+require_relative( File.join( "IFC2X3", "IfcCartesianTransformationOperator3D.rb" ))
 
 module BimTools
  module IfcManager
@@ -287,8 +290,37 @@ module BimTools
       
       # create geometry from faces
       unless faces.empty? || ifc_entity.is_a?(BimTools::IFC2X3::IfcProject) #(?) skip any geometry placed inside IfcProject object?
-        brep = BimTools::IFC2X3::IfcFacetedBrep.new( ifc_model, faces, brep_transformation )
-        ifc_entity.representation.representations.first.items.add( brep )
+        representation = ifc_entity.representation.representations.first
+        
+        # Check if Mapped representation should be used
+        if representation.representationtype == "'MappedRepresentation'"
+          mapped_item = BimTools::IFC2X3::IfcMappedItem.new( ifc_model )
+          mappingsource = BimTools::IFC2X3::IfcRepresentationMap.new( ifc_model )
+          mappingtarget = BimTools::IFC2X3::IfcCartesianTransformationOperator3D.new( ifc_model )
+          mappingtarget.localorigin = BimTools::IFC2X3::IfcCartesianPoint.new( ifc_model, Geom::Point3d.new )
+
+          mappingsource.mappingorigin = BimTools::IFC2X3::IfcAxis2Placement3D.new( ifc_model, brep_transformation )
+          mappingsource.mappingorigin.location = BimTools::IFC2X3::IfcCartesianPoint.new( ifc_model, brep_transformation.origin )
+          mappingsource.mappingorigin.axis = BimTools::IFC2X3::IfcDirection.new( ifc_model, brep_transformation.zaxis )
+          mappingsource.mappingorigin.refdirection = BimTools::IFC2X3::IfcDirection.new( ifc_model, brep_transformation.xaxis )
+
+          mapped_item.mappingsource = mappingsource
+          mapped_item.mappingtarget = mappingtarget
+
+          mapped_representation = ifc_model.mapped_representation?( definition )
+          if !mapped_representation
+            mapped_representation = BimTools::IFC2X3::IfcShapeRepresentation.new( ifc_model , nil)
+            brep = BimTools::IFC2X3::IfcFacetedBrep.new( ifc_model, faces, Geom::Transformation.new(Geom::Point3d.new) )
+            mapped_representation.items.add( brep )
+            ifc_model.add_mapped_representation( definition, mapped_representation )
+          end
+          
+          mappingsource.mappedrepresentation = mapped_representation
+          representation.items.add( mapped_item )
+        else
+          brep = BimTools::IFC2X3::IfcFacetedBrep.new( ifc_model, faces, brep_transformation )
+          representation.items.add( brep )
+        end
         
         # if no material present, use material from first face?
         #if su_material.nil?

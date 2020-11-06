@@ -44,33 +44,25 @@ module BimTools
     extend self
 
     PLUGIN_PATH_IMAGE = File.join(PLUGIN_PATH, 'images')
-    PLUGIN_PATH_CSS   = File.join(PLUGIN_PATH, 'css')
-    PLUGIN_PATH_LIB   = File.join(PLUGIN_PATH, 'lib')
-    PLUGIN_PATH_TOOLS   = File.join(PLUGIN_PATH, 'tools')
+    PLUGIN_PATH_CSS = File.join(PLUGIN_PATH, 'css')
+    PLUGIN_PATH_LIB = File.join(PLUGIN_PATH, 'lib')
+    PLUGIN_PATH_UI = File.join(PLUGIN_PATH, 'ui')
+    PLUGIN_PATH_TOOLS = File.join(PLUGIN_PATH, 'tools')
+    PLUGIN_PATH_CLASSIFICATIONS = File.join(PLUGIN_PATH, 'classifications')
 
     # Create IfcManager toolbar
     @toolbar = UI::Toolbar.new "IFC Manager"
 
+    # Load settings from yaml file
+    require File.join(PLUGIN_PATH, 'settings.rb')
+    Settings.load()
+
     require File.join(PLUGIN_PATH, 'window.rb')
     require File.join(PLUGIN_PATH, 'export.rb')
     require File.join(PLUGIN_PATH_TOOLS, 'paint_properties.rb')
-    require File.join(PLUGIN_PATH, 'load_nlsfb.rb')
     require File.join(PLUGIN_PATH_TOOLS, 'create_component.rb')
-    require File.join(PLUGIN_PATH, 'load_materials.rb')
     
-    model = Sketchup.active_model
-    
-    # load the NL-SfB classification schema
-    model.start_operation('Load IFC Manager NL-SfB classification schema', true)
-    load_nlsfb()
-    model.commit_operation
-    
-    # create default materials
-    model.start_operation('Create IFC Manager default materials', true)
-    load_materials()
-    model.commit_operation
-
-    # add tools to toolbar
+    # add tools to toolbar  
     # Open window button
     btn_ifc_window = UI::Command.new('Show IFC properties') {
       PropertiesWindow.toggle
@@ -82,8 +74,7 @@ module BimTools
 
     @toolbar.add_item btn_ifc_window
 
-    # add BIMserver tools to toolbar
-    # Open window button
+    # IFC export button
     btn_ifc_export = UI::Command.new('Export model to IFC') {
 
       # get model current path
@@ -111,6 +102,16 @@ module BimTools
     btn_ifc_export.large_icon = File.join(PLUGIN_PATH_IMAGE, "IfcExport" << ICON_TYPE)
     btn_ifc_export.tooltip = 'Export model to IFC'
     btn_ifc_export.status_bar_text = 'Export model to IFC'
+
+    # Open settings window
+    btn_settings_window = UI::Command.new("IFC Manager settings") {
+      Settings.toggle
+    }
+    btn_settings_window.small_icon = File.join(PLUGIN_PATH_IMAGE, "settings" + ICON_TYPE)
+    btn_settings_window.large_icon = File.join(PLUGIN_PATH_IMAGE, "settings" + ICON_TYPE)
+    btn_settings_window.tooltip = "Open IFC Manager settings"
+    btn_settings_window.status_bar_text = "Open IFC Manager settings"
+    @toolbar.add_item btn_settings_window
 
     @toolbar.add_item btn_ifc_export
     @toolbar.show

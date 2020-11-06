@@ -88,8 +88,10 @@ module BimTools
       if target.is_a?( Sketchup::ComponentInstance )
         @model.selection.clear
         @model.selection.add target
-        if IfcManager::PropertiesWindow.window.visible?
-          IfcManager::PropertiesWindow.update
+      
+        # refresh edit window
+        if IfcManager::PropertiesWindow.window && IfcManager::PropertiesWindow.window.visible?
+          IfcManager::PropertiesWindow.set_html
         end
       end
     end

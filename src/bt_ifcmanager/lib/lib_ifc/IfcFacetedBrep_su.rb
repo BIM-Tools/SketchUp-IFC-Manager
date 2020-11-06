@@ -82,8 +82,6 @@ module BimTools
               # then reverse the face loop
               if su_transformation.xaxis * su_transformation.yaxis % su_transformation.zaxis < 0#su_transformation.to_a.reject(&:zero?).inject(:*) <0
                 points.reverse!
-              #else
-              #puts 'n'
               end
               
               # def self.get_vertex_order(positions, face_normal)

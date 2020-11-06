@@ -1,6 +1,6 @@
-#  set.rb
+#  list.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2020 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,11 +19,42 @@
 #
 #
 
-require_relative 'list.rb'
-
 module BimTools
  module IfcManager
-  class Ifc_Set < Ifc_List
-  end # class Ifc_Set
+  class Ifc_List
+    attr_accessor :items
+    def initialize( items=nil )
+      if items
+        @items = items
+      else
+        @items = Array.new
+      end
+    end # def initialize
+    def add( entity )
+      @items << entity
+    end # def add
+    def first()
+      return @items.first
+    end # def add
+    def step()
+      line = String.new
+      $i = 0
+      $num = @items.length
+      while $i < $num  do
+        if @items[$i].is_a? String
+          line << @items[$i]
+        else
+          line << "##{@items[$i].ifc_id}"
+        end
+        
+        #skip the , for the last element
+        unless $i == $num - 1
+          line << ","
+        end
+        $i +=1
+      end
+      return "(#{line})"
+    end # def step
+  end # class Ifc_List
  end # module IfcManager
 end # module BimTools
