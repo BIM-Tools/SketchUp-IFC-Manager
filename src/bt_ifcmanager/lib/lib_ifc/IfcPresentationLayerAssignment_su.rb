@@ -19,6 +19,7 @@
 #
 #
 
+require_relative 'IfcLabel.rb'
 require_relative 'set.rb'
 
 module BimTools
@@ -26,7 +27,7 @@ module BimTools
     def initialize(ifc_model, sketchup)
       if sketchup.is_a?( Sketchup::Layer )
         su_layer = sketchup
-        @name = "'#{su_layer.name}'"
+        @name = BimTools::IfcManager::IfcLabel.new( su_layer.name )
         @assigneditems = IfcManager::Ifc_Set.new()
       end
     end # def sketchup

@@ -291,9 +291,10 @@ module BimTools
       # create geometry from faces
       unless faces.empty? || ifc_entity.is_a?(BimTools::IFC2X3::IfcProject) #(?) skip any geometry placed inside IfcProject object?
         representation = ifc_entity.representation.representations.first
+        puts representation.representationtype.value
         
         # Check if Mapped representation should be used
-        if representation.representationtype == "'MappedRepresentation'"
+        if representation.representationtype.value == "MappedRepresentation"
           mapped_item = BimTools::IFC2X3::IfcMappedItem.new( ifc_model )
           mappingsource = BimTools::IFC2X3::IfcRepresentationMap.new( ifc_model )
           mappingtarget = BimTools::IFC2X3::IfcCartesianTransformationOperator3D.new( ifc_model )

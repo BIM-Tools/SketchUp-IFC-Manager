@@ -21,6 +21,7 @@
 
 require_relative 'set.rb'
 require_relative 'IfcLabel.rb'
+require_relative 'IfcIdentifier.rb'
 require_relative 'IfcText.rb'
 require_relative 'ObjectCreator.rb'
 require_relative 'step_writer.rb'
@@ -160,9 +161,9 @@ module BimTools
       owner_history.owninguser.theorganization.name = BimTools::IfcManager::IfcLabel.new( "BIM-Tools" )
       owner_history.owningapplication = BimTools::IFC2X3::IfcApplication.new( self )
       owner_history.owningapplication.applicationdeveloper = owner_history.owninguser.theorganization
-      owner_history.owningapplication.version = "'#{VERSION}'"
-      owner_history.owningapplication.applicationfullname = "'IFC manager for sketchup'"
-      owner_history.owningapplication.applicationidentifier = "'su_ifcmanager'"
+      owner_history.owningapplication.version = BimTools::IfcManager::IfcLabel.new( VERSION )
+      owner_history.owningapplication.applicationfullname = BimTools::IfcManager::IfcLabel.new( "IFC manager for sketchup" )
+      owner_history.owningapplication.applicationidentifier = BimTools::IfcManager::IfcIdentifier.new( "su_ifcmanager" )
       owner_history.changeaction = '.ADDED.'
       owner_history.creationdate = Time.now.to_i.to_s
       return owner_history
@@ -171,13 +172,11 @@ module BimTools
     # Create new IfcGeometricRepresentationContext
     def create_representationcontext()
       representationcontext = BimTools::IFC2X3::IfcGeometricRepresentationContext.new( self )
-      representationcontext.contexttype = "'Model'"
+      representationcontext.contexttype = BimTools::IfcManager::IfcLabel.new( "Model" )
       representationcontext.coordinatespacedimension = '3'
       representationcontext.worldcoordinatesystem = BimTools::IFC2X3::IfcAxis2Placement3D.new( self )
-      representationcontext.worldcoordinatesystem.location = BimTools::IFC2X3::IfcCartesianPoint.new( self )
-      representationcontext.worldcoordinatesystem.location.coordinates = '(0., 0., 0.)'
-      representationcontext.truenorth = BimTools::IFC2X3::IfcDirection.new( self )
-      representationcontext.truenorth.directionratios = IfcManager::Ifc_Set.new(['0., 1., 0.'])
+      representationcontext.worldcoordinatesystem.location = BimTools::IFC2X3::IfcCartesianPoint.new( self, Geom::Point3d.new(0,0,0) )
+      representationcontext.truenorth = BimTools::IFC2X3::IfcDirection.new( self, Geom::Vector3d.new(0,1,0) )
       return representationcontext
     end # def create_representationcontext
     
