@@ -70,11 +70,31 @@ module BimTools
       read_classifications()
       load_classifications()
       load_materials()
+
+      # Load export options from settings
+      if @options[:export]
+        @export_hidden =             CheckboxOption.new("hidden", "Export hidden objects", @options[:export][:hidden])
+        @export_classifications =    CheckboxOption.new("classifications", "Export classifications", @options[:export][:classifications])
+        @export_layers =             CheckboxOption.new("layers", "Export tags as layers", @options[:export][:layers])
+        @export_materials =          CheckboxOption.new("materials", "Export materials", @options[:export][:materials])
+        @export_styles =             CheckboxOption.new("styles", "Export colors", @options[:export][:styles])
+        @export_fast_guid =          CheckboxOption.new("fast_guid", "Improve export speed by using fake GUID's", @options[:export][:fast_guid])
+        @export_dynamic_attributes = CheckboxOption.new("dynamic_attributes", "Export dynamic attributes", @options[:export][:dynamic_attributes])
+        @export_mapped_items =       CheckboxOption.new("mapped_items", "Export IFC mapped items", @options[:export][:mapped_items])
+      end
     end # def load
 
     def save()
-      @options[:load][:classifications] = @classifications
-      @options[:load][:materials] = @template_materials
+      @options[:load][:classifications]      = @classifications
+      @options[:load][:template_materials]   = @template_materials
+      @options[:export][:hidden]             = @export_hidden.value
+      @options[:export][:classifications]    = @export_classifications.value
+      @options[:export][:layers]             = @export_layers.value
+      @options[:export][:materials]          = @export_materials.value
+      @options[:export][:styles]             = @export_styles.value
+      @options[:export][:fast_guid]          = @export_fast_guid.value
+      @options[:export][:dynamic_attributes] = @export_dynamic_attributes.value
+      @options[:export][:mapped_items]       = @export_mapped_items.value
       File.open(@settings_file, "w") { |file| file.write(@options.to_yaml) }
       if IfcManager::PropertiesWindow.window && IfcManager::PropertiesWindow.window.visible?
         PropertiesWindow.close
@@ -199,10 +219,10 @@ module BimTools
       @dialog = UI::HtmlDialog.new(
       {
         :dialog_title => "IFC Manager Settings",
-        :scrollable => false,
-        :resizable => false,
-        :width => 220,
-        :height => 220,
+        :scrollable => true,
+        :resizable => true,
+        :width => 320,
+        :height => 420,
         :left => 220,
         :top => 200,
         :style => UI::HtmlDialog::STYLE_UTILITY
@@ -211,14 +231,37 @@ module BimTools
       @dialog.add_action_callback("save_settings") { |action_context, s_form_data|
         update_classifications = []
         @template_materials = false
+        @export_hidden.value              = false
+        @export_classifications.value     = false
+        @export_layers.value              = false
+        @export_materials.value           = false
+        @export_styles.value              = false
+        @export_fast_guid.value           = false
+        @export_dynamic_attributes.value  = false
+        @export_mapped_items.value        = false
 
         a_form_data = CGI.unescape(s_form_data).split('&')
         a_form_data.each do |s_setting|
           a_setting = s_setting.split('=')
-          
-          if a_setting[0] == "materials"
-            puts "materials"
+                    
+          if a_setting[0] == "template_materials"
             @template_materials = true
+          elsif a_setting[0] == "hidden"
+            @export_hidden.value = true
+          elsif a_setting[0] == "classifications"
+            @export_classifications.value = true
+          elsif a_setting[0] == "layers"
+            @export_layers.value = true
+          elsif a_setting[0] == "materials"
+            @export_materials.value = true
+          elsif a_setting[0] == "styles"
+            @export_styles.value = true
+          elsif a_setting[0] == "fast_guid"
+            @export_fast_guid.value = true
+          elsif a_setting[0] == "dynamic_attributes"
+            @export_dynamic_attributes.value = true
+          elsif a_setting[0] == "mapped_items"
+            @export_mapped_items.value = true
           else
             update_classifications << a_setting[1]
           end
@@ -262,9 +305,23 @@ module BimTools
         end
         html << "
             <div class=\"col-md-12 row\">
-              <label class=\"radio-inline\"><input type=\"checkbox\" name=\"classification\" value=\"#{classification_name}\" #{checked}> #{classification_name}</label>
+              <label class=\"check-inline\"><input type=\"checkbox\" name=\"classification\" value=\"#{classification_name}\" #{checked}> #{classification_name}</label>
             </div>"
       end
+
+      # Export settings
+      html << '
+          <h1>Export</h1>'
+      html << @export_hidden.html()
+      html << @export_classifications.html()
+      html << @export_layers.html()
+      html << @export_materials.html()
+      html << @export_styles.html()
+      html << @export_fast_guid.html()
+      html << @export_dynamic_attributes.html()
+      html << @export_mapped_items.html()
+
+      # Default materials
       html << '
           <h1>Load default materials</h1>
           <div class="col-md-12 row">'
@@ -274,7 +331,7 @@ module BimTools
         materials_checked = ""
       end
       html << "
-            <label class=\"radio-inline\"><input type=\"checkbox\" name=\"materials\" value=\"materials\" #{materials_checked}> Template materials</label>"
+            <label class=\"check-inline\"><input type=\"checkbox\" name=\"template_materials\" value=\"template_materials\" #{materials_checked}> Template materials</label>"
       html << '
           </div>
           <br>
@@ -287,6 +344,30 @@ module BimTools
       </div>'
       html << "</body></html>"
       @dialog.set_html( html )
+    end
+
+    class CheckboxOption
+      attr_accessor :value
+      def initialize(name, title, initial_value)
+        @name = name
+        @title = title
+        @value = initial_value
+      end
+      def html()
+        html_string = '
+        <div class="col-md-12 row">'
+        if @value
+          checked = "checked"
+        else
+          checked = ""
+        end
+        html_string << "
+          <label class=\"check-inline\"><input type=\"checkbox\" name=\"#{@name}\" value=\"#{@name}\" #{checked}> #{@title}</label>"
+          html_string << '
+        </div>'
+        return html_string
+      end
+
     end
 
     end # module Settings

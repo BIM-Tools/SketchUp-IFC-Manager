@@ -11,11 +11,12 @@
   :styles: true
   :fast_guid: false
   :dynamic_attributes: true
+  :mapped_items: false
 :load:
   :classifications:
     NL-SfB 2005, tabel 1: true
     DIN 276-1: false
-  :materials: false
+  :template_materials: false
 :material_list:
   beton:
   - 142

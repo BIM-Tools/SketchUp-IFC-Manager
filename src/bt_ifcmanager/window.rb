@@ -118,25 +118,25 @@ module BimTools
           model.selection.each do |entity|
             entity.material = new_material.name
           end
-          set_html()
+          PropertiesWindow::set_html()
         end
       }
       materials.add_button()
-      layers = HtmlSelectLayers.new(@window, "Layer")
+      layers = HtmlSelectLayers.new(@window, "Tag/Layer")
       @form_elements << layers
       @window.add_action_callback("add_" + layers.id) { |action_context|
-        input = UI.inputbox(["Name:"], [""], "Create layer...")
+        input = UI.inputbox(["Name:"], [""], "Create tag...")
         if input
           
           # make sure the input is never empty to get a proper layer name
           if input[0] == ""
-            input[0] = "Layer"
+            input[0] = "Tag"
           end
           new_layer = Sketchup.active_model.layers.add(input[0].downcase)
           model.selection.each do |entity|
             entity.layer = new_layer.name
           end
-          set_html()
+          PropertiesWindow::set_html()
         end
       }
       layers.add_button()
@@ -155,7 +155,7 @@ module BimTools
       unless @window
         self.create()
       end
-      self.set_html
+      PropertiesWindow::set_html()
       unless @window.visible?
         @window.show
       end

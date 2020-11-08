@@ -93,32 +93,37 @@ module BimTools
         @representation = BimTools::IFC2X3::IfcProductDefinitionShape.new(ifc_model, sketchup.definition)
         
         # set material if sketchup @su_object has a material
-        if @su_object.material
-          material_name = @su_object.material.display_name
-        else
-          material_name = "Default"
-        end
+        if ifc_model.options[:materials]
+          if @su_object.material
+            material_name = @su_object.material.display_name
+          else
+            material_name = "Default"
+          end
+            
+          #check if materialassociation exists
+          unless ifc_model.materials[material_name]
+            
+            # create new materialassociation
+            ifc_model.materials[material_name] = BimTools::IFC2X3::IfcRelAssociatesMaterial.new(ifc_model, material_name)
+          end
           
-        #check if materialassociation exists
-        unless ifc_model.materials[material_name]
-          
-          # create new materialassociation
-          ifc_model.materials[material_name] = BimTools::IFC2X3::IfcRelAssociatesMaterial.new(ifc_model, material_name)
+          #add self to materialassociation
+          ifc_model.materials[material_name].relatedobjects.add( self )
         end
-        
-        #add self to materialassociation
-        ifc_model.materials[material_name].relatedobjects.add( self )
         
         # set layer
-        #check if IfcPresentationLayerAssignment exists
-        unless ifc_model.layers[@su_object.layer.name]
+        if ifc_model.options[:layers]
           
-          # create new IfcPresentationLayerAssignment
-          ifc_model.layers[@su_object.layer.name] = BimTools::IFC2X3::IfcPresentationLayerAssignment.new(ifc_model, @su_object.layer)
+          #check if IfcPresentationLayerAssignment exists
+          unless ifc_model.layers[@su_object.layer.name]
+            
+            # create new IfcPresentationLayerAssignment
+            ifc_model.layers[@su_object.layer.name] = BimTools::IFC2X3::IfcPresentationLayerAssignment.new(ifc_model, @su_object.layer)
+          end
+          
+          #add self to IfcPresentationLayerAssignment
+          ifc_model.layers[@su_object.layer.name].assigneditems.add( @representation.representations.first )
         end
-        
-        #add self to IfcPresentationLayerAssignment
-        ifc_model.layers[@su_object.layer.name].assigneditems.add( @representation.representations.first )
         
         if ifc_model.options[:attributes]
           ifc_model.options[:attributes].each do | attr_dict_name |

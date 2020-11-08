@@ -328,7 +328,9 @@ module BimTools
         #end
         
         # add color from su-object material, or a su_parent's
-        BimTools::IFC2X3::IfcStyledItem.new( ifc_model, brep, su_material )
+        if ifc_model.options[:styles]
+          BimTools::IFC2X3::IfcStyledItem.new( ifc_model, brep, su_material )
+        end
       end
     end # def initialize
   end # class ObjectCreator

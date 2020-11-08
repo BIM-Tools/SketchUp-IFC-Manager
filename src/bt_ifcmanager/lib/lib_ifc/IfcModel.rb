@@ -223,12 +223,14 @@ module BimTools
         
           # add color from su-object material, or a su_parent's
           # if no material found, check first face in group for a material and if true, use that.
-          if faces[0].material.nil?
-            su_material = nil
-          else
-            su_material = faces[0].material
+          if @options[:styles]
+            if faces[0].material.nil?
+              su_material = nil
+            else
+              su_material = faces[0].material
+            end
+            BimTools::IFC2X3::IfcStyledItem.new( self, brep, su_material )
           end
-          BimTools::IFC2X3::IfcStyledItem.new( self, brep, su_material )
         end
       end
       return ifc_objects
