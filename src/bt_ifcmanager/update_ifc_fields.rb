@@ -32,9 +32,15 @@ module BimTools
         type = entity.get_attribute 'AppliedSchemaTypes', 'IFC 2x3'
         if type
           path = ['IFC 2x3', type.to_s, 'Name', 'IfcLabel']
+          entity.instances.each{|comIns|
           
           # overwrite the IFC label for name with the component name
-          entity.set_classification_value(path, entity.name) # (?) does every IFC type in sketchup have a name?
+           
+          unless comIns.name == ""
+	    entity.set_classification_value(path, comIns.name) # (?) does every IFC type in sketchup have a name?
+          else 
+           entity.set_classification_value(path, entity.name)
+          }
         end
       end
     end
