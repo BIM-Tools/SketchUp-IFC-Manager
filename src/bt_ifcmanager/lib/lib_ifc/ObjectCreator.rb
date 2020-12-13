@@ -185,6 +185,8 @@ module BimTools
               parent_buildingstorey = parent_ifc
             when "BimTools::IFC2X3::IfcSpace"
               parent_space = parent_ifc
+            when "BimTools::IFC2X3::IfcElementAssembly"
+            when "BimTools::IFC2X3::IfcCurtainWall"
             
             # when parent is not a spacialstructureelement
             else
