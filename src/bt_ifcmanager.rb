@@ -28,7 +28,7 @@ module BimTools
   PLUGIN_ROOT_PATH = File.dirname(__FILE__) unless defined? PLUGIN_ROOT_PATH
 
   module IfcManager
-    VERSION = '2.2.6'.freeze
+    VERSION = '2.2.7'.freeze
     
     # load plugin only if SketchUp version is PRO
     if Sketchup.is_pro? && Sketchup.version_number>1600000000
