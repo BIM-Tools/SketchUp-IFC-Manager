@@ -64,7 +64,7 @@ module BimTools
       
       # check if entity_type is part of the entity list that needs exporting
       # also continue if NOT an IFC entity but the parent object IS an entity
-      if ifc_model.options[:ifc_entities] == false || ifc_model.options[:ifc_entities].include?( ent_type_name ) || ( ent_type_name.nil? && parent_ifc.is_a?(BimTools::IFC2X3::IfcProduct) && !parent_ifc.is_a?(BimTools::IFC2X3::IfcSpatialStructureElement))
+      if ifc_model.options[:ifc_entities] == false || ifc_model.options[:ifc_entities].include?( ent_type_name )# || ( ent_type_name.nil? && parent_ifc.is_a?(BimTools::IFC2X3::IfcProduct) && !parent_ifc.is_a?(BimTools::IFC2X3::IfcSpatialStructureElement))
         
         # Create IFC entity based on the IFC classification in sketchup
         begin
@@ -204,7 +204,7 @@ module BimTools
           end
           
           # add this element to the model
-          parent_ifc.add_related_element( ifc_entity )
+          parent_ifc.add_related_object( ifc_entity )
         end
         
         # add spacialstructureelements to the spacialhierarchy
