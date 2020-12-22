@@ -31,11 +31,30 @@ module BimTools
       @ifc_model = ifc_model
     end # def initialize
     
-    def decomposes()
-      return @decomposes
-    end
     
-    # add child object in the model hierarchy
+    ##
+    # Add an element for which this element is the spatial container
+    # Like a wall thats contained in a building
+
+    def add_contained_element( object )
+    
+      # if no contains_elements exists, create one
+      unless @contains_elements
+        @contains_elements = BimTools::IFC2X3::IfcRelContainedInSpatialStructure.new(@ifc_model)
+        @contains_elements.relatingstructure= self
+        @contains_elements.relatedelements = BimTools::IfcManager::Ifc_Set.new()
+      end
+      
+      # add child object
+      @contains_elements.relatedelements.add( object )
+    end # def add_contained_element
+    
+
+    ##
+    # Add an object from which this element is decomposed
+    # Like a building is decomposed into multiple buildingstoreys
+    # Or a curtainwall is decomposed into muliple members/plates
+    
     def add_related_object( object )
       
       # if no decomposes exists, create one
@@ -112,19 +131,5 @@ module BimTools
       end
       return @default_related_object
     end # def get_default_related_object
-    
-    # add direct child object
-    def add_related_element( object )
-    
-      # if no ifc_rel_contained_in_spatial_structure exists, create one
-      unless @ifc_rel_contained_in_spatial_structure
-        @ifc_rel_contained_in_spatial_structure = BimTools::IFC2X3::IfcRelContainedInSpatialStructure.new(@ifc_model)
-        @ifc_rel_contained_in_spatial_structure.relatingstructure= self
-        @ifc_rel_contained_in_spatial_structure.relatedelements = BimTools::IfcManager::Ifc_Set.new()
-      end
-      
-      # add child object
-      @ifc_rel_contained_in_spatial_structure.relatedelements.add( object )
-    end # def add_related_object
   end # module IfcObjectDefinition_su
 end # module BimTools

@@ -74,7 +74,9 @@ module BimTools
           @relatingpropertydefinition = pset
           pset.name = BimTools::IfcManager::IfcLabel.new( attr_dict.name ) unless attr_dict.name.nil?
           pset.hasproperties = IfcManager::Ifc_Set.new()
-          if attr_dict.length == 0 && attr_dict.attribute_dictionaries
+
+          # removed check for attr_dict length due to the fact the sketchup classifier always adds is_hidden property
+          if attr_dict.attribute_dictionaries# && attr_dict.length == 0
             attr_dict.attribute_dictionaries.each { | dict |
               
               prop = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model, attr_dict )
