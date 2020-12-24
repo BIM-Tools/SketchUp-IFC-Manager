@@ -20,59 +20,48 @@
 #
 # select2 for materials
 
-module BimTools
-  module IfcManager
-    module PropertiesWindow      
-      class HtmlSelectClassifications < HtmlSelect
-        def set_value()
-          selection = []
-          Sketchup.active_model.selection.each do |ent|
-            if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
-              value = ent.definition.get_attribute("AppliedSchemaTypes", @name)
-              unless selection.include? value
-                selection << value
-              end
-            end
-          end
-          if selection.length == 1
-            if selection[0]
-              @value = selection[0]
-            else
-              @value = "-"
-            end
-          else
-            set_options("...")
-            @value = "..."
+module BimTools::IfcManager
+  module PropertiesWindow      
+    class HtmlSelectClassifications < HtmlSelect
+      def set_value()
+        selection = Set.new()
+        Sketchup.active_model.selection.each do |ent|
+          if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
+            selection.add(ent.definition.get_attribute("AppliedSchemaTypes", @name))
           end
         end
-        def add_save_command(dialog)
-          model = Sketchup.active_model
-          dialog.add_action_callback(@id) { |action_context, value|
-            if model.classifications[@name]
-              model.selection.each do |ent|
-                if(ent.is_a? Sketchup::ComponentInstance) || (ent.is_a? Sketchup::Group)
-                  if value == "-"
-                    old_value = ent.definition.get_attribute("AppliedSchemaTypes", @name)
-                    ent.definition.remove_classification(@name, old_value)
-                  else
-                    ent.definition.add_classification(@name, value)
-                  end
+        set_value_from_list(selection.to_a)
+      end
+      
+      def html(selection)
+        set_options()
+        set_value()
+        super
+      end
+
+      def set_callback()
+
+        # Add save callback
+        model = Sketchup.active_model
+        @dialog.add_action_callback(@id) { |action_context, value|
+          if model.classifications[@name]
+            model.selection.each do |ent|
+              if(ent.is_a? Sketchup::ComponentInstance) || (ent.is_a? Sketchup::Group)
+                if value == "-"
+                  old_value = ent.definition.get_attribute("AppliedSchemaTypes", @name)
+                  ent.definition.remove_classification(@name, old_value)
+                else
+                  ent.definition.add_classification(@name, value)
                 end
               end
-              # @value = value
-            else
-              notification = UI::Notification.new(IFCMANAGER_EXTENSION, "No classification with name: " + @name)
-              notification.show
             end
-            PropertiesWindow::set_html()
-          }
-        end
-        def html(selection)
-          set_options()
-          set_value()
-          super
-        end
-      end # def HtmlSelectClassifications
-    end # module PropertiesWindow
-  end # module IfcManager
-end # module BimTools
+          else
+            notification = UI::Notification.new(IFCMANAGER_EXTENSION, "No classification with name: " + @name)
+            notification.show
+          end
+          PropertiesWindow::update()
+        }
+      end
+    end
+  end
+end

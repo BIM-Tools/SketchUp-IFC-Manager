@@ -22,75 +22,92 @@
 
 require 'json'
 
-module BimTools
-  module IfcManager
-    module PropertiesWindow      
-      class HtmlSelectMaterials < HtmlSelect
-        def set_options(extra=nil)
-          @options = Sketchup.active_model.materials.map{ |x| x.name}
+module BimTools::IfcManager
+  module PropertiesWindow      
+    class HtmlSelectMaterials < HtmlSelect
 
-          # Add position for default material
-          @options.prepend("Default")
+      def initialize(dialog, name)
+        super(dialog, name)          
+        @button = true
+      end
 
-          # When multiple items are selected add "..."
-          if extra
-            @options = @options.prepend(extra)
-          end
-          
-          @default_index = @options.find_index("Default")
+      def set_options(extra=nil)
+        materials = Sketchup.active_model.materials.map{ |x| x.name}
 
-          json = @options.map{ |i| {:id => @options.find_index(i),:text => i} }.to_json
+        # Add position for default material
+        materials.prepend("Default")
 
-          @js =  "      $('##{@id}').select2({\n        data: #{json}\n      })\n"
-          @js << "$('#add_#{@id}').click(function() {sketchup.add_#{@id}()});"
-          @onchange = "$('##{@id}').on('select2:select', function (e) { sketchup.#{@id}(e.params.data.text)});"
-        end
-        def set_value()
-          material_selection = []
-          Sketchup.active_model.selection.each do |ent|
-            if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
-              unless material_selection.include? ent.material
-                material_selection << ent.material
-              end
+        self.options=materials
+        super(extra)
+      end
+      
+      def set_value()
+        selection = Set.new()
+        Sketchup.active_model.selection.each do |ent|
+          if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
+            if ent.material
+              selection.add(ent.material.name)
+            else
+              selection.add("Default")
             end
           end
-          if material_selection.length == 1
-            if material_selection[0]
-              @value = material_selection[0].name
-            else
-              @value = @default_index
+        end
+        set_value_from_list(selection.to_a)
+      end
+      
+      def html(selection)
+        set_options()
+        set_value()
+        super
+      end
+
+      # def update(selection)
+      #   set_options()
+      #   super(selection)
+      # end
+
+      def set_callback()
+
+        # Add save callback
+        @dialog.add_action_callback(@id) { |action_context, value|
+          model = Sketchup.active_model
+          materials = model.materials
+          if value == "..."
+          elsif value == "Default" || value == "-"
+            model.selection.each do |ent|
+              ent.material = nil
+            end
+          elsif materials[value]
+            model.selection.each do |ent|
+              ent.material = value
             end
           else
-            set_options("...")
-            @value = 0
+            notification = UI::Notification.new(IFCMANAGER_EXTENSION, "No material with name: " + value)
+            notification.show
           end
-        end
-        def add_save_command(dialog)
-          dialog.add_action_callback(@id) { |action_context, value|
+          PropertiesWindow::update()
+        }
+
+        # Add button callback
+        @dialog.add_action_callback("add_" + @id) { |action_context|
+          input = UI.inputbox(["Name:"], [""], "Create material...")
+          if input
+          
+            # make sure the input is never empty to get a proper material name
+            if input[0] == ""
+              input[0] = "Material"
+            end
+            
             model = Sketchup.active_model
-            materials = model.materials
-            if value == "..."
-            elsif value == "Default"
-              model.selection.each do |ent|
-                ent.material = nil
-              end
-            elsif materials[value]
-              model.selection.each do |ent|
-                ent.material = value
-              end
-            else
-              notification = UI::Notification.new(IFCMANAGER_EXTENSION, "No material with name: " + value)
-              notification.show
+            new_material = model.materials.add(input[0].downcase)
+            new_material.color = [255, 255, 255]
+            model.selection.each do |entity|
+              entity.material = new_material.name
             end
             PropertiesWindow::set_html()
-          }
-        end
-        def html(selection)
-          set_options()
-          set_value()
-          super
-        end
-      end # class HtmlSelectMaterials
-    end # module PropertiesWindow
-  end # module IfcManager
-end # module BimTools
+          end
+        }
+      end
+    end
+  end
+end

@@ -22,75 +22,95 @@
 
 require 'json'
 
-module BimTools
-  module IfcManager
-    module PropertiesWindow      
-      class HtmlSelectLayers < HtmlSelect
-        def set_options(extra=nil)
-          @options = Sketchup.active_model.layers.map{ |x| x.name}
+module BimTools::IfcManager
+  module PropertiesWindow      
+    class HtmlSelectLayers < HtmlSelect
 
-          # Rename layers to tags for SU 20+
-          unless Sketchup.version_number < 2000000000
-            if index = @options.index("Layer0")
-              @options[index] = "Untagged"
-            end
-          end
+      def initialize(dialog, name)
+        super(dialog, name)          
+        @button = true
+      end
 
-          # When multiple items are selected add "..."
-          if extra
-            @options = @options.prepend(extra)
+      def set_options(extra=false)
+        layers = Sketchup.active_model.layers.map{ |x| x.name}
+
+        # Rename layers to tags for SU 20+
+        unless Sketchup.version_number < 2000000000
+          if index = layers.index("Layer0")
+            layers[index] = "Untagged"
           end
-          json = @options.map{ |i| {:id => @options.find_index(i),:text => i} }.to_json
-          @js =  "      $('##{@id}').select2({\n        data: #{json}\n      })\n"
-          @js << "$('#add_#{@id}').click(function() {sketchup.add_#{@id}()});"
-          @onchange = "$('##{@id}').on('select2:select', function (e) { sketchup.#{@id}(e.params.data.text)});"
         end
-        def set_value()
-          layer_selection = []
-          Sketchup.active_model.selection.each do |ent|
-            if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
-              unless layer_selection.include? ent.layer
-                layer_selection << ent.layer
-              end
+        
+        self.options=layers
+        super(extra)
+      end
+
+      def set_value()
+        selection = Set.new()
+        Sketchup.active_model.selection.each do |ent|
+          if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
+            if ent.layer.name != "Layer0"
+              selection.add(ent.layer.name)
+            else
+              selection.add(0)
             end
           end
-          if layer_selection.length == 1
-            if (layer_selection[0]) && (layer_selection[0].name != "Layer0")
-              @value = layer_selection[0].name
-            else
-              @value = "Untagged"
+        end
+        set_value_from_list(selection.to_a)
+      end
+      
+      def html(selection)
+        set_options()
+        set_value()
+        super
+      end
+
+      # def update(selection)
+      #   set_options()
+      #   super(selection)
+      # end
+
+      def set_callback()
+
+        # Add save callback
+        @dialog.add_action_callback(@id) { |action_context, value|
+          model = Sketchup.active_model
+          layers = model.layers
+          if value == "..."
+          elsif value == "Untagged" || value == "-"
+            model.selection.each do |ent|
+              ent.layer = "Layer0"
+            end
+          elsif layers[value]
+            model.selection.each do |ent|
+              ent.layer = value
             end
           else
-            set_options("...")
-            @value = 0
+            notification = UI::Notification.new(IFCMANAGER_EXTENSION, "No layer with name: " + value)
+            notification.show
           end
-        end
-        def add_save_command(dialog)
-          dialog.add_action_callback(@id) { |action_context, value|
+          PropertiesWindow::update()
+        }
+
+        # Add button callback
+        @dialog.add_action_callback("add_" + @id) { |action_context|
+          input = UI.inputbox(["Name:"], [""], "Create tag...")
+          if input
+            
+            # make sure the input is never empty to get a proper layer name
+            if input[0] == ""
+              input[0] = "Tag"
+            end
+
             model = Sketchup.active_model
-            layers = model.layers
-            if value == "..."
-            elsif value == "Untagged"
-              model.selection.each do |ent|
-                ent.layer = "Layer0"
-              end
-            elsif layers[value]
-              model.selection.each do |ent|
-                ent.layer = value
-              end
-            else
-              notification = UI::Notification.new(IFCMANAGER_EXTENSION, "No layer with name: " + value)
-              notification.show
+            new_layer = model.layers.add(input[0].downcase)
+            model.selection.each do |entity|
+              entity.layer = new_layer.name
             end
             PropertiesWindow::set_html()
-          }
-        end
-        def html(selection)
-          set_options()
-          set_value()
-          super
-        end
-      end # class HtmlSelectLayers
-    end # module PropertiesWindow
-  end # module IfcManager
-end # module BimTools
+          end
+        }
+      end
+    end
+  end
+end

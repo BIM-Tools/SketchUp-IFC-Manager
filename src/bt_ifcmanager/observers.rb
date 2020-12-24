@@ -47,13 +47,13 @@ module BimTools
   # observer that updates the window on selection change
   class IMSelectionObserver < Sketchup::SelectionObserver
     def onSelectionBulkChange(selection)
-      PropertiesWindow.set_html()
+      PropertiesWindow.update()
     end
     def onSelectionCleared(selection)
-      PropertiesWindow.set_html()
+      PropertiesWindow.update()
     end
     def onSelectionAdded(selection,entity)
-      PropertiesWindow.set_html()
+      PropertiesWindow.update()
     end
   end
 
@@ -61,12 +61,12 @@ module BimTools
   class IMEntitiesObserver < Sketchup::EntitiesObserver
     def onElementModified(entities,entity)
       if Sketchup.active_model.selection.include?(entity)
-        PropertiesWindow.set_html()
+        PropertiesWindow.update()
       end
     end
     def onElementAdded(entities,entity)
       if entity.deleted? || Sketchup.active_model.selection.include?(entity)
-        PropertiesWindow.set_html()
+        PropertiesWindow.update()
       end
     end
   end

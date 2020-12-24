@@ -26,7 +26,7 @@ module BimTools
   require File.join(PLUGIN_PATH, 'observers.rb')
   require File.join(PLUGIN_PATH_UI, 'html.rb')
   require File.join(PLUGIN_PATH_UI, 'title.rb')
-  require File.join(PLUGIN_PATH_UI, 'input_text.rb')
+  require File.join(PLUGIN_PATH_UI, 'input_name.rb')
   require File.join(PLUGIN_PATH_UI, 'select.rb')
   require File.join(PLUGIN_PATH_UI, 'select_classifications.rb')
   require File.join(PLUGIN_PATH_UI, 'select_materials.rb')
@@ -61,7 +61,7 @@ module BimTools
       }
 
       # Add title showing selected items
-      @form_elements << Title.new()
+      @form_elements << Title.new(@window)
 
       # Add html select for classifications
       classification_list = {"IFC 2x3" => true}.merge!(Settings.classifications)
@@ -74,88 +74,47 @@ module BimTools
       end
 
       # Add html text input for definition name
-      name = HtmlInputText.new(@window, "Name")
-      @window.add_action_callback(name.id) { |action_context, value|
-        Sketchup.active_model.selection.each do |ent|
-          if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
-            ent.definition.name = value
-          end
-        end
-        PropertiesWindow::set_html()
-      }
-      name.define_singleton_method(:set_value) do
-        selection = []
-        Sketchup.active_model.selection.each do |ent|
-          if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
-            unless selection.include? ent.definition
-              selection << ent.definition
-            end
-          end
-        end
-        if selection.length == 1
-          if selection[0]
-            @value = selection[0].name
-          end
-        else
-          @value = "..."
-        end
-      end
-      @form_elements << name
+      @form_elements << HtmlInputName.new(@window)
 
-      materials = HtmlSelectMaterials.new(@window, "Material")
-      @form_elements << materials
-      @window.add_action_callback("add_" + materials.id) { |action_context|
-        input = UI.inputbox(["Name:"], [""], "Create material...")
-        if input
-        
-          # make sure the input is never empty to get a proper material name
-          if input[0] == ""
-            input[0] = "Material"
-          end
-          
-          new_material = model.materials.add(input[0].downcase)
-          new_material.color = [255, 255, 255]
-          model.selection.each do |entity|
-            entity.material = new_material.name
-          end
-          PropertiesWindow::set_html()
-        end
-      }
-      materials.add_button()
+      @form_elements << HtmlSelectMaterials.new(@window, "Material")
+
       layers = HtmlSelectLayers.new(@window, "Tag/Layer")
       @form_elements << layers
-      @window.add_action_callback("add_" + layers.id) { |action_context|
-        input = UI.inputbox(["Name:"], [""], "Create tag...")
-        if input
-          
-          # make sure the input is never empty to get a proper layer name
-          if input[0] == ""
-            input[0] = "Tag"
-          end
-          new_layer = Sketchup.active_model.layers.add(input[0].downcase)
-          model.selection.each do |entity|
-            entity.layer = new_layer.name
-          end
-          PropertiesWindow::set_html()
-        end
-      }
+      # layers.define_singleton_method(:set_callback) do
+      #   super()
+      #   @window.add_action_callback("add_" + layers.id) { |action_context|
+      #     input = UI.inputbox(["Name:"], [""], "Create tag...")
+      #     if input
+            
+      #       # make sure the input is never empty to get a proper layer name
+      #       if input[0] == ""
+      #         input[0] = "Tag"
+      #       end
+      #       new_layer = Sketchup.active_model.layers.add(input[0].downcase)
+      #       model.selection.each do |entity|
+      #         entity.layer = new_layer.name
+      #       end
+      #       PropertiesWindow::update()
+      #     end
+      #   }
+      # end
       layers.add_button()
     end # def create
 
     def close
       @observers.stop
-      if @window
+      if @window && @window.visible?
         @window.close
       end
     end # def close
 
     # show Sketchup HtmlDialog window
     def show
-      @observers.start
       unless @window
         self.create()
       end
-      PropertiesWindow::set_html()
+      @observers.start
+      self.set_html()
       unless @window.visible?
         @window.show
       end
@@ -183,24 +142,52 @@ module BimTools
           break
         end
       end
-      if(ifc_able)
-        html = html_header()
-        @form_elements.each do |form_element|
-          html << form_element.html(model.selection)
+      html = html_header()
+      @form_elements.each do |form_element|
+        unless(ifc_able)
+          form_element.hide()
         end
-        js = ""
-        @form_elements.each do |form_element|
-          js << form_element.js
-          js << form_element.onchange
-        end
-        html << html_footer(js)
-      else
-        html = html_header()
-        html << "<h1>No selection</h1>"
-        html << html_footer("")
+        html << form_element.html(model.selection)
       end
+      js = ""
+      @form_elements.each do |form_element|
+        js << form_element.js
+        js << form_element.onchange
+      end
+      html << html_footer(js)
       @window.set_html(html)
+      set_callbacks()
     end # def set_html
+
+    def set_callbacks()
+      @form_elements.each do |form_element|
+        form_element.set_callback()
+      end
+    end
+    
+    def update()
+      model = Sketchup.active_model
+      ifc_able = false
+      model.selection.each do |ent|
+        if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
+          ifc_able = true
+          break
+        end
+      end
+      if ifc_able
+        @form_elements.each do |form_element|
+          form_element.update(model.selection)
+          form_element.show()
+          # @window.execute_script(form_element.update(model.selection).to_s)
+          # form_element.set_callback()
+        end
+      else
+        @form_elements.each do |form_element|
+          form_element.update(model.selection)
+          form_element.hide()
+        end
+      end
+    end # def update
   end # module PropertiesWindow
  end # module IfcManager
 end # module BimTools

@@ -20,31 +20,42 @@
 #
 # input text element
 
-module BimTools
-  module IfcManager
-    module PropertiesWindow      
-      class HtmlInputText
-        attr_reader :id
-        attr_accessor :onchange, :value
-        def initialize(dialog, name)
-          @dialog = dialog
-          @name = name
-          @id = name.gsub(/[^0-9A-Za-z]/, '')
-          @js = ""
-          @onchange = ""
+module BimTools::IfcManager
+  require File.join(PLUGIN_PATH_UI, 'form_element.rb')
+  module PropertiesWindow      
+    class HtmlInputText < FormElement
+
+      def initialize(dialog, name)
+        super(dialog)
+        @id = name.gsub(/[^0-9A-Za-z]/, '')
+        @name = name
+      end
+
+      def js()
+        "$('##{@id}').on('change',function(e){sketchup.#{@id}($('##{@id}')[0].value,$('##{@id}')[0].id);});"
+      end
+
+      def html(selection)
+        if @hidden
+          hide_css = " style=\"display:none;\""
+        else
+          hide_css = ""
         end
-        def js()
-          "$('##{@id}').on('change',function(e){sketchup.#{@id}($('##{@id}')[0].value,$('##{@id}')[0].id);});"
-        end
-        def html(selection)
-          set_value()
-          html =  "<div class=\"form-group row\">"
-          html << "<label for=\"#{@id}\" class=\"col-3 col-form-label\">#{@name}:</label>"
-          html << "<div class=\"col-9\">"
-          html << "<input type=\"text\" class=\"form-control\" id=\"#{@id}\" value=\"#{@value}\" autocomplete=\"off\">"
-          html << "</div></div>"
-        end
-      end # class HtmlInputText
-    end # module PropertiesWindow
-  end # module IfcManager
-end # module BimTools
+        set_value()
+        html =  "<div class=\"form-group row #{@id}_row\"#{hide_css}>"
+        html << "<label for=\"#{@id}\" class=\"col-3 col-form-label\">#{@name}:</label>"
+        html << "<div class=\"col-9\">"
+        html << "<input type=\"text\" class=\"form-control\" id=\"#{@id}\" value=\"#{@value}\" autocomplete=\"off\">"
+        html << "</div></div>"
+      end
+
+      def update(selection)
+        set_value()
+        self.dialog.execute_script("$('##{@id}').val('#{@value}');")
+      end
+
+      def set_value()
+      end
+    end
+  end
+end
