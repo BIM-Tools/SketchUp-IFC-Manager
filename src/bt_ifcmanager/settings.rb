@@ -171,7 +171,7 @@ module BimTools
 
     # @return [Hash] List of materials
     def materials
-      if(@options[:load][:materials] && @options[:material_list].is_a?(Hash))
+      if(@options[:load][:template_materials] && @options[:material_list].is_a?(Hash))
         @template_materials = true
         return @options[:material_list]
       else
