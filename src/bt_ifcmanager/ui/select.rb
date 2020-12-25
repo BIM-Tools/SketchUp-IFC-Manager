@@ -139,6 +139,13 @@ module BimTools::IfcManager
 
         def set_callback()
         end
+
+        def hide()
+
+          # Also hide dropdown when form elements are hidden
+          self.dialog.execute_script("$('##{@id}').select2('close');")
+          super()
+        end
       end
     end
   end

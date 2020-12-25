@@ -42,10 +42,14 @@ module BimTools::IfcManager
       end
       def set_callback()
       end
+
+      # When no components or groups are selected all form elements are hidden
       def hide()
         @hidden = true
         @dialog.execute_script("$('.#{@id}_row').hide();")
       end
+
+      # When components or groups are selected all form elements are shown
       def show()
         @hidden = false
         @dialog.execute_script("$('.#{@id}_row').show();")
