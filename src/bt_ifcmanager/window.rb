@@ -17,12 +17,11 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-#
+# IFC properties window
 
 require 'yaml'
 
-module BimTools
- module IfcManager
+module BimTools::IfcManager
   require File.join(PLUGIN_PATH, 'observers.rb')
   require File.join(PLUGIN_PATH_UI, 'html.rb')
   require File.join(PLUGIN_PATH_UI, 'title.rb')
@@ -47,10 +46,11 @@ module BimTools
       :resizable       => true
     }
   
-    # create observers
-    @observers = IfcManager::Observers.new()
+    # create observers for updating form elements content
+    @observers = BimTools::IfcManager::Observers.new()
 
     # create Sketchup HtmlDialog window
+    # needs to be recreated only when settings change
     def create()
       model = Sketchup.active_model
       selection = model.selection
@@ -73,34 +73,17 @@ module BimTools
         end
       end
 
-      # Add html text input for definition name
+      # Add html text input for component definition name
       @form_elements << HtmlInputName.new(@window)
 
+      # Add html select for materials
       @form_elements << HtmlSelectMaterials.new(@window, "Material")
 
-      layers = HtmlSelectLayers.new(@window, "Tag/Layer")
-      @form_elements << layers
-      # layers.define_singleton_method(:set_callback) do
-      #   super()
-      #   @window.add_action_callback("add_" + layers.id) { |action_context|
-      #     input = UI.inputbox(["Name:"], [""], "Create tag...")
-      #     if input
-            
-      #       # make sure the input is never empty to get a proper layer name
-      #       if input[0] == ""
-      #         input[0] = "Tag"
-      #       end
-      #       new_layer = Sketchup.active_model.layers.add(input[0].downcase)
-      #       model.selection.each do |entity|
-      #         entity.layer = new_layer.name
-      #       end
-      #       PropertiesWindow::update()
-      #     end
-      #   }
-      # end
-      layers.add_button()
+      # Add html select for layers
+      @form_elements << HtmlSelectLayers.new(@window, "Tag/Layer")
     end # def create
 
+    # close Sketchup HtmlDialog window
     def close
       @observers.stop
       if @window && @window.visible?
@@ -120,6 +103,8 @@ module BimTools
       end
     end # def show
 
+    # toggle Sketchup HtmlDialog window visibility
+    # close when visible, show otherwise
     def toggle
       if @window
         if@window.visible?
@@ -133,6 +118,8 @@ module BimTools
       end
     end # def toggle
     
+    # Refresh entire window contents
+    # triggered from show and close window
     def set_html()
       model = Sketchup.active_model
       ifc_able = false
@@ -157,7 +144,7 @@ module BimTools
       html << html_footer(js)
       @window.set_html(html)
       set_callbacks()
-    end # def set_html
+    end
 
     def set_callbacks()
       @form_elements.each do |form_element|
@@ -165,6 +152,8 @@ module BimTools
       end
     end
     
+    # Update form elements content
+    # triggered from observers on selection or object changes
     def update()
       model = Sketchup.active_model
       ifc_able = false
@@ -178,8 +167,6 @@ module BimTools
         @form_elements.each do |form_element|
           form_element.update(model.selection)
           form_element.show()
-          # @window.execute_script(form_element.update(model.selection).to_s)
-          # form_element.set_callback()
         end
       else
         @form_elements.each do |form_element|
@@ -187,7 +174,6 @@ module BimTools
           form_element.hide()
         end
       end
-    end # def update
-  end # module PropertiesWindow
- end # module IfcManager
-end # module BimTools
+    end
+  end
+end
