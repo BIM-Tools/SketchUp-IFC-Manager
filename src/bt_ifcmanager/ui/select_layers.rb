@@ -32,16 +32,16 @@ module BimTools::IfcManager
       end
 
       def set_options(extra=false)
-        layers = Sketchup.active_model.layers.map{ |x| x.name}
+        @layers = Sketchup.active_model.layers.map{ |x| x.name}
 
         # Rename layers to tags for SU 20+
         unless Sketchup.version_number < 2000000000
-          if index = layers.index("Layer0")
-            layers[index] = "Untagged"
+          if index = @layers.index("Layer0")
+            @layers[index] = "Untagged"
           end
         end
         
-        self.options=layers
+        self.set_js_options(@layers)
         super(extra)
       end
 
@@ -96,18 +96,31 @@ module BimTools::IfcManager
         @dialog.add_action_callback("add_" + @id) { |action_context|
           input = UI.inputbox(["Name:"], [""], "Create tag...")
           if input
+            model = Sketchup.active_model
+            layers = model.layers
             
             # make sure the input is never empty to get a proper layer name
             if input[0] == ""
-              input[0] = "Tag"
+              layer_name = layers.unique_name("Tag")
+            elsif input[0] == "Untagged"
+              layer_name = "Layer0"
+            else
+              layer_name = input[0].downcase
             end
 
-            model = Sketchup.active_model
-            new_layer = model.layers.add(input[0].downcase)
-            model.selection.each do |entity|
-              entity.layer = new_layer.name
+            layer = layers[layer_name]
+            if layer
+              self.dialog.execute_script("$('##{@id}').val(#{@layers.index(layer_name)});\n$('##{@id}').trigger('change');\n")
+            else
+              layer = layers.add(layer_name)
+              index = @index_max
+              @index_max += 1
+              @layers << layer.name
+              self.dialog.execute_script("var newMaterialOption = new Option('#{layer.name}', '#{index}', false, true);\n$('##{@id}').append(newMaterialOption).trigger('change');\n")
             end
-            PropertiesWindow::set_html()
+            model.selection.each do |entity|
+              entity.layer = layer.name
+            end
           end
         }
       end

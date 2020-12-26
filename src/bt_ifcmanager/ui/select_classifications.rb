@@ -49,7 +49,9 @@ module BimTools::IfcManager
               if(ent.is_a? Sketchup::ComponentInstance) || (ent.is_a? Sketchup::Group)
                 if value == "-"
                   old_value = ent.definition.get_attribute("AppliedSchemaTypes", @name)
-                  ent.definition.remove_classification(@name, old_value)
+                  if old_value
+                    ent.definition.remove_classification(@name, old_value)
+                  end
                 else
                   ent.definition.add_classification(@name, value)
                 end

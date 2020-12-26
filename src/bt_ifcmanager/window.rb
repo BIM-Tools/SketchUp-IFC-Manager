@@ -68,7 +68,13 @@ module BimTools::IfcManager
       classification_list.each_pair do | classification_name, active |
         if active
           classification = HtmlSelectClassifications.new(@window, classification_name)
-          classification.options = YAML.load_file(File.join(PLUGIN_PATH, "classifications", classification_name + ".yml"))
+
+          # Add "-" option to unset the classification
+          options_template = [{:id => "-", :text => "-"}]
+
+          # Load options from file
+          options = YAML.load_file(File.join(PLUGIN_PATH, "classifications", classification_name + ".yml"))
+          classification.set_js_options(options,options_template)
           @form_elements << classification
         end
       end

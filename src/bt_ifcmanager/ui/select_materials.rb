@@ -34,10 +34,10 @@ module BimTools::IfcManager
       def set_options(extra=nil)
         materials = Sketchup.active_model.materials.map{ |x| x.name}
 
-        # Add position for default material
-        materials.prepend("Default")
+        # Add default material
+        options_template = [{:id => "-", :text => "Default"}]
 
-        self.options=materials
+        self.set_js_options(materials,options_template)
         super(extra)
       end
       
@@ -104,7 +104,9 @@ module BimTools::IfcManager
             model.selection.each do |entity|
               entity.material = new_material.name
             end
-            PropertiesWindow::set_html()
+            index = @index_max
+            @index_max += 1
+            self.dialog.execute_script("var newMaterialOption = new Option('#{new_material.name}', '#{index}', false, true);\n$('##{@id}').append(newMaterialOption).trigger('change');\n")
           end
         }
       end

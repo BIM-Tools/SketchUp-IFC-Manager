@@ -33,17 +33,19 @@ module BimTools::IfcManager
           @id = name.gsub(/[^0-9A-Za-z]/, '').downcase
           @name = name
           @button = false
+          @index_max = 0
         end
 
-        def options=(options)
+        def set_js_options(options, options_template=[])
           if options.is_a? Array
             @options = options
-            @js_options = [{:id => "-", :text => "-"}]
+            @js_options = options_template
             i = 0
             while i < options.length() do
               @js_options << {:id => i, :text => options[i]}
               i += 1
             end
+            @index_max = i
           end
         end
 
