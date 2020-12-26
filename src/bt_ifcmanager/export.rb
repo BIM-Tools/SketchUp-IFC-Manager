@@ -26,7 +26,7 @@ module BimTools
     require 'net/http'
     require 'uri'
     require File.join(PLUGIN_PATH, 'update_ifc_fields.rb')
-    require File.join(PLUGIN_PATH, 'lib', 'progressbar.rb')
+    require File.join(PLUGIN_PATH_LIB, 'progressbar.rb')
 
     def export( file_path )
       su_model = Sketchup.active_model

@@ -40,6 +40,8 @@ require_relative File.join('IFC2X3', 'IfcGeometricRepresentationContext.rb')
 
 module BimTools
  module IfcManager
+  require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')
+
   class IfcModel
     
     # (?) possible additional methods:
@@ -187,7 +189,7 @@ module BimTools
         sketchup_objects.entities.each do | ent |
         
           # skip hidden objects if skip-hidden option is set
-          unless @options[:hidden] == false && (ent.hidden? || !ent.layer.visible?)
+          unless @options[:hidden] == false && (ent.hidden? || !BimTools::IfcManager::layer_visible?(ent.layer))
             case ent
             when Sketchup::Group, Sketchup::ComponentInstance
               transformation = Geom::Transformation.new

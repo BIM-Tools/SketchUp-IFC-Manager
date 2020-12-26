@@ -46,8 +46,8 @@ require_relative( File.join( "IFC2X3", "IfcMappedItem.rb" ))
 require_relative( File.join( "IFC2X3", "IfcRepresentationMap.rb" ))
 require_relative( File.join( "IFC2X3", "IfcCartesianTransformationOperator3D.rb" ))
 
-module BimTools
- module IfcManager
+module BimTools::IfcManager
+  require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')
 
   # checks the current definition for ifc objects, and calls itself for all nested items
   class ObjectCreator
@@ -270,7 +270,7 @@ module BimTools
       definition.entities.each do | ent |
         
         # skip hidden objects if skip-hidden option is set
-        unless ifc_model.options[:hidden] == false && (ent.hidden? || !ent.layer.visible? )
+        unless ifc_model.options[:hidden] == false && (ent.hidden? || !BimTools::IfcManager::layer_visible?(ent.layer))
           case ent
           when Sketchup::Group, Sketchup::ComponentInstance
             # ObjectCreator.new( ifc_model, ent, container, containing_entity, parent_ifc, transformation_from_entity, transformation_from_container)
@@ -337,6 +337,4 @@ module BimTools
       end
     end # def initialize
   end # class ObjectCreator
-
- end # module IfcManager
-end # module BimTools
+end
