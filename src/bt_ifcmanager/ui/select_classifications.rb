@@ -21,6 +21,9 @@
 # select2 for materials
 
 module BimTools::IfcManager
+  if Settings.common_psets
+    require File.join(PLUGIN_PATH_LIB, "lib_ifc", 'add_common_psets.rb')
+  end
   module PropertiesWindow      
     class HtmlSelectClassifications < HtmlSelect
       def set_value()
@@ -47,13 +50,23 @@ module BimTools::IfcManager
           if model.classifications[@name]
             model.selection.each do |ent|
               if(ent.is_a? Sketchup::ComponentInstance) || (ent.is_a? Sketchup::Group)
+                definition = ent.definition
                 if value == "-"
-                  old_value = ent.definition.get_attribute("AppliedSchemaTypes", @name)
+                  old_value = definition.get_attribute("AppliedSchemaTypes", @name)
                   if old_value
-                    ent.definition.remove_classification(@name, old_value)
+                    definition.remove_classification(@name, old_value)
                   end
                 else
-                  ent.definition.add_classification(@name, value)
+                  definition.add_classification(@name, value)
+
+                  # In case of IFC2X3 classification add common propertysets
+                  #   together with the IFC classification
+                  # (?) Is this the best place for this check?
+                  if @name=="IFC 2x3"
+                    if Settings.common_psets
+                      BimTools::IfcManager::add_common_psets(definition, value)
+                    end
+                  end
                 end
               end
             end

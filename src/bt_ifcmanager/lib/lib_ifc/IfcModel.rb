@@ -67,7 +67,7 @@ module BimTools
         styles:             true,                                   # create IfcStyledItems
         fast_guid:          false,                                  # create simplified guids
         dynamic_attributes: true,                                   # export dynamic component data
-        mapped_items:       true
+        mapped_items:       false
       }
       @options = defaults.merge( options )
       

@@ -44,8 +44,9 @@ module BimTools
   module Settings
     extend self
     attr_accessor :visible
-    attr_reader :classifications
+    attr_reader :classifications, :common_psets
     @template_materials = false
+    @common_psets = true
     @settings_file = File.join(PLUGIN_PATH, "settings.yml")
     @classifications = Hash.new
     # @css = File.join(PLUGIN_PATH_CSS, 'sketchup.css')
@@ -80,13 +81,14 @@ module BimTools
         @export_styles =             CheckboxOption.new("styles", "Export colors", @options[:export][:styles])
         @export_fast_guid =          CheckboxOption.new("fast_guid", "Improve export speed by using fake GUID's", @options[:export][:fast_guid])
         @export_dynamic_attributes = CheckboxOption.new("dynamic_attributes", "Export dynamic attributes", @options[:export][:dynamic_attributes])
-        @export_mapped_items =       CheckboxOption.new("mapped_items", "Export IFC mapped items", @options[:export][:mapped_items])
+        # @export_mapped_items =       CheckboxOption.new("mapped_items", "Export IFC mapped items", @options[:export][:mapped_items])
       end
     end # def load
 
     def save()
       @options[:load][:classifications]      = @classifications
       @options[:load][:template_materials]   = @template_materials
+      @options[:properties][:common_psets]   = @common_psets
       @options[:export][:hidden]             = @export_hidden.value
       @options[:export][:classifications]    = @export_classifications.value
       @options[:export][:layers]             = @export_layers.value
@@ -94,7 +96,7 @@ module BimTools
       @options[:export][:styles]             = @export_styles.value
       @options[:export][:fast_guid]          = @export_fast_guid.value
       @options[:export][:dynamic_attributes] = @export_dynamic_attributes.value
-      @options[:export][:mapped_items]       = @export_mapped_items.value
+      # @options[:export][:mapped_items]       = @export_mapped_items.value
       File.open(@settings_file, "w") { |file| file.write(@options.to_yaml) }
       if IfcManager::PropertiesWindow.window && IfcManager::PropertiesWindow.window.visible?
         PropertiesWindow.close
@@ -230,7 +232,8 @@ module BimTools
       set_html()
       @dialog.add_action_callback("save_settings") { |action_context, s_form_data|
         update_classifications = []
-        @template_materials = false
+        @template_materials               = false
+        @common_psets                     = false
         @export_hidden.value              = false
         @export_classifications.value     = false
         @export_layers.value              = false
@@ -238,7 +241,7 @@ module BimTools
         @export_styles.value              = false
         @export_fast_guid.value           = false
         @export_dynamic_attributes.value  = false
-        @export_mapped_items.value        = false
+        # @export_mapped_items.value        = false
 
         a_form_data = CGI.unescape(s_form_data).split('&')
         a_form_data.each do |s_setting|
@@ -246,6 +249,8 @@ module BimTools
                     
           if a_setting[0] == "template_materials"
             @template_materials = true
+          elsif a_setting[0] == "common_psets"
+            @common_psets = true
           elsif a_setting[0] == "hidden"
             @export_hidden.value = true
           elsif a_setting[0] == "classifications"
@@ -319,7 +324,7 @@ module BimTools
       html << @export_styles.html()
       html << @export_fast_guid.html()
       html << @export_dynamic_attributes.html()
-      html << @export_mapped_items.html()
+      # html << @export_mapped_items.html()
 
       # Default materials
       html << '
@@ -332,6 +337,17 @@ module BimTools
       end
       html << "
             <label class=\"check-inline\"><input type=\"checkbox\" name=\"template_materials\" value=\"template_materials\" #{materials_checked}> Template materials</label>"
+      html << '
+          </div>
+          <h1>Property sets</h1>
+          <div class="col-md-12 row">'
+      if @common_psets
+        common_psets_checked = "checked"
+      else
+        common_psets_checked = ""
+      end
+      html << "
+            <label class=\"check-inline\"><input type=\"checkbox\" name=\"common_psets\" value=\"common_psets\" #{common_psets_checked}> Common PropertySets</label>"
       html << '
           </div>
           <br>

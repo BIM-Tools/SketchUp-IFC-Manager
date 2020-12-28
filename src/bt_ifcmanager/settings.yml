@@ -17,6 +17,8 @@
     NL-SfB 2005, tabel 1: true
     DIN 276-1: false
   :template_materials: false
+:properties:
+  :common_psets: true
 :material_list:
   beton:
   - 142
