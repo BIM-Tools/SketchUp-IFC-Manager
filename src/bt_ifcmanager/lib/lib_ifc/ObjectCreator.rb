@@ -284,16 +284,15 @@ module BimTools::IfcManager
         end
       end
       
-      unless ifc_entity.is_a?(BimTools::IFC2X3::IfcProject) || parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
-        brep_transformation = ifc_entity.objectplacement.ifc_total_transformation.inverse * su_total_transformation
-      else
+      if ifc_entity.is_a?(BimTools::IFC2X3::IfcProject) || parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
         brep_transformation = su_total_transformation
+      else
+        brep_transformation = ifc_entity.objectplacement.ifc_total_transformation.inverse * su_total_transformation
       end
       
       # create geometry from faces
       unless faces.empty? || ifc_entity.is_a?(BimTools::IFC2X3::IfcProject) #(?) skip any geometry placed inside IfcProject object?
         representation = ifc_entity.representation.representations.first
-        puts representation.representationtype.value
         
         # Check if Mapped representation should be used
         if representation.representationtype.value == "MappedRepresentation"

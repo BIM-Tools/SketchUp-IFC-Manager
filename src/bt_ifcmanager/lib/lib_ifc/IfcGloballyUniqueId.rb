@@ -25,6 +25,8 @@ require 'securerandom'
 module BimTools
  module IfcManager
  
+  # Generate a GlobalId optionally based on sketchup ComponentInstance
+  # @param [Sketchup::ComponentInstance] sketchup (OPTIONAL)
   class IfcGloballyUniqueId
    
     # possible characters in GUID
