@@ -44,6 +44,7 @@ module BimTools
     add_component_option( 'IfcBuildingElementProxy', 'building element' )
     add_component_option( 'IfcBuildingStorey', 'building storey' )
     add_component_option( 'IfcBuilding', 'building' )
+    add_component_option( 'IfcSite', 'site' )
     
     # The activate method is called by SketchUp when the tool is first selected.
     # it is a good place to put most of your initialization
