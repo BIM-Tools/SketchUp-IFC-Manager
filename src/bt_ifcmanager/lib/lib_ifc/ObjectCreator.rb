@@ -40,11 +40,6 @@ require_relative( File.join( "IFC2X3", "IfcBuilding.rb" ))
 require_relative( File.join( "IFC2X3", "IfcBuildingStorey.rb" ))
 require_relative( File.join( "IFC2X3", "IfcBuildingElementProxy.rb" ))
 require_relative( File.join( "IFC2X3", "IfcLocalPlacement.rb" ))
-require_relative( File.join( "IFC2X3", "IfcFacetedBrep.rb" ))
-require_relative( File.join( "IFC2X3", "IfcStyledItem.rb" ))
-require_relative( File.join( "IFC2X3", "IfcMappedItem.rb" ))
-require_relative( File.join( "IFC2X3", "IfcRepresentationMap.rb" ))
-require_relative( File.join( "IFC2X3", "IfcCartesianTransformationOperator3D.rb" ))
 
 module BimTools::IfcManager
   require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')

@@ -21,10 +21,10 @@
 
 require_relative 'Ifc_Type.rb'
 
-module BimTools
- module IfcManager
+module BimTools::IfcManager
   class IfcLabel < Ifc_Type
     attr_reader :value
+
     def initialize( value )
       begin
         
@@ -33,7 +33,7 @@ module BimTools
       rescue StandardError, TypeError => e
         print "cannot be converted to a String #{e.to_s}"
       end
-    end # def initialize
+    end
     
     # generate step object output string
     # adding long = true returns a full object string
@@ -44,7 +44,6 @@ module BimTools
         val = add_long( val )
       end
       return val
-    end # def step
-  end # class IfcLabel
- end # module IfcManager
-end # module BimTools
+    end
+  end
+end

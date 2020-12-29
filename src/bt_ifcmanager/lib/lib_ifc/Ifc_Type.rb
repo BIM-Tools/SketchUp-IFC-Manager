@@ -19,8 +19,7 @@
 #
 #
 
-module BimTools
- module IfcManager
+module BimTools::IfcManager
   class Ifc_Type
     attr_accessor :long
 
@@ -53,6 +52,5 @@ module BimTools
       classname = self.class.name.split('::').last.upcase
       return "#{classname}(#{string})"
     end
-  end # class Ifc_Type
- end # module IfcManager
-end # module BimTools
+  end
+end

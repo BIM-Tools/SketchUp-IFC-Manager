@@ -19,15 +19,28 @@
 #
 #
 
-require_relative File.join('IFC2X3', 'IfcLocalPlacement.rb')
-require_relative File.join('IFC2X3', 'IfcProductDefinitionShape.rb')
-require_relative File.join('IFC2X3', 'IfcRelAssociatesMaterial.rb')
-require_relative File.join('IFC2X3', 'IfcPresentationLayerAssignment.rb')
-require_relative File.join('IFC2X3', 'IfcRelDefinesByProperties.rb')
-require_relative File.join('IFC2X3', 'IfcClassification.rb')
-require_relative File.join('IFC2X3', 'IfcClassificationReference.rb')
-require_relative File.join('IFC2X3', 'IfcRelAssociatesClassification.rb')
-require_relative File.join('dynamic_attributes.rb')
+# load types
+require_relative "IfcLabel.rb"
+require_relative "IfcIdentifier.rb"
+require_relative "IfcText.rb"
+require_relative "enumeration.rb"
+
+# load entities
+require_relative File.join("IFC2X3", "IfcLocalPlacement.rb")
+require_relative File.join("IFC2X3", "IfcProductDefinitionShape.rb")
+require_relative File.join("IFC2X3", "IfcRelAssociatesMaterial.rb")
+require_relative File.join("IFC2X3", "IfcPresentationLayerAssignment.rb")
+require_relative File.join("IFC2X3", "IfcRelDefinesByProperties.rb")
+require_relative File.join("IFC2X3", "IfcClassification.rb")
+require_relative File.join("IFC2X3", "IfcClassificationReference.rb")
+require_relative File.join("IFC2X3", "IfcRelAssociatesClassification.rb")
+require_relative File.join("IFC2X3", "IfcFacetedBrep.rb")
+require_relative File.join("IFC2X3", "IfcStyledItem.rb")
+require_relative File.join("IFC2X3", "IfcMappedItem.rb")
+require_relative File.join("IFC2X3", "IfcRepresentationMap.rb")
+require_relative File.join("IFC2X3", "IfcCartesianTransformationOperator3D.rb")
+
+require_relative File.join("dynamic_attributes.rb")
 
 module BimTools
   module IfcProduct_su
@@ -49,8 +62,8 @@ module BimTools
         @name = BimTools::IfcManager::IfcLabel.new( definition.name )
         
         if definition.attribute_dictionaries
-          if definition.attribute_dictionaries['IFC 2x3']
-            if props_ifc = definition.attribute_dictionaries['IFC 2x3'].attribute_dictionaries
+          if definition.attribute_dictionaries["IFC 2x3"]
+            if props_ifc = definition.attribute_dictionaries["IFC 2x3"].attribute_dictionaries
               props_ifc.each do |prop_dict|
                 prop = prop_dict.name
                 prop_sym = prop.to_sym
@@ -60,17 +73,35 @@ module BimTools
                   # like: path = ["IFC 2x3", "IfcWindow", "OverallWidth", "IfcPositiveLengthMeasure", "IfcLengthMeasure"]
                   val_dict = return_value_dict( prop_dict )
                   if value = val_dict["value"]
-                    
-                    # create the proper type based on the dictionary name
-                    case val_dict.name
-                    when "IfcText"
-                      send("#{prop.downcase}=", "'#{val_dict["value"]}'")
-                    when "IfcLabel"
-                      send("#{prop.downcase}=", "'#{val_dict["value"]}'")
-                    when "IfcIdentifier"
-                      send("#{prop.downcase}=", "'#{val_dict["value"]}'")
-                    when "IfcLengthMeasure"
-                      send("#{prop.downcase}=", val_dict["value"].to_f.to_s)
+                    attribute_type = prop_dict.get_attribute(val_dict.name, "attribute_type")
+                    case attribute_type
+                    when "choice"
+                      # Skip this attribute, this is not a value but a reference
+                    when "string"
+                      begin
+                        # require_relative ent_type_name
+                        entity_type = eval("BimTools::IfcManager::#{val_dict.name}")
+                        value_entity = entity_type.new(value)
+                      rescue
+                        puts "Not found: #{entity_type}"
+                        value_entity = "'#{value}'"
+                      end
+                      send("#{prop.downcase}=", value_entity)
+                    when "double"
+                      begin
+                        # require_relative ent_type_name
+                        entity_type = eval("BimTools::IfcManager::#{val_dict.name}")
+                        value_entity = entity_type.new(value)
+                      rescue
+                        puts "Not found: #{entity_type}"
+                        value_entity = value.to_f.to_s
+                      end
+                      send("#{prop.downcase}=", value_entity)
+                    when "enumeration"
+                      puts value
+                      send("#{prop.downcase}=", BimTools::IfcManager::Enumeration.new(value))
+                    else
+                      send("#{prop.downcase}=", value.to_s)
                     end
                   end
                 else
@@ -82,11 +113,6 @@ module BimTools
               end
             end
           end
-        end
-        
-        # (!) fill predefinedtype, needs more work
-        if @predefinedtype.nil?
-          @predefinedtype = '.NOTDEFINED.'
         end
         
         # set material if sketchup @su_object has a material
@@ -245,15 +271,15 @@ module BimTools
   # @su_model.classifications.each { |schema|
     
     # # create any classification except for IFC
-    # unless schema.name == 'IFC 2x3'
+    # unless schema.name == "IFC 2x3"
       # classification = BimTools::IFC2X3::IfcClassification.new( self )
-      # classification.source = ''
-      # classification.edition = ''
+      # classification.source = ""
+      # classification.edition = ""
       # classification.name = "'" << schema.name << "'"
       # classifications << classification
       
       # # special options for nlsfb
-      # if schema.name == 'NL-SfB 2005, tabel 1'
+      # if schema.name == "NL-SfB 2005, tabel 1"
         # classification.source = "'BIM-Loket'"
         # classification.edition = "'2005'"
         # unicode = BimTools::IFC2X3::IfcClassification.new( self )
@@ -268,7 +294,7 @@ module BimTools
 # end # def create_classifications
 
           #(mp) added if loop to temporarily allow only DIN 276-1 classification
-          if attr_dict.name == 'DIN 276-1' # unless attr_dict.name == 'IFC 2x3'
+          if attr_dict.name == "DIN 276-1" # unless attr_dict.name == "IFC 2x3"
             if su_model.classifications[ attr_dict.name ]
               
               # Create classifications if they don't exist
@@ -283,17 +309,17 @@ module BimTools
               end
               
               # retrieve classification value from su object
-              type = definition.get_attribute('AppliedSchemaTypes', attr_dict.name)
+              type = definition.get_attribute("AppliedSchemaTypes", attr_dict.name)
               if type
-                code = definition.get_classification_value([attr_dict.name, type, 'din_code'])
-                text = definition.get_classification_value([attr_dict.name, type, 'din_text'])
+                code = definition.get_classification_value([attr_dict.name, type, "din_code"])
+                text = definition.get_classification_value([attr_dict.name, type, "din_text"])
                 
                 # only create IfcClassificationReference if component has the code and text values for the classification
                 if code && text
                   ifc_classification_reference = cls.ifc_classification_references[ code ]
                   unless ifc_classification_reference
                     ifc_classification_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
-                    #ifc_classification_reference.location = ''
+                    #ifc_classification_reference.location = ""
                     ifc_classification_reference.itemreference = "'#{code}'"
                     ifc_classification_reference.name = "'#{text}'"
                     ifc_classification_reference.referencedsource = cls
@@ -303,8 +329,8 @@ module BimTools
                     
                     # create IfcRelAssociatesClassification
                     assoc = BimTools::IFC2X3::IfcRelAssociatesClassification.new( ifc_model )
-                    #assoc.name = ''
-                    #assoc.description = ''
+                    #assoc.name = ""
+                    #assoc.description = ""
                     assoc.relatedobjects = BimTools::IfcManager::Ifc_Set.new( [self] )
                     assoc.relatingclassification = ifc_classification_reference
                     ifc_classification_reference.ifc_rel_associates_classification = assoc
@@ -316,7 +342,7 @@ module BimTools
           end #(mp) end of DIN 276-1 loop
           
           # temporarily allow only nlsfb classification
-          if attr_dict.name == 'NL-SfB 2005, tabel 1' # unless attr_dict.name == 'IFC 2x3'
+          if attr_dict.name == "NL-SfB 2005, tabel 1" # unless attr_dict.name == "IFC 2x3"
             if su_model.classifications[ attr_dict.name ]
               
               # Create classifications if they don't exist
@@ -338,17 +364,17 @@ module BimTools
               end
               
               # retrieve classification value from su object
-              type = definition.get_attribute('AppliedSchemaTypes', attr_dict.name)
+              type = definition.get_attribute("AppliedSchemaTypes", attr_dict.name)
               if type
-                code = definition.get_classification_value([attr_dict.name, type, 'Class-codenotatie'])
-                tekst = definition.get_classification_value([attr_dict.name, type, 'tekst_NL-SfB'])
+                code = definition.get_classification_value([attr_dict.name, type, "Class-codenotatie"])
+                tekst = definition.get_classification_value([attr_dict.name, type, "tekst_NL-SfB"])
                 
                 # only create IfcClassificationReference if component has the code and text values for the classification
                 if code && tekst
                   ifc_classification_reference = cls.ifc_classification_references[ code ]
                   unless ifc_classification_reference
                     ifc_classification_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
-                    #ifc_classification_reference.location = ''
+                    #ifc_classification_reference.location = ""
                     ifc_classification_reference.itemreference = "'#{code}'"
                     ifc_classification_reference.name = "'#{tekst}'"
                     ifc_classification_reference.referencedsource = cls
@@ -358,8 +384,8 @@ module BimTools
                     
                     # create IfcRelAssociatesClassification
                     assoc = BimTools::IFC2X3::IfcRelAssociatesClassification.new( ifc_model )
-                    #assoc.name = ''
-                    #assoc.description = ''
+                    #assoc.name = ""
+                    #assoc.description = ""
                     assoc.relatedobjects = BimTools::IfcManager::Ifc_Set.new( [self] )
                     assoc.relatingclassification = ifc_classification_reference
                     ifc_classification_reference.ifc_rel_associates_classification = assoc
@@ -372,7 +398,7 @@ module BimTools
                     unicode_reference.referencedsource = unicode_cls
                     unicode_assoc = BimTools::IFC2X3::IfcRelAssociatesClassification.new( ifc_model )
                     unicode_assoc.name = "'Uniformat Classification'"
-                    #unicode_assoc.description = ''
+                    #unicode_assoc.description = ""
                     unicode_assoc.relatedobjects = IfcManager::Ifc_Set.new( [self] )
                     unicode_assoc.relatingclassification = unicode_reference
                     unicode_reference.ifc_rel_associates_classification = unicode_assoc
@@ -388,7 +414,7 @@ module BimTools
     
     # add export summary for IfcProducts
     def step
-      @ifc_model.summary_add(self.class.name.split('::').last)
+      @ifc_model.summary_add(self.class.name.split("::").last)
       super
     end
   end # module IfcProduct_su

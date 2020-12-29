@@ -19,30 +19,32 @@
 #
 #
 
-module BimTools
- module IfcManager
-  class IfcReal
+require_relative 'Ifc_Type.rb'
+
+module BimTools::IfcManager
+  class IfcReal < Ifc_Type
     attr_accessor :long
+
     def initialize( value )
       begin
         @value = value.to_f
       rescue StandardError, TypeError => e
         print value << "cannot be converted to a Float" << e
       end
-    end # def initialize
+    end
+    
     def step()
       val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
       if @long
         val = add_long( val )
       end
       return val
-    end # def step
+    end
     
     # adding long = true returns a full object string
     def add_long( string )
       classname = self.class.name.split('::').last.upcase
       return "#{classname}(#{string})"
     end
-  end # class IfcReal
- end # module IfcManager
-end # module BimTools
+  end
+end

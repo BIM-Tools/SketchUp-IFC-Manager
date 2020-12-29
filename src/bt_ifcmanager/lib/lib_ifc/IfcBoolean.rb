@@ -21,8 +21,7 @@
 
 require_relative 'Ifc_Type.rb'
 
-module BimTools
- module IfcManager
+module BimTools::IfcManager
   class IfcBoolean < Ifc_Type
     def initialize( value )
       @value = true?(value) # (!) type check? error when not explicitly string false?
@@ -42,6 +41,5 @@ module BimTools
     def true?(obj)
       obj.to_s == "true"
     end
-  end # class IfcBoolean
- end # module IfcManager
-end # module BimTools
+  end
+end

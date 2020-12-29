@@ -21,9 +21,7 @@
 
 require_relative 'IfcReal.rb'
 
-module BimTools
- module IfcManager
+module BimTools::IfcManager
   class IfcLengthMeasure < IfcReal
-  end # class IfcLengthMeasure
- end # module IfcManager
-end # module BimTools
+  end
+end

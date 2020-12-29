@@ -1,6 +1,6 @@
-#  IfcText.rb
+#  enumeration.rb
 #
-#  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2020 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,19 +22,15 @@
 require_relative 'Ifc_Type.rb'
 
 module BimTools::IfcManager
-  class IfcText < Ifc_Type
-    
+  class Enumeration < Ifc_Type
+    attr_reader :value
+
     def initialize( value )
-      begin
-        @value = value.to_s
-      rescue StandardError, TypeError => e
-        print "#{value} cannot be converted to a String #{e}"
-      end
+      @value = value.to_s
     end
-    
+
     def step()
-      str_replace = replace_char( @value )
-      val = "'#{str_replace}'"
+      val = ".#{@value.upcase}."
       if @long
         val = add_long( val )
       end

@@ -19,10 +19,8 @@
 #
 #
 
-require_relative 'set.rb'
 require_relative 'IfcLabel.rb'
 require_relative 'IfcIdentifier.rb'
-require_relative 'IfcText.rb'
 require_relative 'ObjectCreator.rb'
 require_relative 'step_writer.rb'
 
