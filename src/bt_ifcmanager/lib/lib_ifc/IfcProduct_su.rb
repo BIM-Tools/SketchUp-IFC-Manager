@@ -88,9 +88,6 @@ module BimTools
         if @predefinedtype.nil?
           @predefinedtype = '.NOTDEFINED.'
         end
-
-        # set representation based on definition
-        @representation = BimTools::IFC2X3::IfcProductDefinitionShape.new(ifc_model, sketchup.definition)
         
         # set material if sketchup @su_object has a material
         if ifc_model.options[:materials]
@@ -109,20 +106,6 @@ module BimTools
           
           #add self to materialassociation
           ifc_model.materials[material_name].relatedobjects.add( self )
-        end
-        
-        # set layer
-        if ifc_model.options[:layers]
-          
-          #check if IfcPresentationLayerAssignment exists
-          unless ifc_model.layers[@su_object.layer.name]
-            
-            # create new IfcPresentationLayerAssignment
-            ifc_model.layers[@su_object.layer.name] = BimTools::IFC2X3::IfcPresentationLayerAssignment.new(ifc_model, @su_object.layer)
-          end
-          
-          #add self to IfcPresentationLayerAssignment
-          ifc_model.layers[@su_object.layer.name].assigneditems.add( @representation.representations.first )
         end
         
         if ifc_model.options[:attributes]
@@ -150,6 +133,72 @@ module BimTools
         end
       end
     end # def initialize
+
+    # Add representation to the IfcProduct, transform geometry with given transformation
+    # @param [Sketchup::Transformation] transformation
+    def create_representation(faces, transformation, su_material)
+      
+      # set representation based on definition
+      unless @representation
+        @representation = BimTools::IFC2X3::IfcProductDefinitionShape.new(@ifc_model, @su_object.definition)
+      end
+
+      representation = @representation.representations.first
+        
+      # Check if Mapped representation should be used
+      if representation.representationtype.value == "MappedRepresentation"
+        mapped_item = BimTools::IFC2X3::IfcMappedItem.new( @ifc_model )
+        mappingsource = BimTools::IFC2X3::IfcRepresentationMap.new( @ifc_model )
+        mappingtarget = BimTools::IFC2X3::IfcCartesianTransformationOperator3D.new( @ifc_model )
+        mappingtarget.localorigin = BimTools::IFC2X3::IfcCartesianPoint.new( @ifc_model, Geom::Point3d.new )
+
+        mappingsource.mappingorigin = BimTools::IFC2X3::IfcAxis2Placement3D.new( @ifc_model, transformation )
+        mappingsource.mappingorigin.location = BimTools::IFC2X3::IfcCartesianPoint.new( @ifc_model, transformation.origin )
+        mappingsource.mappingorigin.axis = BimTools::IFC2X3::IfcDirection.new( @ifc_model, transformation.zaxis )
+        mappingsource.mappingorigin.refdirection = BimTools::IFC2X3::IfcDirection.new( @ifc_model, transformation.xaxis )
+
+        mapped_item.mappingsource = mappingsource
+        mapped_item.mappingtarget = mappingtarget
+
+        mapped_representation = @ifc_model.mapped_representation?( definition )
+        if !mapped_representation
+          mapped_representation = BimTools::IFC2X3::IfcShapeRepresentation.new( @ifc_model , nil)
+          brep = BimTools::IFC2X3::IfcFacetedBrep.new( @ifc_model, faces, Geom::Transformation.new(Geom::Point3d.new) )
+          mapped_representation.items.add( brep )
+          @ifc_model.add_mapped_representation( definition, mapped_representation )
+        end
+        
+        mappingsource.mappedrepresentation = mapped_representation
+        representation.items.add( mapped_item )
+      else
+        brep = BimTools::IFC2X3::IfcFacetedBrep.new( @ifc_model, faces, transformation )
+        representation.items.add( brep )
+      end
+      
+      # if no material present, use material from first face?
+      #if su_material.nil?
+      #  su_material = faces[0].material unless faces[0].material.nil?
+      #end
+      
+      # add color from su-object material, or a su_parent's
+      if @ifc_model.options[:styles]
+        BimTools::IFC2X3::IfcStyledItem.new( @ifc_model, brep, su_material )
+      end
+        
+      # set layer
+      if @ifc_model.options[:layers]
+        
+        #check if IfcPresentationLayerAssignment exists
+        unless @ifc_model.layers[@su_object.layer.name]
+          
+          # create new IfcPresentationLayerAssignment
+          @ifc_model.layers[@su_object.layer.name] = BimTools::IFC2X3::IfcPresentationLayerAssignment.new(@ifc_model, @su_object.layer)
+        end
+        
+        #add self to IfcPresentationLayerAssignment
+        @ifc_model.layers[@su_object.layer.name].assigneditems.add( @representation.representations.first )
+      end
+    end
     
     # find the dictionary containing "value" field
     def return_value_dict( dict )
