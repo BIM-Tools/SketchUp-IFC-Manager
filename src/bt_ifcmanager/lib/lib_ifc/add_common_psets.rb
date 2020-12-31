@@ -75,15 +75,22 @@ module BimTools::IfcManager
                       attribute_type = "string"
                       # value = ""
                     end
-                    pset_dict.set_attribute property_name, "attribute_type", attribute_type
+                    property_dict = pset_dict.attribute_dictionary(property_name, true)
                     pset_dict.set_attribute property_name, "is_hidden", false
-                    pset_dict.set_attribute property_name, "value", nil # value
+                    value_dict = property_dict.attribute_dictionary(value_type, true)
+                    property_dict.set_attribute value_type, "attribute_type", attribute_type
+                    property_dict.set_attribute value_type, "is_hidden", false
+                    property_dict.set_attribute value_type, "value", nil # value
                   elsif property_type == "TypePropertyEnumeratedValue"
+                    value_type = e.elements().to_a("PropertyType/TypePropertyEnumeratedValue/EnumList").first["name"]
                     options = e.get_elements('PropertyType/TypePropertyEnumeratedValue/EnumList/EnumItem').map { |e| e.text() }
-                    pset_dict.set_attribute property_name, "attribute_type", "enumeration"
+                    property_dict = pset_dict.attribute_dictionary(property_name, true)
                     pset_dict.set_attribute property_name, "is_hidden", false
-                    pset_dict.set_attribute property_name, "options", options
-                    pset_dict.set_attribute property_name, "value", options.last # value
+                    value_dict = property_dict.attribute_dictionary(value_type, true)
+                    property_dict.set_attribute value_type, "attribute_type", "enumeration"
+                    property_dict.set_attribute value_type, "is_hidden", false
+                    property_dict.set_attribute value_type, "options", options
+                    property_dict.set_attribute value_type, "value", options.last # value
                   end
                 end
               end

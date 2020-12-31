@@ -19,32 +19,12 @@
 #
 #
 
-require_relative 'Ifc_Type.rb'
+require_relative 'IfcLabel.rb'
 
-module BimTools
- module IfcManager
-  class IfcIdentifier < Ifc_Type
-    def initialize( value )
-      begin
-      
-        # IfcIdentifier may not be longer than 255 characters
-        @value = value.to_s[0..254]
-      rescue StandardError, TypeError => e
-        print "cannot be converted to a String #{e.to_s}"
-      end
-    end # def initialize
-    def step()
-      str_replace = replace_char( @value )
-      val = "'#{str_replace}'"
-      if @long
-        add_long( val )
-      end
-      return val
-    end # def step
+module BimTools::IfcManager
 
-    def to_s()
-      return @value   
-    end # def to_s
-  end # class IfcIdentifier
- end # module IfcManager
-end # module BimTools
+  # An identifier is an alphanumeric string which allows an individual
+  #   thing to be identified. It may not provide natural-language meaning.
+  class IfcIdentifier < IfcLabel
+  end
+end

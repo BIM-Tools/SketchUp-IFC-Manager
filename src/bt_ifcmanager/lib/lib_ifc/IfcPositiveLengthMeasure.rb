@@ -1,4 +1,4 @@
-#  IfcLengthMeasure.rb
+#  IfcPositiveLengthMeasure.rb
 #
 #  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
 #
@@ -19,12 +19,21 @@
 #
 #
 
-require_relative 'IfcReal.rb'
+require_relative 'IfcLengthMeasure.rb'
 
 module BimTools::IfcManager
 
-  # A length measure is the value of a distance.
-  #   Usually measured in millimeters (mm).
-  class IfcLengthMeasure < IfcReal
+  # A positive length measure is a length measure that is greater than zero.
+  class IfcPositiveLengthMeasure < IfcLengthMeasure
+    def initialize( value )
+      begin
+        @value = value.to_f
+        if @value <= 0
+          BimTools::IfcManager::add_export_message("IfcPositiveLengthMeasure must be a positive number!")
+        end
+      rescue StandardError, TypeError => e
+        print value.to_s << " cannot be converted to a Float: " << e
+      end
+    end
   end
 end

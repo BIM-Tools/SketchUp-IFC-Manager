@@ -59,7 +59,7 @@ module BimTools
               
               # create new PropertySet with name pset_name
               unless pset_hash[pset_name]
-                reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, nil )
+                reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model )
                 reldef.relatedobjects.add( ifc_object )
                 pset = BimTools::IFC2X3::IfcPropertySet.new( ifc_model, attr_dict )
                 pset.name = BimTools::IfcManager::IfcLabel.new( pset_name )
@@ -87,7 +87,7 @@ module BimTools
             
                 # create new PropertySet with name "SU_DynamicAttributes"
                 unless pset_hash["SU_DynamicAttributes"]
-                  reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, nil )
+                  reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model )
                   reldef.relatedobjects.add( ifc_object )
                   pset = BimTools::IFC2X3::IfcPropertySet.new( ifc_model, attr_dict )
                   pset.name = BimTools::IfcManager::IfcLabel.new( "SU_DynamicAttributes" )

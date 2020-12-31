@@ -35,7 +35,7 @@ module BimTools
           elsif property.is_a?(IfcManager::IfcGloballyUniqueId) || property.is_a?(IfcManager::Ifc_List) || property.is_a?(IfcManager::Ifc_Type)
             line << property.step
           else
-            line << "##{property.ifc_id}"
+            line << property.ref
           end
         else
           line << "$"
@@ -48,5 +48,10 @@ module BimTools
       end
       return "##{@ifc_id}= #{self.class.name.split('::').last.upcase}(#{line})"
     end # step
+
+    # Instead of the full step object return a reference
+    def ref()
+      return "##{@ifc_id}"
+    end
  end # module Step
 end # module BimTools

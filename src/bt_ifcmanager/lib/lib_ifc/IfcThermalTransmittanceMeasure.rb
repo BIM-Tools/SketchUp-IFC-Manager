@@ -1,4 +1,4 @@
-#  IfcLengthMeasure.rb
+#  IfcThermalTransmittanceMeasure.rb
 #
 #  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
 #
@@ -23,8 +23,8 @@ require_relative 'IfcReal.rb'
 
 module BimTools::IfcManager
 
-  # A length measure is the value of a distance.
-  #   Usually measured in millimeters (mm).
-  class IfcLengthMeasure < IfcReal
+  # IfcThermalTransmittanceMeasure is a measure of the rate at which energy is transmitted through a body.
+  #   Usually measured in Watts/m2 Kelvin.
+  class IfcThermalTransmittanceMeasure < IfcReal
   end
 end

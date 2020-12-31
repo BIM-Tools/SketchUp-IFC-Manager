@@ -52,5 +52,10 @@ module BimTools::IfcManager
       classname = self.class.name.split('::').last.upcase
       return "#{classname}(#{string})"
     end
+
+    # Type objects don't have references, instead return step serialization
+    def ref()
+      return step()
+    end
   end
 end

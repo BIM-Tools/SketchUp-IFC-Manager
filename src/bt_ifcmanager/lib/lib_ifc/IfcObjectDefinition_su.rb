@@ -83,7 +83,7 @@ module BimTools
         # If it does not exist, then create
         case self
         when BimTools::IFC2X3::IfcProject
-          puts 'add default site'
+          BimTools::IfcManager::add_export_message("Created default IfcSite")
           @default_related_object = BimTools::IFC2X3::IfcSite.new( @ifc_model )
           @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Site" )
           @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Site" )
@@ -97,13 +97,13 @@ module BimTools
           end
           parent_objectplacement = nil
         when BimTools::IFC2X3::IfcSite
-          puts 'add default building'
+          BimTools::IfcManager::add_export_message("Created default IfcBuilding")
           @default_related_object = BimTools::IFC2X3::IfcBuilding.new( @ifc_model )
           @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Building" )
           @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Building" )
           parent_objectplacement = @objectplacement
         when BimTools::IFC2X3::IfcBuilding
-          puts 'add default storey'
+          BimTools::IfcManager::add_export_message("Created default IfcBuildingStorey")
           @default_related_object = BimTools::IFC2X3::IfcBuildingStorey.new( @ifc_model )
           @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Building Storey" )
           @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Building Storey" )

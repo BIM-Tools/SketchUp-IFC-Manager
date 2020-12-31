@@ -22,14 +22,26 @@
 require_relative 'Ifc_Type.rb'
 
 module BimTools::IfcManager
+
+  # A label is the term by which something may be referred to.
+  #   It is a string which represents the human-interpretable name of
+  #   something and shall have a natural-language meaning.
   class IfcLabel < Ifc_Type
     attr_reader :value
 
     def initialize( value )
+
       begin
-        
+
+        @value = value.to_s
+        # puts @value
+        # puts @value.length
+
         # IfcLabel may not be longer than 255 characters
-        @value = value.to_s[0..254]
+        if @value.length > 255
+          BimTools::IfcManager::add_export_message("IfcLabel truncated to maximum of 255 characters")
+          @value = @value[0..254]
+        end
       rescue StandardError, TypeError => e
         print "cannot be converted to a String #{e.to_s}"
       end

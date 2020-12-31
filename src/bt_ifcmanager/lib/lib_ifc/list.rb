@@ -41,10 +41,11 @@ module BimTools
       $i = 0
       $num = @items.length
       while $i < $num  do
-        if @items[$i].is_a? String
-          line << @items[$i]
+        item = @items[$i]
+        if item.is_a? String
+          line << item
         else
-          line << "##{@items[$i].ifc_id}"
+          line << item.ref
         end
         
         #skip the , for the last element

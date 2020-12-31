@@ -20,9 +20,16 @@
 #
 
 # load types
+require_relative 'IfcBoolean.rb'
 require_relative "IfcLabel.rb"
 require_relative "IfcIdentifier.rb"
 require_relative "IfcText.rb"
+require_relative "IfcReal.rb"
+require_relative "IfcInteger.rb"
+require_relative "IfcLengthMeasure.rb"
+require_relative "IfcPositiveLengthMeasure.rb"
+require_relative "IfcPlaneAngleMeasure.rb"
+require_relative "IfcThermalTransmittanceMeasure.rb"
 require_relative "enumeration.rb"
 
 # load entities
@@ -41,6 +48,7 @@ require_relative File.join("IFC2X3", "IfcRepresentationMap.rb")
 require_relative File.join("IFC2X3", "IfcCartesianTransformationOperator3D.rb")
 
 require_relative File.join("dynamic_attributes.rb")
+require_relative File.join("PropertyReader.rb")
 
 module BimTools
   module IfcProduct_su
@@ -68,41 +76,42 @@ module BimTools
                 prop = prop_dict.name
                 prop_sym = prop.to_sym
                 if properties.include? prop_sym
+
+                  property_reader = BimTools::PropertyReader.new(prop_dict)
+                  dict_value = property_reader.value
+                  value_type = property_reader.value_type
+                  attribute_type = property_reader.attribute_type
                   
-                  # get data for objects with additional nesting levels
-                  # like: path = ["IFC 2x3", "IfcWindow", "OverallWidth", "IfcPositiveLengthMeasure", "IfcLengthMeasure"]
-                  val_dict = return_value_dict( prop_dict )
-                  if value = val_dict["value"]
-                    attribute_type = prop_dict.get_attribute(val_dict.name, "attribute_type")
-                    case attribute_type
-                    when "choice"
-                      # Skip this attribute, this is not a value but a reference
-                    when "string"
+                  if attribute_type == "choice"
+                    # Skip this attribute, this is not a value but a reference
+                  elsif attribute_type == "enumeration"
+                    send("#{prop.downcase}=", BimTools::IfcManager::Enumeration.new(dict_value))
+                  else
+                    entity_type = false
+                    if value_type
                       begin
                         # require_relative ent_type_name
-                        entity_type = eval("BimTools::IfcManager::#{val_dict.name}")
-                        value_entity = entity_type.new(value)
-                      rescue
-                        puts "Not found: #{entity_type}"
-                        value_entity = "'#{value}'"
+                        entity_type = eval("BimTools::IfcManager::#{value_type}")
+                        value_entity = entity_type.new(dict_value)
+                      rescue => e
+                        puts "Error creating IFC type: " << e.to_s
+                        # puts dict_value
                       end
-                      send("#{prop.downcase}=", value_entity)
-                    when "double"
-                      begin
-                        # require_relative ent_type_name
-                        entity_type = eval("BimTools::IfcManager::#{val_dict.name}")
-                        value_entity = entity_type.new(value)
-                      rescue
-                        puts "Not found: #{entity_type}"
-                        value_entity = value.to_f.to_s
-                      end
-                      send("#{prop.downcase}=", value_entity)
-                    when "enumeration"
-                      puts value
-                      send("#{prop.downcase}=", BimTools::IfcManager::Enumeration.new(value))
-                    else
-                      send("#{prop.downcase}=", value.to_s)
                     end
+                    unless entity_type
+                      
+                      case attribute_type
+                      when "boolean"
+                        value_entity = BimTools::IfcManager::IfcBoolean.new(dict_value)
+                      when "double"
+                        value_entity = BimTools::IfcManager::IfcReal.new(dict_value)
+                      when "long"
+                        value_entity = BimTools::IfcManager::IfcInteger.new(dict_value)
+                      else # "string" and others?
+                        value_entity = BimTools::IfcManager::IfcLabel.new(dict_value)
+                      end
+                    end
+                    send("#{prop.downcase}=", value_entity)
                   end
                 else
                   if prop_dict.attribute_dictionaries && prop_dict.name != "instanceAttributes"
@@ -201,11 +210,6 @@ module BimTools
         representation.items.add( brep )
       end
       
-      # if no material present, use material from first face?
-      #if su_material.nil?
-      #  su_material = faces[0].material unless faces[0].material.nil?
-      #end
-      
       # add color from su-object material, or a su_parent's
       if @ifc_model.options[:styles]
         BimTools::IFC2X3::IfcStyledItem.new( @ifc_model, brep, su_material )
@@ -225,21 +229,6 @@ module BimTools
         @ifc_model.layers[@su_object.layer.name].assigneditems.add( @representation.representations.first )
       end
     end
-    
-    # find the dictionary containing "value" field
-    def return_value_dict( dict )
-      
-      # if a field "value" exists then we are at the data level and data can be retrieved, otherwise dig deeper
-      if dict.keys.include?("value")
-        return dict
-      else
-        dict.attribute_dictionaries.each do | sub_dict |
-          unless sub_dict.name == "instanceAttributes"
-            return return_value_dict( sub_dict )
-          end
-        end
-      end
-    end # def return_value_dict
     
     def collect_psets( ifc_model, attr_dict )
       if attr_dict.is_a? Sketchup::AttributeDictionary
@@ -264,34 +253,6 @@ module BimTools
       # Collect all attached classifications except for IFC
       if definition.attribute_dictionaries
         definition.attribute_dictionaries.each do | attr_dict |
-        
-# # create classifications from su_model
-# def create_classifications()
-  # classifications = Array.new
-  # @su_model.classifications.each { |schema|
-    
-    # # create any classification except for IFC
-    # unless schema.name == "IFC 2x3"
-      # classification = BimTools::IFC2X3::IfcClassification.new( self )
-      # classification.source = ""
-      # classification.edition = ""
-      # classification.name = "'" << schema.name << "'"
-      # classifications << classification
-      
-      # # special options for nlsfb
-      # if schema.name == "NL-SfB 2005, tabel 1"
-        # classification.source = "'BIM-Loket'"
-        # classification.edition = "'2005'"
-        # unicode = BimTools::IFC2X3::IfcClassification.new( self )
-        # unicode.source = "'http://www.csiorg.net/uniformat'"
-        # unicode.edition = "'1998'"
-        # unicode.name = "'Uniformat'"
-        # classifications << unicode
-      # end
-    # end
-  # }
-  # return classifications
-# end # def create_classifications
 
           #(mp) added if loop to temporarily allow only DIN 276-1 classification
           if attr_dict.name == "DIN 276-1" # unless attr_dict.name == "IFC 2x3"

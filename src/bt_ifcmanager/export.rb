@@ -41,6 +41,9 @@ module BimTools
         @summary_dialog.close
       end
 
+      # reset export messages
+      BimTools::IfcManager::export_messages = Array.new
+
       # create new progressbar
       pb = ProgressBar.new(4,"Exporting to IFC...")
       
@@ -101,6 +104,12 @@ module BimTools
         puts "failed writing log."
       end
     end # export
+
+    def add_export_message(message)
+      puts message
+      BimTools::IfcManager::export_messages << message
+    end
+
     def show_summary( hash, file_path, time )
       css = File.join(PLUGIN_PATH_CSS, 'sketchup.css')
       html = "<html><head><link rel='stylesheet' type='text/css' href='" << css << "'></head><body><textarea readonly>IFC Entities exported:\n\n"
@@ -109,6 +118,13 @@ module BimTools
       end
       html << "\n To file '" << file_path << "'\n"
       html << "\n Taking a total number of " << time.to_s << " seconds\n"
+      unless BimTools::IfcManager::export_messages.empty?
+        messages = BimTools::IfcManager::export_messages.uniq.sort
+        html << "\nMessages:\n"
+        messages.each do |message|
+          html << "- #{message}\n"
+        end
+      end
       html << "</textarea></body></html>"
       @summary_dialog = UI::HtmlDialog.new(
       {

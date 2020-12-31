@@ -1,6 +1,6 @@
-#  IfcLengthMeasure.rb
+#  IfcInteger.rb
 #
-#  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,12 +19,30 @@
 #
 #
 
-require_relative 'IfcReal.rb'
+require_relative 'Ifc_Type.rb'
 
 module BimTools::IfcManager
 
-  # A length measure is the value of a distance.
-  #   Usually measured in millimeters (mm).
-  class IfcLengthMeasure < IfcReal
+  # A defined type of simple data type Integer. (Required since a select
+  #   type, i.e. IfcSimpleValue, cannot include directly simple types in
+  #   its select list).
+  class IfcInteger < Ifc_Type
+    attr_accessor :long
+
+    def initialize( value )
+      begin
+        @value = value.to_i
+      rescue StandardError, TypeError => e
+        print value << "cannot be converted to a Integer" << e
+      end
+    end
+    
+    def step()
+      val = @value.to_s
+      if @long
+        val = add_long( val )
+      end
+      return val
+    end
   end
 end

@@ -40,6 +40,7 @@ module BimTools
     end
     
     attr_reader :toolbar
+    attr_accessor :export_messages
 
     extend self
 
@@ -49,6 +50,9 @@ module BimTools
     PLUGIN_PATH_UI = File.join(PLUGIN_PATH, 'ui')
     PLUGIN_PATH_TOOLS = File.join(PLUGIN_PATH, 'tools')
     PLUGIN_PATH_CLASSIFICATIONS = File.join(PLUGIN_PATH, 'classifications')
+
+    # Create export message collection
+    @export_messages = Array.new
 
     # Create IfcManager toolbar
     @toolbar = UI::Toolbar.new "IFC Manager"

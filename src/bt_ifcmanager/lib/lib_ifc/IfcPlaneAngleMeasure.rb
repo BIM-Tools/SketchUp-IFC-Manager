@@ -1,4 +1,4 @@
-#  IfcLengthMeasure.rb
+#  IfcPlaneAngleMeasure.rb
 #
 #  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
 #
@@ -23,8 +23,10 @@ require_relative 'IfcReal.rb'
 
 module BimTools::IfcManager
 
-  # A length measure is the value of a distance.
-  #   Usually measured in millimeters (mm).
-  class IfcLengthMeasure < IfcReal
+  # A plane angle measure is the value of an angle in a plane.
+  #   Usually measured in radian (rad, m/m = 1), but also grads may
+  #   be used. The grad unit may be declared as a conversion based
+  #   unit based on radian unit.
+  class IfcPlaneAngleMeasure < IfcReal
   end
 end
