@@ -30,7 +30,7 @@ module BimTools
   module IfcManager
 
     # Version and release information.
-    VERSION = '3.1.0'.freeze
+    VERSION = '3.3.0'.freeze
     
     # load plugin only if SketchUp version is PRO
     if Sketchup.is_pro? && Sketchup.version_number>1600000000
