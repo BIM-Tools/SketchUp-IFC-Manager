@@ -76,7 +76,7 @@ module BimTools
       if @options[:export]
         @export_hidden =             CheckboxOption.new("hidden", "Export hidden objects", @options[:export][:hidden])
         @export_classifications =    CheckboxOption.new("classifications", "Export classifications", @options[:export][:classifications])
-        @export_layers =             CheckboxOption.new("layers", "Export tags as layers", @options[:export][:layers])
+        @export_layers =             CheckboxOption.new("layers", "Export tags/layers as IFC layers", @options[:export][:layers])
         @export_materials =          CheckboxOption.new("materials", "Export materials", @options[:export][:materials])
         @export_styles =             CheckboxOption.new("styles", "Export colors", @options[:export][:styles])
         @export_fast_guid =          CheckboxOption.new("fast_guid", "Improve export speed by using fake GUID's", @options[:export][:fast_guid])
