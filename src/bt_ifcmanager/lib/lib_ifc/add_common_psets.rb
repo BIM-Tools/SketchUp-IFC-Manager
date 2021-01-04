@@ -62,25 +62,29 @@ module BimTools::IfcManager
                     # - double
                     # - string
                     value_type = e.elements().to_a("PropertyType/TypePropertySingleValue/DataType").first["type"]
-                    if value_type == "IfcBoolean"
-                      attribute_type = "boolean"
-                      # value = false
-                    elsif value_type == "IfcInteger"
-                      attribute_type = "long"
-                      # value = 0
-                    elsif value_type.include?("Measure")
-                      attribute_type = "double"
-                      # value = 0.0
+                    if value_type
+                      if value_type == "IfcBoolean"
+                        attribute_type = "boolean"
+                        # value = false
+                      elsif value_type == "IfcInteger"
+                        attribute_type = "long"
+                        # value = 0
+                      elsif value_type.include?("Measure")
+                        attribute_type = "double"
+                        # value = 0.0
+                      else
+                        attribute_type = "string"
+                        # value = ""
+                      end
+                      property_dict = pset_dict.attribute_dictionary(property_name, true)
+                      pset_dict.set_attribute property_name, "is_hidden", false
+                      value_dict = property_dict.attribute_dictionary(value_type, true)
+                      property_dict.set_attribute value_type, "attribute_type", attribute_type
+                      property_dict.set_attribute value_type, "is_hidden", false
+                      property_dict.set_attribute value_type, "value", nil # value
                     else
-                      attribute_type = "string"
-                      # value = ""
+                      puts "DataType not found"
                     end
-                    property_dict = pset_dict.attribute_dictionary(property_name, true)
-                    pset_dict.set_attribute property_name, "is_hidden", false
-                    value_dict = property_dict.attribute_dictionary(value_type, true)
-                    property_dict.set_attribute value_type, "attribute_type", attribute_type
-                    property_dict.set_attribute value_type, "is_hidden", false
-                    property_dict.set_attribute value_type, "value", nil # value
                   elsif property_type == "TypePropertyEnumeratedValue"
                     value_type = e.elements().to_a("PropertyType/TypePropertyEnumeratedValue/EnumList").first["name"]
                     options = e.get_elements('PropertyType/TypePropertyEnumeratedValue/EnumList/EnumItem').map { |e| e.text() }
