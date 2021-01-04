@@ -19,6 +19,7 @@
 
 module BimTools
  module IfcManager
+  require File.join(PLUGIN_PATH_LIB, "set_ifc_entity_name.rb")
   module CreateComponent
     extend self
     attr_accessor :name
@@ -62,11 +63,11 @@ module BimTools
       # convert group to component instance
       instance = group.to_component
       
-      # set component name
-      instance.definition.name = model.definitions.unique_name( name.downcase )
-      
       # set IFC type
       instance.definition.add_classification("IFC 2x3", ifc_type)
+      
+      # Set name in definition, instance and ifc properties
+      BimTools::IfcManager::set_ifc_entity_name(model, instance, name.downcase)
       
       # set group as selected entity
       selection.clear

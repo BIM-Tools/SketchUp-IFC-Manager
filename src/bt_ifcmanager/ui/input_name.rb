@@ -22,6 +22,7 @@
 
 module BimTools::IfcManager
   require File.join(PLUGIN_PATH_UI, 'input_text.rb')
+  require File.join(PLUGIN_PATH_LIB, "set_ifc_entity_name.rb")
   module PropertiesWindow
     class HtmlInputName < HtmlInputText
       def initialize(dialog)
@@ -30,9 +31,12 @@ module BimTools::IfcManager
       def set_callback()
         super
         self.dialog.add_action_callback(self.id) { |action_context, value|
-          Sketchup.active_model.selection.each do |ent|
+          model = Sketchup.active_model
+          model.selection.each do |ent|
+
+            # Set name in definition, instance and ifc properties
             if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
-              ent.definition.name = value
+              BimTools::IfcManager::set_ifc_entity_name(model, ent, value)
             end
           end
           PropertiesWindow::update()

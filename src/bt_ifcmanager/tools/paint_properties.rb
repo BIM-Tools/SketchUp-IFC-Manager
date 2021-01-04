@@ -19,6 +19,7 @@
 
 module BimTools
  module IfcManager
+  require File.join(PLUGIN_PATH_LIB, "set_ifc_entity_name.rb")
   module PaintProperties
     extend self
     attr_accessor :name
@@ -127,26 +128,23 @@ module BimTools
       target.definition.name = @model.definitions.unique_name( source.definition.name )
       
       # clone attribute dictionaries
-        
-        # clear existing target definition attributes
-        target_dicts = target.definition.attribute_dictionaries
-        unless target_dicts.nil?
-          target.definition.attribute_dictionaries.each do |dict|
-            unless dict.name == "GSU_ContributorsInfo" || dict.name == "dynamic_attributes"
-              target_dicts.delete dict
-            end
+      
+      # clear existing target definition attributes
+      target_dicts = target.definition.attribute_dictionaries
+      unless target_dicts.nil?
+        target.definition.attribute_dictionaries.each do |dict|
+          unless dict.name == "GSU_ContributorsInfo" || dict.name == "dynamic_attributes"
+            target_dicts.delete dict
           end
-        end          
-        
-        # copy attributes
-        clone_attributes( source.definition, target.definition )
-        
-        # Fix IFC name property
-        ifc_type = target.definition.get_attribute "AppliedSchemaTypes", "IFC 2x3"
-        if ifc_type
-          path = ["IFC 2x3", ifc_type.to_s, "Name", "IfcLabel"]
-          target.definition.set_classification_value(path, target.definition.name)
         end
+      end          
+      
+      # copy attributes
+      clone_attributes( source.definition, target.definition )
+      
+      # Fix IFC name property
+      BimTools::IfcManager::set_ifc_entity_name(@model, target, target.definition.name)
+
       @model.commit_operation # End of operation/undo section
       @model.active_view.refresh # Refresh model
     end # def copy_properties
