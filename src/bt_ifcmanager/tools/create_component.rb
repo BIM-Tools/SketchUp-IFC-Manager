@@ -21,13 +21,10 @@ module BimTools
  module IfcManager
   module CreateComponent
     extend self
-    attr_accessor :name, :small_icon, :large_icon
+    attr_accessor :name
 
     @name = 'Create component'
     @description = 'Create component from selected entities'
-    @small_icon = File.join( PLUGIN_PATH_IMAGE, 'PaintProperties_small.png' )
-    @large_icon = File.join( PLUGIN_PATH_IMAGE, 'PaintProperties_large.png' )
-    @cursor_icon = File.join( PLUGIN_PATH_IMAGE, 'PaintProperties-cursor.png' )
     
     def add_component_option( ifc_type, name, objecttype=nil )
       UI.add_context_menu_handler do |context_menu|

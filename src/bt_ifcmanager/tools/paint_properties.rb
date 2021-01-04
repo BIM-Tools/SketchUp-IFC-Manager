@@ -21,13 +21,11 @@ module BimTools
  module IfcManager
   module PaintProperties
     extend self
-    attr_accessor :name, :small_icon, :large_icon
+    attr_accessor :name
 
     @name = 'Paint properties'
     @description = 'Copy properties of BIM-Tools elements'
-    @small_icon = File.join( PLUGIN_PATH_IMAGE, 'PaintProperties_small.png' )
-    @large_icon = File.join( PLUGIN_PATH_IMAGE, 'PaintProperties_large.png' )
-    @cursor_icon = File.join( PLUGIN_PATH_IMAGE, 'PaintProperties-cursor.png' )
+    @cursor_icon = File.join( PLUGIN_PATH_IMAGE, "PaintProperties-cursor" << ICON_LARGE << ICON_TYPE)
 
     @source = nil
     @cursor_id = nil
@@ -36,6 +34,16 @@ module BimTools
     if File.file?( @cursor_icon ) # check if file is really a file
       @cursor_id = UI.create_cursor( @cursor_icon, 4, 3 )
     end
+
+    # add to TOOLBAR
+    cmd = UI::Command.new(@description) {
+      Sketchup.active_model.select_tool( self )
+    }
+    cmd.small_icon = File.join(PLUGIN_PATH_IMAGE, "PaintProperties" << ICON_SMALL << ICON_TYPE)
+    cmd.large_icon = File.join(PLUGIN_PATH_IMAGE, "PaintProperties" << ICON_LARGE << ICON_TYPE)
+    cmd.tooltip = 'Paint properties'
+    cmd.status_bar_text = 'Paint BIM-Tools properties'
+    IfcManager.toolbar.add_item cmd
 
     # The activate method is called by SketchUp when the tool is first selected.
     # it is a good place to put most of your initialization
@@ -183,20 +191,6 @@ module BimTools
         end
       end
     end # def clone_attributes
-
-    # add to TOOLBAR
-
-    cmd = UI::Command.new(@description) {
-
-      # call tool
-      Sketchup.active_model.select_tool( self )
-    }
-    cmd.small_icon = File.join( @small_icon )
-    cmd.large_icon = File.join( @large_icon )
-    cmd.tooltip = 'Paint properties'
-    cmd.status_bar_text = 'Paint BIM-Tools properties'
-    IfcManager.toolbar.add_item cmd
-
   end # module PaintProperties
  end # module IfcManager
 end # module BimTools

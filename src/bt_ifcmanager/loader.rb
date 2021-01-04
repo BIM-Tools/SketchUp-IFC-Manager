@@ -32,11 +32,17 @@ module BimTools
     
     # set icon file type
     if Sketchup.version_number < 1600000000
-      ICON_TYPE = '.png'
+      ICON_TYPE = ".png"
+      ICON_SMALL = "_small"
+      ICON_LARGE = "_large"
     elsif PLATFORM_IS_WINDOWS
-      ICON_TYPE = '.svg'
+      ICON_TYPE = ".svg"
+      ICON_SMALL = ""
+      ICON_LARGE = ""
     else # OSX
-      ICON_TYPE = '.pdf'
+      ICON_TYPE = ".pdf"
+      ICON_SMALL = ""
+      ICON_LARGE = ""
     end
     
     attr_reader :toolbar
@@ -65,18 +71,26 @@ module BimTools
     require File.join(PLUGIN_PATH, 'export.rb')
     require File.join(PLUGIN_PATH_TOOLS, 'paint_properties.rb')
     require File.join(PLUGIN_PATH_TOOLS, 'create_component.rb')
+    require File.join(PLUGIN_PATH_TOOLS, 'ifc_import.rb')
     
     # add tools to toolbar  
     # Open window button
     btn_ifc_window = UI::Command.new('Show IFC properties') {
       PropertiesWindow.toggle
     }
-    btn_ifc_window.small_icon = File.join(PLUGIN_PATH_IMAGE, "IfcEdit" << ICON_TYPE)
-    btn_ifc_window.large_icon = File.join(PLUGIN_PATH_IMAGE, "IfcEdit" << ICON_TYPE)
+    btn_ifc_window.small_icon = File.join(PLUGIN_PATH_IMAGE, "IfcEdit" << ICON_SMALL << ICON_TYPE)
+    btn_ifc_window.large_icon = File.join(PLUGIN_PATH_IMAGE, "IfcEdit" << ICON_LARGE << ICON_TYPE)
     btn_ifc_window.tooltip = "Show IFC properties"
     btn_ifc_window.status_bar_text = "Edit IFC properties"
-
-    @toolbar.add_item btn_ifc_window
+    
+    # Import IFC file
+    btn_ifc_import = UI::Command.new("Import IFC file") {
+      ifc_import()
+    }
+    btn_ifc_import.small_icon = File.join(PLUGIN_PATH_IMAGE, "IfcImport" << ICON_SMALL << ICON_TYPE)
+    btn_ifc_import.large_icon = File.join(PLUGIN_PATH_IMAGE, "IfcImport" << ICON_LARGE << ICON_TYPE)
+    btn_ifc_import.tooltip = "Import IFC file"
+    btn_ifc_import.status_bar_text = "Import IFC file"
 
     # IFC export button
     btn_ifc_export = UI::Command.new('Export model to IFC') {
@@ -102,8 +116,8 @@ module BimTools
         export( export_path )
       end
     }
-    btn_ifc_export.small_icon = File.join(PLUGIN_PATH_IMAGE, "IfcExport" << ICON_TYPE)
-    btn_ifc_export.large_icon = File.join(PLUGIN_PATH_IMAGE, "IfcExport" << ICON_TYPE)
+    btn_ifc_export.small_icon = File.join(PLUGIN_PATH_IMAGE, "IfcExport" << ICON_SMALL << ICON_TYPE)
+    btn_ifc_export.large_icon = File.join(PLUGIN_PATH_IMAGE, "IfcExport" << ICON_LARGE << ICON_TYPE)
     btn_ifc_export.tooltip = 'Export model to IFC'
     btn_ifc_export.status_bar_text = 'Export model to IFC'
 
@@ -111,14 +125,24 @@ module BimTools
     btn_settings_window = UI::Command.new("IFC Manager settings") {
       Settings.toggle
     }
-    btn_settings_window.small_icon = File.join(PLUGIN_PATH_IMAGE, "settings" + ICON_TYPE)
-    btn_settings_window.large_icon = File.join(PLUGIN_PATH_IMAGE, "settings" + ICON_TYPE)
+    btn_settings_window.small_icon = File.join(PLUGIN_PATH_IMAGE, "Settings" << ICON_SMALL << ICON_TYPE)
+    btn_settings_window.large_icon = File.join(PLUGIN_PATH_IMAGE, "Settings" << ICON_LARGE << ICON_TYPE)
     btn_settings_window.tooltip = "Open IFC Manager settings"
     btn_settings_window.status_bar_text = "Open IFC Manager settings"
-    @toolbar.add_item btn_settings_window
 
+    @toolbar.add_item btn_settings_window
+    @toolbar.add_item btn_ifc_import
+    @toolbar.add_item btn_ifc_window
     @toolbar.add_item btn_ifc_export
+
     @toolbar.show
 
+    # Add icons to command
+    #
+    # @param command [UI::Command]
+    # @param name [UI::Command]
+    def add_icons(command, name)
+
+    end
   end # module IfcManager
 end # module BimTools
