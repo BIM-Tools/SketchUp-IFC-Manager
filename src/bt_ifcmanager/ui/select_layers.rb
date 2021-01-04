@@ -27,7 +27,8 @@ module BimTools::IfcManager
     class HtmlSelectLayers < HtmlSelect
 
       def initialize(dialog, name)
-        super(dialog, name)          
+        super(dialog, name)
+        @layer0_name = "Layer0"
         @button = true
       end
 
@@ -36,8 +37,9 @@ module BimTools::IfcManager
 
         # Rename layers to tags for SU 20+
         unless Sketchup.version_number < 2000000000
+          @layer0_name = "Untagged"
           if index = @layers.index("Layer0")
-            @layers[index] = "Untagged"
+            @layers[index] = @layer0_name
           end
         end
         
@@ -52,7 +54,7 @@ module BimTools::IfcManager
             if ent.layer.name != "Layer0"
               selection.add(ent.layer.name)
             else
-              selection.add(0)
+              selection.add(@layer0_name)
             end
           end
         end
