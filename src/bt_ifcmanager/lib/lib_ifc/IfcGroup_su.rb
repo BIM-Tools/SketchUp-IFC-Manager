@@ -1,6 +1,6 @@
-#  IfcGroup.rb
+#  IfcGroup_su.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2021 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,23 +19,23 @@
 #
 #
 
-require_relative(File.join('..', 'step.rb'))
-require_relative(File.join('..', 'IfcGroup_su.rb'))
-require_relative('IfcObject.rb')
+require_relative 'set.rb'
+require_relative File.join('IFC2X3', 'IfcRelAssignsToGroup.rb')
 
 module BimTools
- module IFC2X3
-  class IfcGroup < IfcObject
-    attr_accessor :ifc_id
-    include Step
-    include IfcGroup_su
-    def initialize( ifc_model, sketchup=nil, *args ) 
-      @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
+  module IfcGroup_su
+    # @parameter ifc_model [IfcManager::IfcModel]
+    # @parameter sketchup [Sketchup::ComponentDefinition]
+    def initialize(ifc_model, sketchup=nil)
       super
-    end # def initialize 
-    def properties()
-      return [:GlobalId, :OwnerHistory, :Name, :Description, :ObjectType]
-    end # def properties
-  end # class IfcGroup
- end # module IFC2X3
-end # module BimTools
+
+      @rel = BimTools::IFC2X3::IfcRelAssignsToGroup.new( ifc_model )
+      @rel.relatinggroup = self
+      @rel.relatedobjects = IfcManager::Ifc_Set.new()
+    end
+    
+    def add(entity)
+      @rel.relatedobjects.add(entity)
+    end
+  end
+end

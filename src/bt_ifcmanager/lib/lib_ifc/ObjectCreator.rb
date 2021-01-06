@@ -34,7 +34,9 @@
 
 require_relative( "IfcGloballyUniqueId.rb" )
 require_relative( "IfcLengthMeasure.rb" )
+
 require_relative( File.join( "IFC2X3", "IfcSpatialStructureElement.rb" ))
+require_relative( File.join( "IFC2X3", "IfcGroup.rb" ))
 require_relative( File.join( "IFC2X3", "IfcSite.rb" ))
 require_relative( File.join( "IFC2X3", "IfcBuilding.rb" ))
 require_relative( File.join( "IFC2X3", "IfcBuildingStorey.rb" ))
@@ -96,6 +98,11 @@ module BimTools::IfcManager
       
       # find the correct parent in the spacialhierarchy
       if ifc_entity.is_a? BimTools::IFC2X3::IfcProduct
+
+        # if parent is a IfcGroup, add entity to group
+        if parent_ifc.is_a?(BimTools::IFC2X3::IfcGroup)
+          parent_ifc.add(ifc_entity)
+        end
         
         # check the element type and set the correct parent in the spacialhierarchy
         case ifc_entity.class.to_s
@@ -212,12 +219,20 @@ module BimTools::IfcManager
         ifc_entity.parent = parent_ifc
       end
       
+      # corrigeren voor het geval beide transformties dezelfde verschaling hebben, die mag niet met inverse geneutraliseerd worden
+      # er zou in de ifc_total_transformation eigenlijk geen verschaling mogen zitten.
+      # wat mag er wel in zitten? wel verdraaiing en verplaatsing.
+      
+      if next_parent_site then parent_site = next_parent_site end
+      if next_parent_building then parent_building = next_parent_building end
+      if next_parent_buildingstorey then parent_buildingstorey = next_parent_buildingstorey end
+        
       # calculate the total transformation
       su_total_transformation = su_total_transformation * su_instance.transformation
       
       # create objectplacement for ifc_entity
       # set objectplacement based on transformation
-      if ifc_entity
+      if ifc_entity.is_a?( BimTools::IFC2X3::IfcProduct )
         if parent_ifc.is_a?( BimTools::IFC2X3::IfcProject )
           parent_objectplacement = nil
         else
@@ -251,26 +266,17 @@ module BimTools::IfcManager
       # calculate the local transformation
       # if the SU object if not an IFC entity, then BREP needs to be transformed with SU object transformation
       
-      
-      # corrigeren voor het geval beide transformties dezelfde verschaling hebben, die mag niet met inverse geneutraliseerd worden
-      # er zou in de ifc_total_transformation eigenlijk geen verschaling mogen zitten.
-      # wat mag er wel in zitten? wel verdraaiing en verplaatsing.
-      
-      if next_parent_site then parent_site = next_parent_site end
-      if next_parent_building then parent_building = next_parent_building end
-      if next_parent_buildingstorey then parent_buildingstorey = next_parent_buildingstorey end
-      
       # find sub-objects (geometry and entities)
       faces = Array.new
       definition.entities.each do | ent |
         
         # skip hidden objects if skip-hidden option is set
+        # if ifc_model.options[:hidden] == true
+        #   if !ent.hidden? || BimTools::IfcManager::layer_visible?(ent.layer)
         unless ifc_model.options[:hidden] == false && (ent.hidden? || !BimTools::IfcManager::layer_visible?(ent.layer))
           case ent
           when Sketchup::Group, Sketchup::ComponentInstance
-            # ObjectCreator.new( ifc_model, ent, container, containing_entity, parent_ifc, transformation_from_entity, transformation_from_container)
             ObjectCreator.new(ifc_model, ent, su_total_transformation, ifc_entity, parent_site, parent_building, parent_buildingstorey, parent_space, su_material, guid.to_s)
-
           when Sketchup::Face
             unless @skip_entity
               faces << ent
@@ -279,16 +285,21 @@ module BimTools::IfcManager
         end
       end
       
-      if ifc_entity.is_a?(BimTools::IFC2X3::IfcProject) || parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
+      if !ifc_entity.is_a?(BimTools::IFC2X3::IfcProduct) || parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
         brep_transformation = su_total_transformation
       else
         brep_transformation = ifc_entity.objectplacement.ifc_total_transformation.inverse * su_total_transformation
       end
       
       # create geometry from faces
-      unless faces.empty? || ifc_entity.is_a?(BimTools::IFC2X3::IfcProject) #(?) skip any geometry placed inside IfcProject object?
+      # (!) skips any geometry placed inside objects NOT of the type IfcProduct
+      if !faces.empty? && ifc_entity.is_a?(BimTools::IFC2X3::IfcProduct)
         ifc_entity.create_representation(faces, brep_transformation, su_material)
       end
+      # # create geometry from faces
+      # unless faces.empty? || ifc_entity.is_a?(BimTools::IFC2X3::IfcProject) #(?) skip any geometry placed inside IfcProject object?
+      #   ifc_entity.create_representation(faces, brep_transformation, su_material)
+      # end
     end # def initialize
   end # class ObjectCreator
 end

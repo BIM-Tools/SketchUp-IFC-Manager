@@ -24,7 +24,6 @@ require_relative 'Ifc_Type.rb'
 module BimTools::IfcManager
   class IfcBoolean < Ifc_Type
     def initialize( value )
-      puts value.class
       self.value=(value)
     end
     
