@@ -218,7 +218,7 @@ module BimTools
           end
           
           # add this element to the IfcModel
-          parent_ifc.add_related_element( ifc_entity )
+          parent_ifc.add_contained_element( ifc_entity )
         end
       end
       return ifc_objects
