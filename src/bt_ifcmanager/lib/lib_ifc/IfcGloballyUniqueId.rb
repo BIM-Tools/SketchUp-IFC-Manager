@@ -32,20 +32,19 @@ module BimTools
     # possible characters in GUID
     GUID64 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$'
     
-    def initialize( sketchup = nil )
+    def initialize( sketchup = nil, parent_hex_guid=nil)
       @sketchup = sketchup
       
       # if sketchup object has a GUID, then use that, otherwise create new
-      if @sketchup && defined?( @sketchup.guid )
-        @hex_guid = unformat_guid( @sketchup.guid )
+      if sketchup && defined?( sketchup.guid )
+        @hex_guid = unformat_guid( sketchup.guid )
+        if parent_hex_guid
+          @hex_guid = combined_guid( @hex_guid, parent_hex_guid )
+        end
       else
         @hex_guid = new_guid
       end
     end
-    
-    def set_parent_guid( parent_hex_guid )
-      @hex_guid = combined_guid( @hex_guid, parent_hex_guid )
-    end # def set_parent
     
     # return IfcGloballyUniqueId within quotes
     def step()

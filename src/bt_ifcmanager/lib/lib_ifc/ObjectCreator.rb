@@ -50,16 +50,16 @@ module BimTools::IfcManager
   class ObjectCreator
     
     # def initialize(ifc_model, su_instance, container, containing_entity, parent_ifc, transformation_from_entity, transformation_from_container, site=nil, site_container=nil, building=nil, building_container=nil, building_storey=nil, building_storey_container=nil)
-    def initialize(ifc_model, su_instance, su_total_transformation, parent_ifc, parent_site=nil, parent_building=nil, parent_buildingstorey=nil, parent_space=nil, su_material=nil, parent_hex_guid=nil)
-      @skip_entity = false
+    def initialize(ifc_model, su_instance, su_total_transformation, parent_ifc, parent_site=nil, parent_building=nil, parent_buildingstorey=nil, parent_space=nil, su_material=nil)
+      ifc_entity = nil
       definition = su_instance.definition   
       su_material = su_instance.material if su_instance.material      
       ent_type_name = definition.get_attribute("AppliedSchemaTypes", "IFC 2x3")
       
-      # set GUID based on optional parent GUID
-      guid = IfcGloballyUniqueId.new( su_instance )
-      if parent_hex_guid
-        guid.set_parent_guid( parent_hex_guid )
+      if parent_ifc.globalid
+        parent_hex_guid = parent_ifc.globalid.to_s
+      else
+        parent_hex_guid = nil
       end
       
       # check if entity_type is part of the entity list that needs exporting
@@ -78,22 +78,20 @@ module BimTools::IfcManager
             ifc_entity = nil
           else
             ifc_entity = entity_type.new(ifc_model, su_instance)
-            ifc_entity.globalid = guid
+            if entity_type == BimTools::IFC2X3::IfcRoot
+              ifc_entity.globalid = IfcGloballyUniqueId.new( su_instance, parent_hex_guid )
+            end
           end
         rescue
           
           # If not classified as IFC in sketchup AND the parent is an IfcSpatialStructureElement then this is an IfcBuildingElementProxy
           if parent_ifc.is_a?(BimTools::IFC2X3::IfcSpatialStructureElement) || parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
             ifc_entity = BimTools::IFC2X3::IfcBuildingElementProxy.new(ifc_model, su_instance)
-            ifc_entity.globalid = guid
+            ifc_entity.globalid = IfcGloballyUniqueId.new( su_instance, parent_hex_guid )
           else # this instance is pure geometry, ifc_entity = nil
             ifc_entity = nil
           end
         end
-      else
-        
-        # mark this entity's geometry to be skipped
-        @skip_entity = true
       end
       
       # find the correct parent in the spacialhierarchy
@@ -276,9 +274,9 @@ module BimTools::IfcManager
         unless ifc_model.options[:hidden] == false && (ent.hidden? || !BimTools::IfcManager::layer_visible?(ent.layer))
           case ent
           when Sketchup::Group, Sketchup::ComponentInstance
-            ObjectCreator.new(ifc_model, ent, su_total_transformation, ifc_entity, parent_site, parent_building, parent_buildingstorey, parent_space, su_material, guid.to_s)
+            ObjectCreator.new(ifc_model, ent, su_total_transformation, ifc_entity, parent_site, parent_building, parent_buildingstorey, parent_space, su_material)
           when Sketchup::Face
-            unless @skip_entity
+            if ifc_model.options[:geometry]
               faces << ent
             end
           end

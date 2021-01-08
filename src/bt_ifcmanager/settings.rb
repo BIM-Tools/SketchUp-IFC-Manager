@@ -79,6 +79,7 @@ module BimTools
         @export_layers =             CheckboxOption.new("layers", "Export tags/layers as IFC layers", @options[:export][:layers])
         @export_materials =          CheckboxOption.new("materials", "Export materials", @options[:export][:materials])
         @export_styles =             CheckboxOption.new("styles", "Export colors", @options[:export][:styles])
+        @export_geometry =           CheckboxOption.new("geometry", "Export geometry", @options[:export][:geometry])
         @export_fast_guid =          CheckboxOption.new("fast_guid", "Improve export speed by using fake GUID's", @options[:export][:fast_guid])
         @export_dynamic_attributes = CheckboxOption.new("dynamic_attributes", "Export dynamic attributes", @options[:export][:dynamic_attributes])
         # @export_mapped_items =       CheckboxOption.new("mapped_items", "Export IFC mapped items", @options[:export][:mapped_items])
@@ -94,6 +95,7 @@ module BimTools
       @options[:export][:layers]             = @export_layers.value
       @options[:export][:materials]          = @export_materials.value
       @options[:export][:styles]             = @export_styles.value
+      @options[:export][:geometry]           = @export_geometry.value
       @options[:export][:fast_guid]          = @export_fast_guid.value
       @options[:export][:dynamic_attributes] = @export_dynamic_attributes.value
       # @options[:export][:mapped_items]       = @export_mapped_items.value
@@ -239,6 +241,7 @@ module BimTools
         @export_layers.value              = false
         @export_materials.value           = false
         @export_styles.value              = false
+        @export_geometry.value            = false
         @export_fast_guid.value           = false
         @export_dynamic_attributes.value  = false
         # @export_mapped_items.value        = false
@@ -261,6 +264,8 @@ module BimTools
             @export_materials.value = true
           elsif a_setting[0] == "styles"
             @export_styles.value = true
+          elsif a_setting[0] == "geometry"
+            @export_geometry.value = true
           elsif a_setting[0] == "fast_guid"
             @export_fast_guid.value = true
           elsif a_setting[0] == "dynamic_attributes"
@@ -322,6 +327,7 @@ module BimTools
       html << @export_layers.html()
       html << @export_materials.html()
       html << @export_styles.html()
+      html << @export_geometry.html()
       html << @export_fast_guid.html()
       html << @export_dynamic_attributes.html()
       # html << @export_mapped_items.html()

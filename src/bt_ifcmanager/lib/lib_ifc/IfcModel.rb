@@ -63,6 +63,7 @@ module BimTools
         layers:             true,                                   # create IfcPresentationLayerAssignments
         materials:          true,                                   # create IfcMaterials
         styles:             true,                                   # create IfcStyledItems
+        geometry:           true,                                   # create geometry for entities
         fast_guid:          false,                                  # create simplified guids
         dynamic_attributes: true,                                   # export dynamic component data
         mapped_items:       false
