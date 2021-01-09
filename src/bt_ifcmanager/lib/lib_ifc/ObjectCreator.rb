@@ -82,7 +82,9 @@ module BimTools::IfcManager
               ifc_entity.globalid = IfcGloballyUniqueId.new( su_instance, parent_hex_guid )
             end
           end
-        rescue
+
+        # LoadError added because require errors are not catched by StandardError
+        rescue StandardError, LoadError
           
           # If not classified as IFC in sketchup AND the parent is an IfcSpatialStructureElement then this is an IfcBuildingElementProxy
           if parent_ifc.is_a?(BimTools::IFC2X3::IfcSpatialStructureElement) || parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)
