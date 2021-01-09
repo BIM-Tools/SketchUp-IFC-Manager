@@ -1,0 +1,4549 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="(100) GRUNDSTUECK">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="100"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="GRUNDSTUECK"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(110) Grundstueckswert">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="110"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Grundstueckswert"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(120) Grundstuecksnebenkosten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="120"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Grundstuecksnebenkosten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(121) Vermessungsgebuehren">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="121"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Vermessungsgebuehren"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(122) Gerichtsgebuehren">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="122"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gerichtsgebuehren"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(123) Notariatsgebuehren">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="123"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Notariatsgebuehren"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(124) Maklerprovisionen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="124"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Maklerprovisionen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(125) Grunderwerbssteuer">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="125"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Grunderwerbssteuer"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(126) Wertermittlungen, Untersuchungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="126"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Wertermittlungen, Untersuchungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(127) Genehmigungsgebuehren">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="127"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Genehmigungsgebuehren"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(128) Bodenordnung, Grenzregulierung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="128"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Bodenordnung, Grenzregulierung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(129) Grundstuecksnebenkosten, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="129"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Grundstuecksnebenkosten, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(130) Freimachen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="130"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Freimachen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(131) Abfindungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="131"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Abfindungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(132) Abloesen dinglicher Rechte">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="132"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Abloesen dinglicher Rechte"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(139) Freimachen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="139"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Freimachen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(200) HERRICHTEN UND ERSCHLIESSEN">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="200"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="HERRICHTEN UND ERSCHLIESSEN"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(210) Herrichten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="210"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Herrichten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(211) Sicherungsmassnahmen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="211"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sicherungsmassnahmen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(212) Abbruchmassnahmen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="212"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Abbruchmassnahmen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(213) Altlastenbeseitigung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="213"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Altlastenbeseitigung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(214) Herrichten der Gelaendeoberflaeche">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="214"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Herrichten der Gelaendeoberflaeche"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(219) Herrichten, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="219"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Herrichten, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(220) Oeffentliche Erschliessung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="220"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Oeffentliche Erschliessung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(221) Abwasserentsorgung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="221"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Abwasserentsorgung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(222) Wasserversorgung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="222"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Wasserversorgung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(223) Gasversorgung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="223"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gasversorgung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(224) Fernwaermeversorgung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="224"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Fernwaermeversorgung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(225) Stromversorgung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="225"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Stromversorgung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(226) Telekommunikation">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="226"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Telekommunikation"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(227) Verkehrserschliessung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="227"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Verkehrserschliessung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(228) Abfallentsorgung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="228"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Abfallentsorgung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(229) Oeffentliche Erschliessung, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="229"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Oeffentliche Erschliessung, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(230) Nichtoeffentliche Erschliessung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="230"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Nichtoeffentliche Erschliessung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(240) Ausgleichsabgaben">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="240"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Ausgleichsabgaben"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(250) Uebergangsmassnahmen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="250"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Uebergangsmassnahmen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(251) Provisorien">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="251"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Provisorien"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(252) Auslagerungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="252"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Auslagerungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(300) BAUWERK — BAUKONSTRUKTIONEN">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="300"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="BAUWERK — BAUKONSTRUKTIONEN"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(310) Baugrube">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="310"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Baugrube"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(311) Baugrubenherstellung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="311"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Baugrubenherstellung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(312) Baugrubenumschliessung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="312"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Baugrubenumschliessung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(313) Wasserhaltung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="313"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Wasserhaltung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(319) Baugrube, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="319"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Baugrube, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(320) Gruendung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="320"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gruendung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(321) Baugrundverbesserung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="321"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Baugrundverbesserung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(322) Flachgruendungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="322"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Flachgruendungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(323) Tiefgruendungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="323"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Tiefgruendungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(324) Unterboeden und Bodenplatten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="324"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Unterboeden und Bodenplatten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(325) Bodenbelaege">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="325"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Bodenbelaege"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(326) Bauwerksabdichtungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="326"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Bauwerksabdichtungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(327) Draenagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="327"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Draenagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(329) Gruendung, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="329"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gruendung, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(330) Aussenwaende">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="330"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Aussenwaende"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(331) Tragende Aussenwaende">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="331"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Tragende Aussenwaende"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(332) Nichttragende Aussenwaende">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="332"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Nichttragende Aussenwaende"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(333) Aussenstuetzen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="333"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Aussenstuetzen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(334) Aussentueren und -fenster">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="334"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Aussentueren und -fenster"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(335) Aussenwandbekleidungen, aussen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="335"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Aussenwandbekleidungen, aussen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(336) Aussenwandbekleidungen, innen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="336"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Aussenwandbekleidungen, innen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(336) Aussenwandbekleidungen, innen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="336"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Aussenwandbekleidungen, innen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(337) Elementierte Aussenwaende">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="337"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Elementierte Aussenwaende"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(338) Sonnenschutz">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="338"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sonnenschutz"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(339) Aussenwaende, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="339"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Aussenwaende, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(340) Innenwaende">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="340"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Innenwaende"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(341) Tragende Innenwaende">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="341"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Tragende Innenwaende"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(342) Nichttragende Innenwaende">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="342"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Nichttragende Innenwaende"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(343) Innenstuetzen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="343"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Innenstuetzen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(344) Innentueren und -fenster">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="344"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Innentueren und -fenster"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(345) Innenwandbekleidungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="345"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Innenwandbekleidungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(346) Elementierte Innenwaende">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="346"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Elementierte Innenwaende"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(349) Innenwaende, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="349"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Innenwaende, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(350) Decken">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="350"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Decken"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(351) Deckenkonstruktionen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="351"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Deckenkonstruktionen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(352) Deckenbelaege">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="352"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Deckenbelaege"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(353) Deckenbekleidungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="353"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Deckenbekleidungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(359) Decken, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="359"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Decken, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(360) Daecher">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="360"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Daecher"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(361) Dachkonstruktionen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="361"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Dachkonstruktionen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(362) Dachfenster, Dachoeffnungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="362"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Dachfenster, Dachoeffnungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(363) Dachbelaege">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="363"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Dachbelaege"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(364) Dachbekleidungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="364"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Dachbekleidungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(369) Daecher, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="369"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Daecher, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(370) Baukonstruktive Einbauten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="370"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Baukonstruktive Einbauten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(371) Allgemeine Einbauten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="371"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Allgemeine Einbauten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(372) Besondere Einbauten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="372"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Besondere Einbauten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(379) Baukonstruktive Einbauten, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="379"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Baukonstruktive Einbauten, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(390) Sonstige Massnahmen fuer Baukonstruktionen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="390"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sonstige Massnahmen fuer Baukonstruktionen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(391) Baustelleneinrichtung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="391"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Baustelleneinrichtung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(392) Gerueste">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="392"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gerueste"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(393) Sicherungsmassnahmen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="393"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sicherungsmassnahmen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(394) Abbruchmassnahmen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="394"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Abbruchmassnahmen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(395) Instandsetzungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="395"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Instandsetzungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(396) Materialentsorgung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="396"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Materialentsorgung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(397) Zusaetzliche Massnahmen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="397"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Zusaetzliche Massnahmen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(398) Provisorische Baukonstruktionen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="398"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Provisorische Baukonstruktionen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(399) Sonstige Massnahmen fuer Baukonstruktionen, sonstige">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="399"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sonstige Massnahmen fuer Baukonstruktionen, sonstige"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(400) BAUWERK — TECHNISCHE ANLAGEN">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="400"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="BAUWERK — TECHNISCHE ANLAGEN"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(410) Abwasser-, Wasser-, Gasanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="410"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Abwasser-, Wasser-, Gasanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(411) Abwasseranlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="411"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Abwasseranlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(412) Wasseranlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="412"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Wasseranlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(413) Gasanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="413"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gasanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(419) Abwasser-, Wasser-, Gasanlagen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="419"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Abwasser-, Wasser-, Gasanlagen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(420) Waermeversorgungsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="420"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Waermeversorgungsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(421) Waermeerzeugungsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="421"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Waermeerzeugungsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(422) Waermeverteilnetze">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="422"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Waermeverteilnetze"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(423) Raumheizflaechen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="423"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Raumheizflaechen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(429) Waermeversorgungsanlagen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="429"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Waermeversorgungsanlagen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(430) Lufttechnische Anlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="430"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Lufttechnische Anlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(431) Lueftungsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="431"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Lueftungsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(432) Teilklimaanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="432"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Teilklimaanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(433) Klimaanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="433"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Klimaanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(434) Kaelteanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="434"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Kaelteanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(439) Lufttechnische Anlagen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="439"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Lufttechnische Anlagen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(440) Starkstromanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="440"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Starkstromanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(441) Hoch- und Mittelspannungsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="441"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Hoch- und Mittelspannungsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(442) Eigenstromversorgungsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="442"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Eigenstromversorgungsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(443) Niederspannungsschaltanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="443"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Niederspannungsschaltanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(444) Niederspannungsinstallationsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="444"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Niederspannungsinstallationsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(445) Beleuchtungsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="445"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Beleuchtungsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(446) Blitzschutz- und Erdungsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="446"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Blitzschutz- und Erdungsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(449) Starkstromanlagen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="449"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Starkstromanlagen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(450) Fernmelde- und informationstechnische Anlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="450"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Fernmelde- und informationstechnische Anlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(451) Telekommunikationsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="451"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Telekommunikationsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(452) Such- und Signalanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="452"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Such- und Signalanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(453) Zeitdienstanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="453"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Zeitdienstanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(454) Elektroakustische Anlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="454"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Elektroakustische Anlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(455) Fernseh- und Antennenanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="455"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Fernseh- und Antennenanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(456) Gefahrenmelde- und Alarmanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="456"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gefahrenmelde- und Alarmanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(457) Uebertragungsnetze">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="457"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Uebertragungsnetze"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(459) Fernmelde- und informationstechnische Anlagen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="459"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Fernmelde- und informationstechnische Anlagen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(460) Foerderanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="460"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Foerderanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(461) Aufzugsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="461"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Aufzugsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(462) Fahrtreppen, Fahrsteige">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="462"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Fahrtreppen, Fahrsteige"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(463) Befahranlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="463"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Befahranlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(464) Transportanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="464"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Transportanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(465) Krananlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="465"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Krananlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(469) Foerderanlagen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="469"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Foerderanlagen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(470) Nutzungsspezifische Anlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="470"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Nutzungsspezifische Anlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(471) Kuechentechnische Anlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="471"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Kuechentechnische Anlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(472) Waescherei- und Reinigungsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="472"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Waescherei- und Reinigungsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(473) Medienversorgungsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="473"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Medienversorgungsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(474) Medizin- und labortechnische Anlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="474"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Medizin- und labortechnische Anlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(475) Feuerloeschanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="475"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Feuerloeschanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(476) Badetechnische Anlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="476"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Badetechnische Anlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(477) Prozesswaerme-, kaelte- und -luftanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="477"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Prozesswaerme-, kaelte- und -luftanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(478) Entsorgungsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="478"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Entsorgungsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(479) Nutzungsspezifische Anlagen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="479"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Nutzungsspezifische Anlagen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(480) Gebaeudeautomation">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="480"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gebaeudeautomation"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(481) Automationssysteme">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="481"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Automationssysteme"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(482) Schaltschraenke">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="482"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Schaltschraenke"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(483) Management- und Bedieneinrichtungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="483"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Management- und Bedieneinrichtungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(484) Raumautomationssysteme">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="484"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Raumautomationssysteme"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(485) Uebertragungsnetze">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="485"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Uebertragungsnetze"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(489) Gebaeudeautomation, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="489"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gebaeudeautomation, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(490) Sonstige Massnahmen fuer technische Anlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="490"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sonstige Massnahmen fuer technische Anlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(491) Baustelleneinrichtung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="491"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Baustelleneinrichtung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(492) Gerueste">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="492"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gerueste"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(493) Sicherungsmassnahmen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="493"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sicherungsmassnahmen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(494) Abbruchmassnahmen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="494"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Abbruchmassnahmen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(495) Instandsetzungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="495"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Instandsetzungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(496) Materialentsorgung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="496"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Materialentsorgung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(497) Zusaetzliche Massnahmen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="497"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Zusaetzliche Massnahmen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(498) Provisorische technische Anlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="498"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Provisorische technische Anlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(499) Sonstige Massnahmen fuer technische Anlagen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="499"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sonstige Massnahmen fuer technische Anlagen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(500) AUSSENANLAGEN">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="500"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="AUSSENANLAGEN"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(510) Gelaendeflaechen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="510"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gelaendeflaechen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(511) Oberbodenarbeiten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="511"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Oberbodenarbeiten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(512) Bodenarbeiten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="512"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Bodenarbeiten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(519) Gelaendeflaechen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="519"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gelaendeflaechen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(520) Befestigte Flaechen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="520"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Befestigte Flaechen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(521) Wege">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="521"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Wege"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(522) Strassen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="522"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Strassen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(523) Plaetze, Hoefe">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="523"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Plaetze, Hoefe"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(524) Stellplaetze">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="524"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Stellplaetze"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(525) Sportplatzflaechen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="525"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sportplatzflaechen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(526) Spielplatzflaechen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="526"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Spielplatzflaechen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(527) Gleisanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="527"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gleisanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(529) Befestigte Flaechen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="529"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Befestigte Flaechen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(530) Baukonstruktionen in Aussenanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="530"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Baukonstruktionen in Aussenanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(531) Einfriedungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="531"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Einfriedungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(532) Schutzkonstruktionen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="532"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Schutzkonstruktionen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(533) Mauern, Waende">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="533"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Mauern, Waende"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(534) Rampen, Treppen, Tribuenen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="534"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Rampen, Treppen, Tribuenen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(535) Ueberdachungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="535"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Ueberdachungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(536) Bruecken, Stege">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="536"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Bruecken, Stege"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(537) Kanal- und Schachtbauanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="537"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Kanal- und Schachtbauanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(538) Wasserbauliche Anlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="538"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Wasserbauliche Anlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(539) Baukonstruktionen in Aussenanlagen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="539"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Baukonstruktionen in Aussenanlagen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(540) Technische Anlagen in Aussenanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="540"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Technische Anlagen in Aussenanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(541) Abwasseranlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="541"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Abwasseranlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(542) Wasseranlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="542"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Wasseranlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(543) Gasanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="543"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gasanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(544) Waermeversorgungsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="544"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Waermeversorgungsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(545) Lufttechnische Anlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="545"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Lufttechnische Anlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(546) Starkstromanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="546"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Starkstromanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(547) Fernmelde- und informationstechnische Anlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="547"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Fernmelde- und informationstechnische Anlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(548) Nutzungsspezifische Anlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="548"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Nutzungsspezifische Anlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(549) Technische Anlagen in Aussenanlagen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="549"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Technische Anlagen in Aussenanlagen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(550) Einbauten in Aussenanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="550"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Einbauten in Aussenanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(551) Allgemeine Einbauten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="551"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Allgemeine Einbauten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(552) Besondere Einbauten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="552"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Besondere Einbauten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(559) Einbauten in Aussenanlagen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="559"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Einbauten in Aussenanlagen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(560) Wasserflaechen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="560"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Wasserflaechen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(561) Abdichtungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="561"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Abdichtungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(562) Bepflanzungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="562"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Bepflanzungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(569) Wasserflaechen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="569"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Wasserflaechen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(570) Pflanz- und Saatflaechen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="570"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Pflanz- und Saatflaechen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(571) Oberbodenarbeiten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="571"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Oberbodenarbeiten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(572) Vegetationstechnische Bodenbearbeitung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="572"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Vegetationstechnische Bodenbearbeitung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(573) Sicherungsbauweisen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="573"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sicherungsbauweisen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(574) Pflanzen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="574"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Pflanzen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(575) Rasen und Ansaaten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="575"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Rasen und Ansaaten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(576) Begruenung unterbauter Flaechen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="576"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Begruenung unterbauter Flaechen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(579) Pflanz- und Saatflaechen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="579"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Pflanz- und Saatflaechen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(590) Sonstige Aussenanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="590"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sonstige Aussenanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(591) Baustelleneinrichtung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="591"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Baustelleneinrichtung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(592) Gerueste">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="592"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gerueste"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(593) Sicherungsmassnahmen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="593"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sicherungsmassnahmen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(594) Abbruchmassnahmen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="594"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Abbruchmassnahmen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(595) Instandsetzungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="595"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Instandsetzungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(596) Materialentsorgung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="596"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Materialentsorgung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(597) Zusaetzliche Massnahmen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="597"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Zusaetzliche Massnahmen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(598) Provisorische Aussenanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="598"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Provisorische Aussenanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(599) Sonstige Massnahmen fuer Aussenanlagen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="599"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sonstige Massnahmen fuer Aussenanlagen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(600) AUSSTATTUNG UND KUNSTWERKE">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="600"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="AUSSTATTUNG UND KUNSTWERKE"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(610) Ausstattung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="610"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Ausstattung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(611) Allgemeine Ausstattung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="611"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Allgemeine Ausstattung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(612) Besondere Ausstattung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="612"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Besondere Ausstattung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(619) Ausstattung, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="619"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Ausstattung, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(620) Kunstwerke">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="620"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Kunstwerke"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(621) Kunstobjekte">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="621"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Kunstobjekte"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(622) Kuenstlerisch gestaltete Bauteile des Bauwerks">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="622"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Kuenstlerisch gestaltete Bauteile des Bauwerks"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(623) Kuenstlerisch gestaltete Bauteile der Aussenanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="623"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Kuenstlerisch gestaltete Bauteile der Aussenanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(624) der Aussenanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="624"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="der Aussenanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(629) Kunstwerke, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="629"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Kunstwerke, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(700) BAUNEBENKOSTEN">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="700"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="BAUNEBENKOSTEN"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(710) Bauherrenaufgaben">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="710"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Bauherrenaufgaben"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(711) Projektleitung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="711"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Projektleitung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(712) Bedarfsplanung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="712"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Bedarfsplanung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(713) Projektsteuerung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="713"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Projektsteuerung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(719) Bauherrenaufgaben, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="719"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Bauherrenaufgaben, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(720) Vorbereitung der Objektplanung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="720"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Vorbereitung der Objektplanung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(721) Untersuchungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="721"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Untersuchungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(722) Wertermittlungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="722"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Wertermittlungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(723) Staedtebauliche Leistungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="723"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Staedtebauliche Leistungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(724) Landschaftsplanerische Leistungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="724"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Landschaftsplanerische Leistungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(725) Wettbewerbe">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="725"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Wettbewerbe"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(729) Vorbereitung der Objektplanung, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="729"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Vorbereitung der Objektplanung, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(730) Architekten- und Ingenieurleistungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="730"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Architekten- und Ingenieurleistungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(731) Gebaeudeplanung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="731"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gebaeudeplanung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(732) Freianlagenplanung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="732"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Freianlagenplanung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(733) Planung der raumbildenden Ausbauten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="733"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Planung der raumbildenden Ausbauten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(734) Planung der Ingenieurbauwerke und Verkehrsanlagen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="734"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Planung der Ingenieurbauwerke und Verkehrsanlagen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(735) Tragwerksplanung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="735"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Tragwerksplanung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(736) Planung der technischen Ausruestung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="736"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Planung der technischen Ausruestung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(739) Architekten- und Ingenieurleistungen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="739"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Architekten- und Ingenieurleistungen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(740) Gutachten und Beratung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="740"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gutachten und Beratung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(741) Thermische Bauphysik">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="741"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Thermische Bauphysik"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(742) Schallschutz und Raumakustik">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="742"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Schallschutz und Raumakustik"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(743) Bodenmechanik, Erd- und Grundbau">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="743"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Bodenmechanik, Erd- und Grundbau"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(744) Vermessung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="744"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Vermessung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(745) Lichttechnik, Tageslichttechnik">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="745"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Lichttechnik, Tageslichttechnik"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(746) Brandschutz">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="746"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Brandschutz"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(747) Sicherheits- und Gesundheitsschutz">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="747"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sicherheits- und Gesundheitsschutz"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(748) Umweltschutz, Altlasten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="748"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Umweltschutz, Altlasten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(749) Gutachten und Beratung, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="749"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Gutachten und Beratung, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(750) Kuenstlerische Leistungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="750"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Kuenstlerische Leistungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(751) Kunstwettbewerbe">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="751"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Kunstwettbewerbe"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(752) Honorare">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="752"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Honorare"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(759) Kuenstlerische Leistungen, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="759"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Kuenstlerische Leistungen, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(760) Finanzierungskosten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="760"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Finanzierungskosten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(761) Finanzierungsbeschaffung">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="761"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Finanzierungsbeschaffung"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(762) Fremdkapitalzinsen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="762"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Fremdkapitalzinsen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(763) Eigenkapitalzinsen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="763"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Eigenkapitalzinsen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(769) Finanzierungskosten, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="769"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Finanzierungskosten, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(770) Allgemeine Baunebenkosten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="770"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Allgemeine Baunebenkosten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(771) Pruefung, Genehmigungen, Abnahmen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="771"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Pruefung, Genehmigungen, Abnahmen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(772) Bewirtschaftungskosten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="772"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Bewirtschaftungskosten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(773) Bemusterungskosten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="773"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Bemusterungskosten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(774) Betriebskosten nach der Abnahme">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="774"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Betriebskosten nach der Abnahme"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(775) Versicherungen">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="775"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Versicherungen"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(779) Allgemeine Baunebenkosten, sonstiges">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="779"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Allgemeine Baunebenkosten, sonstiges"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>
+  <xs:element name="(790) Sonstige Baunebenkosten">
+    <xs:attribute name="din_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="790"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="din_text">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Sonstige Baunebenkosten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:element>  
+</xs:schema>
+
+
