@@ -26,6 +26,7 @@ module BimTools::IfcManager
     # https://technical.buildingsmart.org/wp-content/uploads/2018/05/IFC2x-Model-Implementation-Guide-V2-0b.pdf
     # page 19 and 20
     def replace_char( in_string )
+      puts in_string
       out_string = ""
       a_char_numbers = in_string.unpack('U*')
       i = 0
@@ -44,6 +45,7 @@ module BimTools::IfcManager
         end
         i += 1
       end
+      puts out_string
       return out_string
     end
     

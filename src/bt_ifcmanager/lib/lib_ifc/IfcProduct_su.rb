@@ -281,8 +281,8 @@ module BimTools
                   unless ifc_classification_reference
                     ifc_classification_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
                     #ifc_classification_reference.location = ""
-                    ifc_classification_reference.itemreference = "'#{code}'"
-                    ifc_classification_reference.name = "'#{text}'"
+                    ifc_classification_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
+                    ifc_classification_reference.name = BimTools::IfcManager::IfcLabel.new(tekst)
                     ifc_classification_reference.referencedsource = cls
                     
                     # add ifc_classification_reference to the list of references in the classification
@@ -336,8 +336,8 @@ module BimTools
                   unless ifc_classification_reference
                     ifc_classification_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
                     #ifc_classification_reference.location = ""
-                    ifc_classification_reference.itemreference = "'#{code}'"
-                    ifc_classification_reference.name = "'#{tekst}'"
+                    ifc_classification_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
+                    ifc_classification_reference.name = BimTools::IfcManager::IfcLabel.new(tekst)
                     ifc_classification_reference.referencedsource = cls
                     
                     # add ifc_classification_reference to the list of references in the classification
@@ -354,8 +354,8 @@ module BimTools
                     # vico hack: store a copy of NL-SfB as unicode
                     unicode_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
                     unicode_reference.location = "'http://www.csiorg.net/uniformat'"
-                    unicode_reference.itemreference = "'#{code}'"
-                    unicode_reference.name = "'#{tekst}'"
+                    unicode_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
+                    unicode_reference.name = BimTools::IfcManager::IfcLabel.new(tekst)
                     unicode_reference.referencedsource = unicode_cls
                     unicode_assoc = BimTools::IFC2X3::IfcRelAssociatesClassification.new( ifc_model )
                     unicode_assoc.name = "'Uniformat Classification'"
