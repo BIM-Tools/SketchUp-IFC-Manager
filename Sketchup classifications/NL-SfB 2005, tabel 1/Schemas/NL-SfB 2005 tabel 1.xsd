@@ -6384,7 +6384,7 @@
       </xs:simpleType>
     </xs:attribute>
   </xs:element>
-  <xs:element name="(52.2) afvoeren; fecali�n">
+  <xs:element name="(52.2) afvoeren; fecaliën">
     <xs:attribute name="Class-codenotatie">
       <xs:simpleType>
         <xs:restriction base="xs:string">
@@ -6395,12 +6395,12 @@
     <xs:attribute name="tekst_NL-SfB">
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:enumeration value="afvoeren; fecali�n"/>
+          <xs:enumeration value="afvoeren; fecaliën"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
   </xs:element>
-  <xs:element name="(52.20) afvoeren; fecali�n, algemeen (verzamelniveau)">
+  <xs:element name="(52.20) afvoeren; fecaliën, algemeen (verzamelniveau)">
     <xs:attribute name="Class-codenotatie">
       <xs:simpleType>
         <xs:restriction base="xs:string">
@@ -6411,12 +6411,12 @@
     <xs:attribute name="tekst_NL-SfB">
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:enumeration value="afvoeren; fecali�n, algemeen (verzamelniveau)"/>
+          <xs:enumeration value="afvoeren; fecaliën, algemeen (verzamelniveau)"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
   </xs:element>
-  <xs:element name="(52.21) afvoeren; fecali�n, standaardsysteem">
+  <xs:element name="(52.21) afvoeren; fecaliën, standaardsysteem">
     <xs:attribute name="Class-codenotatie">
       <xs:simpleType>
         <xs:restriction base="xs:string">
@@ -6427,12 +6427,12 @@
     <xs:attribute name="tekst_NL-SfB">
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:enumeration value="afvoeren; fecali�n, standaardsysteem"/>
+          <xs:enumeration value="afvoeren; fecaliën, standaardsysteem"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
   </xs:element>
-  <xs:element name="(52.22) afvoeren; fecali�n, vacu�msysteem">
+  <xs:element name="(52.22) afvoeren; fecaliën, vacuümsysteem">
     <xs:attribute name="Class-codenotatie">
       <xs:simpleType>
         <xs:restriction base="xs:string">
@@ -6443,12 +6443,12 @@
     <xs:attribute name="tekst_NL-SfB">
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:enumeration value="afvoeren; fecali�n, vacu�msysteem"/>
+          <xs:enumeration value="afvoeren; fecaliën, vacuümsysteem"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
   </xs:element>
-  <xs:element name="(52.23) afvoeren; fecali�n, overdruksysteem">
+  <xs:element name="(52.23) afvoeren; fecaliën, overdruksysteem">
     <xs:attribute name="Class-codenotatie">
       <xs:simpleType>
         <xs:restriction base="xs:string">
@@ -6459,12 +6459,12 @@
     <xs:attribute name="tekst_NL-SfB">
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:enumeration value="afvoeren; fecali�n, overdruksysteem"/>
+          <xs:enumeration value="afvoeren; fecaliën, overdruksysteem"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
   </xs:element>
-  <xs:element name="(52.26) afvoeren; fecali�n, pompsysteem">
+  <xs:element name="(52.26) afvoeren; fecaliën, pompsysteem">
     <xs:attribute name="Class-codenotatie">
       <xs:simpleType>
         <xs:restriction base="xs:string">
@@ -6475,7 +6475,7 @@
     <xs:attribute name="tekst_NL-SfB">
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:enumeration value="afvoeren; fecali�n, pompsysteem"/>
+          <xs:enumeration value="afvoeren; fecaliën, pompsysteem"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
@@ -6768,7 +6768,7 @@
       </xs:simpleType>
     </xs:attribute>
   </xs:element>
-  <xs:element name="(52.62) afvoeren; vast vuil, vacu�msysteem">
+  <xs:element name="(52.62) afvoeren; vast vuil, vacuümsysteem">
     <xs:attribute name="Class-codenotatie">
       <xs:simpleType>
         <xs:restriction base="xs:string">
@@ -6779,7 +6779,7 @@
     <xs:attribute name="tekst_NL-SfB">
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:enumeration value="afvoeren; vast vuil, vacu�msysteem"/>
+          <xs:enumeration value="afvoeren; vast vuil, vacuümsysteem"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
@@ -7472,7 +7472,7 @@
       </xs:simpleType>
     </xs:attribute>
   </xs:element>
-  <xs:element name="(54.2) gassen; perslucht en vacu�m">
+  <xs:element name="(54.2) gassen; perslucht en vacuüm">
     <xs:attribute name="Class-codenotatie">
       <xs:simpleType>
         <xs:restriction base="xs:string">
@@ -7483,12 +7483,12 @@
     <xs:attribute name="tekst_NL-SfB">
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:enumeration value="gassen; perslucht en vacu�m"/>
+          <xs:enumeration value="gassen; perslucht en vacuüm"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
   </xs:element>
-  <xs:element name="(54.20) gassen; perslucht en vacu�m, algemeen (verzamelniveau)">
+  <xs:element name="(54.20) gassen; perslucht en vacuüm, algemeen (verzamelniveau)">
     <xs:attribute name="Class-codenotatie">
       <xs:simpleType>
         <xs:restriction base="xs:string">
@@ -7499,12 +7499,12 @@
     <xs:attribute name="tekst_NL-SfB">
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:enumeration value="gassen; perslucht en vacu�m, algemeen (verzamelniveau)"/>
+          <xs:enumeration value="gassen; perslucht en vacuüm, algemeen (verzamelniveau)"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
   </xs:element>
-  <xs:element name="(54.21) gassen; perslucht en vacu�m, persluchtvoorziening">
+  <xs:element name="(54.21) gassen; perslucht en vacuüm, persluchtvoorziening">
     <xs:attribute name="Class-codenotatie">
       <xs:simpleType>
         <xs:restriction base="xs:string">
@@ -7515,12 +7515,12 @@
     <xs:attribute name="tekst_NL-SfB">
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:enumeration value="gassen; perslucht en vacu�m, persluchtvoorziening"/>
+          <xs:enumeration value="gassen; perslucht en vacuüm, persluchtvoorziening"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
   </xs:element>
-  <xs:element name="(54.22) gassen; perslucht en vacu�m, vacu�mvoorziening">
+  <xs:element name="(54.22) gassen; perslucht en vacuüm, vacuümvoorziening">
     <xs:attribute name="Class-codenotatie">
       <xs:simpleType>
         <xs:restriction base="xs:string">
@@ -7531,7 +7531,7 @@
     <xs:attribute name="tekst_NL-SfB">
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:enumeration value="gassen; perslucht en vacu�m, vacu�mvoorziening"/>
+          <xs:enumeration value="gassen; perslucht en vacuüm, vacuümvoorziening"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>

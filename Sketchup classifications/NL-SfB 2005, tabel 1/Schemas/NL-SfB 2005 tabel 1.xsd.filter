@@ -1,0 +1,304 @@
+(0-) PROJECT TOTAAL
+{
+ Class-codenotatie
+}
+
+(0-.11) indirecte projectvoorzieningen; werkterreininrichting, bijkomende werken algemeen
+{
+ Class-codenotatie
+}
+
+(1-) FUNDERINGEN
+{
+ Class-codenotatie
+}
+ 
+(11) Bodemvoorzieningen
+{
+ Class-codenotatie
+}
+
+(13) Vloeren op grondslag
+{
+ Class-codenotatie
+}
+ 
+(16) Funderingsconstructies
+{
+ Class-codenotatie
+}
+ 
+(2-) RUWBOUW
+{
+ Class-codenotatie
+}
+ 
+(21) BUITENWANDEN
+{
+ Class-codenotatie
+}
+ 
+(22) Binnenwanden
+{
+ Class-codenotatie
+}
+ 
+(23.0) vloeren; algemeen
+{
+ Class-codenotatie
+}
+ 
+(24) Trappen en hellingen
+{
+ Class-codenotatie
+}
+ 
+(27) Daken
+{
+ Class-codenotatie
+}
+ 
+(28) Hoofddraagconstructies
+{
+ Class-codenotatie
+}
+ 
+(3-) AFBOUW
+{
+ Class-codenotatie
+}
+ 
+(31.2) buitenwandopeningen; gevuld met ramen
+{
+ Class-codenotatie
+}
+ 
+(31.3) buitenwandopeningen; gevuld met deuren
+{
+ Class-codenotatie
+}
+ 
+(31.4) buitenwandopeningen; gevuld met puien
+{
+ Class-codenotatie
+}
+ 
+(32.3) binnenwandopeningen; gevuld met deuren
+{
+ Class-codenotatie
+}
+ 
+(37.25) dakopeningen; gevuld, combinatieramen
+{
+ Class-codenotatie
+}
+ 
+(4-) AFWERKINGEN
+{
+ Class-codenotatie
+}
+ 
+(41) Buitenwandafwerkingen
+{
+ Class-codenotatie
+}
+ 
+(42) Binnenwandafwerkingen
+{
+ Class-codenotatie
+}
+ 
+(43) Vloerafwerkingen
+{
+ Class-codenotatie
+}
+ 
+(44) Trap- en hellingafwerkingen
+{
+ Class-codenotatie
+}
+ 
+(45) Plafondafwerkingen
+{
+ Class-codenotatie
+}
+ 
+(47) Dakafwerkingen
+{
+ Class-codenotatie
+}
+ 
+(5-) INSTALLATIES WERKTUIGBOUWKUNDIG
+{
+ Class-codenotatie
+}
+ 
+(51) Warmteopwekking
+{
+ Class-codenotatie
+}
+  
+(52) Afvoeren
+{
+ Class-codenotatie
+}
+  
+(52.1) afvoeren; regenwater
+{
+ Class-codenotatie
+}
+  
+(52.2) afvoeren; fecaliën
+{
+ Class-codenotatie
+}
+  
+(52.3) afvoeren; afvalwater
+{
+ Class-codenotatie
+}
+
+(53) Water
+ {
+  Class-codenotatie
+ }
+
+(53.2) water; verwarmd tapwater
+ {
+  Class-codenotatie
+ }
+
+(54) Gassen
+ {
+  Class-codenotatie
+ }
+
+(55) Koude-opwekking en distributie
+ {
+  Class-codenotatie
+ }
+
+(56) Warmtedistributie
+ {
+  Class-codenotatie
+ }
+
+(57) Luchtbehandeling
+ {
+  Class-codenotatie
+ }
+
+(58) Regeling klimaat en sanitair
+ {
+  Class-codenotatie
+ }
+
+(6-) INSTALLATIES ELEKTROTECHNISCH
+ {
+  Class-codenotatie
+ }
+
+(61) Centrale elektrotechnische voorzieningen
+ {
+  Class-codenotatie
+ }
+
+(62) Krachtstroom
+ {
+  Class-codenotatie
+ }
+
+(63) Verlichting
+ {
+  Class-codenotatie
+ }
+
+(64) Communicatie
+ {
+  Class-codenotatie
+ }
+
+(65) Beveiliging
+ {
+  Class-codenotatie
+ }
+
+(66.0) transport; algemeen
+ {
+  Class-codenotatie
+ }
+
+(67) Gebouwbeheervoorzieningen
+ {
+  Class-codenotatie
+ }
+
+(7-) VASTE VOORZIENINGEN
+ {
+  Class-codenotatie
+ }
+
+(73) Vaste keukenvoorzieningen
+ {
+  Class-codenotatie
+ }
+
+(74) Vaste sanitaire voorzieningen
+ {
+  Class-codenotatie
+ }
+
+(76) Vaste opslagvoorzieningen
+ {
+  Class-codenotatie
+ }
+
+(8-) LOSSE INVENTARIS
+ {
+  Class-codenotatie
+ }
+
+(9-) TERREIN
+ {
+  Class-codenotatie
+ }
+
+(90.1) grondvoorzieningen
+ {
+  Class-codenotatie
+ }
+
+(90.2) opstallen
+ {
+  Class-codenotatie
+ }
+
+(90.3) omheiningen
+ {
+  Class-codenotatie
+ }
+
+(90.4) terreinafwerkingen
+ {
+  Class-codenotatie
+ }
+
+(90.5) terreinvoorzieningen; werktuigbouwkundig
+ {
+  Class-codenotatie
+ }
+
+(90.6) terreinvoorzieningen; elektrotechnisch
+ {
+  Class-codenotatie
+ }
+
+(90.7) terreininrichtingen; standaard
+ {
+  Class-codenotatie
+ }
+
+(90.8) terreininrichtingen; bijzonder
+ {
+  Class-codenotatie
+ }
