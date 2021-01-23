@@ -22,36 +22,30 @@
 # mixin module to set the Step generation methods for all IFC classes
  
 module BimTools
- module Step
+  module Step
     def step()
-      
-      line = String.new
-      properties = properties()
-      properties.each do |property_name|
-        property = self.send(property_name.downcase)
-        if property
-          if property.is_a? String
-            line << property
-          elsif property.is_a?(IfcManager::IfcGloballyUniqueId) || property.is_a?(IfcManager::Ifc_List) ||  property.is_a?(IfcManager::Ifc_Set)  || property.is_a?(IfcManager::Ifc_Type)
-            line << property.step
-          else
-            line << property.ref
-          end
+      attribute_strings = properties().map { |attribute| attribute_to_step(attribute) }
+      return "##{@ifc_id}=#{self.class.name.split('::').last.upcase}(#{attribute_strings.join(",")})"
+    end
+
+    def attribute_to_step(property_name)
+      property = self.send(property_name.downcase)
+      if property
+        if property.is_a? String
+          return property
+        elsif property.is_a?(IfcManager::IfcGloballyUniqueId) || property.is_a?(IfcManager::Ifc_List) || property.is_a?(IfcManager::Ifc_Set) || property.is_a?(IfcManager::Ifc_Type)
+          return property.step
         else
-          line << "$"
+          return property.ref
         end
-        
-        #skip the , for the last element
-        unless property_name == properties.last
-          line << ","
-        end
+      else
+        return "$"
       end
-      return "##{@ifc_id}= #{self.class.name.split('::').last.upcase}(#{line})"
-    end # step
+    end
 
     # Instead of the full step object return a reference
     def ref()
       return "##{@ifc_id}"
     end
- end # module Step
-end # module BimTools
+  end
+end
