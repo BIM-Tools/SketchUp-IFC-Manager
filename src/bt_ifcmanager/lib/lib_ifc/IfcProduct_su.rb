@@ -282,7 +282,7 @@ module BimTools
                     ifc_classification_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
                     #ifc_classification_reference.location = ""
                     ifc_classification_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
-                    ifc_classification_reference.name = BimTools::IfcManager::IfcLabel.new(tekst)
+                    ifc_classification_reference.name = BimTools::IfcManager::IfcLabel.new(text)
                     ifc_classification_reference.referencedsource = cls
                     
                     # add ifc_classification_reference to the list of references in the classification
@@ -328,16 +328,16 @@ module BimTools
               type = definition.get_attribute("AppliedSchemaTypes", attr_dict.name)
               if type
                 code = definition.get_classification_value([attr_dict.name, type, "Class-codenotatie"])
-                tekst = definition.get_classification_value([attr_dict.name, type, "tekst_NL-SfB"])
+                text = definition.get_classification_value([attr_dict.name, type, "tekst_NL-SfB"])
                 
                 # only create IfcClassificationReference if component has the code and text values for the classification
-                if code && tekst
+                if code && text
                   ifc_classification_reference = cls.ifc_classification_references[ code ]
                   unless ifc_classification_reference
                     ifc_classification_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
                     #ifc_classification_reference.location = ""
                     ifc_classification_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
-                    ifc_classification_reference.name = BimTools::IfcManager::IfcLabel.new(tekst)
+                    ifc_classification_reference.name = BimTools::IfcManager::IfcLabel.new(text)
                     ifc_classification_reference.referencedsource = cls
                     
                     # add ifc_classification_reference to the list of references in the classification
@@ -355,7 +355,7 @@ module BimTools
                     unicode_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
                     unicode_reference.location = "'http://www.csiorg.net/uniformat'"
                     unicode_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
-                    unicode_reference.name = BimTools::IfcManager::IfcLabel.new(tekst)
+                    unicode_reference.name = BimTools::IfcManager::IfcLabel.new(text)
                     unicode_reference.referencedsource = unicode_cls
                     unicode_assoc = BimTools::IFC2X3::IfcRelAssociatesClassification.new( ifc_model )
                     unicode_assoc.name = "'Uniformat Classification'"

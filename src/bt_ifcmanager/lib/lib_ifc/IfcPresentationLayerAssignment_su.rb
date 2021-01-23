@@ -30,6 +30,6 @@ module BimTools
         @name = BimTools::IfcManager::IfcLabel.new( su_layer.name )
         @assigneditems = IfcManager::Ifc_Set.new()
       end
-    end # def sketchup
-  end # module IfcPresentationLayerAssignment_su
-end # module BimTools
+    end
+  end
+end
