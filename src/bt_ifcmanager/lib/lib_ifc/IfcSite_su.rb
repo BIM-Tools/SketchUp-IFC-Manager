@@ -77,7 +77,7 @@ module BimTools
 
          # (!) values should be Ifc INTEGER objects instead of Strings(!)
          # (!) returned object should be of type IFC LIST instead of IFC SET
-        return BimTools::IfcManager::Ifc_Set.new([deg.to_s, min.to_s, sec.to_s, msec.to_s])
+        return BimTools::IfcManager::Ifc_List.new([deg.to_s, min.to_s, sec.to_s, msec.to_s])
       end
     end
   end # module IfcSite_su

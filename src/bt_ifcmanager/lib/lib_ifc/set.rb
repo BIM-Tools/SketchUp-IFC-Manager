@@ -19,11 +19,33 @@
 #
 #
 
-require_relative 'list.rb'
+module BimTools::IfcManager
+  class Ifc_Set
+    def initialize( items=nil )
+      if items
+        @items = items.to_set
+      else
+        @items = Set.new
+      end
+    end
 
-module BimTools
- module IfcManager
-  class Ifc_Set < Ifc_List
-  end # class Ifc_Set
- end # module IfcManager
-end # module BimTools
+    def add( entity )
+      unless @items.include?(entity)
+        @items << entity
+      end
+    end
+
+    def item_to_step(item)
+      if item.is_a? String
+        return item
+      else
+        return item.ref
+      end
+    end
+
+    def step()
+      item_strings = @items.map { |item| item_to_step(item) }
+      return "(#{item_strings.join(",")})"
+    end
+  end
+end

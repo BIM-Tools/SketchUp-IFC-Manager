@@ -31,7 +31,7 @@ module BimTools
         x_step = IfcManager::IfcReal.new(sketchup.x.to_f.to_mm).step
         y_step = IfcManager::IfcReal.new(sketchup.y.to_f.to_mm).step
         z_step = IfcManager::IfcReal.new(sketchup.z.to_f.to_mm).step
-        @coordinates = IfcManager::Ifc_Set.new([x_step,y_step,z_step])
+        @coordinates = IfcManager::Ifc_List.new([x_step,y_step,z_step])
       end
     end # def sketchup
   end # module IfcCartesianPoint_su

@@ -29,33 +29,28 @@ module BimTools
       else
         @items = Array.new
       end
-    end # def initialize
+    end
+    
     def add( entity )
       @items << entity
-    end # def add
+    end
+    
     def first()
       return @items.first
-    end # def add
-    def step()
-      line = String.new
-      $i = 0
-      $num = @items.length
-      while $i < $num  do
-        item = @items[$i]
-        if item.is_a? String
-          line << item
-        else
-          line << item.ref
-        end
-        
-        #skip the , for the last element
-        unless $i == $num - 1
-          line << ","
-        end
-        $i +=1
+    end
+
+    def item_to_step(item)
+      if item.is_a? String
+        return item
+      else
+        return item.ref
       end
-      return "(#{line})"
-    end # def step
+    end
+
+    def step()
+      item_strings = @items.map { |item| item_to_step(item) }
+      return "(#{item_strings.join(",")})"
+    end
   end # class Ifc_List
  end # module IfcManager
 end # module BimTools

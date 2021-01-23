@@ -122,7 +122,7 @@ module BimTools
                 prop = BimTools::IFC2X3::IfcPropertyEnumeratedValue.new( ifc_model )
                 value = BimTools::IfcManager::IfcLabel.new(dict_value)
                 value.long = true # adding long = true returns a full object string, necessary for propertyset
-                prop.enumerationvalues = IfcManager::Ifc_Set.new([value])
+                prop.enumerationvalues = IfcManager::Ifc_List.new([value])
               else
                 prop = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model )
                 entity_type = false

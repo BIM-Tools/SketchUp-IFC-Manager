@@ -32,7 +32,7 @@ module BimTools
         if property
           if property.is_a? String
             line << property
-          elsif property.is_a?(IfcManager::IfcGloballyUniqueId) || property.is_a?(IfcManager::Ifc_List) || property.is_a?(IfcManager::Ifc_Type)
+          elsif property.is_a?(IfcManager::IfcGloballyUniqueId) || property.is_a?(IfcManager::Ifc_List) ||  property.is_a?(IfcManager::Ifc_Set)  || property.is_a?(IfcManager::Ifc_Type)
             line << property.step
           else
             line << property.ref

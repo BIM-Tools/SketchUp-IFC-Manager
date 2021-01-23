@@ -20,7 +20,6 @@
 #
 
 require_relative 'set.rb'
-require_relative File.join('IFC2X3', 'IfcFacetedBrep.rb')
 
 module BimTools
   module IfcShapeRepresentation_su
@@ -30,6 +29,6 @@ module BimTools
       @representationidentifier = representationidentifier
       @representationtype = representationtype
       @items = IfcManager::Ifc_Set.new()
-    end # def initialize
-  end # module IfcShapeRepresentation_su
-end # module BimTools
+    end
+  end
+end

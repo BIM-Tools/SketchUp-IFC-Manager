@@ -93,7 +93,7 @@ module BimTools
               polyloop = BimTools::IFC2X3::IfcPolyLoop.new( ifc_model )
               bound.bound = polyloop
               bound.orientation = '.T.' # (?) always true?
-              polyloop.polygon = IfcManager::Ifc_Set.new( points )
+              polyloop.polygon = IfcManager::Ifc_List.new( points )
             end
           end
         end
