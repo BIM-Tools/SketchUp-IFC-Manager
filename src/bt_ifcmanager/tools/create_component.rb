@@ -31,7 +31,7 @@ module BimTools
       UI.add_context_menu_handler do |context_menu|
         selection = Sketchup.active_model.selection
         unless selection.empty?
-          context_menu.add_item( 'Create ' << name.capitalize ) {
+          context_menu.add_item("Create #{name.capitalize}") {
             CreateComponent.activate( ifc_type, name, objecttype )
           }
         end
@@ -49,16 +49,12 @@ module BimTools
     def activate( ifc_type, name, objecttype=nil )
       model = Sketchup.active_model
       entities = model.active_entities
-      selection = Sketchup.active_model.selection
+      selection = model.selection
       
       model.start_operation('Create IFC Component', true)
       
-      # collect selected entities in an Array
-      selected = Array.new
-      selection.each { |ent| selected << ent}
-      
       # create temporary group
-      group = entities.add_group( selected )
+      group = entities.add_group( selection )
       
       # convert group to component instance
       instance = group.to_component

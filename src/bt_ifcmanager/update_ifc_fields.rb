@@ -28,14 +28,19 @@ module BimTools
     if model.classifications['IFC 2x3']
     
       # update every component definition in the model
-      model.definitions.each do | entity |
-        type = entity.get_attribute 'AppliedSchemaTypes', 'IFC 2x3'
+      definitions = model.definitions
+      definition_count = definitions.length
+      i = 0
+      while i < definition_count
+        definition = definitions[i]
+        type = definition.get_attribute 'AppliedSchemaTypes', 'IFC 2x3'
         if type
           path = ['IFC 2x3', type.to_s, 'Name', 'IfcLabel']
           
           # overwrite the IFC label for name with the component name
-          entity.set_classification_value(path, entity.name) # (?) does every IFC type in sketchup have a name?
+          definition.set_classification_value(path, definition.name) # (?) first check if IFC type had a name attribute?
         end
+        i += 1
       end
     end
   end # def update_ifc_fields

@@ -62,7 +62,7 @@ module BimTools
       pb.update(1)
 
       # make sure file_path ends in "ifc"
-      unless file_path.split('.').last == "ifc"
+      unless File.extname(file_path).downcase == ".ifc"
         file_path << '.ifc'
       end
       
@@ -72,7 +72,7 @@ module BimTools
       pb.update(2)
       
       # get total time
-      puts "finished creating IFC entities: " << (Time.now - timer).to_s
+      puts "finished creating IFC entities: #{(Time.now - timer).to_s}"
       
       # export model to IFC step file
       ifc_model.export( file_path )
@@ -81,13 +81,11 @@ module BimTools
       
       # get total time
       time = Time.now - timer
-      puts "finished export: " << time.to_s
+      puts "finished export: #{time.to_s}"
       
       pb.update(4)
       
       show_summary( ifc_model.export_summary, file_path, time )
-      
-      #UI.openURL( file_path ) 
       
       # write log
       begin
@@ -106,24 +104,20 @@ module BimTools
     end # export
 
     def add_export_message(message)
-      puts message
       BimTools::IfcManager::export_messages << message
     end
 
     def show_summary( hash, file_path, time )
       css = File.join(PLUGIN_PATH_CSS, 'sketchup.css')
-      html = "<html><head><link rel='stylesheet' type='text/css' href='" << css << "'></head><body><textarea readonly>IFC Entities exported:\n\n"
+      html = "<html><head><link rel='stylesheet' type='text/css' href='#{css}'></head><body><textarea readonly>IFC Entities exported:\n\n"
       hash.each_pair do | key, value |
-        html << value.to_s << " " << key.to_s << "\n"
+        html << "#{value.to_s} #{key.to_s}\n"
       end
-      html << "\n To file '" << file_path << "'\n"
-      html << "\n Taking a total number of " << time.to_s << " seconds\n"
+      html << "\n To file '#{file_path}'\n"
+      html << "\n Taking a total number of #{time.to_s} seconds\n"
       unless BimTools::IfcManager::export_messages.empty?
-        messages = BimTools::IfcManager::export_messages.uniq.sort
-        html << "\nMessages:\n"
-        messages.each do |message|
-          html << "- #{message}\n"
-        end
+        messages = BimTools::IfcManager::export_messages.uniq.sort.join("\n- ")
+        html << "\nMessages:\n- #{messages}\n"
       end
       html << "</textarea></body></html>"
       @summary_dialog = UI::HtmlDialog.new(
@@ -132,9 +126,9 @@ module BimTools
         :scrollable => false,
         :resizable => true,
         :width => 320,
-        :height => 380,
-        :left => 100,
-        :top => 100,
+        :height => 520,
+        :left => 200,
+        :top => 200,
         :style => UI::HtmlDialog::STYLE_UTILITY
       })
       @summary_dialog.set_html( html )

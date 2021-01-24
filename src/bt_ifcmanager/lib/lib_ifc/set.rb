@@ -21,6 +21,7 @@
 
 module BimTools::IfcManager
   class Ifc_Set
+    attr_accessor :items
     def initialize( items=nil )
       if items
         @items = items.to_set

@@ -32,9 +32,7 @@ module BimTools
         js_bootstrap = File.join(PLUGIN_PATH, 'js', 'bootstrap.min.js')
         js_jquery = File.join(PLUGIN_PATH, 'js', 'jquery.min.js')
         js_select2 = File.join(PLUGIN_PATH, 'js', 'select2.min.js')
-<<-HTML
-<!DOCTYPE html>
-<html lang="en">
+<<HTML
 <head>
   <title>Edit IFC properties</title>
   <meta charset="utf-8">
@@ -50,18 +48,16 @@ module BimTools
 <body>
   <div class="container-fluid">
 HTML
-      end # def html_header
+      end
 
       def html_footer(script)
-<<-HTML
-    </div>
-    <script>
-      $(document).ready(function(){
-#{script}
-      });
-    </script>
-  </body>
-</html>
+<<HTML
+  </div>
+  <script>
+    $(document).ready(function(){
+      #{script}
+    });
+  </script></body>
 HTML
       end
     end # module PropertiesWindow

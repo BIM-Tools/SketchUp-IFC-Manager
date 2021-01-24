@@ -32,7 +32,10 @@ module BimTools::IfcManager
         components = []
         groups = []
         other = []
-        selection.each do |ent|
+        selection_count = selection.length
+        i = 0
+        while i < selection_count
+          ent = selection[i]
           if(ent.is_a?(Sketchup::ComponentInstance))
             components << ent
           elsif(ent.is_a?(Sketchup::Group))
@@ -40,19 +43,20 @@ module BimTools::IfcManager
           else
             other << ent
           end
+          i += 1
         end
         if other.length > 0
-          @text = selection.length.to_s << " entities"
+          @text = "#{selection.length.to_s} entities"
         elsif components.length > 0 && groups.length > 0
-          @text = selection.length.to_s << " Components and Groups"
+          @text = "#{selection.length.to_s} Components and Groups"
         elsif components.length > 1
-          @text = selection.length.to_s << " Components"
+          @text = "#{selection.length.to_s}  Components"
         elsif groups.length > 1
-          @text = selection.length.to_s << " Groups"
+          @text = "#{selection.length.to_s} Groups"
         elsif components.length > 0
-          @text = "Component (" << components[0].definition.count_used_instances.to_s << " in model)"
+          @text = "Component (#{components[0].definition.count_used_instances.to_s} in model)"
         elsif groups.length > 0
-          @text = "Group (" << groups[0].definition.count_used_instances.to_s << " in model)"
+          @text = "Group (#{groups[0].definition.count_used_instances.to_s}  in model)"
         else
           @text = "No selection"
         end
@@ -60,7 +64,7 @@ module BimTools::IfcManager
       end # get_text
 
       def html(selection)
-        return "<h1 id='title'>" << get_text(selection) << "</h1>"
+        return "<h1 id='title'>#{get_text(selection)}</h1>"
       end
       def update(selection)
         self.dialog.execute_script("$('#title').html('#{get_text(selection)}');")

@@ -43,7 +43,11 @@ module BimTools::IfcManager
       
       def set_value()
         selection = Set.new()
-        Sketchup.active_model.selection.each do |ent|
+        su_selection = Sketchup.active_model.selection
+        selection_count = su_selection.length
+        i = 0
+        while i < selection_count
+          ent = su_selection[i]
           if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
             if ent.material
               selection.add(ent.material.name)
@@ -51,6 +55,7 @@ module BimTools::IfcManager
               selection.add("Default")
             end
           end
+          i += 1
         end
         set_value_from_list(selection.to_a)
       end
@@ -61,11 +66,6 @@ module BimTools::IfcManager
         super
       end
 
-      # def update(selection)
-      #   set_options()
-      #   super(selection)
-      # end
-
       def set_callback()
 
         # Add save callback
@@ -73,13 +73,21 @@ module BimTools::IfcManager
           model = Sketchup.active_model
           materials = model.materials
           if value == "..."
-          elsif value == "Default" || value == "-"
-            model.selection.each do |ent|
-              ent.material = nil
+          elsif value == "Default"
+            selection = model.selection
+            selection_count = selection.length
+            i = 0
+            while i < selection_count
+              selection[i].material = nil
+              i += 1
             end
           elsif materials[value]
-            model.selection.each do |ent|
-              ent.material = value
+            selection = model.selection
+            selection_count = selection.length
+            i = 0
+            while i < selection_count
+              selection[i].material = value
+              i += 1
             end
           else
             notification = UI::Notification.new(IFCMANAGER_EXTENSION, "No material with name: " + value)
@@ -99,10 +107,14 @@ module BimTools::IfcManager
             end
             
             model = Sketchup.active_model
+            selection = model.selection
             new_material = model.materials.add(input[0].downcase)
             new_material.color = [255, 255, 255]
-            model.selection.each do |entity|
-              entity.material = new_material.name
+            selection_count = selection.length
+            i = 0
+            while i < selection_count
+              selection[i].material = new_material.name
+              i += 1
             end
             index = @index_max
             @index_max += 1

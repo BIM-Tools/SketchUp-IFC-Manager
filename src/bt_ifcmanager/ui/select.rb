@@ -69,21 +69,23 @@ module BimTools::IfcManager
             hide_css = ""
           end
           if @button == true
-            html =  "<div class=\"form-group row #{@id}_row\"#{hide_css}>"
-            html << "<label for=\"#{@id}\" class=\"col-3 col-form-label\">#{@name}:</label>"
-            html << "<div class=\"input-group col-9 #{@id}_row\">"
-            html << "<select class=\"form-control\" id=\"#{@id}\"></select>"
-            html << "<div class=\"input-group-append\">"
-            html << "<button class=\"btn\" type=\"button\" id=\"add_#{@id}\">+</button>"
-            html << "</div></div></div>"
-            return html
+            return <<-HTML
+              <div class="form-group row #{@id}_row"#{hide_css}>
+              <label for="#{@id}" class="col-3 col-form-label">#{@name}:</label>
+              <div class="input-group col-9 #{@id}_row">
+              <select class="form-control" id="#{@id}"></select>
+              <div class="input-group-append">
+              <button class="btn" type="button" id="add_#{@id}">+</button>
+              </div></div></div>
+            HTML
           else
-            html =  "<div class=\"form-group row #{@id}_row\"#{hide_css}>"
-            html << "<label for=\"#{@id}\" class=\"col-3 col-form-label\">#{@name}:</label>"
-            html << "<div class=\"col-9 #{@id}_row\">"
-            html << "<select class=\"form-control\" id=\"#{@id}\" data-width=\"100%\"></select>"
-            html << "</div></div>"
-            return html
+            return <<-HTML
+              <div class="form-group row #{@id}_row"#{hide_css}>
+              <label for="#{@id}" class="col-3 col-form-label">#{@name}:</label>
+              <div class="col-9 #{@id}_row">
+              <select class="form-control" id="#{@id}" data-width="100%"></select>
+              </div></div>
+            HTML
           end
         end
 

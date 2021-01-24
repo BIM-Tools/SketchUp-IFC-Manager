@@ -268,7 +268,11 @@ module BimTools::IfcManager
       
       # find sub-objects (geometry and entities)
       faces = Array.new
-      definition.entities.each do | ent |
+      entities = definition.entities
+      definition_count = entities.length
+      i = 0
+      while i < definition_count
+        ent = entities[i]
         
         # skip hidden objects if skip-hidden option is set
         # if ifc_model.options[:hidden] == true
@@ -283,6 +287,7 @@ module BimTools::IfcManager
             end
           end
         end
+        i += 1
       end
       
       if !ifc_entity.is_a?(BimTools::IFC2X3::IfcProduct) || parent_ifc.is_a?(BimTools::IFC2X3::IfcProject)

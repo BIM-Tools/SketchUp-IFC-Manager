@@ -49,7 +49,11 @@ module BimTools::IfcManager
 
       def set_value()
         selection = Set.new()
-        Sketchup.active_model.selection.each do |ent|
+        su_selection = Sketchup.active_model.selection
+        selection_count = su_selection.length
+        i = 0
+        while i < selection_count
+          ent = su_selection[i]
           if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
             if ent.layer.name != "Layer0"
               selection.add(ent.layer.name)
@@ -57,6 +61,7 @@ module BimTools::IfcManager
               selection.add(@layer0_name)
             end
           end
+          i += 1
         end
         set_value_from_list(selection.to_a)
       end
@@ -67,11 +72,6 @@ module BimTools::IfcManager
         super
       end
 
-      # def update(selection)
-      #   set_options()
-      #   super(selection)
-      # end
-
       def set_callback()
 
         # Add save callback
@@ -79,13 +79,21 @@ module BimTools::IfcManager
           model = Sketchup.active_model
           layers = model.layers
           if value == "..."
-          elsif value == "Untagged" || value == "-"
-            model.selection.each do |ent|
-              ent.layer = "Layer0"
+          elsif value == "Untagged"
+            selection = model.selection
+            selection_count = selection.length
+            i = 0
+            while i < selection_count
+              selection[i].layer = "Layer0"
+              i += 1
             end
           elsif layers[value]
-            model.selection.each do |ent|
-              ent.layer = value
+            selection = model.selection
+            selection_count = selection.length
+            i = 0
+            while i < selection_count
+              selection[i].layer = value
+              i += 1
             end
           else
             notification = UI::Notification.new(IFCMANAGER_EXTENSION, "No layer with name: " + value)
@@ -120,8 +128,12 @@ module BimTools::IfcManager
               @layers << layer.name
               self.dialog.execute_script("var newMaterialOption = new Option('#{layer.name}', '#{index}', false, true);\n$('##{@id}').append(newMaterialOption).trigger('change');\n")
             end
-            model.selection.each do |entity|
-              entity.layer = layer.name
+            selection = model.selection
+            selection_count = selection.length
+            i = 0
+            while i < selection_count
+              selection[i].layer = layer.name
+              i += 1
             end
           end
         }

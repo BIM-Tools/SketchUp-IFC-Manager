@@ -110,7 +110,7 @@ module BimTools::IfcManager
           while j < instances.length
             instance = instances[j]
             unless instance.name == ""
-              name = instance.name.delete_prefix(ifc_type << " - ")
+              name = instance.name.delete_prefix("#{ifc_type} - ")
               definition.name = definitions.unique_name(name)
             end
             j += 1

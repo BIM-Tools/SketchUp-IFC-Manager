@@ -30,16 +30,20 @@ module BimTools
 
     def attribute_to_step(property_name)
       property = self.send(property_name.downcase)
-      if property
+      if property.nil?
+        return "$"
+      else
         if property.is_a? String
           return property
         elsif property.is_a?(IfcManager::IfcGloballyUniqueId) || property.is_a?(IfcManager::Ifc_List) || property.is_a?(IfcManager::Ifc_Set) || property.is_a?(IfcManager::Ifc_Type)
           return property.step
+        elsif property.is_a? TrueClass
+          return ".T."
+        elsif property.is_a? FalseClass
+          return ".F."
         else
           return property.ref
         end
-      else
-        return "$"
       end
     end
 

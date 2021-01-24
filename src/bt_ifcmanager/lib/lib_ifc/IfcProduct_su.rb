@@ -94,8 +94,7 @@ module BimTools
                         entity_type = eval("BimTools::IfcManager::#{value_type}")
                         value_entity = entity_type.new(dict_value)
                       rescue => e
-                        puts "Error creating IFC type: " << e.to_s
-                        # puts dict_value
+                        puts "Error creating IFC type: #{ e.to_s}"
                       end
                     end
                     unless entity_type

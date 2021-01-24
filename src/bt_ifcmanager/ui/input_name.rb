@@ -32,24 +32,34 @@ module BimTools::IfcManager
         super
         self.dialog.add_action_callback(self.id) { |action_context, value|
           model = Sketchup.active_model
-          model.selection.each do |ent|
+          selection = model.selection
+          selection_count = selection.length
+          i = 0
+          while i < selection_count
+            ent = selection[i]
 
             # Set name in definition, instance and ifc properties
             if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
               BimTools::IfcManager::set_ifc_entity_name(model, ent, value)
             end
+            i += 1
           end
           PropertiesWindow::update()
         }
       end
       def set_value()
         selection = []
-        Sketchup.active_model.selection.each do |ent|
+        su_selection = Sketchup.active_model.selection
+        selection_count = su_selection.length
+        i = 0
+        while i < selection_count
+          ent = su_selection[i]
           if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
             unless selection.include? ent.definition
               selection << ent.definition
             end
           end
+          i += 1
         end
         if selection.length == 1
           if selection[0]

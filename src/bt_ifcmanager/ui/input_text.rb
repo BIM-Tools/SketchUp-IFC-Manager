@@ -42,11 +42,13 @@ module BimTools::IfcManager
           hide_css = ""
         end
         set_value()
-        html =  "<div class=\"form-group row #{@id}_row\"#{hide_css}>"
-        html << "<label for=\"#{@id}\" class=\"col-3 col-form-label\">#{@name}:</label>"
-        html << "<div class=\"col-9\">"
-        html << "<input type=\"text\" class=\"form-control\" id=\"#{@id}\" value=\"#{@value}\" autocomplete=\"off\">"
-        html << "</div></div>"
+        <<-HTML
+          <div class="form-group row #{@id}_row"#{hide_css}>
+          <label for="#{@id}" class="col-3 col-form-label">#{@name}:</label>
+          <div class="col-9">
+          <input type="text" class="form-control" id="#{@id}" value="#{@value}" autocomplete="off">
+          </div></div>
+        HTML
       end
 
       def update(selection)

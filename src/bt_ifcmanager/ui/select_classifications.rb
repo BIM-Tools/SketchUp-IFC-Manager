@@ -28,10 +28,15 @@ module BimTools::IfcManager
     class HtmlSelectClassifications < HtmlSelect
       def set_value()
         selection = Set.new()
-        Sketchup.active_model.selection.each do |ent|
+        su_selection = Sketchup.active_model.selection
+        selection_count = su_selection.length
+        i = 0
+        while i < selection_count
+          ent = su_selection[i]
           if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
             selection.add(ent.definition.get_attribute("AppliedSchemaTypes", @name))
           end
+          i += 1
         end
         set_value_from_list(selection.to_a)
       end
@@ -48,7 +53,11 @@ module BimTools::IfcManager
         model = Sketchup.active_model
         @dialog.add_action_callback(@id) { |action_context, value|
           if model.classifications[@name]
-            model.selection.each do |ent|
+            selection = model.selection
+            selection_count = selection.length
+            i = 0
+            while i < selection_count
+              ent = selection[i]
               if(ent.is_a? Sketchup::ComponentInstance) || (ent.is_a? Sketchup::Group)
                 definition = ent.definition
                 if value == "-"
@@ -69,6 +78,7 @@ module BimTools::IfcManager
                   end
                 end
               end
+              i += 1
             end
           else
             notification = UI::Notification.new(IFCMANAGER_EXTENSION, "No classification with name: " + @name)

@@ -226,8 +226,8 @@ module BimTools
         :scrollable => true,
         :resizable => true,
         :width => 320,
-        :height => 420,
-        :left => 220,
+        :height => 480,
+        :left => 200,
         :top => 200,
         :style => UI::HtmlDialog::STYLE_UTILITY
       })
@@ -288,40 +288,41 @@ module BimTools
       @dialog.show
     end # create_dialog
     def set_html()
-      html = '<html><head>'
-      html << "<link rel='stylesheet' type='text/css' href='" + @css_bootstrap + "'>"
-      html << "<link rel='stylesheet' type='text/css' href='" + @css_core + "'>"
-      html << "<link rel='stylesheet' type='text/css' href='" + @css_settings + "'>"
-      html << "<script type='text/javascript' src='" + @js_jquery + "'></script>"
-      html << "<script type='text/javascript' src='" + @js_bootstrap + "'></script>"
-      html << "      <script>
-      $(document).ready(function(){
-        $( 'form' ).on( 'submit', function( event ) {
-          event.preventDefault();
-          sketchup.save_settings($( this ).serialize());
-        });
+      html = <<HTML
+<head>
+  <link rel='stylesheet' type='text/css' href='#{@css_bootstrap}'>
+  <link rel='stylesheet' type='text/css' href='#{@css_core}'>
+  <link rel='stylesheet' type='text/css' href='#{@css_settings}'>
+  <script type='text/javascript' src='#{@js_jquery}'></script>
+  <script type='text/javascript' src='#{ @js_bootstrap}'></script>
+  <script>
+    $(document).ready(function(){
+      $( 'form' ).on( 'submit', function( event ) {
+        event.preventDefault();
+        sketchup.save_settings($( this ).serialize());
       });
-      </script>"
-      html << '</head><body>'
-      html << '      <div class="container">
-        <form>
-          <div class="form-group">
-          <h1>Classification systems</h1>'
+    });
+  </script>
+</head>
+<body>
+  <div class='container'>
+    <form>
+      <div class='form-group'>
+        <h1>Classification systems</h1>
+HTML
       @classifications.each_pair do |classification_name, load|
         if load
-          checked = "checked"
+          checked = " checked"
         else
           checked = ""
         end
-        html << "
-            <div class=\"col-md-12 row\">
-              <label class=\"check-inline\"><input type=\"checkbox\" name=\"classification\" value=\"#{classification_name}\" #{checked}> #{classification_name}</label>
-            </div>"
+        html << "         <div class=\"col-md-12 row\"><label class=\"check-inline\"><input type=\"checkbox\" name=\"classification\" value=\"#{classification_name}\"#{checked}> #{classification_name}</label></div>\n"
       end
 
       # Export settings
-      html << '
-          <h1>Export</h1>'
+      html << "      </div>\n"
+      html << "      <div class='form-group'>\n"
+      html << "        <h1>Export</h1>"
       html << @export_hidden.html()
       html << @export_classifications.html()
       html << @export_layers.html()
@@ -331,40 +332,44 @@ module BimTools
       html << @export_fast_guid.html()
       html << @export_dynamic_attributes.html()
       # html << @export_mapped_items.html()
+      html << "      </div>\n"
 
       # Default materials
-      html << '
-          <h1>Load default materials</h1>
-          <div class="col-md-12 row">'
       if @template_materials
-        materials_checked = "checked"
+        materials_checked = " checked"
       else
         materials_checked = ""
       end
-      html << "
-            <label class=\"check-inline\"><input type=\"checkbox\" name=\"template_materials\" value=\"template_materials\" #{materials_checked}> Template materials</label>"
-      html << '
-          </div>
-          <h1>Property sets</h1>
-          <div class="col-md-12 row">'
+
       if @common_psets
         common_psets_checked = "checked"
       else
         common_psets_checked = ""
       end
-      html << "
-            <label class=\"check-inline\"><input type=\"checkbox\" name=\"common_psets\" value=\"common_psets\" #{common_psets_checked}> Common PropertySets</label>"
-      html << '
-          </div>
-          <br>
-          <div class="form-group row">
-            <div class="col-sm-12">
-              <button type="submit" class="btn btn-outline-secondary">Save</button>
-            </div>
-          </div>
-        </form>
-      </div>'
-      html << "</body></html>"
+
+      footer = <<HTML
+      <div class='form-group'>
+        <h1>Load default materials</h1>
+        <div class="col-md-12 row">
+          <label class=\"check-inline\"><input type=\"checkbox\" name=\"template_materials\" value=\"template_materials\"#{materials_checked}> Template materials</label>
+        </div>
+      </div>
+      <div class='form-group'>
+        <h1>Property sets</h1>
+        <div class="col-md-12 row">
+          <label class=\"check-inline\"><input type=\"checkbox\" name=\"common_psets\" value=\"common_psets\" #{common_psets_checked}> Common PropertySets</label>
+        </div>
+      </div>
+      <br>
+      <div class="form-group row">
+        <div class="col-sm-12">
+          <button type="submit" class="btn btn-outline-secondary">Save</button>
+        </div>
+      </div>
+    </form>
+  </div></body>
+HTML
+      html << footer
       @dialog.set_html( html )
     end
 
@@ -376,17 +381,16 @@ module BimTools
         @value = initial_value
       end
       def html()
-        html_string = '
-        <div class="col-md-12 row">'
         if @value
-          checked = "checked"
+          checked = " checked"
         else
           checked = ""
         end
-        html_string << "
-          <label class=\"check-inline\"><input type=\"checkbox\" name=\"#{@name}\" value=\"#{@name}\" #{checked}> #{@title}</label>"
-          html_string << '
-        </div>'
+        html_string = <<HTML
+        <div class="col-md-12 row">
+          <label class="check-inline"><input type="checkbox" name="#{@name}" value="#{@name}"#{checked}> #{@title}</label>
+        </div>
+HTML
         return html_string
       end
 

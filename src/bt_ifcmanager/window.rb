@@ -127,57 +127,84 @@ module BimTools::IfcManager
     # Refresh entire window contents
     # triggered from show and close window
     def set_html()
-      model = Sketchup.active_model
       ifc_able = false
-      model.selection.each do |ent|
+      javascript = ""
+      selection = Sketchup.active_model.selection
+      selection_count = selection.length
+      html = html_header()
+
+      # Check if object can be classified as an IFC entity
+      i = 0
+      while i < selection_count
+        ent = selection[i]
         if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
           ifc_able = true
           break
         end
+        i += 1
       end
-      html = html_header()
-      @form_elements.each do |form_element|
+
+      # Add html for each form element
+      j = 0
+      form_element_count = @form_elements.length
+      while j < form_element_count
+        form_element = @form_elements[j]
         unless(ifc_able)
           form_element.hide()
         end
-        html << form_element.html(model.selection)
+        html << form_element.html(selection)
+        javascript << form_element.js
+        javascript << form_element.onchange
+        j += 1
       end
-      js = ""
-      @form_elements.each do |form_element|
-        js << form_element.js
-        js << form_element.onchange
-      end
-      html << html_footer(js)
+      html << html_footer(javascript)
       @window.set_html(html)
       set_callbacks()
     end
 
     def set_callbacks()
-      @form_elements.each do |form_element|
+      i = 0
+      form_element_count = @form_elements.length
+      while i < form_element_count
+        form_element = @form_elements[i]
         form_element.set_callback()
+        i += 1
       end
     end
     
     # Update form elements content
     # triggered from observers on selection or object changes
     def update()
-      model = Sketchup.active_model
+      selection = Sketchup.active_model.selection
       ifc_able = false
-      model.selection.each do |ent|
+
+      # Check if object can be classified as an IFC entity
+      selection_count = selection.length
+      i = 0
+      while i < selection_count
+        ent = selection[i]
         if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
           ifc_able = true
           break
         end
+        i += 1
       end
+
+      form_element_count = @form_elements.length
+      j = 0
       if ifc_able
-        @form_elements.each do |form_element|
-          form_element.update(model.selection)
+        while j < form_element_count
+          form_element = @form_elements[j]
+          form_element.update(selection)
           form_element.show()
+          j += 1
         end
       else
-        @form_elements.each do |form_element|
-          form_element.update(model.selection)
+        while j < form_element_count
+          form_element = @form_elements[j]
+          form_element.update(selection)
           form_element.hide()
+          j += 1
         end
       end
     end

@@ -132,7 +132,7 @@ module BimTools
                     entity_type = eval("BimTools::IfcManager::#{value_type}")
                     prop.nominalvalue = entity_type.new(dict_value)
                   rescue => e
-                    puts "Error creating IFC type: " << e.to_s
+                    puts "Error creating IFC type: #{ e.to_s}"
                     # puts dict_value
                   end
                 end

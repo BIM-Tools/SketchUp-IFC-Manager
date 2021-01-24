@@ -26,8 +26,7 @@ module BimTools
 
     @name = 'Paint properties'
     @description = 'Copy properties of BIM-Tools elements'
-    @cursor_icon = File.join( PLUGIN_PATH_IMAGE, "PaintProperties-cursor" << ICON_LARGE << ICON_TYPE)
-
+    @cursor_icon = File.join( PLUGIN_PATH_IMAGE, "PaintProperties-cursor#{ICON_LARGE}#{ICON_TYPE}")
     @source = nil
     @cursor_id = nil
 
@@ -40,8 +39,8 @@ module BimTools
     cmd = UI::Command.new(@description) {
       Sketchup.active_model.select_tool( self )
     }
-    cmd.small_icon = File.join(PLUGIN_PATH_IMAGE, "PaintProperties" << ICON_SMALL << ICON_TYPE)
-    cmd.large_icon = File.join(PLUGIN_PATH_IMAGE, "PaintProperties" << ICON_LARGE << ICON_TYPE)
+    cmd.small_icon = File.join(PLUGIN_PATH_IMAGE, "PaintProperties#{ICON_SMALL}#{ICON_TYPE}")
+    cmd.large_icon = File.join(PLUGIN_PATH_IMAGE, "PaintProperties#{ICON_LARGE}#{ICON_TYPE}")
     cmd.tooltip = 'Paint properties'
     cmd.status_bar_text = 'Paint BIM-Tools properties'
     IfcManager.toolbar.add_item cmd
@@ -183,7 +182,7 @@ module BimTools
             if target_dict
               clone_attributes( source_dict, target_dict ) # recursively check all possible child dictionaries
             else
-              puts "Unable to copy: " << source_dict.name
+              puts "Unable to copy: #{source_dict.name}"
             end
           end
         end

@@ -185,7 +185,11 @@ module BimTools
     def create_ifc_objects( sketchup_objects )
       if sketchup_objects.is_a? Sketchup::Model
         faces = Array.new
-        sketchup_objects.entities.each do | ent |
+        entities = sketchup_objects.entities
+        entitiy_count = entities.length
+        i = 0
+        while i < entitiy_count
+          ent = entities[i]
         
           # skip hidden objects if skip-hidden option is set
           unless @options[:hidden] == false && (ent.hidden? || !BimTools::IfcManager::layer_visible?(ent.layer))
@@ -197,6 +201,7 @@ module BimTools
               faces << ent
             end
           end
+          i += 1
         end
         
         # create IfcBuildingelementProxy from all 'loose' faces combined
