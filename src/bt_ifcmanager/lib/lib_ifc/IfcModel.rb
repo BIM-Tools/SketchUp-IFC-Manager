@@ -41,6 +41,7 @@ module BimTools
   require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')
 
   class IfcModel
+    include BimTools::IFC2X3
     
     # (?) possible additional methods:
     # - get_ifc_objects(hash ifc->su)
@@ -98,35 +99,34 @@ module BimTools
       
       # create IFC objects for all su instances
       create_ifc_objects( su_model )
-    end # def initialize
+    end
     
     # add object to ifc_objects array
     def add( ifc_object )
       @ifc_objects << ifc_object
       return new_id()
-    end # def add
+    end
     
     # add object to mapped representations Hash
     def add_mapped_representation( su_definition, ifc_object )
       @mapped_representations[ su_definition ] = ifc_object
-    end # def add
+    end
     
     # get mapped representation for component definition
     def mapped_representation?( su_definition )
       return @mapped_representations[ su_definition ]
-    end # def add
+    end
     
     def new_id()
       @ifc_id += 1
-    end # def new_id
+    end
     
     # write the IfcModel to given filepath
     # (?) could be enhanced to also accept multiple ifc types like step / ifczip / ifcxml
     # (?) could be enhanced with export options hash
     def export( file_path )
       IfcStepWriter.new( self, 'file_schema', 'file_description', file_path, @su_model )
-      
-    end # def export
+    end
     
     # add object class name to export summary
     def summary_add( class_name )
@@ -137,30 +137,20 @@ module BimTools
       end
     end
     
-    # retrieve the corresponding su instance for the given ifc object
-    def get_ifc_object( su_object )
-      
-    end # def get_ifc_object
-    
-    # retrieve the corresponding ifc object for the given su instance
-    def get_su_object( ifc_object )
-      
-    end # def get_su_object
-    
     # create new IfcProject
     def create_project( su_model )
-      project = BimTools::IFC2X3::IfcProject.new(self)
-    end # def create_project
+      project = IfcProject.new(self)
+    end
     
     # Create new IfcOwnerHistory
     def create_ownerhistory()
-      owner_history = BimTools::IFC2X3::IfcOwnerHistory.new( self )
-      owner_history.owninguser = BimTools::IFC2X3::IfcPersonAndOrganization.new( self )
-      owner_history.owninguser.theperson = BimTools::IFC2X3::IfcPerson.new( self )
+      owner_history = IfcOwnerHistory.new( self )
+      owner_history.owninguser = IfcPersonAndOrganization.new( self )
+      owner_history.owninguser.theperson = IfcPerson.new( self )
       owner_history.owninguser.theperson.familyname = BimTools::IfcManager::IfcLabel.new( "" )
-      owner_history.owninguser.theorganization = BimTools::IFC2X3::IfcOrganization.new( self )
+      owner_history.owninguser.theorganization = IfcOrganization.new( self )
       owner_history.owninguser.theorganization.name = BimTools::IfcManager::IfcLabel.new( "BIM-Tools" )
-      owner_history.owningapplication = BimTools::IFC2X3::IfcApplication.new( self )
+      owner_history.owningapplication = IfcApplication.new( self )
       owner_history.owningapplication.applicationdeveloper = owner_history.owninguser.theorganization
       owner_history.owningapplication.version = BimTools::IfcManager::IfcLabel.new( VERSION )
       owner_history.owningapplication.applicationfullname = BimTools::IfcManager::IfcLabel.new( "IFC manager for sketchup" )
@@ -168,18 +158,18 @@ module BimTools
       owner_history.changeaction = '.ADDED.'
       owner_history.creationdate = Time.now.to_i.to_s
       return owner_history
-    end # def set_owner_history
+    end
     
     # Create new IfcGeometricRepresentationContext
     def create_representationcontext()
-      representationcontext = BimTools::IFC2X3::IfcGeometricRepresentationContext.new( self )
+      representationcontext = IfcGeometricRepresentationContext.new( self )
       representationcontext.contexttype = BimTools::IfcManager::IfcLabel.new( "Model" )
       representationcontext.coordinatespacedimension = '3'
-      representationcontext.worldcoordinatesystem = BimTools::IFC2X3::IfcAxis2Placement3D.new( self )
-      representationcontext.worldcoordinatesystem.location = BimTools::IFC2X3::IfcCartesianPoint.new( self, Geom::Point3d.new(0,0,0) )
-      representationcontext.truenorth = BimTools::IFC2X3::IfcDirection.new( self, Geom::Vector3d.new(0,1,0) )
+      representationcontext.worldcoordinatesystem = IfcAxis2Placement3D.new( self )
+      representationcontext.worldcoordinatesystem.location = IfcCartesianPoint.new( self, Geom::Point3d.new(0,0,0) )
+      representationcontext.truenorth = IfcDirection.new( self, Geom::Vector3d.new(0,1,0) )
       return representationcontext
-    end # def create_representationcontext
+    end
     
     # create IFC objects for all su instances
     def create_ifc_objects( sketchup_objects )
@@ -196,7 +186,7 @@ module BimTools
             case ent
             when Sketchup::Group, Sketchup::ComponentInstance
               transformation = Geom::Transformation.new
-              ObjectCreator.new( self, ent, transformation, @project )
+              ObjectCreator.new( self, ent, transformation, @project, {IfcProject=>@project} )
             when Sketchup::Face
               faces << ent
             end
@@ -206,29 +196,23 @@ module BimTools
         
         # create IfcBuildingelementProxy from all 'loose' faces combined
         unless faces.empty?
-          ifc_entity = BimTools::IFC2X3::IfcBuildingElementProxy.new(self, nil)
-          ifc_entity.representation = BimTools::IFC2X3::IfcProductDefinitionShape.new(self, nil)
-          brep = BimTools::IFC2X3::IfcFacetedBrep.new( self, faces, Geom::Transformation.new )
+          ifc_entity = IfcBuildingElementProxy.new(self, nil)
+          ifc_entity.name = BimTools::IfcManager::IfcLabel.new("Default Building Element")
+          ifc_entity.representation = IfcProductDefinitionShape.new(self, nil)
+          brep = IfcFacetedBrep.new( self, faces, Geom::Transformation.new )
           ifc_entity.representation.representations.first.items.add( brep )
+          ifc_entity.objectplacement = IfcLocalPlacement.new(self, Geom::Transformation.new)
           
-          if self.project.non_default_related_objects.length == 0 #   if no IfcSite defined
-            parent_ifc = self.project.get_default_related_object #      parent is default site
-            if parent_ifc.non_default_related_objects.length == 0 #   if no IfcBuilding defined
-              parent_ifc = parent_ifc.get_default_related_object #      parent is default building
-              if parent_ifc.non_default_related_objects.length == 0 # if no IfcBuildingStorey defined
-                parent_ifc = parent_ifc.get_default_related_object #    parent is default buildingstorey
-              end
-            end
-          else
-            parent_ifc = self.project.non_default_related_objects[0]
-          end
+          # Create spatial hierarchy
+          parent_ifc = self.project.get_default_related_object #      parent is default site
+          parent_ifc = parent_ifc.get_default_related_object #      parent is default building
+          parent_ifc = parent_ifc.get_default_related_object #    parent is default buildingstorey
           
-          # add this element to the IfcModel
           parent_ifc.add_contained_element( ifc_entity )
         end
       end
       return ifc_objects
-    end # create_ifc_objects
-  end # class IfcModel
- end # module IfcManager
-end # module BimTools
+    end
+  end
+ end
+end
