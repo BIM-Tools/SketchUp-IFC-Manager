@@ -1,5 +1,6 @@
-module BimTools::IfcManager
+# frozen_string_literal: true
 
+module BimTools::IfcManager
   # Recursively merge all coplanar faces in the entities collection
   #
   # @param [Sketchup::Entities]
@@ -12,10 +13,10 @@ module BimTools::IfcManager
         merge_faces(entities[i].definition.entities)
       elsif entities[i].is_a? Sketchup::Edge
         edge = entities[i]
-        faces = edge.faces
-        if faces.length == 2
-          if faces[0].normal.samedirection?(faces[1].normal)
-            delete << edge
+        if edge.hidden?
+          faces = edge.faces
+          if faces.length == 2
+            delete << edge if faces[0].normal.samedirection?(faces[1].normal)
           end
         end
       end
@@ -34,17 +35,16 @@ module BimTools::IfcManager
   # @param [Sketchup::Model]
   #
   def ifc_type_to_layer(model)
-    if Sketchup.active_model.classifications["IFC 2x3"]
+    if Sketchup.active_model.classifications['IFC 2x3']
       definitions = model.definitions
+      definitions.purge_unused
       i = 0
       while i < definitions.length
         definition = definitions[i]
-        ifc_type = definition.get_attribute("AppliedSchemaTypes", "IFC 2x3")
+        ifc_type = definition.get_attribute('AppliedSchemaTypes', 'IFC 2x3')
         if ifc_type
           layers = model.layers
-          unless layers[ifc_type]
-            layers.add(ifc_type)
-          end
+          layers.add(ifc_type) unless layers[ifc_type]
           instances = definition.instances
           j = 0
           while j < instances.length
@@ -67,9 +67,7 @@ module BimTools::IfcManager
     while i < entities.length
       instance = entities[i]
       if instance.is_a?(Sketchup::ComponentInstance)
-        if instance.definition.name.end_with?(".ifc")
-          instance.explode
-        end
+        instance.explode if instance.definition.name.end_with?('.ifc')
       end
       i += 1
     end
@@ -85,7 +83,7 @@ module BimTools::IfcManager
     while j < entities.length
       instance = entities[j]
       if instance.is_a?(Sketchup::ComponentInstance)
-        if instance.definition.get_attribute("AppliedSchemaTypes", "IFC 2x3") == "IfcProject"
+        if instance.definition.get_attribute('AppliedSchemaTypes', 'IFC 2x3') == 'IfcProject'
           instance.explode
         end
       end
@@ -98,18 +96,18 @@ module BimTools::IfcManager
   # @param [Sketchup::Model]
   #
   def improve_definition_names(model)
-    if Sketchup.active_model.classifications["IFC 2x3"]
+    if Sketchup.active_model.classifications['IFC 2x3']
       definitions = model.definitions
       i = 0
       while i < definitions.length
         definition = definitions[i]
-        ifc_type = definition.get_attribute("AppliedSchemaTypes", "IFC 2x3")
+        ifc_type = definition.get_attribute('AppliedSchemaTypes', 'IFC 2x3')
         if ifc_type
           instances = definition.instances
           j = 0
           while j < instances.length
             instance = instances[j]
-            unless instance.name == ""
+            unless instance.name == ''
               name = instance.name.delete_prefix("#{ifc_type} - ")
               definition.name = definitions.unique_name(name)
             end
@@ -138,15 +136,13 @@ module BimTools::IfcManager
 
   # Import IFC model + cleanup
   #
-  def ifc_import()
+  def ifc_import
     default_path = File.join(ENV['HOME'], 'Desktop')
     Sketchup.file_new
     model = Sketchup.active_model
     model.start_operation('IFC Import', true)
-    import_path = UI.openpanel("Open IFC File", default_path, "IFC Files|*.ifc;*.ifcZIP||")
+    import_path = UI.openpanel('Open IFC File', default_path, 'IFC Files|*.ifc;*.ifcZIP||')
     model.import(import_path, false)
-    import_dir = File.dirname(import_path)
-    import_file = File.basename(import_path, ".*") << ".skp"
     model.definitions.purge_unused
     model.commit_operation
     ifc_cleanup(model)
