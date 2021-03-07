@@ -72,6 +72,25 @@ module BimTools::IfcManager
                   #   together with the IFC classification
                   # (?) Is this the best place for this check?
                   if @name=="IFC 2x3"
+
+                    # Set assigned enumerations to default value
+                    ifc_dict = definition.attribute_dictionary("IFC 2x3")
+                    ifc_dict.attribute_dictionaries.each do |attr_dict|
+                      if attr_dict.attribute_dictionaries
+                        attr_dict.attribute_dictionaries.each do |prop_dict|
+                          if prop_dict["attribute_type"] == "enumeration"
+                            if prop_dict["options"]
+                              options = prop_dict["options"]
+                              if options.include?("element")
+                                prop_dict["value"] = "element"
+                              else
+                                prop_dict["value"] = prop_dict["options"].last
+                              end
+                            end
+                          end
+                        end
+                      end
+                    end
                     if Settings.common_psets
                       BimTools::IfcManager::add_common_psets(definition, value)
                     end
