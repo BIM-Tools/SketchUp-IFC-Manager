@@ -72,7 +72,7 @@ module BimTools::IfcManager
       @su_total_transformation = su_total_transformation * su_instance.transformation
 
       # check if entity_type is part of the entity list that needs exporting
-      if @ifc_model.options[:ifc_entities] == false || @ifc_model.options[:ifc_entities].include?(ent_type_name)
+      if @ifc_model.options[:ifc_entities] == false || ent_type_name.nil? || @ifc_model.options[:ifc_entities].include?(ent_type_name)
 
         # Create IFC entity based on the IFC classification in sketchup
         begin
