@@ -16,7 +16,24 @@ module BimTools::IfcManager
         if edge.hidden?
           faces = edge.faces
           if faces.length == 2
-            delete << edge if faces[0].normal.samedirection?(faces[1].normal)
+            if faces[0].normal.samedirection?(faces[1].normal)
+
+              # Double check if samedirection is accurate enough and faces are really on the same plane
+              same_plane = false
+              plane = faces[0].plane
+              verts = faces[1].vertices
+              k = 0
+              while k < verts.length
+                same_plane = verts[k].position.on_plane?(plane)
+                unless same_plane
+                  break
+                end
+                k += 1
+              end
+              if same_plane
+                delete << edge 
+              end
+            end
           end
         end
       end
@@ -61,24 +78,37 @@ module BimTools::IfcManager
   #
   # @param [Sketchup::Model]
   #
-  def explode_ifc_files(model)
-    entities = model.entities
-    i = 0
-    while i < entities.length
-      instance = entities[i]
-      if instance.is_a?(Sketchup::ComponentInstance)
-        instance.explode if instance.definition.name.end_with?('.ifc')
-      end
-      i += 1
+  # @return (Array<Sketchup:Entity>) — An array of entity objects if successful, false if unsuccessful
+  def explode_ifc_files(model, ifc_file_path)
+    ifc_file_name = File.basename(ifc_file_path)
+
+    # check if previous exports with the same name are created
+    next_definition_name = model.definitions.unique_name(ifc_file_name)
+    unless next_definition_name.end_with?('#1') # then there probably is no older import from the same IFC in the model
+      ifc_file_name = "#{ifc_file_name}##{next_definition_name[-1,1].to_i-1}"
     end
+
+    # Explode the instances placed directly in the model
+    definition = model.definitions[ifc_file_name]
+    if (definition) && (definition.instances.length == 1)
+      instance = definition.instances[0]
+      if instance.parent.is_a?(Sketchup::Model)
+        return instance.explode
+      end
+    else
+      message = "Unable to find IFC file to explode"
+      puts message
+      notification = UI::Notification.new(IFCMANAGER_EXTENSION, message)
+      notification.show
+    end
+    return false
   end
 
   # Explode all IfcProjects
   #
   # @param [Sketchup::Model]
   #
-  def explode_ifc_projects(model)
-    entities = model.entities
+  def explode_ifc_projects(entities)
     j = 0
     while j < entities.length
       instance = entities[j]
@@ -123,28 +153,33 @@ module BimTools::IfcManager
   #
   # @param model [Sketchup::Model]
   #
-  def ifc_cleanup(model)
+  def ifc_cleanup(model, import_path)
+    puts "start cleanup"
     model.start_operation('IFC Cleanup', true)
     merge_faces(model.entities)
-    explode_ifc_files(model)
-    explode_ifc_projects(model)
+    puts "start explode"
+    imported_entities = explode_ifc_files(model, import_path)
+    if imported_entities
+      explode_ifc_projects(imported_entities)
+    end
     ifc_type_to_layer(model)
     improve_definition_names(model)
-    model.definitions.purge_unused
     model.commit_operation
   end
 
   # Import IFC model + cleanup
   #
   def ifc_import
-    default_path = File.join(ENV['HOME'], 'Desktop')
-    Sketchup.file_new
     model = Sketchup.active_model
+    default_path = File.dirname(model.path)
+    unless default_path
+      default_path = File.join(ENV['HOME'], 'Desktop')
+    end
     model.start_operation('IFC Import', true)
     import_path = UI.openpanel('Open IFC File', default_path, 'IFC Files|*.ifc;*.ifcZIP||')
     model.import(import_path, false)
-    model.definitions.purge_unused
     model.commit_operation
-    ifc_cleanup(model)
+    puts "import complete"
+    ifc_cleanup(model, import_path)
   end
 end
