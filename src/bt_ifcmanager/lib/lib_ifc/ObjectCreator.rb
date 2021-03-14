@@ -86,7 +86,7 @@ module BimTools::IfcManager
             ifc_entity = nil
           else
             ifc_entity = entity_type.new(@ifc_model, su_instance)
-            if entity_type == IfcRoot
+            if entity_type < IfcRoot
               ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
             end
           end
@@ -256,6 +256,7 @@ module BimTools::IfcManager
     end
 
     # Validates and updates the spatial hierarchy for the current object.
+    # (!) ToDo: Allow possibility of exterior space (with parent IfcSite)
     #
     def validate_spatial_hierarchy
       entity_type_index = spatial_hierarchy_highest_index
