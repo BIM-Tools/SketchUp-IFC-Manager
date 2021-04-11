@@ -31,7 +31,7 @@ module BimTools
       UI.add_context_menu_handler do |context_menu|
         selection = Sketchup.active_model.selection
         unless selection.empty?
-          context_menu.add_item("Create #{name.capitalize}") {
+          context_menu.add_item("Create #{name}") {
             CreateComponent.activate( ifc_type, name, objecttype )
           }
         end
@@ -39,10 +39,10 @@ module BimTools
     end # def add_component_option
     
     # Add the following create new component options to the context menu
-    add_component_option( 'IfcBuildingElementProxy', 'building element' )
-    add_component_option( 'IfcBuildingStorey', 'building storey' )
-    add_component_option( 'IfcBuilding', 'building' )
-    add_component_option( 'IfcSite', 'site' )
+    add_component_option( 'IfcBuildingElementProxy', 'Building Element' )
+    add_component_option( 'IfcBuildingStorey', 'Building Storey' )
+    add_component_option( 'IfcBuilding', 'Building' )
+    add_component_option( 'IfcSite', 'Site' )
     
     # The activate method is called by SketchUp when the tool is first selected.
     # it is a good place to put most of your initialization

@@ -85,7 +85,7 @@ module BimTools
         when BimTools::IFC2X3::IfcProject
           BimTools::IfcManager::add_export_message("Created default IfcSite")
           @default_related_object = BimTools::IFC2X3::IfcSite.new( @ifc_model )
-          @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Site" )
+          @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "default site" )
           @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Site" )
 
           # set geolocation
@@ -99,13 +99,13 @@ module BimTools
         when BimTools::IFC2X3::IfcSite
           BimTools::IfcManager::add_export_message("Created default IfcBuilding")
           @default_related_object = BimTools::IFC2X3::IfcBuilding.new( @ifc_model )
-          @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Building" )
+          @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "default building" )
           @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Building" )
           parent_objectplacement = @objectplacement
         when BimTools::IFC2X3::IfcBuilding
           BimTools::IfcManager::add_export_message("Created default IfcBuildingStorey")
           @default_related_object = BimTools::IFC2X3::IfcBuildingStorey.new( @ifc_model )
-          @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "Default Building Storey" )
+          @default_related_object.name = BimTools::IfcManager::IfcLabel.new( "default building storey" )
           @default_related_object.description = BimTools::IfcManager::IfcText.new( "Description of Default Building Storey" )
           parent_objectplacement = @objectplacement
         end

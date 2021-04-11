@@ -67,7 +67,10 @@ module BimTools
         definition = @su_object.definition
         
         #(?) set name, here? is this a duplicate?
-        @name = BimTools::IfcManager::IfcLabel.new( definition.name )
+        @name = BimTools::IfcManager::IfcLabel.new(definition.name)
+
+        # also set "tag" to component instance name?
+        # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
         
         if definition.attribute_dictionaries
           if definition.attribute_dictionaries["IFC 2x3"]

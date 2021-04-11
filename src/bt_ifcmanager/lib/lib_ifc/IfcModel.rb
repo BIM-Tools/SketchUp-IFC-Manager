@@ -197,7 +197,7 @@ module BimTools
         # create IfcBuildingelementProxy from all 'loose' faces combined
         unless faces.empty?
           ifc_entity = IfcBuildingElementProxy.new(self, nil)
-          ifc_entity.name = BimTools::IfcManager::IfcLabel.new("Default Building Element")
+          ifc_entity.name = BimTools::IfcManager::IfcLabel.new("default building element")
           ifc_entity.representation = IfcProductDefinitionShape.new(self, nil)
           brep = IfcFacetedBrep.new( self, faces, Geom::Transformation.new )
           ifc_entity.representation.representations.first.items.add( brep )
