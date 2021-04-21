@@ -32,6 +32,8 @@ require_relative "IfcLengthMeasure.rb"
 require_relative "IfcPlaneAngleMeasure.rb"
 require_relative "IfcPositiveLengthMeasure.rb"
 require_relative "IfcThermalTransmittanceMeasure.rb"
+require_relative "IfcVolumetricFlowRateMeasure.rb"
+require_relative "IfcPositiveRatioMeasure.rb"
 require_relative "enumeration.rb"
 
 # load entities
@@ -127,14 +129,14 @@ module BimTools
                 prop = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model )
                 entity_type = false
                 if value_type
-                  begin
+                  # begin
                     # require_relative ent_type_name
                     entity_type = eval("BimTools::IfcManager::#{value_type}")
                     prop.nominalvalue = entity_type.new(dict_value)
-                  rescue => e
-                    puts "Error creating IFC type: #{ e.to_s}"
-                    # puts dict_value
-                  end
+                  # rescue => e
+                  #   puts "Error creating IFC type: #{ e.to_s}"
+                  #   # puts dict_value
+                  # end
                 end
                 unless entity_type
                   case attribute_type

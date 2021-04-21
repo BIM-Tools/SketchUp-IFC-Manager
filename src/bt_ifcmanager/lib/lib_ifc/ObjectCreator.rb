@@ -23,6 +23,7 @@
 
 require_relative('IfcGloballyUniqueId.rb')
 require_relative('IfcLengthMeasure.rb')
+require_relative('entity_path.rb')
 
 require_relative(File.join('IFC2X3', 'IfcElementAssembly.rb'))
 require_relative(File.join('IFC2X3', 'IfcBuilding.rb'))
@@ -43,28 +44,20 @@ module BimTools::IfcManager
   class ObjectCreator
     include BimTools::IFC2X3
 
-    SPATIAL_ORDER = [
-      IfcProject,
-      IfcSite,
-      IfcBuilding,
-      IfcBuildingStorey,
-      IfcSpace
-    ].freeze
-
     # This creator class creates the correct IFC entity for the given sketchup object and it's children
     #
     # @parameter ifc_model [IfcManager::IfcModel] The IFC model in which the new IFC entity must be added
     # @parameter su_instance [Sketchup::ComponentInstance, Sketchup::Group] The sketchup component instance or group for which an IFC entity must be created
     # @parameter su_total_transformation [Geom::Transformation] The combined transformation of all parent sketchup objects
     # @parameter geometric_parent [IFC ENTITY] The IFC entity that is the direct geometric parent in the sketchup model
-    # @parameter spatial_hierarchy [Hash<BimTools::IfcManager::IFC2X3::IfcSpatialStructureElement>] Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
+    # @parameter entity_path [Hash<BimTools::IfcManager::IFC2X3::IfcSpatialStructureElement>] Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
     # @parameter su_material [Sketchup::Material] The parent sketchup objects material which will be used when the given one does not have a directly associated material
     #
-    def initialize(ifc_model, su_instance, su_total_transformation, geometric_parent, spatial_hierarchy = {}, su_material = nil)
-      ifc_entity = nil?
+    def initialize(ifc_model, su_instance, su_total_transformation, geometric_parent, entity_path = nil, su_material = nil)
+      ifc_entity = nil
       @ifc_model = ifc_model
       @geometric_parent = geometric_parent
-      @spatial_hierarchy = spatial_hierarchy
+      @entity_path = EntityPath.new(@ifc_model, entity_path)
       ent_type_name = su_instance.definition.get_attribute('AppliedSchemaTypes', 'IFC 2x3')
       parent_hex_guid = @geometric_parent.globalid&.to_s
 
@@ -90,6 +83,7 @@ module BimTools::IfcManager
               ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
             end
           end
+          @entity_path.add(ifc_entity)
           construct_entity(ifc_entity)
           create_nested_objects(ifc_entity, su_instance, su_material)
 
@@ -99,6 +93,7 @@ module BimTools::IfcManager
           if @geometric_parent.is_a?(IfcSpatialStructureElement) || @geometric_parent.is_a?(IfcProject)
             ifc_entity = IfcBuildingElementProxy.new(@ifc_model, su_instance)
             ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
+            @entity_path.add(ifc_entity)
             construct_entity(ifc_entity)
             create_nested_objects(ifc_entity, su_instance, su_material)
           else # this instance is pure geometry and will be part of the parent entity
@@ -115,12 +110,6 @@ module BimTools::IfcManager
     # @parameter ifc_entity
     #
     def construct_entity(ifc_entity)
-      # Add entity to the spatial hierarchy if it's a IfcSpatialStructureElement
-      if ifc_entity.is_a?(IfcSpatialStructureElement)
-        @spatial_hierarchy[ifc_entity.class] = ifc_entity
-      end
-
-      validate_spatial_hierarchy
 
       # if parent is a IfcGroup, add entity to group
       if @geometric_parent.is_a?(IfcGroup)
@@ -135,27 +124,8 @@ module BimTools::IfcManager
         end
       end
 
-      # validate and correct the parent in the spacialhierarchy
-      if ifc_entity && !ifc_entity.is_a?(IfcGroup)
-        ifc_entity.parent = get_parent_ifc(ifc_entity)
-
-        # Add entity to the model structure
-        case ifc_entity
-        when IfcSpatialStructureElement
-          ifc_entity.parent.add_related_object(ifc_entity)
-        else
-          case ifc_entity.parent
-          when IfcSpatialStructureElement
-            ifc_entity.parent.add_contained_element(ifc_entity)
-          when IfcProject, IfcProduct, IfcCurtainWall, IfcElementAssembly
-            ifc_entity.parent.add_related_object(ifc_entity)
-          end
-        end
-      end
-
-      # create objectplacement for ifc_entity
-      # set objectplacement based on transformation
       if ifc_entity.is_a?(IfcProduct)
+        @entity_path.set_parent(ifc_entity)
         if ifc_entity.parent.is_a?(IfcProduct)
           ifc_entity.objectplacement = IfcLocalPlacement.new(@ifc_model, @su_total_transformation, ifc_entity.parent.objectplacement)
         else
@@ -195,11 +165,7 @@ module BimTools::IfcManager
           case ent
           when Sketchup::Group, Sketchup::ComponentInstance
 
-            # Add parent to the next entity's spatial hierarchy if it's a IfcSpatialStructureElement
-            if ifc_entity.is_a?(IfcSpatialStructureElement)
-              @spatial_hierarchy[ifc_entity.class] = ifc_entity
-            end
-            ObjectCreator.new(@ifc_model, ent, @su_total_transformation, ifc_entity, @spatial_hierarchy.clone, su_material)
+            ObjectCreator.new(@ifc_model, ent, @su_total_transformation, ifc_entity, @entity_path, su_material)
           when Sketchup::Face
             faces << ent if @ifc_model.options[:geometry]
           end
@@ -224,69 +190,6 @@ module BimTools::IfcManager
           ifc_entity.parent.create_representation(faces, brep_transformation, su_material)
         end
       end
-    end
-
-    # Finds the parent entity for given IFC entity and completes the spatial hierarchy
-    #
-    # @parameter ifc_entity
-    #
-    def get_parent_ifc(ifc_entity)
-      # If ifc_entity is in the spatial hierarchy (i.a. is a IfcSpatialStructureElement)
-      # if @spatial_hierarchy.has_value?(ifc_entity)
-      if ifc_entity.is_a?(IfcSpatialStructureElement)
-        parent_type_index = SPATIAL_ORDER.index(ifc_entity.class) - 1
-
-      # IfcElementAssembly and IfcCurtainWall are special cases with direct child objects
-      elsif @geometric_parent.is_a?(IfcElementAssembly) || @geometric_parent.is_a?(IfcCurtainWall)
-        return @geometric_parent
-      else
-
-        # Get the highest SPATIAL_ORDER index from @spatial_hierarchy
-        parent_type_index = 0
-        @spatial_hierarchy.each_key do |entity|
-          next unless SPATIAL_ORDER.include?(entity)
-
-          entity_index = SPATIAL_ORDER.index(entity)
-          parent_type_index = entity_index if entity_index > parent_type_index
-        end
-      end
-
-      # Return parent entity
-      @spatial_hierarchy[SPATIAL_ORDER[parent_type_index]]
-    end
-
-    # Validates and updates the spatial hierarchy for the current object.
-    # (!) ToDo: Allow possibility of exterior space (with parent IfcSite)
-    #
-    def validate_spatial_hierarchy
-      entity_type_index = spatial_hierarchy_highest_index
-
-      # Check if minimal spatial structure exists (IfcSite)
-      unless entity_type_index >= SPATIAL_ORDER.index(IfcSite)
-        entity_type_index = SPATIAL_ORDER.index(IfcBuildingStorey)
-      end
-
-      # Fill missing objects in spatial tree
-      i = 1 # start after IfcProject because that's always present
-      while i <= entity_type_index
-        unless @spatial_hierarchy.key?(SPATIAL_ORDER[i])
-          @spatial_hierarchy[SPATIAL_ORDER[i]] = @spatial_hierarchy[SPATIAL_ORDER[i - 1]].get_default_related_object
-        end
-        i += 1
-      end
-    end
-
-    # Get the highest SPATIAL_ORDER index from @spatial_hierarchy
-    #
-    def spatial_hierarchy_highest_index
-      entity_type_index = 0
-      @spatial_hierarchy.each_key do |entity|
-        next unless SPATIAL_ORDER.include?(entity)
-
-        entity_index = SPATIAL_ORDER.index(entity)
-        entity_type_index = entity_index if entity_index > entity_type_index
-      end
-      entity_type_index
     end
   end
 end
