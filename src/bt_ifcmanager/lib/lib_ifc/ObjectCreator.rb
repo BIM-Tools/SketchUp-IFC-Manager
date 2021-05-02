@@ -60,50 +60,68 @@ module BimTools::IfcManager
       @entity_path = EntityPath.new(@ifc_model, entity_path)
       ent_type_name = su_instance.definition.get_attribute('AppliedSchemaTypes', 'IFC 2x3')
       parent_hex_guid = @geometric_parent.globalid&.to_s
+      su_material = su_instance.material if su_instance.material
 
       # Add the current sketchup object's transformation to the total transformation
       @su_total_transformation = su_total_transformation * su_instance.transformation
 
       # check if entity_type is part of the entity list that needs exporting
-      if @ifc_model.options[:ifc_entities] == false || ent_type_name.nil? || @ifc_model.options[:ifc_entities].include?(ent_type_name)
-
-        # Create IFC entity based on the IFC classification in sketchup
-        begin
-          require_relative File.join('IFC2X3', ent_type_name)
-          entity_type = eval(ent_type_name)
-
-          # if a IfcProject then add su_object to the existing project
-          # (?) what if there are multiple projects defined?
-          if entity_type == IfcProject
-            @ifc_model.project.su_object = su_instance
-            ifc_entity = nil
-          else
-            ifc_entity = entity_type.new(@ifc_model, su_instance)
-            if entity_type < IfcRoot
-              ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
-            end
-          end
-          @entity_path.add(ifc_entity)
-          construct_entity(ifc_entity)
-          create_nested_objects(ifc_entity, su_instance, su_material)
-
-        # LoadError added because require errors are not catched by StandardError
-        rescue StandardError, LoadError
-          # If not classified as IFC in sketchup AND the parent is an IfcSpatialStructureElement then this is an IfcBuildingElementProxy
-          if @geometric_parent.is_a?(IfcSpatialStructureElement) || @geometric_parent.is_a?(IfcProject)
-            ifc_entity = IfcBuildingElementProxy.new(@ifc_model, su_instance)
-            ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
-            @entity_path.add(ifc_entity)
-            construct_entity(ifc_entity)
-            create_nested_objects(ifc_entity, su_instance, su_material)
-          else # this instance is pure geometry and will be part of the parent entity
-            create_nested_objects(geometric_parent, su_instance, su_material)
-          end
+      if @ifc_model.options[:nested_entities] == false
+        if @ifc_model.su_entities.empty? || @ifc_model.su_entities.include?(su_instance)
+          create_ifc_entity(ent_type_name, su_instance, parent_hex_guid, su_material)
+        else
+          create_nested_objects(@geometric_parent, su_instance, su_material)
         end
+      elsif @ifc_model.options[:ifc_entities] == false || ent_type_name.nil? || @ifc_model.options[:ifc_entities].include?(ent_type_name)
+        create_ifc_entity(ent_type_name, su_instance, parent_hex_guid, su_material)
       end
     end
 
     private
+
+    # Create IFC entity based on the IFC classification in sketchup
+    def create_ifc_entity(ent_type_name, su_instance, parent_hex_guid, su_material)
+      puts su_instance.definition.name
+      # (?) catch ent_type_name.nil? with if before catch block?
+      begin
+        require_relative File.join('IFC2X3', ent_type_name)
+        entity_type = eval(ent_type_name)
+
+        # if a IfcProject then add su_object to the existing project
+        # (?) what if there are multiple projects defined?
+        if entity_type == IfcProject
+
+          #TODO set all correct parameters for IfcProject!!!
+          @ifc_model.project.su_object = su_instance
+          ifc_entity = @ifc_model.project
+          @ifc_model.project.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
+        else
+          ifc_entity = entity_type.new(@ifc_model, su_instance)
+          if entity_type < IfcRoot
+            ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
+          end
+        end
+        @entity_path.add(ifc_entity)
+        construct_entity(ifc_entity)
+        faces = create_nested_objects(ifc_entity, su_instance, su_material)
+
+      # LoadError added because require errors are not catched by StandardError
+      rescue StandardError, LoadError
+        # If not classified as IFC in sketchup AND the parent is an IfcSpatialStructureElement then this is an IfcBuildingElementProxy
+        if @geometric_parent.is_a?(IfcSpatialStructureElement) || @geometric_parent.is_a?(IfcProject)
+          ifc_entity = IfcBuildingElementProxy.new(@ifc_model, su_instance)
+          ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
+          @entity_path.add(ifc_entity)
+          construct_entity(ifc_entity)
+          faces = create_nested_objects(ifc_entity, su_instance, su_material)
+        else # this instance is pure geometry and will be part of the parent entity
+          faces = create_nested_objects(@geometric_parent, su_instance, su_material)
+        end
+      end
+      if faces
+        create_geometry(ifc_entity, su_material,faces)
+      end
+    end
 
     # Constructs the IFC entity
     #
@@ -148,10 +166,10 @@ module BimTools::IfcManager
     # @parameter su_instance
     # @parameter su_material
     #
+    # @return [Array] direct sketchup geometry
     def create_nested_objects(ifc_entity, su_instance, su_material)
       faces = []
       definition = su_instance.definition
-      su_material = su_instance.material if su_instance.material
       entities = definition.entities
       definition_count = entities.length
       i = 0
@@ -172,6 +190,10 @@ module BimTools::IfcManager
         end
         i += 1
       end
+      return faces
+    end
+
+    def create_geometry(ifc_entity,su_material,faces)
 
       # calculate the local transformation
       # if the SU object if not an IFC entity, then BREP needs to be transformed with SU object transformation

@@ -39,8 +39,7 @@
 require 'yaml'
 require "cgi"
 
-module BimTools
- module IfcManager
+module BimTools::IfcManager
   module Settings
     extend self
     attr_accessor :visible
@@ -67,7 +66,6 @@ module BimTools
       end
   
       # load classification schemes from settings
-      model = Sketchup.active_model
       read_classifications()
       load_classifications()
       load_materials()
@@ -82,7 +80,8 @@ module BimTools
         @export_geometry =           CheckboxOption.new("geometry", "Export geometry", @options[:export][:geometry])
         @export_fast_guid =          CheckboxOption.new("fast_guid", "Improve export speed by using fake GUID's", @options[:export][:fast_guid])
         @export_dynamic_attributes = CheckboxOption.new("dynamic_attributes", "Export dynamic attributes", @options[:export][:dynamic_attributes])
-        # @export_mapped_items =       CheckboxOption.new("mapped_items", "Export IFC mapped items", @options[:export][:mapped_items])
+        # @export_mapped_items =       CheckboxOption.new("mapped_items", "Export IFC mapped items", @options[:export][:mapped_items]),
+        # @export_nested_entities = CheckboxOption.new("nested_entities", "Export nested entities", @options[:export][:nested_entities])
       end
     end # def load
 
@@ -99,11 +98,12 @@ module BimTools
       @options[:export][:fast_guid]          = @export_fast_guid.value
       @options[:export][:dynamic_attributes] = @export_dynamic_attributes.value
       # @options[:export][:mapped_items]       = @export_mapped_items.value
+      # @options[:export][:nested_entities]    = @export_nested_entities.value
       File.open(@settings_file, "w") { |file| file.write(@options.to_yaml) }
-      if IfcManager::PropertiesWindow.window && IfcManager::PropertiesWindow.window.visible?
+      if BimTools::IfcManager::PropertiesWindow.window && BimTools::IfcManager::PropertiesWindow.window.visible?
         PropertiesWindow.close
         PropertiesWindow.create
-        IfcManager::PropertiesWindow.show
+        BimTools::IfcManager::PropertiesWindow.show
       else
         PropertiesWindow.create
       end
@@ -245,6 +245,7 @@ module BimTools
         @export_fast_guid.value           = false
         @export_dynamic_attributes.value  = false
         # @export_mapped_items.value        = false
+        # @export_nested_entities.value     = false        
 
         a_form_data = CGI.unescape(s_form_data).split('&')
         a_form_data.each do |s_setting|
@@ -332,6 +333,7 @@ HTML
       html << @export_fast_guid.html()
       html << @export_dynamic_attributes.html()
       # html << @export_mapped_items.html()
+      # html << @export_nested_entities.html()
       html << "      </div>\n"
 
       # Default materials
@@ -386,16 +388,12 @@ HTML
         else
           checked = ""
         end
-        html_string = <<HTML
+        return <<HTML
         <div class="col-md-12 row">
           <label class="check-inline"><input type="checkbox" name="#{@name}" value="#{@name}"#{checked}> #{@title}</label>
         </div>
 HTML
-        return html_string
       end
-
     end
-
-    end # module Settings
-   end # module IfcManager
-  end # module BimTools
+  end
+end

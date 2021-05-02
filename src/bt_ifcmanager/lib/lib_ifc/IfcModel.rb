@@ -53,15 +53,22 @@ module BimTools
       # - add_ifc_object
 
       attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications, :classificationassociations
-      attr_reader :su_model, :project, :ifc_objects, :export_summary, :options
+      attr_reader :su_model, :project, :ifc_objects, :export_summary, :options, :su_entities
 
       # creates an IFC model based on given su model
       # (?) could be enhanced to also accept other sketchup objects
-      def initialize(su_model, options = {})
+
+      # Creates an IFC model based on given su model
+      #
+      # @parameter su_model [Sketchup::Model] 
+      # @parameter options [Hash] Optional options hash
+      # @parameter su_entities [Array<Sketchup::Entity>] Optional list of entities that have to be exported to IFC, nil exports all model entities.
+      #
+      def initialize(su_model, options = {}, su_entities=[])
         defaults = {
           ifc_entities:       false, #                                  include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
-          hidden:             false, #                                  include hidden sketchup objects
-          attributes:         ['SU_DefinitionSet', 'SU_InstanceSet'], # include specific attribute dictionaries given in array as IfcPropertySets, like ['SU_DefinitionSet', 'SU_InstanceSet'], false means all
+          hidden:             true, #                                  include hidden sketchup objects
+          attributes:         [], # include specific attribute dictionaries given in array as IfcPropertySets, like ['SU_DefinitionSet', 'SU_InstanceSet'], false means all
           classifications:    true, #                                   add all SketchUp classifications
           layers:             true, #                                   create IfcPresentationLayerAssignments
           materials:          true, #                                   create IfcMaterials
@@ -69,11 +76,13 @@ module BimTools
           geometry:           true, #                                   create geometry for entities
           fast_guid:          false, #                                  create simplified guids
           dynamic_attributes: true, #                                   export dynamic component data
-          mapped_items:       false
+          mapped_items:       false,
+          nested_entities:    true #                                    su_entities export nested entities for given objects
         }
         @options = defaults.merge(options)
 
         @su_model = su_model
+        @su_entities = su_entities
         @ifc_id = 0
         @export_summary = {}
 
@@ -98,9 +107,14 @@ module BimTools
         @representationcontext = create_representationcontext
 
         @project.representationcontexts = IfcManager::Ifc_Set.new([@representationcontext])
-
-        # create IFC objects for all su instances
-        create_ifc_objects(su_model)
+        
+        # When no entities are given for export, pass all model entities to create ifc objects
+        # nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked
+        if su_entities.empty? || @options[:nested_entities]==false
+          create_ifc_objects(su_model.entities)
+        else
+          create_ifc_objects(su_entities)
+        end
       end
 
       # add object to ifc_objects array
@@ -169,46 +183,43 @@ module BimTools
       end
 
       # create IFC objects for all su instances
-      def create_ifc_objects(sketchup_objects)
-        if sketchup_objects.is_a? Sketchup::Model
-          faces = []
-          entities = sketchup_objects.entities
-          entitiy_count = entities.length
-          i = 0
-          while i < entitiy_count
-            ent = entities[i]
+      def create_ifc_objects(entities)
+        faces = []
+        entitiy_count = entities.length
+        i = 0
+        while i < entitiy_count
+          ent = entities[i]
 
-            # skip hidden objects if skip-hidden option is set
-            unless @options[:hidden] == false && (ent.hidden? || !BimTools::IfcManager.layer_visible?(ent.layer))
-              case ent
-              when Sketchup::Group, Sketchup::ComponentInstance
-                transformation = Geom::Transformation.new
-                entity_path = EntityPath.new(self)
-                entity_path.add(@project)
-                ObjectCreator.new(self, ent, transformation, @project, entity_path)
-              when Sketchup::Face
-                faces << ent
-              end
+          # skip hidden objects if skip-hidden option is set
+          unless @options[:hidden] == false && (ent.hidden? || !BimTools::IfcManager.layer_visible?(ent.layer))
+            case ent
+            when Sketchup::Group, Sketchup::ComponentInstance
+              transformation = Geom::Transformation.new
+              entity_path = EntityPath.new(self)
+              entity_path.add(@project)
+              ObjectCreator.new(self, ent, transformation, @project, entity_path)
+            when Sketchup::Face
+              faces << ent
             end
-            i += 1
           end
+          i += 1
+        end
 
-          # create IfcBuildingelementProxy from all 'loose' faces combined
-          unless faces.empty?
-            ifc_entity = IfcBuildingElementProxy.new(self, nil)
-            ifc_entity.name = BimTools::IfcManager::IfcLabel.new('default building element')
-            ifc_entity.representation = IfcProductDefinitionShape.new(self, nil)
-            brep = IfcFacetedBrep.new(self, faces, Geom::Transformation.new)
-            ifc_entity.representation.representations.first.items.add(brep)
-            ifc_entity.objectplacement = IfcLocalPlacement.new(self, Geom::Transformation.new)
+        # create IfcBuildingelementProxy from all 'loose' faces combined
+        unless faces.empty?
+          ifc_entity = IfcBuildingElementProxy.new(self, nil)
+          ifc_entity.name = BimTools::IfcManager::IfcLabel.new('default building element')
+          ifc_entity.representation = IfcProductDefinitionShape.new(self, nil)
+          brep = IfcFacetedBrep.new(self, faces, Geom::Transformation.new)
+          ifc_entity.representation.representations.first.items.add(brep)
+          ifc_entity.objectplacement = IfcLocalPlacement.new(self, Geom::Transformation.new)
 
-            # Create spatial hierarchy
-            parent_ifc = project.get_default_related_object #    parent is default site
-            parent_ifc = parent_ifc.get_default_related_object # parent is default building
-            parent_ifc = parent_ifc.get_default_related_object # parent is default buildingstorey
+          # Create spatial hierarchy
+          parent_ifc = project.get_default_related_object #    parent is default site
+          parent_ifc = parent_ifc.get_default_related_object # parent is default building
+          parent_ifc = parent_ifc.get_default_related_object # parent is default buildingstorey
 
-            parent_ifc.add_contained_element(ifc_entity)
-          end
+          parent_ifc.add_contained_element(ifc_entity)
         end
         ifc_objects
       end
