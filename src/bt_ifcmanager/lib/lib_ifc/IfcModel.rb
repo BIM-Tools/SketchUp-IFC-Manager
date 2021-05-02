@@ -66,18 +66,18 @@ module BimTools
       #
       def initialize(su_model, options = {}, su_entities=[])
         defaults = {
-          ifc_entities:       false, #                                  include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
-          hidden:             true, #                                  include hidden sketchup objects
-          attributes:         [], # include specific attribute dictionaries given in array as IfcPropertySets, like ['SU_DefinitionSet', 'SU_InstanceSet'], false means all
-          classifications:    true, #                                   add all SketchUp classifications
-          layers:             true, #                                   create IfcPresentationLayerAssignments
-          materials:          true, #                                   create IfcMaterials
-          styles:             true, #                                   create IfcStyledItems
-          geometry:           true, #                                   create geometry for entities
-          fast_guid:          false, #                                  create simplified guids
-          dynamic_attributes: true, #                                   export dynamic component data
-          mapped_items:       false,
-          nested_entities:    true #                                    su_entities export nested entities for given objects
+          ifc_entities:       false, # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
+          hidden:             true, #  include hidden sketchup objects
+          attributes:         [], #    include specific attribute dictionaries given in array as IfcPropertySets, like ['SU_DefinitionSet', 'SU_InstanceSet'], false means all
+          classifications:    true, #  add all SketchUp classifications
+          layers:             true, #  create IfcPresentationLayerAssignments
+          materials:          true, #  create IfcMaterials
+          colors:             true, #  create IfcStyledItems
+          geometry:           true, #  create geometry for entities
+          fast_guid:          false, # create simplified guids
+          dynamic_attributes: true, #  export dynamic component data
+          mapped_items:       false, # export component definitions as mapped items
+          nested_entities:    true #   su_entities export nested entities for given objects
         }
         @options = defaults.merge(options)
 

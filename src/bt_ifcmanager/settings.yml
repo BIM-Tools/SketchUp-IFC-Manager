@@ -8,7 +8,7 @@
   :classifications: true
   :layers: true
   :materials: true
-  :styles: true
+  :colors: true
   :geometry: true
   :fast_guid: false
   :dynamic_attributes: true

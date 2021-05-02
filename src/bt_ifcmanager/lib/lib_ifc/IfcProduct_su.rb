@@ -213,7 +213,7 @@ module BimTools
       end
       
       # add color from su-object material, or a su_parent's
-      if @ifc_model.options[:styles]
+      if @ifc_model.options[:colors]
         BimTools::IFC2X3::IfcStyledItem.new( @ifc_model, brep, su_material )
       end
         
