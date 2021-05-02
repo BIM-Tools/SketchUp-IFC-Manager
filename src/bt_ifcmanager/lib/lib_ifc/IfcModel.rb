@@ -109,8 +109,8 @@ module BimTools
         @project.representationcontexts = IfcManager::Ifc_Set.new([@representationcontext])
         
         # When no entities are given for export, pass all model entities to create ifc objects
-        # nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked
-        if su_entities.empty? || @options[:nested_entities]==false
+        # if nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked
+        if su_entities.empty? || @options[:nested_entities] == false
           create_ifc_objects(su_model.entities)
         else
           create_ifc_objects(su_entities)
