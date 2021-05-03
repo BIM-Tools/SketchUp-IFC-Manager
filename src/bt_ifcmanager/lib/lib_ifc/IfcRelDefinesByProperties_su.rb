@@ -129,14 +129,13 @@ module BimTools
                 prop = BimTools::IFC2X3::IfcPropertySingleValue.new( ifc_model )
                 entity_type = false
                 if value_type
-                  # begin
+                  begin
                     # require_relative ent_type_name
                     entity_type = eval("BimTools::IfcManager::#{value_type}")
                     prop.nominalvalue = entity_type.new(dict_value)
-                  # rescue => e
-                  #   puts "Error creating IFC type: #{ e.to_s}"
-                  #   # puts dict_value
-                  # end
+                  rescue => e
+                    puts "Error creating IFC type: #{ e.to_s}"
+                  end
                 end
                 unless entity_type
                   case attribute_type
@@ -166,6 +165,6 @@ module BimTools
           end
         end
       end
-    end # def sketchup
-  end # module IfcRelDefinesByProperties_su
-end # module BimTools
+    end
+  end
+end
