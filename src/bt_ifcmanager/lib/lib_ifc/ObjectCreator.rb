@@ -102,6 +102,7 @@ module BimTools::IfcManager
         @entity_path.add(ifc_entity)
         construct_entity(ifc_entity, placement_parent)
         faces = create_nested_objects(ifc_entity, su_instance, su_material)
+        create_geometry(ifc_entity, su_material,faces)
 
       # LoadError added because require errors are not catched by StandardError
       rescue StandardError, LoadError
@@ -112,12 +113,11 @@ module BimTools::IfcManager
           @entity_path.add(ifc_entity)
           construct_entity(ifc_entity, placement_parent)
           faces = create_nested_objects(ifc_entity, su_instance, su_material)
+          create_geometry(ifc_entity, su_material,faces)
         else # this instance is pure geometry and will be part of the parent entity
           faces = create_nested_objects(placement_parent, su_instance, su_material)
+          create_geometry(placement_parent, su_material,faces)
         end
-      end
-      if faces
-        create_geometry(ifc_entity, su_material,faces)
       end
     end
 
