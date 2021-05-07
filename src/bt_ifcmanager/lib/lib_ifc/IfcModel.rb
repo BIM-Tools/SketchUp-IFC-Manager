@@ -182,9 +182,14 @@ module BimTools
         representationcontext
       end
 
-      # create IFC objects for all su instances
+      # Recursively create IFC objects for all given SketchUp entities and add those to the model
+      #
+      # @parameter entities [Sketchup::Entities]
+      #
       def create_ifc_objects(entities)
         faces = []
+        entity_path = EntityPath.new(self)
+        entity_path.add(@project)
         entitiy_count = entities.length
         i = 0
         while i < entitiy_count
@@ -195,8 +200,6 @@ module BimTools
             case ent
             when Sketchup::Group, Sketchup::ComponentInstance
               transformation = Geom::Transformation.new
-              entity_path = EntityPath.new(self)
-              entity_path.add(@project)
               ObjectCreator.new(self, ent, transformation, @project, entity_path)
             when Sketchup::Face
               faces << ent
@@ -205,7 +208,7 @@ module BimTools
           i += 1
         end
 
-        # create IfcBuildingelementProxy from all 'loose' faces combined
+        # create a single IfcBuildingelementProxy from all 'loose' faces in the model
         unless faces.empty?
           ifc_entity = IfcBuildingElementProxy.new(self, nil)
           ifc_entity.name = BimTools::IfcManager::IfcLabel.new('default building element')
@@ -214,14 +217,10 @@ module BimTools
           ifc_entity.representation.representations.first.items.add(brep)
           ifc_entity.objectplacement = IfcLocalPlacement.new(self, Geom::Transformation.new)
 
-          # Create spatial hierarchy
-          parent_ifc = project.get_default_related_object #    parent is default site
-          parent_ifc = parent_ifc.get_default_related_object # parent is default building
-          parent_ifc = parent_ifc.get_default_related_object # parent is default buildingstorey
-
-          parent_ifc.add_contained_element(ifc_entity)
+          # Add to spatial hierarchy
+          entity_path.add(ifc_entity)
+          entity_path.set_parent(ifc_entity)
         end
-        ifc_objects
       end
     end
   end
