@@ -53,32 +53,36 @@ module BimTools::IfcManager
     # @parameter entity_path [Hash<BimTools::IfcManager::IFC2X3::IfcSpatialStructureElement>] Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
     # @parameter su_material [Sketchup::Material] The parent sketchup objects material which will be used when the given one does not have a directly associated material
     #
-    def initialize(ifc_model, su_instance, su_total_transformation, placement_parent, entity_path = nil, su_material = nil)
+    def initialize(ifc_model, su_instance, su_total_transformation, placement_parent = nil, entity_path = nil, su_material = nil)
       @ifc_model = ifc_model
       @entity_path = EntityPath.new(@ifc_model, entity_path)
       ent_type_name = su_instance.definition.get_attribute('AppliedSchemaTypes', 'IFC 2x3')
-      parent_hex_guid = placement_parent.globalid&.to_s
       su_material = su_instance.material if su_instance.material
 
       # Add the current sketchup object's transformation to the total transformation
       @su_total_transformation = su_total_transformation * su_instance.transformation
 
-      # check if entity_type is part of the entity list that needs exporting
-      if @ifc_model.options[:nested_entities] == false
-        if @ifc_model.su_entities.empty? || @ifc_model.su_entities.include?(su_instance)
-          create_ifc_entity(ent_type_name, su_instance, placement_parent, parent_hex_guid, su_material)
+      # check if entity is one of the entities that need to be exported (and possibly it's nested entities)
+      unless @ifc_model.su_entities.empty?
+        if @ifc_model.su_entities.include?(su_instance)
+          if @ifc_model.options[:ifc_entities] == false || @ifc_model.options[:ifc_entities].include?(ent_type_name)
+            create_ifc_entity(ent_type_name, su_instance, placement_parent, su_material)
+          end
         else
           create_nested_objects(placement_parent, su_instance, su_material)
         end
-      elsif @ifc_model.options[:ifc_entities] == false || ent_type_name.nil? || @ifc_model.options[:ifc_entities].include?(ent_type_name)
-        create_ifc_entity(ent_type_name, su_instance, placement_parent, parent_hex_guid, su_material)
+      else
+        if @ifc_model.options[:ifc_entities] == false || @ifc_model.options[:ifc_entities].include?(ent_type_name)
+          create_ifc_entity(ent_type_name, su_instance, placement_parent, su_material)
+        end
       end
     end
 
     private
 
     # Create IFC entity based on the IFC classification in sketchup
-    def create_ifc_entity(ent_type_name, su_instance, placement_parent, parent_hex_guid, su_material)
+    def create_ifc_entity(ent_type_name, su_instance, placement_parent = nil, su_material = nil)
+      parent_hex_guid = placement_parent.globalid&.to_s if placement_parent
 
       # (?) catch ent_type_name.nil? with if before catch block?
       begin

@@ -58,12 +58,12 @@ module BimTools::IfcManager
       end
     end
 
+    # Insert given entity into entity path after given type
+    #
+    # @parameter ifc_entity [BimTools::IFC2X3::IfcProduct]
+    # @parameter ifc_type [BimTools::IFC2X3::IfcProduct] class
+    #
     def insert_after(ifc_entity, ifc_type)
-      # Insert given entity into entity path after given type
-      #
-      # @parameter ifc_entity [BimTools::IFC2X3::IfcProduct]
-      # @parameter ifc_type [BimTools::IFC2X3::IfcProduct] class
-      #
       index = path_types().rindex(ifc_type)
       index += 1
       @entity_path.insert(index, ifc_entity)
@@ -78,14 +78,24 @@ module BimTools::IfcManager
       when IfcSite
         if entity_path_types.include? IfcSite
           # Add as partial IfcSite
-          insert_after(ifc_entity,IfcSite)
+          # TODO fix option to use partial sites
+          # parent_site = @entity_path[path_types().rindex(IfcSite)]
+          # path = ["IFC 2x3", "IfcSite", "CompositionType", "IfcElementCompositionEnum"]
+          # if parent_site.su_object.definition.get_classification_value(path) == "complex" && ifc_entity.su_object.definition.get_classification_value(path) == "partial"
+          #   insert_after(ifc_entity,IfcSite)
+          # else
+          #   @entity_path[path_types().rindex(IfcSite)] = ifc_entity
+          # end
+
+          @entity_path[path_types().rindex(IfcSite)] = ifc_entity
         elsif entity_path_types.include? IfcProject
           insert_after(ifc_entity,IfcProject)
         end
       when IfcBuilding
         if entity_path_types.include? IfcBuilding
           # Add as partial IfcBuilding
-          insert_after(ifc_entity,IfcBuilding)
+          # insert_after(ifc_entity,IfcBuilding)
+          @entity_path[path_types().rindex(IfcBuilding)] = ifc_entity
         elsif entity_path_types.include? IfcSite
           insert_after(ifc_entity,IfcSite)
         else
@@ -96,7 +106,8 @@ module BimTools::IfcManager
       when IfcBuildingStorey
         if entity_path_types.include? IfcBuildingStorey
           # Add as partial IfcBuildingStorey
-          insert_after(ifc_entity,IfcBuildingStorey)
+          # insert_after(ifc_entity,IfcBuildingStorey)
+          @entity_path[path_types().rindex(IfcBuildingStorey)] = ifc_entity
         elsif entity_path_types.include? IfcBuilding
           insert_after(ifc_entity,IfcBuilding)
         else
@@ -107,12 +118,15 @@ module BimTools::IfcManager
       when IfcSpace
         if entity_path_types.include? IfcSpace
           # Add as partial IfcBuildingStorey
-          insert_after(ifc_entity,IfcSpace)
+          # insert_after(ifc_entity,IfcSpace)
+          @entity_path[path_types().rindex(IfcSpace)] = ifc_entity
         elsif entity_path_types.include? IfcBuildingStorey
-          insert_after(ifc_entity,IfcBuildingStorey)
+          # insert_after(ifc_entity,IfcBuildingStorey)
+          @entity_path[path_types().rindex(IfcBuildingStorey)] = ifc_entity
         elsif entity_path_types.include? IfcSite
           # Add as outside space
-          insert_after(ifc_entity,IfcSite)
+          # insert_after(ifc_entity,IfcSite)
+          @entity_path[path_types().rindex(IfcSite)] = ifc_entity
         else
           # Create default IfcBuildingStorey and add there, and check for IfcBuilding and site
           add_default_spatialelement(BimTools::IFC2X3::IfcBuildingStorey)
@@ -169,9 +183,15 @@ module BimTools::IfcManager
 
     # Add entity to the model structure
     def set_parent(ifc_entity)
-      parent = @entity_path[-1]
-      if parent == ifc_entity
-        parent = @entity_path[-2]
+      index = @entity_path.index(ifc_entity)
+      if index
+        if index > 1
+          parent = @entity_path[index - 1]
+        else
+          parent = @entity_path[0]
+        end
+      else
+        parent = @entity_path[-1]
       end
       ifc_entity.parent = parent
       case ifc_entity

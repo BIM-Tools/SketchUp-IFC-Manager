@@ -64,10 +64,10 @@ module BimTools
       # @parameter options [Hash] Optional options hash
       # @parameter su_entities [Array<Sketchup::Entity>] Optional list of entities that have to be exported to IFC, nil exports all model entities.
       #
-      def initialize(su_model, options = {}, su_entities=[])
+      def initialize(su_model, options = {}, su_export_entities=[], su_root_entities=[])
         defaults = {
           ifc_entities:       false, # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
-          hidden:             true, #  include hidden sketchup objects
+          hidden:             false, #  include hidden sketchup objects
           attributes:         [], #    include specific attribute dictionaries given in array as IfcPropertySets, like ['SU_DefinitionSet', 'SU_InstanceSet'], false means all
           classifications:    true, #  add all SketchUp classifications
           layers:             true, #  create IfcPresentationLayerAssignments
@@ -76,13 +76,12 @@ module BimTools
           geometry:           true, #  create geometry for entities
           fast_guid:          false, # create simplified guids
           dynamic_attributes: true, #  export dynamic component data
-          mapped_items:       false, # export component definitions as mapped items
-          nested_entities:    true #   su_entities export nested entities for given objects
+          mapped_items:       false # export component definitions as mapped items
         }
         @options = defaults.merge(options)
 
         @su_model = su_model
-        @su_entities = su_entities
+        @su_entities = su_export_entities
         @ifc_id = 0
         @export_summary = {}
 
@@ -110,10 +109,10 @@ module BimTools
         
         # When no entities are given for export, pass all model entities to create ifc objects
         # if nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked
-        if su_entities.empty? || @options[:nested_entities] == false
+        if su_root_entities.empty?
           create_ifc_objects(su_model.entities)
         else
-          create_ifc_objects(su_entities)
+          create_ifc_objects(su_root_entities)
         end
       end
 
