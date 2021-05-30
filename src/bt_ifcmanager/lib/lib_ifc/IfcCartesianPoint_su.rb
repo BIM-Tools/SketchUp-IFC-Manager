@@ -23,9 +23,15 @@ require_relative 'IfcReal.rb'
 
 module BimTools
   module IfcCartesianPoint_su
+
+    # Creates IfcCartesianPoint entity
+    #
+    # @parameter ifc_model [BimTools::IfcManager::IfcModel] Model to which the IfcCartesianPoint will be added
+    # @parameter sketchup [Geom::Point3d, Geom::Point2d, Array] Takes an Array of length 2 or 3 as coordinates
+    #
     def initialize(ifc_model, sketchup)
       super
       @coordinates = IfcManager::Ifc_List.new(sketchup.to_a.map { |i| IfcManager::IfcReal.new(i.to_mm) })
-    end # def sketchup
-  end # module IfcCartesianPoint_su
-end # module BimTools
+    end
+  end
+end
