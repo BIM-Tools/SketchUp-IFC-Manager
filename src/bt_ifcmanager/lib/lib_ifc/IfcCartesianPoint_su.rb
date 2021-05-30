@@ -25,14 +25,7 @@ module BimTools
   module IfcCartesianPoint_su
     def initialize(ifc_model, sketchup)
       super
-      if sketchup.is_a? Geom::Point3d
-        
-        # set coordinates
-        x_step = IfcManager::IfcReal.new(sketchup.x.to_f.to_mm).step
-        y_step = IfcManager::IfcReal.new(sketchup.y.to_f.to_mm).step
-        z_step = IfcManager::IfcReal.new(sketchup.z.to_f.to_mm).step
-        @coordinates = IfcManager::Ifc_List.new([x_step,y_step,z_step])
-      end
+      @coordinates = IfcManager::Ifc_List.new(sketchup.to_a.map { |i| IfcManager::IfcReal.new(i.to_mm) })
     end # def sketchup
   end # module IfcCartesianPoint_su
 end # module BimTools
