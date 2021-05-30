@@ -27,17 +27,17 @@ require_relative('entity_path.rb')
 require_relative('ObjectCreator.rb')
 require_relative('step_writer.rb')
 
-require_relative(File.join('IFC2X3', 'IfcOwnerHistory.rb'))
-require_relative(File.join('IFC2X3', 'IfcPersonAndOrganization.rb'))
-require_relative(File.join('IFC2X3', 'IfcPerson.rb'))
-require_relative(File.join('IFC2X3', 'IfcOrganization.rb'))
-require_relative(File.join('IFC2X3', 'IfcApplication.rb'))
+# require_relative(File.join('IFC2X3', 'IfcOwnerHistory.rb'))
+# require_relative(File.join('IFC2X3', 'IfcPersonAndOrganization.rb'))
+# require_relative(File.join('IFC2X3', 'IfcPerson.rb'))
+# require_relative(File.join('IFC2X3', 'IfcOrganization.rb'))
+# require_relative(File.join('IFC2X3', 'IfcApplication.rb'))
 
-require_relative(File.join('IFC2X3', 'IfcProject.rb'))
-require_relative(File.join('IFC2X3', 'IfcCartesianPoint.rb'))
-require_relative(File.join('IFC2X3', 'IfcDirection.rb'))
+# require_relative(File.join('IFC2X3', 'IfcProject.rb'))
+# require_relative(File.join('IFC2X3', 'IfcCartesianPoint.rb'))
+# require_relative(File.join('IFC2X3', 'IfcDirection.rb'))
 
-require_relative(File.join('IFC2X3', 'IfcGeometricRepresentationContext.rb'))
+# require_relative(File.join('IFC2X3', 'IfcGeometricRepresentationContext.rb'))
 
 module BimTools
   module IfcManager
@@ -175,9 +175,9 @@ module BimTools
         representationcontext = IfcGeometricRepresentationContext.new(self)
         representationcontext.contexttype = BimTools::IfcManager::IfcLabel.new('Model')
         representationcontext.coordinatespacedimension = '3'
-        representationcontext.worldcoordinatesystem = IfcAxis2Placement3D.new(self)
-        representationcontext.worldcoordinatesystem.location = IfcCartesianPoint.new(self, Geom::Point3d.new(0, 0, 0))
-        representationcontext.truenorth = IfcDirection.new(self, Geom::Vector3d.new(0, 1, 0))
+        representationcontext.worldcoordinatesystem = IfcAxis2Placement2D.new(self)
+        representationcontext.worldcoordinatesystem.location = IfcCartesianPoint.new(self, Geom::Point2d.new(0, 0))
+        # representationcontext.truenorth = IfcDirection.new(self, Geom::Vector3d.new(0, 1, 0))
         representationcontext
       end
 

@@ -37,13 +37,13 @@ require_relative "IfcPositiveRatioMeasure.rb"
 require_relative "enumeration.rb"
 
 # load entities
-require_relative File.join('IFC2X3', 'IfcPropertySet.rb')
-require_relative File.join('IFC2X3', 'IfcPropertySingleValue.rb')
-require_relative File.join('IFC2X3', 'IfcPropertyEnumeratedValue.rb')
-require_relative File.join('IFC2X3', 'IfcElementQuantity.rb')
-require_relative File.join('IFC2X3', 'IfcQuantityArea.rb')
-require_relative File.join('IFC2X3', 'IfcQuantityVolume.rb')
-require_relative File.join('IFC2X3', 'IfcQuantityLength.rb')
+# require_relative File.join('IFC2X3', 'IfcPropertySet.rb')
+# require_relative File.join('IFC2X3', 'IfcPropertySingleValue.rb')
+# require_relative File.join('IFC2X3', 'IfcPropertyEnumeratedValue.rb')
+# require_relative File.join('IFC2X3', 'IfcElementQuantity.rb')
+# require_relative File.join('IFC2X3', 'IfcQuantityArea.rb')
+# require_relative File.join('IFC2X3', 'IfcQuantityVolume.rb')
+# require_relative File.join('IFC2X3', 'IfcQuantityLength.rb')
 
 require_relative File.join("PropertyReader.rb")
 

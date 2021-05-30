@@ -19,7 +19,7 @@
 #
 #
 
-require_relative File.join('IFC2X3', 'IfcAxis2Placement3D.rb')
+# require_relative File.join('IFC2X3', 'IfcAxis2Placement3D.rb')
 
 module BimTools
   module IfcLocalPlacement_su

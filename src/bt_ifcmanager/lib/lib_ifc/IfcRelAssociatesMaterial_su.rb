@@ -19,7 +19,7 @@
 #
 #
 
-require_relative File.join('IFC2X3', 'IfcMaterial.rb')
+# require_relative File.join('IFC2X3', 'IfcMaterial.rb')
 require_relative 'set.rb'
 
 module BimTools

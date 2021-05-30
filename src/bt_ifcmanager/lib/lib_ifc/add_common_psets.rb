@@ -28,7 +28,7 @@ module BimTools::IfcManager
   def add_common_psets(definition, ent_type_name)
     ifc_dict = definition.attribute_dictionary("IFC 2x3")
     if ifc_dict
-      require_relative File.join("IFC2X3", ent_type_name)
+      # require_relative File.join("IFC2X3", ent_type_name)
       entity_type = eval("BimTools::IFC2X3::#{ent_type_name}")
       prefix = 'BimTools::IFC2X3::Ifc'
       entity_type.ancestors.each do |ancestor|

@@ -33,19 +33,19 @@ require_relative "IfcThermalTransmittanceMeasure.rb"
 require_relative "enumeration.rb"
 
 # load entities
-require_relative File.join("IFC2X3", "IfcLocalPlacement.rb")
-require_relative File.join("IFC2X3", "IfcProductDefinitionShape.rb")
-require_relative File.join("IFC2X3", "IfcRelAssociatesMaterial.rb")
-require_relative File.join("IFC2X3", "IfcPresentationLayerAssignment.rb")
-require_relative File.join("IFC2X3", "IfcRelDefinesByProperties.rb")
-require_relative File.join("IFC2X3", "IfcClassification.rb")
-require_relative File.join("IFC2X3", "IfcClassificationReference.rb")
-require_relative File.join("IFC2X3", "IfcRelAssociatesClassification.rb")
-require_relative File.join("IFC2X3", "IfcFacetedBrep.rb")
-require_relative File.join("IFC2X3", "IfcStyledItem.rb")
-require_relative File.join("IFC2X3", "IfcMappedItem.rb")
-require_relative File.join("IFC2X3", "IfcRepresentationMap.rb")
-require_relative File.join("IFC2X3", "IfcCartesianTransformationOperator3D.rb")
+# require_relative File.join("IFC2X3", "IfcLocalPlacement.rb")
+# require_relative File.join("IFC2X3", "IfcProductDefinitionShape.rb")
+# require_relative File.join("IFC2X3", "IfcRelAssociatesMaterial.rb")
+# require_relative File.join("IFC2X3", "IfcPresentationLayerAssignment.rb")
+# require_relative File.join("IFC2X3", "IfcRelDefinesByProperties.rb")
+# require_relative File.join("IFC2X3", "IfcClassification.rb")
+# require_relative File.join("IFC2X3", "IfcClassificationReference.rb")
+# require_relative File.join("IFC2X3", "IfcRelAssociatesClassification.rb")
+# require_relative File.join("IFC2X3", "IfcFacetedBrep.rb")
+# require_relative File.join("IFC2X3", "IfcStyledItem.rb")
+# require_relative File.join("IFC2X3", "IfcMappedItem.rb")
+# require_relative File.join("IFC2X3", "IfcRepresentationMap.rb")
+# require_relative File.join("IFC2X3", "IfcCartesianTransformationOperator3D.rb")
 
 require_relative File.join("dynamic_attributes.rb")
 require_relative File.join("PropertyReader.rb")
@@ -78,7 +78,7 @@ module BimTools
               props_ifc.each do |prop_dict|
                 prop = prop_dict.name
                 prop_sym = prop.to_sym
-                if properties.include? prop_sym
+                if attributes.include? prop_sym
 
                   property_reader = BimTools::PropertyReader.new(prop_dict)
                   dict_value = property_reader.value
@@ -338,7 +338,13 @@ module BimTools
                   unless ifc_classification_reference
                     ifc_classification_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
                     #ifc_classification_reference.location = ""
-                    ifc_classification_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
+
+                    # Catch IFC4 changes
+                    if BimTools::IFC2X3::IfcClassificationReference.method_defined?(:itemreference)
+                      ifc_classification_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
+                    else
+                      ifc_classification_reference.identification = BimTools::IfcManager::IfcIdentifier.new(code)
+                    end
                     ifc_classification_reference.name = BimTools::IfcManager::IfcLabel.new(text)
                     ifc_classification_reference.referencedsource = cls
                     
@@ -356,7 +362,13 @@ module BimTools
                     # vico hack: store a copy of NL-SfB as unicode
                     unicode_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
                     unicode_reference.location = "'http://www.csiorg.net/uniformat'"
-                    unicode_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
+
+                    # Catch IFC4 changes
+                    if BimTools::IFC2X3::IfcClassificationReference.method_defined?(:itemreference)
+                      ifc_classification_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
+                    else
+                      ifc_classification_reference.identification = BimTools::IfcManager::IfcIdentifier.new(code)
+                    end
                     unicode_reference.name = BimTools::IfcManager::IfcLabel.new(text)
                     unicode_reference.referencedsource = unicode_cls
                     unicode_assoc = BimTools::IFC2X3::IfcRelAssociatesClassification.new( ifc_model )

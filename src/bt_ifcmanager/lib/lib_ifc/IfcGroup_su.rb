@@ -20,7 +20,7 @@
 #
 
 require_relative 'set.rb'
-require_relative File.join('IFC2X3', 'IfcRelAssignsToGroup.rb')
+# require_relative File.join('IFC2X3', 'IfcRelAssignsToGroup.rb')
 
 module BimTools
   module IfcGroup_su

@@ -24,7 +24,9 @@
 # (!) Note: securerandom takes very long to load
 require 'securerandom'
 
-module BimTools  
+require File.join(File.dirname(__FILE__),'lib', 'lib_ifc', 'xsd_parse.rb')
+
+module BimTools
   module IfcManager
   
     PLATFORM_IS_OSX     = ( Object::RUBY_PLATFORM =~ /darwin/i ) ? true : false
@@ -56,7 +58,7 @@ module BimTools
     PLUGIN_PATH_UI = File.join(PLUGIN_PATH, 'ui')
     PLUGIN_PATH_TOOLS = File.join(PLUGIN_PATH, 'tools')
     PLUGIN_PATH_CLASSIFICATIONS = File.join(PLUGIN_PATH, 'classifications')
-
+    
     # Create export message collection
     @export_messages = Array.new
 

@@ -19,15 +19,15 @@
 #
 #
 
-require_relative(File.join('IFC2X3', 'IfcElementAssembly.rb'))
-require_relative(File.join('IFC2X3', 'IfcBuilding.rb'))
-require_relative(File.join('IFC2X3', 'IfcBuildingStorey.rb'))
-require_relative(File.join('IFC2X3', 'IfcCurtainWall.rb'))
-require_relative(File.join('IFC2X3', 'IfcProduct.rb'))
-require_relative(File.join('IFC2X3', 'IfcProject.rb'))
-require_relative(File.join('IFC2X3', 'IfcSite.rb'))
-require_relative(File.join('IFC2X3', 'IfcSpace.rb'))
-require_relative(File.join('IFC2X3', 'IfcSpatialStructureElement.rb'))
+# require_relative(File.join('IFC2X3', 'IfcElementAssembly.rb'))
+# require_relative(File.join('IFC2X3', 'IfcBuilding.rb'))
+# require_relative(File.join('IFC2X3', 'IfcBuildingStorey.rb'))
+# require_relative(File.join('IFC2X3', 'IfcCurtainWall.rb'))
+# require_relative(File.join('IFC2X3', 'IfcProduct.rb'))
+# require_relative(File.join('IFC2X3', 'IfcProject.rb'))
+# require_relative(File.join('IFC2X3', 'IfcSite.rb'))
+# require_relative(File.join('IFC2X3', 'IfcSpace.rb'))
+# require_relative(File.join('IFC2X3', 'IfcSpatialStructureElement.rb'))
 
 module BimTools::IfcManager
 

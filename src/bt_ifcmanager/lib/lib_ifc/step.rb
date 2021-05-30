@@ -24,7 +24,7 @@
 module BimTools
   module Step
     def step()
-      attribute_strings = properties().map { |attribute| attribute_to_step(attribute) }
+      attribute_strings = attributes().map { |attribute| attribute_to_step(attribute) }
       return "##{@ifc_id}=#{self.class.name.split('::').last.upcase}(#{attribute_strings.join(",")})"
     end
 

@@ -19,10 +19,10 @@
 #
 #
 
-require_relative File.join('IFC2X3', 'IfcPresentationStyleAssignment.rb')
-require_relative File.join('IFC2X3', 'IfcSurfaceStyle.rb')
-require_relative File.join('IFC2X3', 'IfcSurfaceStyleRendering.rb')
-require_relative File.join('IFC2X3', 'IfcColourRgb.rb')
+# require_relative File.join('IFC2X3', 'IfcPresentationStyleAssignment.rb')
+# require_relative File.join('IFC2X3', 'IfcSurfaceStyle.rb')
+# require_relative File.join('IFC2X3', 'IfcSurfaceStyleRendering.rb')
+# require_relative File.join('IFC2X3', 'IfcColourRgb.rb')
 
 module BimTools
   module IfcStyledItem_su

@@ -20,7 +20,7 @@
 #
 
 require_relative 'list.rb'
-require_relative File.join('IFC2X3', 'IfcShapeRepresentation.rb')
+# require_relative File.join('IFC2X3', 'IfcShapeRepresentation.rb')
 
 module BimTools
   module IfcProductDefinitionShape_su

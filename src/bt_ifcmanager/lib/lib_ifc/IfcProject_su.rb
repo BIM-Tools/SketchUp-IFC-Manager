@@ -19,8 +19,8 @@
 #
 #
 
-require_relative File.join('IFC2X3', 'IfcUnitAssignment.rb')
-require_relative File.join('IFC2X3', 'IfcSIUnit.rb')
+# require_relative File.join('IFC2X3', 'IfcUnitAssignment.rb')
+# require_relative File.join('IFC2X3', 'IfcSIUnit.rb')
 
 module BimTools
   module IfcProject_su

@@ -20,12 +20,12 @@
 #
 
 require_relative 'set.rb'
-require_relative File.join('IFC2X3', 'IfcClosedShell.rb')
-require_relative File.join('IFC2X3', 'IfcFace.rb')
-require_relative File.join('IFC2X3', 'IfcFaceBound.rb')
-require_relative File.join('IFC2X3', 'IfcFaceOuterBound.rb')
-require_relative File.join('IFC2X3', 'IfcPolyLoop.rb')
-require_relative File.join('IFC2X3', 'IfcCartesianPoint.rb')
+# require_relative File.join('IFC2X3', 'IfcClosedShell.rb')
+# require_relative File.join('IFC2X3', 'IfcFace.rb')
+# require_relative File.join('IFC2X3', 'IfcFaceBound.rb')
+# require_relative File.join('IFC2X3', 'IfcFaceOuterBound.rb')
+# require_relative File.join('IFC2X3', 'IfcPolyLoop.rb')
+# require_relative File.join('IFC2X3', 'IfcCartesianPoint.rb')
 
 module BimTools
   module IfcFacetedBrep_su
