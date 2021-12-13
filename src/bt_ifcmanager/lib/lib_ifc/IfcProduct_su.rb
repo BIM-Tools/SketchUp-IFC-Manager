@@ -67,10 +67,7 @@ module BimTools
         definition = @su_object.definition
         
         #(?) set name, here? is this a duplicate?
-        @name = BimTools::IfcManager::IfcLabel.new(definition.name)
-
-        # also set "tag" to component instance name?
-        # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
+        @name = BimTools::IfcManager::IfcLabel.new( definition.name )
         
         if definition.attribute_dictionaries
           if definition.attribute_dictionaries["IFC 2x3"]
@@ -213,7 +210,7 @@ module BimTools
       end
       
       # add color from su-object material, or a su_parent's
-      if @ifc_model.options[:colors]
+      if @ifc_model.options[:styles]
         BimTools::IFC2X3::IfcStyledItem.new( @ifc_model, brep, su_material )
       end
         
@@ -305,7 +302,9 @@ module BimTools
           end #(mp) end of DIN 276-1 loop
           
           # temporarily allow only nlsfb classification
-          if attr_dict.name == "NL-SfB 2005, tabel 1" # unless attr_dict.name == "IFC 2x3"
+		  #nlsfb_cls_names = ["NL-SfB tabel 1", "NL-SfB 2005, tabel 1"]
+          #if attr_dict.name.include? nlsfb_cls_names 
+		  if attr_dict.name == "NL-SfB tabel 1"
             if su_model.classifications[ attr_dict.name ]
               
               # Create classifications if they don't exist
@@ -319,11 +318,11 @@ module BimTools
                 cls.name = BimTools::IfcManager::IfcLabel.new( attr_dict.name )
                 
                 # vico hack: store a copy of NL-SfB as unicode
-                unicode_cls = BimTools::IFC2X3::IfcClassification.new( ifc_model )
-                unicode_cls.source = BimTools::IfcManager::IfcLabel.new("http://www.csiorg.net/uniformat")
-                unicode_cls.edition = BimTools::IfcManager::IfcLabel.new("1998")
+                #unicode_cls = BimTools::IFC2X3::IfcClassification.new( ifc_model )
+                #unicode_cls.source = BimTools::IfcManager::IfcLabel.new("http://www.csiorg.net/uniformat")
+                #unicode_cls.edition = BimTools::IfcManager::IfcLabel.new("1998")
                 #unicode_cls.editiondate
-                unicode_cls.name = BimTools::IfcManager::IfcLabel.new("Uniformat")
+                #unicode_cls.name = BimTools::IfcManager::IfcLabel.new("Uniformat")
               end
               
               # retrieve classification value from su object
@@ -354,17 +353,17 @@ module BimTools
                     ifc_classification_reference.ifc_rel_associates_classification = assoc
                     
                     # vico hack: store a copy of NL-SfB as unicode
-                    unicode_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
-                    unicode_reference.location = "'http://www.csiorg.net/uniformat'"
-                    unicode_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
-                    unicode_reference.name = BimTools::IfcManager::IfcLabel.new(text)
-                    unicode_reference.referencedsource = unicode_cls
-                    unicode_assoc = BimTools::IFC2X3::IfcRelAssociatesClassification.new( ifc_model )
-                    unicode_assoc.name = "'Uniformat Classification'"
+                    #unicode_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
+                    #unicode_reference.location = "'http://www.csiorg.net/uniformat'"
+                    #unicode_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
+                    #unicode_reference.name = BimTools::IfcManager::IfcLabel.new(text)
+                    #unicode_reference.referencedsource = unicode_cls
+                    #unicode_assoc = BimTools::IFC2X3::IfcRelAssociatesClassification.new( ifc_model )
+                    #unicode_assoc.name = "'Uniformat Classification'"
                     #unicode_assoc.description = ""
-                    unicode_assoc.relatedobjects = IfcManager::Ifc_Set.new( [self] )
-                    unicode_assoc.relatingclassification = unicode_reference
-                    unicode_reference.ifc_rel_associates_classification = unicode_assoc
+                    #unicode_assoc.relatedobjects = IfcManager::Ifc_Set.new( [self] )
+                    #unicode_assoc.relatingclassification = unicode_reference
+                    #unicode_reference.ifc_rel_associates_classification = unicode_assoc
                     
                   end
                 end
