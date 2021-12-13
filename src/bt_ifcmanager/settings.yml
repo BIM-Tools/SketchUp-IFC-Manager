@@ -8,6 +8,7 @@
   :classifications: true
   :layers: true
   :materials: true
+  :colors: true
   :styles: true
   :geometry: true
   :fast_guid: false
@@ -16,7 +17,7 @@
 :load:
   :classifications:
     NL-SfB tabel 1: true
-    DIN 276-1: true
+    DIN 276-1: false
   :template_materials: false
 :properties:
   :common_psets: true
