@@ -24,21 +24,20 @@ require_relative 'IfcReal.rb'
 module BimTools
   module IfcCartesianPoint_su
     include IfcManager
+
+    # Creates IfcCartesianPoint entity
+    #
+    # @parameter ifc_model [BimTools::IfcManager::IfcModel] Model to which the IfcCartesianPoint will be added
+    # @parameter sketchup [Geom::Point3d, Geom::Point2d, Array] Takes an Array of length 2 or 3 as coordinates
+    #
     def initialize(ifc_model, sketchup)
       super
       case sketchup
-      when Geom::Point3d
-        x_step = IfcReal.new(sketchup.x.to_f.to_mm).step
-        y_step = IfcReal.new(sketchup.y.to_f.to_mm).step
-        z_step = IfcReal.new(sketchup.z.to_f.to_mm).step
-        @coordinates = Ifc_List.new([x_step,y_step,z_step])        
-      when Geom::Point2d
-        x_step = IfcReal.new(sketchup.x.to_f.to_mm).step
-        y_step = IfcReal.new(sketchup.y.to_f.to_mm).step
-        @coordinates = Ifc_List.new([x_step,y_step])        
+      when Geom::Point3d, Geom::Point2d   
+        @coordinates = IfcManager::Ifc_List.new(sketchup.to_a.map{|x| IfcManager::IfcReal.new(x.to_mm)})
       else
         raise TypeError, "Expected a point type."
       end
-    end # def sketchup
-  end # module IfcCartesianPoint_su
-end # module BimTools
+    end
+  end
+end
