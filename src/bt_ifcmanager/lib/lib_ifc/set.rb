@@ -36,6 +36,10 @@ module BimTools::IfcManager
       end
     end
 
+    def empty?()
+      return @items.empty?
+    end
+
     def item_to_step(item)
       if item.is_a? String
         return item

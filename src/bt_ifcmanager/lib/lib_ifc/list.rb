@@ -34,6 +34,10 @@ module BimTools
     def add( entity )
       @items << entity
     end
+
+    def empty?()
+      return @items.empty?
+    end
     
     def first()
       return @items.first

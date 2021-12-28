@@ -68,15 +68,9 @@ module BimTools
     end
     
     def create_data_section( sketchup_objects )
-      step_objects = Array.new
-      ifc_objects = @ifc_model.ifc_objects()
-      step_objects << 'DATA'
-      object_count = ifc_objects.length
-      i = 0
-      while i < object_count
-        step_objects << ifc_objects[i].step()
-        i += 1
-      end
+
+      step_objects = @ifc_model.ifc_objects().map(&:step)
+      step_objects.unshift('DATA')
       step_objects << 'ENDSEC'
       return step_objects
     end
