@@ -43,7 +43,7 @@ module BimTools::IfcManager
   require File.join(File.dirname(__FILE__),'lib', 'skc_reader.rb')
   module Settings
     extend self
-    attr_accessor :visible, :ifc_version, :ifc_module
+    attr_accessor :visible, :ifc_version, :ifc_version_compact, :ifc_module
     attr_reader :ifc_classification, :ifc_classifications, :classifications, :common_psets
     @template_materials = false
     @common_psets = true

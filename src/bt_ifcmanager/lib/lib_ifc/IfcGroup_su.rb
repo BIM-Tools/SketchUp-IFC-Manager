@@ -52,7 +52,7 @@ module BimTools
               props_ifc.each do |prop_dict|
                 prop = prop_dict.name
                 prop_sym = prop.to_sym
-                if properties.include? prop_sym
+                if attributes.include? prop_sym
 
                   property_reader = BimTools::PropertyReader.new(prop_dict)
                   dict_value = property_reader.value
@@ -67,11 +67,10 @@ module BimTools
                     entity_type = false
                     if value_type
                       begin
-                        # require_relative ent_type_name
-                        entity_type = eval("BimTools::IfcManager::#{value_type}")
+                        entity_type = BimTools::IfcManager.const_get(value_type)
                         value_entity = entity_type.new(dict_value)
                       rescue => e
-                        puts "Error creating IFC type: #{ e.to_s}"
+                        puts "Error creating IfcGroup property value: #{value_type}, #{ e.to_s}"
                       end
                     end
                     unless entity_type
@@ -91,7 +90,7 @@ module BimTools
                   end
                 else
                   if prop_dict.attribute_dictionaries && prop_dict.name != "instanceAttributes"
-                    reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, prop_dict )
+                    reldef = IfcRelDefinesByProperties.new( ifc_model, prop_dict )
                     reldef.relatedobjects.add( self )
                   end
                 end

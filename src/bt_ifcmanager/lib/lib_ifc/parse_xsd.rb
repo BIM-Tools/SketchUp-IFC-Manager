@@ -45,7 +45,8 @@ module BimTools
         @ifc_version = ifc_version
         ifc_version_compact = ifc_version.delete(' ').upcase
         @ifc_module = BimTools.const_set(ifc_version_compact, Module.new)
-        BimTools::IfcManager::Settings.ifc_version = ifc_version_compact
+        BimTools::IfcManager::Settings.ifc_version = ifc_version
+        BimTools::IfcManager::Settings.ifc_version_compact = ifc_version_compact
         BimTools::IfcManager::Settings.ifc_module = @ifc_module
         create_ifcentity()
       end

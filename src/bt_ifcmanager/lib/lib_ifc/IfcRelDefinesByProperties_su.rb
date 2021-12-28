@@ -22,7 +22,9 @@
 
 # load types
 require_relative 'set.rb'
+require_relative "IfcAreaMeasure.rb"
 require_relative 'IfcBoolean.rb'
+require_relative "IfcCountMeasure.rb"
 require_relative "IfcLabel.rb"
 require_relative "IfcIdentifier.rb"
 require_relative "IfcText.rb"
@@ -122,10 +124,10 @@ module BimTools
                 entity_type = false
                 if value_type
                   begin
-                    entity_type = BimTools::IfcManager::Settings.ifc_module.const_get(value_type)
+                    entity_type = BimTools::IfcManager.const_get(value_type)
                     prop.nominalvalue = entity_type.new(dict_value)
                   rescue => e
-                    puts "Error creating IFC type: #{value_type}, #{ e.to_s}"
+                    puts "Error creating IFC property type: #{value_type}, #{ e.to_s}"
                   end
                 end
                 unless entity_type

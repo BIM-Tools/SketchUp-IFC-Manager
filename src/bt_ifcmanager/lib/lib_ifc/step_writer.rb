@@ -62,7 +62,7 @@ module BimTools
       step_objects << 'HEADER'
       step_objects << "FILE_DESCRIPTION (('ViewDefinition [CoordinationView]'), '2;1')"
       step_objects << "FILE_NAME ('', '#{timestamp}', (''), (''), 'IFC-manager for SketchUp (#{VERSION})', '#{originating_system}', '')"
-      step_objects << "FILE_SCHEMA (('#{BimTools::IfcManager::Settings.ifc_version}'))"
+      step_objects << "FILE_SCHEMA (('#{BimTools::IfcManager::Settings.ifc_version_compact}'))"
       step_objects << 'ENDSEC'
       return step_objects
     end

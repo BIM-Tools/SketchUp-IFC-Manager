@@ -83,7 +83,7 @@ module BimTools
                         entity_type = BimTools::IfcManager.const_get(value_type)
                         value_entity = entity_type.new(dict_value)
                       rescue => e
-                        puts "Error creating IFC type: #{self.class}, #{ e.to_s}"
+                        puts "Error creating IfcProduct property type: #{self.class}, #{ e.to_s}"
                       end
                     end
                     unless entity_type
