@@ -67,6 +67,7 @@ module BimTools::IfcManager
       classification_list = {"IFC 2x3" => true}.merge!(Settings.classifications)
       classification_list.each_pair do | classification_name, active |
         if active
+          classification_name = File.basename(classification_name, ".skc")
           classification = HtmlSelectClassifications.new(@window, classification_name)
 
           # Add "-" option to unset the classification

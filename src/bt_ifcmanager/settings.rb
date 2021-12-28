@@ -40,15 +40,16 @@ require 'yaml'
 require "cgi"
 
 module BimTools::IfcManager
+  require File.join(File.dirname(__FILE__),'lib', 'skc_reader.rb')
   module Settings
     extend self
-    attr_accessor :visible
-    attr_reader :classifications, :common_psets
+    attr_accessor :visible, :ifc_version, :ifc_module
+    attr_reader :ifc_classification, :ifc_classifications, :classifications, :common_psets
     @template_materials = false
     @common_psets = true
     @settings_file = File.join(PLUGIN_PATH, "settings.yml")
+    @ifc_classifications = Hash.new
     @classifications = Hash.new
-    # @css = File.join(PLUGIN_PATH_CSS, 'sketchup.css')
     @css_bootstrap = File.join(PLUGIN_PATH_CSS, 'bootstrap.min.css')
     @css_core = File.join(PLUGIN_PATH_CSS, 'dialog.css')
     @css_settings = File.join(PLUGIN_PATH_CSS, 'settings.css')
@@ -59,16 +60,17 @@ module BimTools::IfcManager
       begin
         @options = YAML.load(File.read(@settings_file))
       rescue
-        message = "Default settings loaded.\r\nUnable to load settings from:\r\n'#{@settings_file}'"
+        message = "Unable to load settings from:\r\n'#{@settings_file}'\r\nDefault settings loaded."
         puts message
-        notification = UI::Notification.new(IFCMANAGER_EXTENSION, message)
-        notification.show
+        UI::Notification.new(IFCMANAGER_EXTENSION, message).show
       end
   
       # load classification schemes from settings
+      read_ifc_classifications()
       read_classifications()
       load_classifications()
       load_materials()
+      load_ifc_skc(@ifc_classification)
 
       # Load export options from settings
       if @options[:export]
@@ -82,9 +84,10 @@ module BimTools::IfcManager
         @export_dynamic_attributes = CheckboxOption.new("dynamic_attributes", "Export dynamic attributes", @options[:export][:dynamic_attributes])
         # @export_mapped_items =       CheckboxOption.new("mapped_items", "Export IFC mapped items", @options[:export][:mapped_items]),
       end
-    end # def load
+    end
 
     def save()
+      @options[:load][:ifc_classifications]  = @ifc_classifications
       @options[:load][:classifications]      = @classifications
       @options[:load][:template_materials]   = @template_materials
       @options[:properties][:common_psets]   = @common_psets
@@ -98,15 +101,52 @@ module BimTools::IfcManager
       @options[:export][:dynamic_attributes] = @export_dynamic_attributes.value
       # @options[:export][:mapped_items]       = @export_mapped_items.value
       File.open(@settings_file, "w") { |file| file.write(@options.to_yaml) }
-      if BimTools::IfcManager::PropertiesWindow.window && BimTools::IfcManager::PropertiesWindow.window.visible?
+      if PropertiesWindow.window && PropertiesWindow.window.visible?
         PropertiesWindow.close
         PropertiesWindow.create
-        BimTools::IfcManager::PropertiesWindow.show
-      else
-        PropertiesWindow.create
+        PropertiesWindow.show
       end
       load()
-    end # def save
+    end
+
+    # Load skc and generate IFC classes
+    # (?) First check if already loaded?
+    def load_ifc_skc(ifc_classification)
+      reader = SkcReader.new(ifc_classification)
+      ifc_version = reader.classification_name()
+      parser = IfcXmlParser.new(ifc_version)
+      parser.from_string(reader.xsd_schema())
+    end
+
+    def set_ifc_classification(ifc_classification_name)
+      @ifc_classification = ifc_classification_name
+      @ifc_classifications[ifc_classification_name] = true
+      unless @options[:load][:ifc_classifications].key? ifc_classification_name
+        @options[:load][:ifc_classifications][ifc_classification_name] = true
+      end
+      load_ifc_skc(@ifc_classification)
+    end
+
+    def unset_ifc_classification(ifc_classification_name)
+      @ifc_classifications[ifc_classification_name] = false
+      if @options[:load][:ifc_classifications].include? ifc_classification_name
+        @options[:load][:ifc_classifications][ifc_classification_name] = false
+      end
+    end
+
+    def read_ifc_classifications()
+      @ifc_classifications = Hash.new
+      if @options[:load][:ifc_classifications].is_a? Hash
+        @options[:load][:ifc_classifications].each_pair do |ifc_classification_name, load|
+          if load == true
+            @ifc_classification = ifc_classification_name
+            @ifc_classifications[ifc_classification_name] = load
+          elsif load == false
+            @ifc_classifications[ifc_classification_name] = load
+          end
+        end
+      end
+    end
 
     def set_classification(classification_name)
       @classifications[classification_name] = true
@@ -137,39 +177,30 @@ module BimTools::IfcManager
       return @classifications
     end
 
+    # Load enabled classification files from settings.yml
+    #   Loads both IFC and other classifications
+    #   First checks plugin classifications folder then check SketchUp support files
     def load_classifications()
       model = Sketchup.active_model
       model.start_operation("Load IFC Manager classifications", true)
-      Settings.classifications.each_pair do | classification_name, classification_active |
+      classifications = Settings.ifc_classifications.merge(Settings.classifications)
+      classifications.each_pair do | classification_file, classification_active |
         if classification_active
-          unless model.classifications[classification_name]
-            classifications = model.classifications
-            file = File.join(PLUGIN_PATH_CLASSIFICATIONS, classification_name + ".skc")
-            
-            # If not in plugin lib folder then check support files
-            unless file
-              file = Sketchup.find_support_file(classification + ".skc", "Classifications")
-            end
-            if file
-              classifications.load_schema(file) if !file.nil?
-            else
-              message = "Unable to load classification:\r\n'#{classification_name}'"
-              puts message
-              notification = UI::Notification.new(IFCMANAGER_EXTENSION, message)
-              notification.show
-            end
+          filepath = File.join(PLUGIN_PATH_CLASSIFICATIONS, classification_file)
+          unless filepath
+            filepath = Sketchup.find_support_file(classification_file, "Classifications")
+          end
+          if !filepath.nil?
+            model.classifications.load_schema(filepath)
+          else
+            message = "Unable to load classification:\r\n'#{classification_name}'"
+            puts message
+            UI::Notification.new(IFCMANAGER_EXTENSION, message).show
           end
         end
       end
-      
-      # also check if IFC2X3 is loaded
-      unless Sketchup.active_model.classifications["IFC 2x3"]
-        c = Sketchup.active_model.classifications
-        file = Sketchup.find_support_file('IFC 2x3.skc', 'Classifications')
-        c.load_schema(file) if !file.nil?
-      end
       model.commit_operation
-    end # def load_classifications
+    end
 
     # @return [Hash] List of materials
     def materials
@@ -231,7 +262,9 @@ module BimTools::IfcManager
       })
       set_html()
       @dialog.add_action_callback("save_settings") { |action_context, s_form_data|
+        puts s_form_data
         update_classifications = []
+        update_ifc_classifications = []
         @template_materials               = false
         @common_psets                     = false
         @export_hidden.value              = false
@@ -246,32 +279,34 @@ module BimTools::IfcManager
 
         a_form_data = CGI.unescape(s_form_data).split('&')
         a_form_data.each do |s_setting|
-          a_setting = s_setting.split('=')
-                    
-          if a_setting[0] == "template_materials"
+          key, value = s_setting.split('=')
+          case key
+          when "template_materials"
             @template_materials = true
-          elsif a_setting[0] == "common_psets"
+          when "common_psets"
             @common_psets = true
-          elsif a_setting[0] == "hidden"
+          when "hidden"
             @export_hidden.value = true
-          elsif a_setting[0] == "classifications"
+          when "classifications"
             @export_classifications.value = true
-          elsif a_setting[0] == "layers"
+          when "layers"
             @export_layers.value = true
-          elsif a_setting[0] == "materials"
+          when "materials"
             @export_materials.value = true
-          elsif a_setting[0] == "colors"
+          when "colors"
             @export_colors.value = true
-          elsif a_setting[0] == "geometry"
+          when "geometry"
             @export_geometry.value = true
-          elsif a_setting[0] == "fast_guid"
+          when "fast_guid"
             @export_fast_guid.value = true
-          elsif a_setting[0] == "dynamic_attributes"
+          when "dynamic_attributes"
             @export_dynamic_attributes.value = true
-          elsif a_setting[0] == "mapped_items"
+          when "mapped_items"
             @export_mapped_items.value = true
-          else
-            update_classifications << a_setting[1]
+          when "ifc_classification"
+            update_ifc_classifications << value
+          when "classification"
+            update_classifications << value
           end
         end
         @classifications.each_key do |classification_name|
@@ -279,6 +314,13 @@ module BimTools::IfcManager
             self.set_classification(classification_name)
           else
             self.unset_classification(classification_name)
+          end
+        end
+        @ifc_classifications.each_key do |ifc_classification|
+          if update_ifc_classifications.include? ifc_classification
+            self.set_ifc_classification(ifc_classification)
+          else
+            self.unset_ifc_classification(ifc_classification)
           end
         end
         self.save()
@@ -306,8 +348,21 @@ module BimTools::IfcManager
   <div class='container'>
     <form>
       <div class='form-group'>
-        <h1>Classification systems</h1>
+        <h1>IFC version</h1>
 HTML
+      # ifc_classifications = Sketchup.find_support_files('skc', 'Classifications').select {|path| File.basename(path).downcase.include? 'ifc' } 
+      @ifc_classifications.each_pair do |ifc_classification, load|
+        if load
+          checked = " checked"
+        else
+          checked = ""
+        end
+        ifc_classification_name = File.basename(ifc_classification, ".skc")
+        html << "      <input type=\"radio\" id=\"#{ifc_classification_name}\" name=\"ifc_classification\" value=\"#{ifc_classification}\"#{checked}>\n"
+        html << "      <label for=\"#{ifc_classification_name}\">#{ifc_classification_name}</label><br>\n"
+      end
+      html << "      <h1>Other classification systems</h1>\n"
+
       @classifications.each_pair do |classification_name, load|
         if load
           checked = " checked"

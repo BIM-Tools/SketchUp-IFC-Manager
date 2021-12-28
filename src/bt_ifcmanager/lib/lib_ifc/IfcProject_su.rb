@@ -19,11 +19,10 @@
 #
 #
 
-# require_relative File.join('IFC2X3', 'IfcUnitAssignment.rb')
-# require_relative File.join('IFC2X3', 'IfcSIUnit.rb')
-
 module BimTools
   module IfcProject_su
+    include BimTools::IfcManager::Settings.ifc_module
+    
     attr_accessor :su_object
     def initialize(ifc_model, sketchup)
       super
@@ -31,20 +30,20 @@ module BimTools
       @ifc_model = ifc_model
       
       # IfcUnitAssignment
-      @unitsincontext = BimTools::IFC2X3::IfcUnitAssignment.new( ifc_model )
+      @unitsincontext = IfcUnitAssignment.new( ifc_model )
       @unitsincontext.units = IfcManager::Ifc_Set.new()
-      mm = BimTools::IFC2X3::IfcSIUnit.new( ifc_model )
+      mm = IfcSIUnit.new( ifc_model )
       mm.dimensions = '*'
       mm.unittype = '.LENGTHUNIT.'
       mm.prefix = '.MILLI.'
       mm.name = '.METRE.'
       @unitsincontext.units.add( mm )
-      m2 = BimTools::IFC2X3::IfcSIUnit.new( ifc_model )
+      m2 = IfcSIUnit.new( ifc_model )
       m2.dimensions = '*'
       m2.unittype = '.AREAUNIT.'
       m2.name = '.SQUARE_METRE.'
       @unitsincontext.units.add( m2 )
-      m3 = BimTools::IFC2X3::IfcSIUnit.new( ifc_model )
+      m3 = IfcSIUnit.new( ifc_model )
       m3.dimensions = '*'
       m3.unittype = '.VOLUMEUNIT.'
       m3.name = '.CUBIC_METRE.'

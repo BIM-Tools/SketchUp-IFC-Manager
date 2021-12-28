@@ -20,19 +20,15 @@
 #
 
 require_relative 'set.rb'
-# require_relative File.join('IFC2X3', 'IfcClosedShell.rb')
-# require_relative File.join('IFC2X3', 'IfcFace.rb')
-# require_relative File.join('IFC2X3', 'IfcFaceBound.rb')
-# require_relative File.join('IFC2X3', 'IfcFaceOuterBound.rb')
-# require_relative File.join('IFC2X3', 'IfcPolyLoop.rb')
-# require_relative File.join('IFC2X3', 'IfcCartesianPoint.rb')
 
 module BimTools
   module IfcFacetedBrep_su
+    include BimTools::IfcManager::Settings.ifc_module
+    
     def initialize( ifc_model, su_faces, su_transformation )
       super
       
-      ifcclosedshell = BimTools::IFC2X3::IfcClosedShell.new( ifc_model, su_faces )
+      ifcclosedshell = IfcClosedShell.new( ifc_model, su_faces )
       @ifc_model = ifc_model
       @su_transformation = su_transformation
       @outer = ifcclosedshell
@@ -52,7 +48,7 @@ module BimTools
     end
     def add_face(su_face)
       create_points(su_face)
-      face = BimTools::IFC2X3::IfcFace.new( @ifc_model )
+      face = IfcFace.new( @ifc_model )
       bounds = su_face.loops.map{|loop| create_loop(loop)}
       face.bounds = IfcManager::Ifc_Set.new(bounds)
       return face
@@ -61,13 +57,13 @@ module BimTools
         
       # differenciate between inner and outer loops/bounds
       if loop.outer?
-        bound = BimTools::IFC2X3::IfcFaceOuterBound.new( @ifc_model )
+        bound = IfcFaceOuterBound.new( @ifc_model )
       else
-        bound = BimTools::IFC2X3::IfcFaceBound.new( @ifc_model )
+        bound = IfcFaceBound.new( @ifc_model )
       end
 
       points = loop.vertices.map{|vert| @vertices[vert]}
-      polyloop = BimTools::IFC2X3::IfcPolyLoop.new( @ifc_model )
+      polyloop = IfcPolyLoop.new( @ifc_model )
       bound.bound = polyloop
       bound.orientation = @flipped
       polyloop.polygon = IfcManager::Ifc_List.new( points )
@@ -80,7 +76,7 @@ module BimTools
       while i < vert_count
         unless @vertices[vertices[i]]
           position = vertices[i].position.transform(@su_transformation)
-          @vertices[vertices[i]] = BimTools::IFC2X3::IfcCartesianPoint.new( @ifc_model, position)
+          @vertices[vertices[i]] = IfcCartesianPoint.new( @ifc_model, position)
         end
         i += 1
       end

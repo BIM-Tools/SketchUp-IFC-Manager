@@ -24,8 +24,6 @@
 # (!) Note: securerandom takes very long to load
 require 'securerandom'
 
-require File.join(File.dirname(__FILE__),'lib', 'lib_ifc', 'xsd_parse.rb')
-
 module BimTools
   module IfcManager
   
@@ -68,7 +66,7 @@ module BimTools
     # Load settings from yaml file
     require File.join(PLUGIN_PATH, 'settings.rb')
     Settings.load()
-
+    
     require File.join(PLUGIN_PATH, 'window.rb')
     require File.join(PLUGIN_PATH, 'export.rb')
     require File.join(PLUGIN_PATH_TOOLS, 'paint_properties.rb')

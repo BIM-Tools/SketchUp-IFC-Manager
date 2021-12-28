@@ -15,8 +15,11 @@
   :mapped_items: false
 :load:
   :classifications:
-    NL-SfB 2005, tabel 1: true
-    DIN 276-1: false
+    NL-SfB 2005, tabel 1.skc: true
+    DIN 276-1.skc: false
+  :ifc_classifications:
+    IFC 2x3.skc: true
+    IFC4.skc: false
   :template_materials: false
 :properties:
   :common_psets: true

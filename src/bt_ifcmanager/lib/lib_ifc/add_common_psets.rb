@@ -26,11 +26,10 @@ module BimTools::IfcManager
   # @param [Sketchup::ComponentDefinition] definition
   # @param [String] ent_type_name
   def add_common_psets(definition, ent_type_name)
-    ifc_dict = definition.attribute_dictionary("IFC 2x3")
+    ifc_dict = definition.attribute_dictionary(BimTools::IfcManager::Settings.ifc_classification)
     if ifc_dict
-      # require_relative File.join("IFC2X3", ent_type_name)
-      entity_type = eval("BimTools::IFC2X3::#{ent_type_name}")
-      prefix = 'BimTools::IFC2X3::Ifc'
+      entity_type = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name)
+      prefix = BimTools::IfcManager::Settings.ifc_module + '::Ifc'
       entity_type.ancestors.each do |ancestor|
         name = ancestor.name
         if name.start_with?(prefix)

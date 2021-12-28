@@ -19,21 +19,35 @@
 #
 #
 
-# require_relative File.join('IFC2X3', 'IfcPresentationStyleAssignment.rb')
-# require_relative File.join('IFC2X3', 'IfcSurfaceStyle.rb')
-# require_relative File.join('IFC2X3', 'IfcSurfaceStyleRendering.rb')
-# require_relative File.join('IFC2X3', 'IfcColourRgb.rb')
-
 module BimTools
   module IfcStyledItem_su
+    include BimTools::IfcManager::Settings.ifc_module
+    
     def initialize(ifc_model, brep, material=nil)
       super
+      instance_variable_set(:@attr, ([:Item] + self.attributes))
       
-      styleassignment = BimTools::IFC2X3::IfcPresentationStyleAssignment.new( ifc_model, material )
-      surfacestyle = BimTools::IFC2X3::IfcSurfaceStyle.new( ifc_model, material )
-      surfacestylerendering = BimTools::IFC2X3::IfcSurfaceStyleRendering.new( ifc_model, material )
-      colourrgb = BimTools::IFC2X3::IfcColourRgb.new( ifc_model, material )
-      
+      styleassignment = IfcPresentationStyleAssignment.new( ifc_model, material )
+      surfacestyle = IfcSurfaceStyle.new( ifc_model, material )
+      surfacestylerendering = IfcSurfaceStyleRendering.new( ifc_model, material )
+      colourrgb = IfcColourRgb.new( ifc_model, material )
+
+      # Workaround for bug in IFC XSD's forward from IFC4, missing "item" attribute
+      unless attributes.include? :Item
+        @item = nil
+        self.define_singleton_method(:attributes) do
+          attributes = self.class.attributes        
+          return [:Item] + attributes
+          return attributes
+        end
+        self.define_singleton_method(:item) do
+          return @item
+        end
+        self.define_singleton_method(:item=) do |item|
+          return @item = item
+        end
+      end
+
       @item = brep
       @styles = IfcManager::Ifc_Set.new( [styleassignment] )
       
@@ -63,7 +77,6 @@ module BimTools
         colourrgb.blue = "1.0"
       end
       
-    end # def initialize
-    
-  end # module IfcStyledItem_su
-end # module BimTools
+    end
+  end
+end

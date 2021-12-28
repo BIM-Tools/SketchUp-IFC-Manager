@@ -20,16 +20,17 @@
 #
 
 require_relative 'set.rb'
-# require_relative File.join('IFC2X3', 'IfcRelAssignsToGroup.rb')
 
 module BimTools
   module IfcGroup_su
+    include BimTools::IfcManager::Settings.ifc_module
+
     # @parameter ifc_model [IfcManager::IfcModel]
     # @parameter sketchup [Sketchup::ComponentDefinition]
     def initialize(ifc_model, sketchup=nil)
       super
 
-      @rel = BimTools::IFC2X3::IfcRelAssignsToGroup.new( ifc_model )
+      @rel = IfcRelAssignsToGroup.new( ifc_model )
       @rel.relatinggroup = self
       @rel.relatedobjects = IfcManager::Ifc_Set.new()
     end

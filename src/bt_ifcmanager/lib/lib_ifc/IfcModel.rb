@@ -27,24 +27,12 @@ require_relative('entity_path.rb')
 require_relative('ObjectCreator.rb')
 require_relative('step_writer.rb')
 
-# require_relative(File.join('IFC2X3', 'IfcOwnerHistory.rb'))
-# require_relative(File.join('IFC2X3', 'IfcPersonAndOrganization.rb'))
-# require_relative(File.join('IFC2X3', 'IfcPerson.rb'))
-# require_relative(File.join('IFC2X3', 'IfcOrganization.rb'))
-# require_relative(File.join('IFC2X3', 'IfcApplication.rb'))
-
-# require_relative(File.join('IFC2X3', 'IfcProject.rb'))
-# require_relative(File.join('IFC2X3', 'IfcCartesianPoint.rb'))
-# require_relative(File.join('IFC2X3', 'IfcDirection.rb'))
-
-# require_relative(File.join('IFC2X3', 'IfcGeometricRepresentationContext.rb'))
-
 module BimTools
   module IfcManager
     require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')
 
     class IfcModel
-      include BimTools::IFC2X3
+      include BimTools::IfcManager::Settings.ifc_module
       
       # (?) possible additional methods:
       # - get_ifc_objects(hash ifc->su)
@@ -153,21 +141,31 @@ module BimTools
       end
 
       # Create new IfcOwnerHistory
-      def create_ownerhistory
+      def create_ownerhistory        
+        creation_date = Time.now.to_i.to_s
         owner_history = IfcOwnerHistory.new(self)
-        owner_history.owninguser = IfcPersonAndOrganization.new(self)
-        owner_history.owninguser.theperson = IfcPerson.new(self)
-        owner_history.owninguser.theperson.familyname = BimTools::IfcManager::IfcLabel.new('')
-        owner_history.owninguser.theorganization = IfcOrganization.new(self)
-        owner_history.owninguser.theorganization.name = BimTools::IfcManager::IfcLabel.new('BIM-Tools')
-        owner_history.owningapplication = IfcApplication.new(self)
-        owner_history.owningapplication.applicationdeveloper = owner_history.owninguser.theorganization
-        owner_history.owningapplication.version = BimTools::IfcManager::IfcLabel.new(VERSION)
-        owner_history.owningapplication.applicationfullname = BimTools::IfcManager::IfcLabel.new('IFC manager for sketchup')
-        owner_history.owningapplication.applicationidentifier = BimTools::IfcManager::IfcIdentifier.new('su_ifcmanager')
+        owninguser = IfcPersonAndOrganization.new(self)
+        owninguser.theperson = IfcPerson.new(self)
+        owninguser.theperson.familyname = BimTools::IfcManager::IfcLabel.new('')
+        owninguser.theorganization = IfcOrganization.new(self)
+        owninguser.theorganization.name = BimTools::IfcManager::IfcLabel.new('')
+        # owninguser.theperson = IfcPerson.new(self)
+        # owninguser.theorganization = IfcOrganization.new(self)
+        owner_history.owninguser = owninguser
+        owningapplication = IfcApplication.new(self)
+        applicationdeveloper = IfcOrganization.new(self)
+        applicationdeveloper.name = BimTools::IfcManager::IfcLabel.new('BIM-Tools')
+        owningapplication.applicationdeveloper = applicationdeveloper
+        owningapplication.version = BimTools::IfcManager::IfcLabel.new(VERSION)
+        owningapplication.applicationfullname = BimTools::IfcManager::IfcLabel.new('IFC manager for sketchup')
+        owningapplication.applicationidentifier = BimTools::IfcManager::IfcIdentifier.new('su_ifcmanager')
+        owner_history.owningapplication = owningapplication
         owner_history.changeaction = '.ADDED.'
-        owner_history.creationdate = Time.now.to_i.to_s
-        owner_history
+        owner_history.lastmodifieddate = creation_date
+        owner_history.creationdate = creation_date
+        owner_history.lastmodifyinguser = owninguser
+        owner_history.lastmodifyingapplication = owningapplication
+        return owner_history
       end
 
       # Create new IfcGeometricRepresentationContext
@@ -177,7 +175,7 @@ module BimTools
         representationcontext.coordinatespacedimension = '3'
         representationcontext.worldcoordinatesystem = IfcAxis2Placement2D.new(self)
         representationcontext.worldcoordinatesystem.location = IfcCartesianPoint.new(self, Geom::Point2d.new(0, 0))
-        # representationcontext.truenorth = IfcDirection.new(self, Geom::Vector3d.new(0, 1, 0))
+        representationcontext.truenorth = IfcDirection.new(self, Geom::Vector2d.new(0, 1))
         representationcontext
       end
 

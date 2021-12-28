@@ -19,30 +19,12 @@
 #
 #
 
-# require_relative(File.join('IFC2X3', 'IfcElementAssembly.rb'))
-# require_relative(File.join('IFC2X3', 'IfcBuilding.rb'))
-# require_relative(File.join('IFC2X3', 'IfcBuildingStorey.rb'))
-# require_relative(File.join('IFC2X3', 'IfcCurtainWall.rb'))
-# require_relative(File.join('IFC2X3', 'IfcProduct.rb'))
-# require_relative(File.join('IFC2X3', 'IfcProject.rb'))
-# require_relative(File.join('IFC2X3', 'IfcSite.rb'))
-# require_relative(File.join('IFC2X3', 'IfcSpace.rb'))
-# require_relative(File.join('IFC2X3', 'IfcSpatialStructureElement.rb'))
-
 module BimTools::IfcManager
 
   # The EntityPath class represents the entity path to a given entity within the IFC project spatial hierarchy.
   #
   class EntityPath
-    include BimTools::IFC2X3
-
-    SPATIAL_ORDER = [
-      IfcProject,
-      IfcSite,
-      IfcBuilding,
-      IfcBuildingStorey,
-      IfcSpace
-    ].freeze
+    include BimTools::IfcManager::Settings.ifc_module
 
     # This creator class creates the EntityPath object for a specific IFC entity
     #
@@ -50,6 +32,13 @@ module BimTools::IfcManager
     # @parameter spatial_hierarchy [Hash<BimTools::IfcManager::IFC2X3::IfcSpatialStructureElement>] Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
     #
     def initialize( ifc_model, entity_path = nil )
+      @spatial_order = [
+        IfcProject,
+        IfcSite,
+        IfcBuilding,
+        IfcBuildingStorey,
+        IfcSpace
+      ].freeze
       @ifc_model = ifc_model
       if entity_path
         @entity_path = entity_path.to_a.clone
@@ -100,7 +89,7 @@ module BimTools::IfcManager
           insert_after(ifc_entity,IfcSite)
         else
           # Create default Site and add there
-          add_default_spatialelement(BimTools::IFC2X3::IfcSite)
+          add_default_spatialelement(IfcSite)
           insert_after(ifc_entity,IfcSite)
         end
       when IfcBuildingStorey
@@ -112,7 +101,7 @@ module BimTools::IfcManager
           insert_after(ifc_entity,IfcBuilding)
         else
           # Create default IfcBuilding and add there, and check for site
-          add_default_spatialelement(BimTools::IFC2X3::IfcBuilding)
+          add_default_spatialelement(IfcBuilding)
           insert_after(ifc_entity,IfcBuilding)
         end
       when IfcSpace
@@ -129,21 +118,21 @@ module BimTools::IfcManager
           @entity_path[path_types().rindex(IfcSite)] = ifc_entity
         else
           # Create default IfcBuildingStorey and add there, and check for IfcBuilding and site
-          add_default_spatialelement(BimTools::IFC2X3::IfcBuildingStorey)
+          add_default_spatialelement(IfcBuildingStorey)
           insert_after(ifc_entity,IfcBuildingStorey)
         end
       when IfcElementAssembly, IfcCurtainWall
 
         # add to end but check for basic spatial hierarchy
         if (entity_path_types & [IfcSpace,IfcBuildingStorey,IfcSite]).empty?
-          add_default_spatialelement(BimTools::IFC2X3::IfcBuildingStorey)
+          add_default_spatialelement(IfcBuildingStorey)
         end
         @entity_path << ifc_entity
       else # IfcProduct
 
         # don't add but check for basic spatial hierarchy
         if (entity_path_types & [IfcSpace,IfcBuildingStorey,IfcSite]).empty?
-          add_default_spatialelement(BimTools::IFC2X3::IfcBuildingStorey)
+          add_default_spatialelement(IfcBuildingStorey)
         end
       end
     end
@@ -152,8 +141,8 @@ module BimTools::IfcManager
     def add_default_spatialelement(entity_class)
 
       # find parent type, if entity not present find the next one
-      index = SPATIAL_ORDER.rindex(entity_class) -1
-      parent_class = SPATIAL_ORDER[index]
+      index = @spatial_order.rindex(entity_class) -1
+      parent_class = @spatial_order[index]
       unless path_types().include?(parent_class)
         add_default_spatialelement(parent_class)
       end

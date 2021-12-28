@@ -20,11 +20,11 @@
 #
 
 require_relative 'set.rb'
-# require_relative File.join('IFC2X3', 'IfcRelContainedInSpatialStructure.rb')
-# require_relative File.join('IFC2X3', 'IfcRelAggregates.rb')
 
 module BimTools
   module IfcObjectDefinition_su
+    include BimTools::IfcManager::Settings.ifc_module
+
     attr_accessor :decomposes, :default_related_object
     def initialize(ifc_model, sketchup)
       super
@@ -36,7 +36,7 @@ module BimTools
     #
     def add_contained_element( object )
       unless @contains_elements
-        @contains_elements = BimTools::IFC2X3::IfcRelContainedInSpatialStructure.new(@ifc_model)
+        @contains_elements = IfcRelContainedInSpatialStructure.new(@ifc_model)
         @contains_elements.relatingstructure= self
         @contains_elements.relatedelements = BimTools::IfcManager::Ifc_Set.new()
       end
@@ -49,7 +49,7 @@ module BimTools
     #
     def add_related_object( object )
       unless @decomposes
-        @decomposes = BimTools::IFC2X3::IfcRelAggregates.new(@ifc_model)
+        @decomposes = IfcRelAggregates.new(@ifc_model)
         @decomposes.relatingobject = self
         @decomposes.relatedobjects = BimTools::IfcManager::Ifc_Set.new()
       end

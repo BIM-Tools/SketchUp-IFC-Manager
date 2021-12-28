@@ -25,24 +25,11 @@ require_relative('IfcGloballyUniqueId.rb')
 require_relative('IfcLengthMeasure.rb')
 require_relative('entity_path.rb')
 
-# require_relative(File.join('IFC2X3', 'IfcElementAssembly.rb'))
-# require_relative(File.join('IFC2X3', 'IfcBuilding.rb'))
-# require_relative(File.join('IFC2X3', 'IfcBuildingStorey.rb'))
-# require_relative(File.join('IFC2X3', 'IfcBuildingElementProxy.rb'))
-# require_relative(File.join('IFC2X3', 'IfcCurtainWall.rb'))
-# require_relative(File.join('IFC2X3', 'IfcGroup.rb'))
-# require_relative(File.join('IFC2X3', 'IfcLocalPlacement.rb'))
-# require_relative(File.join('IFC2X3', 'IfcProject.rb'))
-# require_relative(File.join('IFC2X3', 'IfcSite.rb'))
-# require_relative(File.join('IFC2X3', 'IfcSpace.rb'))
-# require_relative(File.join('IFC2X3', 'IfcSpatialStructureElement.rb'))
-# require_relative(File.join('IFC2X3', 'IfcZone.rb'))
-
 module BimTools::IfcManager
   require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')
 
   class ObjectCreator
-    include BimTools::IFC2X3
+    include BimTools::IfcManager::Settings.ifc_module
 
     # This creator class creates the correct IFC entity for the given sketchup object and it's children
     #
@@ -86,8 +73,7 @@ module BimTools::IfcManager
 
       # (?) catch ent_type_name.nil? with if before catch block?
       begin
-        # require_relative File.join('IFC2X3', ent_type_name)
-        entity_type = eval(ent_type_name)
+        entity_type = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name)
 
         # if a IfcProject then add su_object to the existing project
         # (?) what if there are multiple projects defined?
