@@ -29,10 +29,10 @@ module BimTools
       when Geom::Vector3d, Geom::Vector2d        
         
         # round values
-        @directionratios = IfcManager::Ifc_List.new(sketchup.to_a.map{|x| IfcManager::IfcReal.new(x).step})
+        @directionratios = IfcManager::Ifc_List.new(sketchup.to_a.map{|x| IfcManager::IfcReal.new(x)})
       else
         raise TypeError, "Expected a vector type."
       end
-    end # def sketchup
-  end # module IfcDirection_su
-end # module BimTools
+    end
+  end
+end
