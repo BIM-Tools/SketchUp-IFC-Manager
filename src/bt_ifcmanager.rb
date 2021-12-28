@@ -36,7 +36,7 @@ module BimTools
 
     # load plugin only if SketchUp version is PRO
     # raised minimum version to 2017 due to switch to htmldialog
-    if Sketchup.is_pro? && Sketchup.version_number > 1_700_000_000
+    if Sketchup.version_number > 1_700_000_000
       PLUGIN_PATH       = File.join(PLUGIN_ROOT_PATH, 'bt_ifcmanager')
       PLUGIN_IMAGE_PATH = File.join(PLUGIN_PATH, 'images')
 

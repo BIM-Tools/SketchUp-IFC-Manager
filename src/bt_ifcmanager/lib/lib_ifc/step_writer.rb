@@ -50,13 +50,8 @@ module BimTools
       timestamp = time.strftime("%Y-%m-%dT%H:%M:%S")
       
       # get originating_system
-      if Sketchup.is_pro?
-        pro = " Pro"
-      else
-        pro = ""
-      end
       version_number = Sketchup.version_number/100000000.floor
-      originating_system = "SketchUp#{pro} 20#{version_number.to_s} (#{Sketchup.version})"
+      originating_system = "SketchUp 20#{version_number.to_s} (#{Sketchup.version})"
           
       step_objects = Array.new
       step_objects << 'HEADER'

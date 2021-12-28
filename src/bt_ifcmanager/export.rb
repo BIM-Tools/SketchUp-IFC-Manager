@@ -30,11 +30,6 @@ module BimTools
 
     def export( file_path )
       su_model = Sketchup.active_model
-      
-      # check if it's possible to write IFC files
-      unless Sketchup.is_pro?
-        raise "You need SketchUp PRO to create IFC-files"
-      end
 
       # close previous export summary if still open
       if @summary_dialog
