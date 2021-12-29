@@ -90,7 +90,7 @@ module BimTools
         @owner_history = create_ownerhistory
 
         # create new IfcProject
-        @project = IfcProject.new(self)
+        @project = IfcProject.new(self, su_model)
 
         # create IfcGeometricRepresentationContext for all IFC geometry objects
         @representationcontext = create_representationcontext

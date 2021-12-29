@@ -194,7 +194,7 @@ module BimTools
             attr_accessor *ifc_attributes.map { |x| x.downcase }
             # @@attribute_list = ifc_attributes
             if mixin
-              include mixin
+              prepend mixin
             end
             @attr = ifc_attributes
             def initialize( ifc_model=nil, sketchup=nil, *args )

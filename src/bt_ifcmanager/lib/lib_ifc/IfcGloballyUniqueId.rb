@@ -33,7 +33,6 @@ module BimTools
     GUID64 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$'
     
     def initialize( sketchup = nil, parent_hex_guid=nil)
-      @sketchup = sketchup
       
       # if sketchup object has a GUID, then use that, otherwise create new
       if sketchup && defined?( sketchup.guid )
@@ -48,70 +47,23 @@ module BimTools
     
     # return IfcGloballyUniqueId within quotes
     def step()
-      return hex_to_ifc_guid( @hex_guid )
-    end # def step
+      return "'#{self.to_s}'"
+    end
     
-    def to_s()
+    # get unformatted hex number
+    def to_hex()
       return @hex_guid
-    end # def to_s
-    
-    # recognize guid type and reformat to unformatted hex version
-    def unformat_guid( guid )
-      
-      # check if ifc_guid(length is 22) or uuid
-      if guid.length == 22
-        guid = ifc_guid_to_hex( guid )
-      else
-      
-        # tr('-', ''): removes the dashes from the hex string
-        guid.tr('-', '')
-      end
-    end # def unformat_guid
-    
-    # combine guid with parent guid
-    def combined_guid( sketchup_guid, parent_guid )
-      guid = (sketchup_guid.to_i(16) ^ parent_guid.to_i(16)).to_s(16).rjust(32, '0')
-      
-      # The digit at position 1 above is always "4"
-      # set the four most significant bits of the 7th byte to 0100'B, so the high nibble is "4"
-      guid[12] = "4"
-      
-      # and the digit at position 2 is always one of "8", "9", "A" or "B".
-      # set the two most significant bits of the 9th byte to 10'B, so the high nibble will be one of "8", "9", "A", or "B".
-      h_val = guid[16]
-      b_val = [h_val].pack('H*').unpack('B*')[0]
-      b_val[0] = "1"
-      b_val[1] = "0"
-      guid[16] = [b_val].pack('B*').unpack('H*')[0]
-      return guid
-    end # def combined_guid
-    
-    # convert IfcGloballyUniqueId into unformatted hex number
-    def ifc_guid_to_hex( ifc_guid )
-      bin = ""
-      length = 2
-      ifc_guid.each_char do | char |
-        n = GUID64.index( char.to_s )
-        bin = bin << n.to_s( 2 ).rjust( length, "0" )
-        length = 6
-      end
-      return [bin].pack('B*').unpack('H*')[0]
-    end # def ifc_guid_to_hex
-    
-    # # convert IfcGloballyUniqueId into UUID
-    # def ifc_guid_to_uuid( ifc_guid )
-      # return ifc_guid_to_hex( ifc_guid ).insert(20, '-').insert(16, '-').insert(12, '-').insert(8, '-')
-    # end # def ifc_guid_to_uuid
+    end
     
     # convert unformatted hex number into IfcGloballyUniqueId
-    def hex_to_ifc_guid( hex_guid )
+    def to_s()
       ifc_guid = ""
       
       # https://www.cryptosys.net/pki/uuid-rfc4122.html 
       # pack('H*'): converts the hex string to a binary number (high nibble first)
       # unpack('B*'): converts the binary number to a bit string (128 0's and 1's) and places it into an array (Most Significant Block first)
       # [0]: gets the first (and only) value from the array
-      bit_string = [hex_guid].pack('H*').unpack('B*')[0].to_s
+      bit_string = [@hex_guid].pack('H*').unpack('B*')[0].to_s
       
       # take the number (0 - 63) and find the matching character in guid64, add the found character to the guid string
       # start with the 2 leftover bits
@@ -123,8 +75,50 @@ module BimTools
         ifc_guid << GUID64[char_num]
         block_counter += 6
       end
-      return "'#{ifc_guid}'"
-    end # def hex_to_ifc_guid
+      return "#{ifc_guid}"
+    end
+    
+    # recognize guid type (IFC or UUID) and reformat to unformatted hex version without dashes
+    def unformat_guid( guid )
+      if guid.length == 22
+        guid = ifc_guid_to_hex( guid )
+      else
+        guid.tr('-', '')
+      end
+    end
+    
+    # combine guid with parent guid
+    def combined_guid( sketchup_guid, parent_guid )
+      guid = (sketchup_guid.to_i(16) ^ parent_guid.to_i(16)).to_s(16).rjust(32, '0')
+      
+      # The digit at position 1 above is always "4"
+      # set the four most significant bits of the 7th byte to 0100'B, so the high nibble is "4"
+      guid[12] = "4"
+      
+      # and the digit at position 2 is always one of "8", "9", "A" or "B".
+      # set the two most significant bits of the 9th byte to 10'B, so the high nibble will be one of "8", "9", "A", or "B".
+      bin = [guid[16]].pack('H*').unpack('B*')[0]
+      bin[0..1] = "10"
+      guid[16] = [bin].pack('B*').unpack('H*')[0][0]
+      return guid
+    end
+    
+    # convert IfcGloballyUniqueId into unformatted hex number
+    def ifc_guid_to_hex( ifc_guid )
+      bin = ""
+      length = 2
+      ifc_guid.each_char do | char |
+        n = GUID64.index( char.to_s )
+        bin = bin << n.to_s( 2 ).rjust( length, "0" )
+        length = 6
+      end
+      return [bin].pack('B*').unpack('H*')[0]
+    end
+
+    # convert IfcGloballyUniqueId into UUID
+    def to_uuid()      
+      return  @hex_guid.insert(20, '-').insert(16, '-').insert(12, '-').insert(8, '-')
+    end
     
     def new_guid
       
@@ -139,6 +133,6 @@ module BimTools
       # convert to hex
       return unformat_guid( SecureRandom.uuid )
     end
-  end # class IfcGloballyUniqueId
- end # module IfcManager
-end # module BimTools
+  end
+ end
+end
