@@ -38,6 +38,7 @@ module BimTools
       if sketchup.is_a?(Sketchup::Group) || sketchup.is_a?(Sketchup::ComponentInstance)
         
         # get properties from su object and add them to ifc object
+        ifc_version = BimTools::IfcManager::Settings.ifc_version
         definition = sketchup.definition
         
         #(?) set name, here? is this a duplicate?
@@ -47,8 +48,8 @@ module BimTools
         # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
         
         if definition.attribute_dictionaries
-          if definition.attribute_dictionaries["IFC 2x3"]
-            if props_ifc = definition.attribute_dictionaries["IFC 2x3"].attribute_dictionaries
+          if definition.attribute_dictionaries[ifc_version]
+            if props_ifc = definition.attribute_dictionaries[ifc_version].attribute_dictionaries
               props_ifc.each do |prop_dict|
                 prop = prop_dict.name
                 prop_sym = prop.to_sym

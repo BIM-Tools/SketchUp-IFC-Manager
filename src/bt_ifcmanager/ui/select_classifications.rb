@@ -71,10 +71,11 @@ module BimTools::IfcManager
                   # In case of IFC2X3 classification add common propertysets
                   #   together with the IFC classification
                   # (?) Is this the best place for this check?
-                  if @name=="IFC 2x3"
+                  ifc_version = BimTools::IfcManager::Settings.ifc_version
+                  if @name==ifc_version
 
                     # Set assigned enumerations to default value
-                    ifc_dict = definition.attribute_dictionary("IFC 2x3")
+                    ifc_dict = definition.attribute_dictionary(ifc_version)
                     ifc_dict.attribute_dictionaries.each do |attr_dict|
                       if attr_dict.attribute_dictionaries
                         attr_dict.attribute_dictionaries.each do |prop_dict|

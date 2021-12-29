@@ -43,7 +43,7 @@ module BimTools::IfcManager
     def initialize(ifc_model, su_instance, su_total_transformation, placement_parent = nil, entity_path = nil, su_material = nil)
       @ifc_model = ifc_model
       @entity_path = EntityPath.new(@ifc_model, entity_path)
-      ent_type_name = su_instance.definition.get_attribute('AppliedSchemaTypes', 'IFC 2x3')
+      ent_type_name = su_instance.definition.get_attribute('AppliedSchemaTypes', BimTools::IfcManager::Settings.ifc_version)
       su_material = su_instance.material if su_instance.material
 
       # Add the current sketchup object's transformation to the total transformation

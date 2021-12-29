@@ -64,7 +64,7 @@ module BimTools::IfcManager
       @form_elements << Title.new(@window)
 
       # Add html select for classifications
-      classification_list = {"IFC 2x3" => true}.merge!(Settings.classifications)
+      classification_list = {Settings.ifc_version => true}.merge!(Settings.classifications)
       classification_list.each_pair do | classification_name, active |
         if active
           classification_name = File.basename(classification_name, ".skc")

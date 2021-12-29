@@ -22,7 +22,7 @@
 
 module BimTools::IfcManager
   require File.join(PLUGIN_PATH_UI, 'input_text.rb')
-  require File.join(PLUGIN_PATH_LIB, "set_ifc_entity_name.rb")
+  require File.join(PLUGIN_PATH, 'update_ifc_fields.rb')
   module PropertiesWindow
     class HtmlInputName < HtmlInputText
       def initialize(dialog)
