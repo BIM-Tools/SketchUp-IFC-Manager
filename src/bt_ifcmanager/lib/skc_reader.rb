@@ -19,14 +19,14 @@
 #
 #
 
-require 'rexml/document'
-
 begin
   require 'zip'
-rescue
+rescue LoadError
   Gem::install('rubyzip')
   require 'zip'
 end
+
+require 'rexml/document'
 
 require File.join(File.dirname(__FILE__), 'lib_ifc', 'parse_xsd.rb')
 
@@ -39,6 +39,7 @@ module BimTools
       attr_reader :filepath, :name, :properties
       def initialize(filename)
         @name = ""
+        @properties = {}
 
         # Find schema file
         plugin_filepath = File.join(PLUGIN_PATH_CLASSIFICATIONS, filename)
@@ -65,8 +66,6 @@ module BimTools
               document_properties = REXML::Document.new(entry.get_input_stream.read)
               document_properties.elements.each("documentProperties") do |element|
                 @properties = element.elements.map{|e| [e.name.split(":").last.to_sym, e.text] }.to_h
-                
-                puts @properties
                 if @properties.include? :title
                   @name = @properties[:title]
                 end
