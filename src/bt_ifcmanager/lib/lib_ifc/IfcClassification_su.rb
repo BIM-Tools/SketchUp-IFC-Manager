@@ -26,6 +26,7 @@ module BimTools
       
       # key must be reference name, value the IfcClassificationReference object
       @ifc_classification_references = Hash.new
+      super
     end
   end # module IfcClassification_su
 end # module BimTools

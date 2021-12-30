@@ -78,7 +78,7 @@ module BimTools
         # create collections for materials and layers
         @materials = {}
         @layers = {}
-        @classifications = []
+        @classifications = {}
 
         # create empty array that will contain all IFC objects
         @ifc_objects = []

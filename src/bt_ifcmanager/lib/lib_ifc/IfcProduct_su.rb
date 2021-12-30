@@ -239,138 +239,64 @@ module BimTools
     # add classifications    
     def collect_classifications( ifc_model, definition )
       su_model = ifc_model.su_model
+      active_classifications = BimTools::IfcManager::Settings.classification_names
     
       # Collect all attached classifications except for IFC
       if definition.attribute_dictionaries
         definition.attribute_dictionaries.each do | attr_dict |
-
-          #(mp) added if loop to temporarily allow only DIN 276-1 classification
-          if attr_dict.name == "DIN 276-1" # unless attr_dict.name == "IFC 2x3"
-            if su_model.classifications[ attr_dict.name ]
+          if active_classifications.keys.include? attr_dict.name
+            skc_reader = active_classifications[attr_dict.name]
               
-              # Create classifications if they don't exist
-              if ifc_model.classifications.include?( attr_dict.name )
-                cls = ifc_model.classifications[attr_dict.name]
-              else
-                cls = IfcClassification.new( ifc_model )
-                cls.source = BimTools::IfcManager::IfcLabel.new("DIN Deutsches Institut für Normung e.V.")
-                cls.edition = BimTools::IfcManager::IfcLabel.new("2008-12")
-                #cls.editiondate
-                cls.name = BimTools::IfcManager::IfcLabel.new("DIN 276-1:2008-12")
+            # Create classifications if they don't exist
+            if ifc_model.classifications.keys.include?( attr_dict.name )
+              ifc_classification = ifc_model.classifications[attr_dict.name]
+            else
+              ifc_classification = IfcClassification.new( ifc_model )
+              ifc_model.classifications[attr_dict.name] = ifc_classification
+              classification_properties = skc_reader.properties
+              if classification_properties.key?("creator")
+                ifc_classification.source = BimTools::IfcManager::IfcLabel.new(classification_properties.creator)
               end
-              
-              # retrieve classification value from su object
-              type = definition.get_attribute("AppliedSchemaTypes", attr_dict.name)
-              if type
-                code = definition.get_classification_value([attr_dict.name, type, "din_code"])
-                text = definition.get_classification_value([attr_dict.name, type, "din_text"])
-                
-                # only create IfcClassificationReference if component has the code and text values for the classification
-                if code && text
-                  ifc_classification_reference = cls.ifc_classification_references[ code ]
-                  unless ifc_classification_reference
-                    ifc_classification_reference = IfcClassificationReference.new( ifc_model )
-                    #ifc_classification_reference.location = ""
-                    ifc_classification_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
-                    ifc_classification_reference.name = BimTools::IfcManager::IfcLabel.new(text)
-                    ifc_classification_reference.referencedsource = cls
-                    
-                    # add ifc_classification_reference to the list of references in the classification
-                    cls.ifc_classification_references[ code ] = ifc_classification_reference
-                    
-                    # create IfcRelAssociatesClassification
-                    assoc = IfcRelAssociatesClassification.new( ifc_model )
-                    #assoc.name = ""
-                    #assoc.description = ""
-                    assoc.relatedobjects = BimTools::IfcManager::Ifc_Set.new( [self] )
-                    assoc.relatingclassification = ifc_classification_reference
-                    ifc_classification_reference.ifc_rel_associates_classification = assoc
-                    
-                  end
-                end
+              if classification_properties.key?("edition")
+                ifc_classification.edition = BimTools::IfcManager::IfcLabel.new(classification_properties.edition)
               end
+              #ifc_classification.editiondate
+              ifc_classification.name = BimTools::IfcManager::IfcLabel.new( attr_dict.name )
             end
-          end #(mp) end of DIN 276-1 loop
-          
-          # temporarily allow only nlsfb classification
-          if attr_dict.name == "NL-SfB 2005, tabel 1" # unless attr_dict.name == "IFC 2x3"
-            if su_model.classifications[ attr_dict.name ]
-              
-              # Create classifications if they don't exist
-              if ifc_model.classifications.include?( attr_dict.name )
-                cls = ifc_model.classifications[attr_dict.name]
-              else
-                cls = IfcClassification.new( ifc_model )
-                cls.source = BimTools::IfcManager::IfcLabel.new("BIM Loket")
-                cls.edition = BimTools::IfcManager::IfcLabel.new("2005")
-                #cls.editiondate
-                cls.name = BimTools::IfcManager::IfcLabel.new( attr_dict.name )
-                
-                # vico hack: store a copy of NL-SfB as unicode
-                unicode_cls = IfcClassification.new( ifc_model )
-                unicode_cls.source = BimTools::IfcManager::IfcLabel.new("http://www.csiorg.net/uniformat")
-                unicode_cls.edition = BimTools::IfcManager::IfcLabel.new("1998")
-                #unicode_cls.editiondate
-                unicode_cls.name = BimTools::IfcManager::IfcLabel.new("Uniformat")
-              end
-              
-              # retrieve classification value from su object
-              type = definition.get_attribute("AppliedSchemaTypes", attr_dict.name)
-              if type
-                code = definition.get_classification_value([attr_dict.name, type, "Class-codenotatie"])
-                text = definition.get_classification_value([attr_dict.name, type, "tekst_NL-SfB"])
-                
-                # only create IfcClassificationReference if component has the code and text values for the classification
-                if code && text
-                  ifc_classification_reference = cls.ifc_classification_references[ code ]
-                  unless ifc_classification_reference
-                    ifc_classification_reference = IfcClassificationReference.new( ifc_model )
-                    #ifc_classification_reference.location = ""
 
-                    # Catch IFC4 changes
-                    if IfcClassificationReference.method_defined?(:itemreference)
-                      ifc_classification_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
-                    else
-                      ifc_classification_reference.identification = BimTools::IfcManager::IfcIdentifier.new(code)
-                    end
-                    ifc_classification_reference.name = BimTools::IfcManager::IfcLabel.new(text)
-                    ifc_classification_reference.referencedsource = cls
-                    
-                    # add ifc_classification_reference to the list of references in the classification
-                    cls.ifc_classification_references[ code ] = ifc_classification_reference
-                    
-                    # create IfcRelAssociatesClassification
-                    assoc = IfcRelAssociatesClassification.new( ifc_model )
-                    #assoc.name = ""
-                    #assoc.description = ""
-                    assoc.relatedobjects = BimTools::IfcManager::Ifc_Set.new( [self] )
-                    assoc.relatingclassification = ifc_classification_reference
-                    ifc_classification_reference.ifc_rel_associates_classification = assoc
-                    
-                    # vico hack: store a copy of NL-SfB as unicode
-                    unicode_reference = IfcClassificationReference.new( ifc_model )
-                    unicode_reference.location = "'http://www.csiorg.net/uniformat'"
+            attributes = []
+            attr_dict.attribute_dictionaries.each do |attribute|
+              attributes << attribute['value']
+            end
+            
+            # No way to map values with certainty, just pick the first 2
+            if attributes.length > 1
+              ifc_classification_reference = ifc_classification.ifc_classification_references[ attributes[0] ]
+              unless ifc_classification_reference
+                ifc_classification_reference = IfcClassificationReference.new( ifc_model )
+                #ifc_classification_reference.location = ""
 
-                    # Catch IFC4 changes
-                    if IfcClassificationReference.method_defined?(:itemreference)
-                      unicode_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
-                    else
-                      unicode_reference.identification = BimTools::IfcManager::IfcIdentifier.new(code)
-                    end
-                    unicode_reference.name = BimTools::IfcManager::IfcLabel.new(text)
-                    unicode_reference.referencedsource = unicode_cls
-                    unicode_assoc = IfcRelAssociatesClassification.new( ifc_model )
-                    unicode_assoc.name = "'Uniformat Classification'"
-                    #unicode_assoc.description = ""
-                    unicode_assoc.relatedobjects = IfcManager::Ifc_Set.new( [self] )
-                    unicode_assoc.relatingclassification = unicode_reference
-                    unicode_reference.ifc_rel_associates_classification = unicode_assoc
-                    
-                  end
+                # Catch IFC4 changes
+                if IfcClassificationReference.method_defined?(:itemreference)
+                  ifc_classification_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(attributes[0])
+                else
+                  ifc_classification_reference.identification = BimTools::IfcManager::IfcIdentifier.new(attributes[0])
                 end
+                ifc_classification_reference.name = BimTools::IfcManager::IfcLabel.new(attributes[1])
+                ifc_classification_reference.referencedsource = ifc_classification
+                
+                # add ifc_classification_reference to the list of references in the classification
+                ifc_classification.ifc_classification_references[ attributes[0] ] = ifc_classification_reference
+                
+                # create IfcRelAssociatesClassification
+                rel = IfcRelAssociatesClassification.new( ifc_model )
+                rel.relatedobjects = BimTools::IfcManager::Ifc_Set.new( [self] )
+                rel.relatingclassification = ifc_classification_reference
+                ifc_classification_reference.ifc_rel_associates_classification = rel                    
               end
             end
           end
+
         end
       end
     end

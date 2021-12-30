@@ -36,20 +36,48 @@ module BimTools
     MAX_SIZE = 10485760 # 10MiB
 
     class SkcReader
-      attr_reader :filepath
+      attr_reader :filepath, :name, :properties
       def initialize(filename)
-        files = Sketchup.find_support_files('skc', 'Classifications')
-        @skc_filepath = nil
-    
+        @name = ""
+
         # Find schema file
-        files.each do |skc_file|
-          if File.basename(skc_file) == filename
-            @skc_filepath = skc_file
+        plugin_filepath = File.join(PLUGIN_PATH_CLASSIFICATIONS, filename)
+        if File.file?(plugin_filepath)
+          filepath = plugin_filepath
+        else
+          filepath = Sketchup.find_support_file(filename, "Classifications")
+        end
+        if filepath
+          @skc_filepath = filepath
+          set_properties()
+        else
+          message = "Unable to find SKC-file:\r\n'#{filename}'"
+          puts message
+          UI::Notification.new(IFCMANAGER_EXTENSION, message).show
+        end
+      end
+
+      def set_properties()
+        if @skc_filepath
+          Zip::File.open(@skc_filepath) do |zip_file|
+            if entry = zip_file.find_entry("documentProperties.xml")
+              raise 'File too large when extracted' if entry.size > MAX_SIZE
+              document_properties = REXML::Document.new(entry.get_input_stream.read)
+              document_properties.elements.each("documentProperties") do |element|
+                @properties = element.elements.map{|e| [e.name.split(":").last.to_sym, e.text] }.to_h
+                
+                puts @properties
+                if @properties.include? :title
+                  @name = @properties[:title]
+                end
+              end        
+            end
           end
         end
       end
 
       # Get classification name
+      # (!) Better to read once and store in variable
       def classification_name()
         if @skc_filepath
           Zip::File.open(@skc_filepath) do |zip_file|
@@ -91,6 +119,55 @@ module BimTools
               return entry.get_input_stream.read
             else
               raise 'Unable to read classification'
+            end
+          end
+        end
+      end
+    
+
+      def xsd_filter()
+        if @skc_filepath
+          Zip::File.open(@skc_filepath) do |zip_file|
+            xsd_file = nil
+
+            # Find XSD file name
+            if entry = zip_file.find_entry('document.xml')
+              raise 'File too large when extracted' if entry.size > MAX_SIZE
+              document = REXML::Document.new(entry.get_input_stream.read)
+              document.elements.each('classificationDocument') do |element|
+                element.elements.each('cls:Classification') do |element|
+                  if xsd_file = element.attributes['xsdFile']
+                    break
+                  end
+                end
+                break
+              end
+            end
+
+            # Read XSD filter file
+            if entry = zip_file.find_entry(xsd_file << '.filter')
+              raise 'File too large when extracted' if entry.size > MAX_SIZE
+              skip = false
+              filter = []
+              entry.get_input_stream.read.each_line do |line|
+                case line
+                when "{\n"
+                  skip = true
+                when "}\n"
+                  skip = false
+                when "\n"
+                else
+                  unless skip
+                    unless line.start_with?("//")
+                      filter << line.strip
+                    end
+                  end
+                end
+              end
+              return filter
+            else
+              puts 'Unable to find classification filter'
+              return false
             end
           end
         end

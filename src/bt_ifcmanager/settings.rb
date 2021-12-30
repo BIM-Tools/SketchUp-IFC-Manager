@@ -43,18 +43,20 @@ module BimTools::IfcManager
   require File.join(File.dirname(__FILE__),'lib', 'skc_reader.rb')
   module Settings
     extend self
-    attr_accessor :visible, :ifc_version, :ifc_version_compact, :ifc_module
-    attr_reader :ifc_classification, :ifc_classifications, :classifications, :common_psets
+    attr_accessor :visible, :ifc_version, :ifc_version_compact, :ifc_module, :filters
+    attr_reader :ifc_classification, :ifc_classifications, :classifications, :classification_names, :common_psets
     @template_materials = false
     @common_psets = true
     @settings_file = File.join(PLUGIN_PATH, "settings.yml")
     @ifc_classifications = Hash.new
     @classifications = Hash.new
+    @classification_names = Hash.new
     @css_bootstrap = File.join(PLUGIN_PATH_CSS, 'bootstrap.min.css')
     @css_core = File.join(PLUGIN_PATH_CSS, 'dialog.css')
     @css_settings = File.join(PLUGIN_PATH_CSS, 'settings.css')
     @js_bootstrap = File.join(PLUGIN_PATH, 'js', 'bootstrap.min.js')
     @js_jquery = File.join(PLUGIN_PATH, 'js', 'jquery.min.js')
+    @filters = {}
 
     def load()
       begin
@@ -101,11 +103,7 @@ module BimTools::IfcManager
       @options[:export][:dynamic_attributes] = @export_dynamic_attributes.value
       # @options[:export][:mapped_items]       = @export_mapped_items.value
       File.open(@settings_file, "w") { |file| file.write(@options.to_yaml) }
-      if PropertiesWindow.window && PropertiesWindow.window.visible?
-        PropertiesWindow.close
-        PropertiesWindow.create
-        PropertiesWindow.show
-      end
+      PropertiesWindow.reload
       load()
     end
 
@@ -113,7 +111,8 @@ module BimTools::IfcManager
     # (?) First check if already loaded?
     def load_ifc_skc(ifc_classification)
       reader = SkcReader.new(ifc_classification)
-      ifc_version = reader.classification_name()
+      @filters[ifc_classification] = reader
+      ifc_version = reader.name()
       parser = IfcXmlParser.new(ifc_version)
       parser.from_string(reader.xsd_schema())
     end
@@ -165,9 +164,14 @@ module BimTools::IfcManager
     def read_classifications()
       @classifications = Hash.new
       if @options[:load][:classifications].is_a? Hash
-        @options[:load][:classifications].each_pair do |classification_name, load|
-          if(load == true || load == false)
-            @classifications[classification_name] = load
+        @options[:load][:classifications].each_pair do |classification_file, load|
+          if(load == true)
+            skc_reader = SkcReader.new(classification_file)
+            @filters[classification_file] = skc_reader
+            @classification_names[skc_reader.name] = skc_reader
+            @classifications[classification_file] = load
+          elsif load == false
+            @classifications[classification_file] = load
           end
         end
       end
@@ -186,11 +190,13 @@ module BimTools::IfcManager
       classifications = Settings.ifc_classifications.merge(Settings.classifications)
       classifications.each_pair do | classification_file, classification_active |
         if classification_active
-          filepath = File.join(PLUGIN_PATH_CLASSIFICATIONS, classification_file)
-          unless filepath
+          plugin_filepath = File.join(PLUGIN_PATH_CLASSIFICATIONS, classification_file)
+          if File.file?(plugin_filepath)
+            filepath = plugin_filepath
+          else
             filepath = Sketchup.find_support_file(classification_file, "Classifications")
           end
-          if !filepath.nil?
+          if filepath
             model.classifications.load_schema(filepath)
           else
             message = "Unable to load classification:\r\n'#{classification_name}'"
@@ -363,13 +369,14 @@ HTML
       end
       html << "      <h1>Other classification systems</h1>\n"
 
-      @classifications.each_pair do |classification_name, load|
+      @classifications.each_pair do |classification, load|
         if load
           checked = " checked"
         else
           checked = ""
         end
-        html << "         <div class=\"col-md-12 row\"><label class=\"check-inline\"><input type=\"checkbox\" name=\"classification\" value=\"#{classification_name}\"#{checked}> #{classification_name}</label></div>\n"
+        classification_name = File.basename(classification, ".skc")
+        html << "         <div class=\"col-md-12 row\"><label class=\"check-inline\"><input type=\"checkbox\" name=\"classification\" value=\"#{classification}\"#{checked}> #{classification_name}</label></div>\n"
       end
 
       # Export settings

@@ -64,19 +64,29 @@ module BimTools::IfcManager
       @form_elements << Title.new(@window)
 
       # Add html select for classifications
-      classification_list = {Settings.ifc_version => true}.merge!(Settings.classifications)
-      classification_list.each_pair do | classification_name, active |
+      classification_list = {Settings.ifc_classification => true}.merge!(Settings.classifications)
+      classification_list.each_pair do | classification_file, active |
         if active
-          classification_name = File.basename(classification_name, ".skc")
-          classification = HtmlSelectClassifications.new(@window, classification_name)
+          if BimTools::IfcManager::Settings.filters.key?(classification_file)
+            skc_reader = BimTools::IfcManager::Settings.filters[classification_file]
+            classification_name = skc_reader.name
+            classification = HtmlSelectClassifications.new(@window, classification_name)
 
-          # Add "-" option to unset the classification
-          options_template = [{:id => "-", :text => "-"}]
+            # Add "-" option to unset the classification
+            options_template = [{:id => "-", :text => "-"}]
 
-          # Load options from file
-          options = YAML.load_file(File.join(PLUGIN_PATH, "classifications", classification_name + ".yml"))
-          classification.set_js_options(options,options_template)
-          @form_elements << classification
+            # Load options from file
+            yml_path = File.join(PLUGIN_PATH, "classifications", classification_name + ".ymla")
+            if File.file?(yml_path)
+              options = YAML.load_file(yml_path)
+              classification.set_js_options(options,options_template)
+              @form_elements << classification
+            else
+              options = skc_reader.xsd_filter()
+              classification.set_js_options(options,options_template)
+              @form_elements << classification
+            end
+          end
         end
       end
 
@@ -109,6 +119,13 @@ module BimTools::IfcManager
         @window.show
       end
     end # def show
+
+    # Reload Sketchup HtmlDialog window
+    def reload
+      self.close
+      self.create
+      self.show
+    end
 
     # toggle Sketchup HtmlDialog window visibility
     # close when visible, show otherwise
