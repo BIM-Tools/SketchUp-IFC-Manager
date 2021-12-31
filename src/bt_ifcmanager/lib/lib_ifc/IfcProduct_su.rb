@@ -23,13 +23,8 @@
 require_relative 'IfcBoolean.rb'
 require_relative "IfcLabel.rb"
 require_relative "IfcIdentifier.rb"
-require_relative "IfcText.rb"
 require_relative "IfcReal.rb"
 require_relative "IfcInteger.rb"
-require_relative "IfcLengthMeasure.rb"
-require_relative "IfcPositiveLengthMeasure.rb"
-require_relative "IfcPlaneAngleMeasure.rb"
-require_relative "IfcThermalTransmittanceMeasure.rb"
 require_relative "enumeration.rb"
 
 require_relative File.join("dynamic_attributes.rb")

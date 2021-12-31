@@ -25,14 +25,10 @@ module BimTools::IfcManager
 
   # A positive length measure is a length measure that is greater than zero.
   class IfcPositiveLengthMeasure < IfcLengthMeasure
-    def initialize( value )
-      begin
-        @value = value.to_f
-        if @value <= 0
-          BimTools::IfcManager::add_export_message("IfcPositiveLengthMeasure must be a positive number!")
-        end
-      rescue StandardError, TypeError => e
-        print value.to_s << " cannot be converted to a Float: " << e
+    def initialize( ifc_model, value )
+      super      
+      if @value <= 0
+        BimTools::IfcManager::add_export_message("IfcPositiveLengthMeasure must be a positive number!")
       end
     end
   end

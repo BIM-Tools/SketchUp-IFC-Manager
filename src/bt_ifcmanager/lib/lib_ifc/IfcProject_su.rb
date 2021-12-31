@@ -21,6 +21,7 @@
 
 module BimTools
   module IfcProject_su
+
     include BimTools::IfcManager::Settings.ifc_module
     
     attr_accessor :su_object
@@ -29,26 +30,9 @@ module BimTools
       self.su_object=(sketchup)
       @ifc_model = ifc_model
       
-      # IfcUnitAssignment
-      @unitsincontext = IfcUnitAssignment.new( ifc_model )
-      @unitsincontext.units = IfcManager::Ifc_Set.new()
-      mm = IfcSIUnit.new( ifc_model )
-      mm.dimensions = '*'
-      mm.unittype = '.LENGTHUNIT.'
-      mm.prefix = '.MILLI.'
-      mm.name = '.METRE.'
-      @unitsincontext.units.add( mm )
-      m2 = IfcSIUnit.new( ifc_model )
-      m2.dimensions = '*'
-      m2.unittype = '.AREAUNIT.'
-      m2.name = '.SQUARE_METRE.'
-      @unitsincontext.units.add( m2 )
-      m3 = IfcSIUnit.new( ifc_model )
-      m3.dimensions = '*'
-      m3.unittype = '.VOLUMEUNIT.'
-      m3.name = '.CUBIC_METRE.'
-      @unitsincontext.units.add( m3 )
-    end # def initialize
+      # Set project units to sketchup units
+      @unitsincontext = IfcUnitAssignment.new( @ifc_model )
+    end
     
     def su_object=(sketchup)
       @name = BimTools::IfcManager::IfcLabel.new( "default project" )
@@ -76,5 +60,5 @@ module BimTools
       @ifc_model.summary_add(self.class.name.split('::').last)
       super
     end
-  end # module IfcProject_su
-end # module BimTools
+  end
+end

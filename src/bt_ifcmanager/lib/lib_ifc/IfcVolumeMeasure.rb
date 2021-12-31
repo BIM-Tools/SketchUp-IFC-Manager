@@ -1,6 +1,6 @@
-#  IfcCartesianPoint_su.rb
+#  IfcVolumeMeasure.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2021 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,25 +19,25 @@
 #
 #
 
-require_relative 'IfcReal.rb'
+require_relative 'Ifc_Type.rb'
 
-module BimTools
-  module IfcCartesianPoint_su
-    include IfcManager
+module BimTools::IfcManager
+  class IfcVolumeMeasure < Ifc_Type
 
-    # Creates IfcCartesianPoint entity
-    #
-    # @parameter ifc_model [BimTools::IfcManager::IfcModel] Model to which the IfcCartesianPoint will be added
-    # @parameter sketchup [Geom::Point3d, Geom::Point2d, Array] Takes an Array of length 2 or 3 as coordinates
-    #
-    def initialize(ifc_model, sketchup)
-      super
-      case sketchup
-      when Geom::Point3d, Geom::Point2d   
-        @coordinates = IfcManager::Ifc_List.new(sketchup.to_a.map{|c| IfcManager::IfcLengthMeasure.new(ifc_model, c)})
-      else
-        raise TypeError, "Expected a point type."
+    def initialize( value )
+      begin
+        @value = value.to_f
+      rescue StandardError, TypeError => e
+        print value << "cannot be converted to an volume: " << e
       end
+    end
+    
+    def step()
+      val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
+      if @long
+        val = add_long( val )
+      end
+      return val
     end
   end
 end

@@ -31,13 +31,18 @@ module BimTools::IfcManager
         print value << "cannot be converted to a Float: " << e
       end
     end
-    
-    def step()
-      val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
+
+    # Convert float to STEP formatted STEP string taking into account possible scientific notation
+    def to_step_string(value)
+      val = value.to_s.upcase.gsub(/(\.)0+$/, '.')
       if @long
         val = add_long( val )
       end
       return val
+    end
+    
+    def step()
+      return to_step_string(@value)
     end
   end
 end

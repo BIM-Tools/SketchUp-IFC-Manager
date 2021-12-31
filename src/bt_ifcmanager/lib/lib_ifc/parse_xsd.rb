@@ -197,7 +197,7 @@ module BimTools
               prepend mixin
             end
             @attr = ifc_attributes
-            def initialize( ifc_model=nil, sketchup=nil, *args )
+            def initialize( ifc_model, sketchup=nil, *args )
               @ifc_id = ifc_model.add( self ) if @ifc_id.nil?
               unless self.class.superclass == Object
                 super

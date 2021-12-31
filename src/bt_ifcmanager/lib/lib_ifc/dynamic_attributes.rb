@@ -31,7 +31,7 @@ module BimTools
   include BimTools::IfcManager::Settings.ifc_module
 
   def self.get_dynamic_attributes( ifc_model, ifc_object )
-    
+    @ifc_model = ifc_model
     instance = ifc_object.su_object
     definition = instance.definition
     pset_hash = Hash.new
@@ -129,7 +129,7 @@ module BimTools
     
     # exception: Default fields lenx, leny and lenz are always "DEFAULT" meaning Length
     if ["lenx","leny","lenz"].include? key
-      return BimTools::IfcManager::IfcLengthMeasure.new( value.to_f.to_mm ) # (!)(?) always mm?
+      return BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, value )
     end
     
     # get unit, use "formulaunits" if possible, if not use "units"
@@ -139,18 +139,18 @@ module BimTools
     
     case units
     when "CENTIMETERS", "INCHES"
-      return BimTools::IfcManager::IfcLengthMeasure.new( value.to_f.to_mm ) # (!)(?) always mm?
+      return BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, value )
     when "STRING"
       return BimTools::IfcManager::IfcLabel.new( value )
     when "FLOAT"
       return BimTools::IfcManager::IfcReal.new( value.to_f )
     else # (?) when "DEFAULT"
       if value.is_a? Length
-        return BimTools::IfcManager::IfcLengthMeasure.new( value.to_mm ) # (!)(?) always mm?
+        return BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, value )
       elsif value.is_a? String
         return BimTools::IfcManager::IfcLabel.new( value )
       elsif value.is_a? Float
-        return BimTools::IfcManager::IfcReal.new( value.to_f )
+        return BimTools::IfcManager::IfcReal.new( value )
       end
     end
   end # def get_dynamic_attribute_value

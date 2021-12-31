@@ -76,7 +76,7 @@ module BimTools::IfcManager
             options_template = [{:id => "-", :text => "-"}]
 
             # Load options from file
-            yml_path = File.join(PLUGIN_PATH, "classifications", classification_name + ".ymla")
+            yml_path = File.join(PLUGIN_PATH, "classifications", classification_name + ".yml")
             if File.file?(yml_path)
               options = YAML.load_file(yml_path)
               classification.set_js_options(options,options_template)

@@ -34,6 +34,7 @@ require_relative "IfcLengthMeasure.rb"
 require_relative "IfcPlaneAngleMeasure.rb"
 require_relative "IfcPositiveLengthMeasure.rb"
 require_relative "IfcThermalTransmittanceMeasure.rb"
+require_relative "IfcVolumeMeasure.rb"
 require_relative "IfcVolumetricFlowRateMeasure.rb"
 require_relative "IfcPositiveRatioMeasure.rb"
 require_relative "enumeration.rb"
@@ -61,17 +62,17 @@ module BimTools
               when "Area", "GrossArea"
                 prop = IfcQuantityArea.new( ifc_model, attr_dict )
                 prop.name = BimTools::IfcManager::IfcIdentifier.new( qty_dict.name )
-                prop.areavalue = BimTools::IfcManager::IfcReal.new( qty_dict['value'] ) # real should be IfcLengthMeasure
+                prop.areavalue = BimTools::IfcManager::IfcAreaMeasure.new( qty_dict['value'] )
                 qty.quantities.add( prop )
               when "Volume"
                 prop = IfcQuantityVolume.new( ifc_model, attr_dict )
                 prop.name = BimTools::IfcManager::IfcIdentifier.new( qty_dict.name )
-                prop.volumevalue = BimTools::IfcManager::IfcReal.new( qty_dict['value'] ) # real should be IfcLengthMeasure
+                prop.volumevalue = BimTools::IfcManager::IfcVolumeMeasure.new( qty_dict['value'] )
                 qty.quantities.add( prop )
               when "Width", "Height", "Depth", "Perimeter"
                 prop = IfcQuantityLength.new( ifc_model, attr_dict )
                 prop.name = BimTools::IfcManager::IfcIdentifier.new( qty_dict.name )
-                prop.lengthvalue = BimTools::IfcManager::IfcReal.new( qty_dict['value'] ) # real should be IfcLengthMeasure
+                prop.lengthvalue = BimTools::IfcManager::IfcLengthMeasure.new( qty_dict['value'] )
                 qty.quantities.add( prop )
               #else
               end

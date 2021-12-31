@@ -147,8 +147,8 @@ module BimTools::IfcManager
         # (?) is this the best place to define building storey elevation?
         #   could be better set from within IfcBuildingStorey?
         if ifc_entity.is_a?(IfcBuildingStorey)
-          elevation = ifc_entity.objectplacement.ifc_total_transformation.origin.z.to_mm
-          ifc_entity.elevation = BimTools::IfcManager::IfcLengthMeasure.new(elevation)
+          elevation = ifc_entity.objectplacement.ifc_total_transformation.origin.z
+          ifc_entity.elevation = BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, elevation)
         end
       end
     end

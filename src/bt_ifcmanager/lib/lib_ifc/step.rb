@@ -49,6 +49,9 @@ module BimTools
 
     # Instead of the full step object return a reference
     def ref()
+      if !@ifc_id
+        raise "Missing IFC object ID for: #{self}"
+      end        
       return "##{@ifc_id}"
     end
   end
