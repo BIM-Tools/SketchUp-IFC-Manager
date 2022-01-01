@@ -23,31 +23,45 @@
  
 module BimTools
   module Step
+
+    # Returns the STEP representation for an object
+    #
+    # @return String
+    #
     def step()
       attribute_strings = attributes().map { |attribute| attribute_to_step(attribute) }
       return "##{@ifc_id}=#{self.class.name.split('::').last.upcase}(#{attribute_strings.join(",")})"
     end
 
+    # Returns the STEP representation for an attribute
+    #
+    # @param property_name
+    #
+    # @return String
+    #
     def attribute_to_step(property_name)
       property = self.send(property_name.downcase)
-      if property.nil?
+      case property
+      when nil
         return "$"
+      when String
+        return property
+      when TrueClass
+        return ".T."
+      when FalseClass
+        return ".F."
+      when IfcManager::IfcGloballyUniqueId, IfcManager::Ifc_List, IfcManager::Ifc_Set, IfcManager::Ifc_Type
+        return property.step
       else
-        if property.is_a? String
-          return property
-        elsif property.is_a?(IfcManager::IfcGloballyUniqueId) || property.is_a?(IfcManager::Ifc_List) || property.is_a?(IfcManager::Ifc_Set) || property.is_a?(IfcManager::Ifc_Type)
-          return property.step
-        elsif property.is_a? TrueClass
-          return ".T."
-        elsif property.is_a? FalseClass
-          return ".F."
-        else
-          return property.ref
-        end
+        return property.ref
       end
     end
 
-    # Instead of the full step object return a reference
+    # Instead of the full step object return a STEP reference
+    #   for example '#15'
+    #
+    # @return String
+    #
     def ref()
       if !@ifc_id
         raise "Missing IFC object ID for: #{self}"
