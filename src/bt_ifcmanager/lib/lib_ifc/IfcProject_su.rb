@@ -36,7 +36,6 @@ module BimTools
     
     def su_object=(sketchup)
       @name = BimTools::IfcManager::IfcLabel.new( "default project" )
-      @description = BimTools::IfcManager::IfcLabel.new( "Description of Default Project" )
       if sketchup.is_a?(Sketchup::Group) || sketchup.is_a?(Sketchup::ComponentInstance)
         @su_object = sketchup
         

@@ -157,10 +157,11 @@ module BimTools
     # Add representation to the IfcProduct, transform geometry with given transformation
     # @param [Sketchup::Transformation] transformation
     def create_representation(faces, transformation, su_material)
+      definition = @su_object.definition
       
       # set representation based on definition
       unless @representation
-        @representation = IfcProductDefinitionShape.new(@ifc_model, @su_object.definition)
+        @representation = IfcProductDefinitionShape.new(@ifc_model, definition)
       end
 
       representation = @representation.representations.first

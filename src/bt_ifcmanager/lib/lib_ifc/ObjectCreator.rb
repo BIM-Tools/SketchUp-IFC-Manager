@@ -87,13 +87,14 @@ module BimTools::IfcManager
           #TODO set all correct parameters for IfcProject!!!
           @ifc_model.project.su_object = su_instance
           ifc_entity = @ifc_model.project
-          @ifc_model.project.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
         else
           ifc_entity = entity_type.new(@ifc_model, su_instance)
-          if entity_type < IfcRoot
-            ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
-          end
         end
+        
+        if entity_type < IfcRoot
+          ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
+        end
+
         @entity_path.add(ifc_entity)
         construct_entity(ifc_entity, placement_parent)
         faces = create_nested_objects(ifc_entity, su_instance, su_material)
