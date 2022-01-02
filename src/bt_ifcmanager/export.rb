@@ -55,11 +55,6 @@ module BimTools
       su_model.commit_operation
       
       pb.update(1)
-
-      # make sure file_path ends in "ifc"
-      unless File.extname(file_path).downcase == ".ifc"
-        file_path << '.ifc'
-      end
       
       # create new IfcModel
       ifc_model = IfcModel.new( su_model, options )

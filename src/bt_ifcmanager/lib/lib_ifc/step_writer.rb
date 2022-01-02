@@ -69,10 +69,33 @@ module BimTools
       step_objects << 'ENDSEC'
       return step_objects
     end
-    
+
     def write( file_path, step_objects )
-      File.open(file_path, "w:ISO-8859-1") do |file|
-        file.write(step_objects.join(";\n") << ";")
+      if File.extname(file_path).downcase == '.ifczip'
+
+        # Make sure rubyzip is loaded
+        begin
+          require 'zip'
+        rescue LoadError
+          Gem::install('rubyzip')
+          begin
+            require 'zip'
+          rescue LoadError
+            message = "Unable to write ifcZIP, rubyzip not available"
+            puts message
+            UI::Notification.new(IFCMANAGER_EXTENSION, message).show
+          end
+        end
+
+        file_name = File.basename(file_path, File.extname(file_path)) << '.ifc'
+        Zip::OutputStream.open(file_path) do |zos|
+          zos.put_next_entry(file_name)
+          zos.puts (step_objects.join(";\n") << ";").encode("iso-8859-1")
+        end
+      else
+        File.open(file_path, "w:ISO-8859-1") do |file|
+          file.write(step_objects.join(";\n") << ";")
+        end
       end
     end
   end
