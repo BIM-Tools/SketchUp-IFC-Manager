@@ -21,11 +21,11 @@
 #
 #
 
-require_relative('IfcLabel.rb')
-require_relative('IfcIdentifier.rb')
-require_relative('entity_path.rb')
-require_relative('ObjectCreator.rb')
-require_relative('step_writer.rb')
+require_relative('IfcLabel')
+require_relative('IfcIdentifier')
+require_relative('entity_path')
+require_relative('ObjectCreator')
+require_relative('step_writer')
 
 module BimTools
   module IfcManager
@@ -33,29 +33,30 @@ module BimTools
 
     class IfcModel
       include BimTools::IfcManager::Settings.ifc_module
-      
+
       # (?) possible additional methods:
       # - get_ifc_objects(hash ifc->su)
       # - get_su_objects(hash su->ifc)
       # - add_su_object
       # - add_ifc_object
 
-      attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications, :classificationassociations
-      attr_reader :su_model, :project, :ifc_objects, :export_summary, :options, :su_entities, :units
+      attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications,
+                    :classificationassociations
+      attr_reader :su_model, :project, :ifc_objects, :export_summary, :options, :su_entities, :units, :default_location, :default_axis, :default_refdirection, :default_placement
 
       # creates an IFC model based on given su model
       # (?) could be enhanced to also accept other sketchup objects
 
       # Creates an IFC model based on given su model
       #
-      # @parameter su_model [Sketchup::Model] 
+      # @parameter su_model [Sketchup::Model]
       # @parameter options [Hash] Optional options hash
       # @parameter su_entities [Array<Sketchup::Entity>] Optional list of entities that have to be exported to IFC, nil exports all model entities.
       #
       def initialize(su_model, options = {})
         defaults = {
           ifc_entities:       false, # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
-          hidden:             false, #  include hidden sketchup objects
+          hidden:             false, # include hidden sketchup objects
           attributes:         [], #    include specific attribute dictionaries given in array as IfcPropertySets, like ['SU_DefinitionSet', 'SU_InstanceSet'], false means all
           classifications:    true, #  add all SketchUp classifications
           layers:             true, #  create IfcPresentationLayerAssignments
@@ -83,7 +84,7 @@ module BimTools
         # create empty array that will contain all IFC objects
         @ifc_objects = []
 
-        # create empty hash that will contaon all Mapped Representations (Component Definitions)
+        # create empty hash that will contain all Mapped Representations (Component Definitions)
         @mapped_representations = {}
 
         # create IfcOwnerHistory for all IFC objects
@@ -91,7 +92,7 @@ module BimTools
 
         # create new IfcProject
         @project = IfcProject.new(self, su_model)
-        
+
         # set_units
         @units = @project.unitsincontext
 
@@ -99,7 +100,17 @@ module BimTools
         @representationcontext = create_representationcontext
 
         @project.representationcontexts = IfcManager::Ifc_Set.new([@representationcontext])
-        
+
+        # Create default origin and axes for re-use throughout the model
+        transformation = Geom::Transformation.new
+        @default_placement = IfcAxis2Placement3D.new( self, transformation )
+        @default_location = IfcCartesianPoint.new( self, transformation.origin )
+        @default_axis = IfcDirection.new( self, transformation.zaxis )
+        @default_refdirection = IfcDirection.new( self, transformation.xaxis )
+        @default_placement.location = @default_location
+        @default_placement.axis = @default_axis
+        @default_placement.refdirection = @default_refdirection
+
         # When no entities are given for export, pass all model entities to create ifc objects
         # if nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked
         if @options[:root_entities].empty?
@@ -146,7 +157,7 @@ module BimTools
       end
 
       # Create new IfcOwnerHistory
-      def create_ownerhistory        
+      def create_ownerhistory
         creation_date = Time.now.to_i.to_s
         owner_history = IfcOwnerHistory.new(self)
         owninguser = IfcPersonAndOrganization.new(self)
@@ -170,7 +181,7 @@ module BimTools
         owner_history.creationdate = creation_date
         owner_history.lastmodifyinguser = owninguser
         owner_history.lastmodifyingapplication = owningapplication
-        return owner_history
+        owner_history
       end
 
       # Create new IfcGeometricRepresentationContext
@@ -224,7 +235,6 @@ module BimTools
           entity_path.set_parent(ifc_entity)
         end
       end
-
     end
   end
 end

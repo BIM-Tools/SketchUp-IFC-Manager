@@ -155,6 +155,13 @@ module BimTools::IfcManager
         default_parent = entity_class.new( @ifc_model )
         default_parent.name = BimTools::IfcManager::IfcLabel.new("default " << entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(" ").downcase)
         
+        # Add ObjectPlacement
+        default_parent.objectplacement = IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)#(!) clean up duplicate transformation assignment
+        default_parent.objectplacement.relativeplacement = @ifc_model.default_placement
+        if parent.respond_to?(:objectplacement)
+          default_parent.objectplacement.placementrelto = parent.objectplacement
+        end
+
         # set default related element
         parent.default_related_object = default_parent
       end
