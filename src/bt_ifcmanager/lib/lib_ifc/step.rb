@@ -20,17 +20,16 @@
 #
 
 # mixin module to set the Step generation methods for all IFC classes
- 
+
 module BimTools
   module Step
-
     # Returns the STEP representation for an object
     #
     # @return String
     #
-    def step()
-      attribute_strings = attributes().map { |attribute| attribute_to_step(attribute) }
-      return "##{@ifc_id}=#{self.class.name.split('::').last.upcase}(#{attribute_strings.join(",")})"
+    def step
+      attribute_strings = attributes.map { |attribute| attribute_to_step(attribute) }
+      "##{@ifc_id}=#{self.class.name.split('::').last.upcase}(#{attribute_strings.join(',')})"
     end
 
     # Returns the STEP representation for an attribute
@@ -40,20 +39,26 @@ module BimTools
     # @return String
     #
     def attribute_to_step(property_name)
-      property = self.send(property_name.downcase)
+      property = send(property_name.downcase)
+      property_to_step(property)
+    end
+
+    def property_to_step(property)
       case property
       when nil
-        return "$"
+        '$'
+      when Symbol
+        ".#{property.upcase}."
       when String
-        return property
+        property
       when TrueClass
-        return ".T."
+        '.T.'
       when FalseClass
-        return ".F."
+        '.F.'
       when IfcManager::IfcGloballyUniqueId, IfcManager::Ifc_List, IfcManager::Ifc_Set, IfcManager::Ifc_Type
-        return property.step
+        property.step
       else
-        return property.ref
+        property.ref
       end
     end
 
@@ -62,11 +67,10 @@ module BimTools
     #
     # @return String
     #
-    def ref()
-      if !@ifc_id
-        raise "Missing IFC object ID for: #{self}"
-      end        
-      return "##{@ifc_id}"
+    def ref
+      raise "Missing IFC object ID for: #{self}" unless @ifc_id
+
+      "##{@ifc_id}"
     end
   end
 end
