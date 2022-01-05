@@ -20,42 +20,56 @@
 #
 
 module BimTools::IfcManager
+
+  # Basic IFC Type class inherited by most other IFC Types
   class Ifc_Type
-    attr_accessor :long
+    attr_accessor :value, :long
+
+    @@not_boolean = "Parameter 'long' must be 'true' or 'false'"
+    @@boolean = [true, false]
+
+    def initialize(value, long = false)
+      @value = value
+      if @@boolean.include? long
+        @long = long
+      else
+        raise(ArgumentError, @@not_boolean)
+      end
+    end
 
     # https://technical.buildingsmart.org/wp-content/uploads/2018/05/IFC2x-Model-Implementation-Guide-V2-0b.pdf
     # page 19 and 20
-    def replace_char( in_string )
-      out_string = ""
+    def replace_char(in_string)
+      out_string = ''
       a_char_numbers = in_string.unpack('U*')
       i = 0
-      while i < a_char_numbers.length do
+      while i < a_char_numbers.length
         case a_char_numbers[i]
         when (0..31), 39, 92 # \X\code , 39 is the ansii number for the quote character ' , and 92 is \
-          out_string << "\\X\\#{("%02x" % a_char_numbers[i]).upcase}"
+          out_string << "\\X\\#{('%02x' % a_char_numbers[i]).upcase}"
         when 32..127
           out_string << a_char_numbers[i]
         when 128..255 # \S\code
-          out_string << "\\S\\" << a_char_numbers[i] - 128
-        when 256..65535 # \X2\code\X0\
-          out_string << "\\X2\\#{("%04x" % a_char_numbers[i]).upcase}\\X0\\"
+          out_string << '\\S\\' << a_char_numbers[i] - 128
+        when 256..65_535 # \X2\code\X0\
+          out_string << "\\X2\\#{('%04x' % a_char_numbers[i]).upcase}\\X0\\"
         else # \X4\code\X0\
-          out_string << "\\X4\\#{("%08x" % a_char_numbers[i]).upcase}\\X0\\"
+          out_string << "\\X4\\#{('%08x' % a_char_numbers[i]).upcase}\\X0\\"
         end
         i += 1
       end
-      return out_string
+      out_string
     end
-    
+
     # adding long = true returns a full object string
-    def add_long( string )
+    def add_long(string)
       classname = self.class.name.split('::').last.upcase
-      return "#{classname}(#{string})"
+      "#{classname}(#{string})"
     end
 
     # Type objects don't have references, instead return step serialization
-    def ref()
-      return step()
+    def ref
+      step
     end
   end
 end

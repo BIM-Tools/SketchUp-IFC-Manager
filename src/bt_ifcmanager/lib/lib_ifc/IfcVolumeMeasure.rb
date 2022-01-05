@@ -19,25 +19,23 @@
 #
 #
 
-require_relative 'Ifc_Type.rb'
+require_relative 'Ifc_Type'
 
 module BimTools::IfcManager
   class IfcVolumeMeasure < Ifc_Type
-
-    def initialize( value )
+    def initialize(value, long = false)
+      super
       begin
         @value = value.to_f
       rescue StandardError, TypeError => e
-        print value << "cannot be converted to an volume: " << e
+        puts value << 'cannot be converted to a volume: ' << e
       end
     end
-    
-    def step()
+
+    def step
       val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
-      if @long
-        val = add_long( val )
-      end
-      return val
+      val = add_long(val) if @long
+      val
     end
   end
 end

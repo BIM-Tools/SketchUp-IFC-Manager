@@ -19,26 +19,24 @@
 #
 #
 
-require_relative 'Ifc_Type.rb'
+require_relative 'Ifc_Type'
 
 module BimTools::IfcManager
   class IfcText < Ifc_Type
-    
-    def initialize( value )
+    def initialize(value, long = false)
+      super
       begin
         @value = value.to_s
       rescue StandardError, TypeError => e
-        print "#{value} cannot be converted to a String #{e}"
+        puts "Value cannot be converted to a String: #{e}"
       end
     end
-    
-    def step()
-      str_replace = replace_char( @value )
+
+    def step
+      str_replace = replace_char(@value)
       val = "'#{str_replace}'"
-      if @long
-        val = add_long( val )
-      end
-      return val
+      val = add_long(val) if @long
+      val
     end
   end
 end

@@ -19,17 +19,18 @@
 #
 #
 
-require_relative 'Ifc_Type.rb'
+require_relative 'Ifc_Type'
 
 module BimTools::IfcManager
   class IfcBoolean < Ifc_Type
-    def initialize( value )
-      self.value=(value)
+    def initialize(value, long = false)
+      super
+      self.value = (value)
     end
-    
+
     def value=(value)
       case value
-      when NilClass, ""
+      when NilClass, ''
         @value = nil
       when TrueClass, FalseClass
         @value = value
@@ -37,34 +38,32 @@ module BimTools::IfcManager
 
         # see if casting it to a string makes it a boolean type
         case value.to_s.downcase
-        when "true"
+        when 'true'
           @value = true
-        when "false"
+        when 'false'
           @value = false
-        else        
+        else
           @value = nil
-          BimTools::IfcManager::add_export_message("IfcBoolean must be true or false, not #{value.to_s}")
+          BimTools::IfcManager.add_export_message("IfcBoolean must be true or false, not #{value}")
         end
       end
     end
 
-    def step()
+    def step
       case @value
       when TrueClass
-        value = ".T."
+        value = '.T.'
       when FalseClass
-        value = ".F."
+        value = '.F.'
       else
-        return "$"
+        return '$'
       end
-      if @long
-        value = add_long( value )
-      end
-      return value
+      value = add_long(value) if @long
+      value
     end
-    
+
     def true?(obj)
-      obj.to_s == "true"
+      obj.to_s == 'true'
     end
   end
 end

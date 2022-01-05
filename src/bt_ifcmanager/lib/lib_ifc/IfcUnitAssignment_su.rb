@@ -57,29 +57,29 @@ module BimTools
     ].freeze
 
     IFC_UNITS = {
-      CubicMillimeter: %i[VOLUMEUNIT MILLI CUBIC_METRE],
-      CubicCentimeter: %i[VOLUMEUNIT CENTI CUBIC_METRE],
-      CubicMeter: [:VOLUMEUNIT, '*', :CUBIC_METRE],
-      Liter: %i[VOLUMEUNIT DECI CUBIC_METRE],
-      Millimeter: %i[LENGTHUNIT MILLI METRE],
-      Centimeter: %i[LENGTHUNIT CENTI METRE],
-      Meter: [:LENGTHUNIT, '*', :METRE],
-      SquareMillimeter: %i[AREAUNIT MILLI SQUARE_METRE],
-      SquareCentimeter: %i[AREAUNIT CENTI SQUARE_METRE],
-      SquareMeter: [:AREAUNIT, '*', :SQUARE_METRE]
+      CubicMillimeter: %i[volumeunit milli cubic_metre],
+      CubicCentimeter: %i[volumeunit centi cubic_metre],
+      CubicMeter: [:volumeunit, '*', :cubic_metre],
+      Liter: %i[volumeunit deci cubic_metre],
+      Millimeter: %i[lengthunit milli metre],
+      Centimeter: %i[lengthunit centi metre],
+      Meter: [:lengthunit, '*', :metre],
+      SquareMillimeter: %i[areaunit milli square_metre],
+      SquareCentimeter: %i[areaunit centi square_metre],
+      SquareMeter: [:areaunit, '*', :square_metre]
     }
 
     CONVERSIONBASEDUNITS = {
-      SquareYard: [:SquareMeter, :AREAUNIT, 'SQUARE YARD', 0.83612736, [2, 0, 0, 0, 0, 0, 0]],
-      CubicInches: [:CubicMeter, :VOLUMEUNIT, 'CUBIC INCH', 1.6387064e-05, [3, 0, 0, 0, 0, 0, 0]],
-      CubicFeet: [:CubicMeter, :VOLUMEUNIT, 'CUBIC FOOT', 0.028316846592, [3, 0, 0, 0, 0, 0, 0]],
-      CubicYard: [:CubicMeter, :VOLUMEUNIT, 'CUBIC YARD', 0, 764_554_857_984, [3, 0, 0, 0, 0, 0, 0]],
-      USGallon: [:CubicMeter, :VOLUMEUNIT, 'US GALLON', 0.00378541178, [3, 0, 0, 0, 0, 0, 0]],
-      Inches: [:Meter, :LENGTHUNIT, 'INCH', 0.0254, [1, 0, 0, 0, 0, 0, 0]],
-      Feet: [:Meter, :LENGTHUNIT, 'FOOT', 0.3048, [1, 0, 0, 0, 0, 0, 0]],
-      Yard: [:Meter, :LENGTHUNIT, 'YARD', 0.9144, [1, 0, 0, 0, 0, 0, 0]],
-      SquareInches: [:SquareMeter, :AREAUNIT, 'SQUARE INCH', 0.00064516, [2, 0, 0, 0, 0, 0, 0]],
-      SquareFeet: [:SquareMeter, :AREAUNIT, 'SQUARE FOOT', 0.09290304, [2, 0, 0, 0, 0, 0, 0]]
+      SquareYard: [:SquareMeter, :areaunit, 'SQUARE YARD', 0.83612736, [2, 0, 0, 0, 0, 0, 0]],
+      CubicInches: [:CubicMeter, :volumeunit, 'CUBIC INCH', 1.6387064e-05, [3, 0, 0, 0, 0, 0, 0]],
+      CubicFeet: [:CubicMeter, :volumeunit, 'CUBIC FOOT', 0.028316846592, [3, 0, 0, 0, 0, 0, 0]],
+      CubicYard: [:CubicMeter, :volumeunit, 'CUBIC YARD', 0, 764_554_857_984, [3, 0, 0, 0, 0, 0, 0]],
+      USGallon: [:CubicMeter, :volumeunit, 'US GALLON', 0.00378541178, [3, 0, 0, 0, 0, 0, 0]],
+      Inches: [:Meter, :lengthunit, 'INCH', 0.0254, [1, 0, 0, 0, 0, 0, 0]],
+      Feet: [:Meter, :lengthunit, 'FOOT', 0.3048, [1, 0, 0, 0, 0, 0, 0]],
+      Yard: [:Meter, :lengthunit, 'YARD', 0.9144, [1, 0, 0, 0, 0, 0, 0]],
+      SquareInches: [:SquareMeter, :areaunit, 'SQUARE INCH', 0.00064516, [2, 0, 0, 0, 0, 0, 0]],
+      SquareFeet: [:SquareMeter, :areaunit, 'SQUARE FOOT', 0.09290304, [2, 0, 0, 0, 0, 0, 0]]
     }
 
     def initialize(ifc_model)
@@ -127,11 +127,11 @@ module BimTools
         conversionbasedunit.conversionfactor = measurewithunit
         unit = IfcSIUnit.new(@ifc_model)
         case unit_values[1]
-        when :LENGTHUNIT
+        when :lengthunit
           valuecomponent = BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, unit_values[3])
-        when :AREAUNIT
+        when :areaunit
           valuecomponent = BimTools::IfcManager::IfcAreaMeasure.new(unit_values[3])
-        when :VOLUMEUNIT
+        when :volumeunit
           valuecomponent = BimTools::IfcManager::IfcVolumeMeasure.new(unit_values[3])
         end
         valuecomponent.long = true

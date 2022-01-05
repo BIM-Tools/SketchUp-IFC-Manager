@@ -19,43 +19,35 @@
 #
 #
 
-require_relative 'Ifc_Type.rb'
+require_relative 'Ifc_Type'
 
 module BimTools::IfcManager
-
   # A label is the term by which something may be referred to.
   #   It is a string which represents the human-interpretable name of
   #   something and shall have a natural-language meaning.
   class IfcLabel < Ifc_Type
-    attr_reader :value
-
-    def initialize( value )
-
+    def initialize(value, long = false)
+      super
       begin
-
-        @value = value.to_s
-        # puts @value
-        # puts @value.length
+        @value = @value.to_s
 
         # IfcLabel may not be longer than 255 characters
         if @value.length > 255
-          BimTools::IfcManager::add_export_message("IfcLabel truncated to maximum of 255 characters")
+          BimTools::IfcManager.add_export_message('IfcLabel truncated to maximum of 255 characters')
           @value = @value[0..254]
         end
       rescue StandardError, TypeError => e
-        print "cannot be converted to a String #{e.to_s}"
+        print "Value cannot be converted to a String #{e}"
       end
     end
-    
+
     # generate step object output string
     # adding long = true returns a full object string
-    def step()
-      str_replace = replace_char( @value )
+    def step
+      str_replace = replace_char(@value)
       val = "'#{str_replace}'"
-      if @long
-        val = add_long( val )
-      end
-      return val
+      val = add_long(val) if @long
+      val
     end
   end
 end

@@ -25,7 +25,6 @@ require_relative "IfcLabel.rb"
 require_relative "IfcIdentifier.rb"
 require_relative "IfcReal.rb"
 require_relative "IfcInteger.rb"
-require_relative "enumeration.rb"
 
 require_relative File.join("dynamic_attributes.rb")
 require_relative File.join("PropertyReader.rb")
@@ -34,20 +33,21 @@ module BimTools
   module IfcProduct_su
     include BimTools::IfcManager::Settings.ifc_module
 
-    attr_accessor :su_object, :parent, :total_transformation
+    attr_accessor :su_object, :parent, :total_transformation, :type_product
     @su_object = nil
     @parent = nil
     
     def initialize(ifc_model, sketchup)
       @ifc_model = ifc_model
       super
-      if sketchup.is_a?(Sketchup::Group) || sketchup.is_a?(Sketchup::ComponentInstance)
+      ifc_version = BimTools::IfcManager::Settings.ifc_version
+      if sketchup.is_a?(Sketchup::Group) || sketchup.is_a?(Sketchup::ComponentInstance) #(?) Is this check neccesary?
       
         @su_object = sketchup
         
         # get properties from su object and add them to ifc object
         definition = @su_object.definition
-        
+
         #(?) set name, here? is this a duplicate?
         @name = BimTools::IfcManager::IfcLabel.new(definition.name)
 
@@ -55,8 +55,8 @@ module BimTools
         # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
         
         if definition.attribute_dictionaries
-          if definition.attribute_dictionaries["IFC 2x3"]
-            if props_ifc = definition.attribute_dictionaries["IFC 2x3"].attribute_dictionaries
+          if definition.attribute_dictionaries[ifc_version]
+            if props_ifc = definition.attribute_dictionaries[ifc_version].attribute_dictionaries
               props_ifc.each do |prop_dict|
                 prop = prop_dict.name
                 prop_sym = prop.to_sym
@@ -70,7 +70,7 @@ module BimTools
                   if attribute_type == "choice"
                     # Skip this attribute, this is not a value but a reference
                   elsif attribute_type == "enumeration"
-                    send("#{prop.downcase}=", BimTools::IfcManager::Enumeration.new(dict_value))
+                    send("#{prop.downcase}=", dict_value)
                   else
                     entity_type = false
                     if value_type
@@ -152,7 +152,7 @@ module BimTools
           BimTools::DynamicAttributes::get_dynamic_attributes( ifc_model, self )
         end
       end
-    end # def initialize
+    end
 
     # Add representation to the IfcProduct, transform geometry with given transformation
     # @param [Sketchup::Transformation] transformation
@@ -302,5 +302,5 @@ module BimTools
       @ifc_model.summary_add(self.class.name.split("::").last)
       super
     end
-  end # module IfcProduct_su
-end # module BimTools
+  end
+end

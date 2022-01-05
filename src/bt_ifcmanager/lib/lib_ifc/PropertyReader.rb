@@ -21,43 +21,46 @@
 
 module BimTools
   class PropertyReader
-    attr_reader :name, :value, :value_type, :attribute_type
-    def initialize( attr_dict )
+    attr_reader :name, :value, :value_type, :attribute_type, :options
+
+    def initialize(attr_dict)
       @name = attr_dict.name
       @value = false
       @value_type = false
-    
+
       # get data for objects with additional nesting levels
       # like: path = ["IFC 2x3", "IfcWindow", "Name", "IfcLabel"]
-      if !attr_dict["value"] && attr_dict.attribute_dictionaries
+      if !attr_dict['value'] && attr_dict.attribute_dictionaries
         val_dict = false
         attr_dict.attribute_dictionaries.each do |dict|
-          if dict.name != "instanceAttributes"
+          if dict.name != 'instanceAttributes'
             val_dict = dict
             break
           end
         end
-        
-        @value = val_dict["value"]
+
+        @value = val_dict['value']
         @value_type = val_dict.name
-        @attribute_type = val_dict["attribute_type"]
+        @attribute_type = val_dict['attribute_type']
+
+        # enumerations have options lists
+        @options = val_dict['options'] if val_dict['options']
 
         # Sometimes the value is even nested a level deeper
         # like: path = ["IFC 2x3", "IfcWindow", "OverallWidth", "IfcPositiveLengthMeasure", "IfcLengthMeasure"]
         if !@value && val_dict.attribute_dictionaries
           subtype_dict = false
           val_dict.attribute_dictionaries.each do |dict|
-            if dict.name != "instanceAttributes"
+            if dict.name != 'instanceAttributes'
               subtype_dict = dict
               break
             end
           end
-          @value = subtype_dict["value"]
+          @value = subtype_dict['value']
         end
       else
-        # val_dict = attr_dict
-        @value = attr_dict["value"]
-        @attribute_type = attr_dict["attribute_type"]
+        @value = attr_dict['value']
+        @attribute_type = attr_dict['attribute_type']
       end
     end
   end

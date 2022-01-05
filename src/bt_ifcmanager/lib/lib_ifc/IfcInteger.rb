@@ -19,30 +19,26 @@
 #
 #
 
-require_relative 'Ifc_Type.rb'
+require_relative 'Ifc_Type'
 
 module BimTools::IfcManager
-
   # A defined type of simple data type Integer. (Required since a select
   #   type, i.e. IfcSimpleValue, cannot include directly simple types in
   #   its select list).
   class IfcInteger < Ifc_Type
-    attr_accessor :long
-
-    def initialize( value )
+    def initialize(value, long = false)
+      super
       begin
         @value = value.to_i
       rescue StandardError, TypeError => e
-        print value << "cannot be converted to a Integer" << e
+        print value << 'cannot be converted to a Integer' << e
       end
     end
-    
-    def step()
+
+    def step
       val = @value.to_s
-      if @long
-        val = add_long( val )
-      end
-      return val
+      val = add_long(val) if @long
+      val
     end
   end
 end

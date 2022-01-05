@@ -55,11 +55,11 @@ module BimTools
 
       styleassignment.styles = IfcManager::Ifc_Set.new([surfacestyle])
 
-      surfacestyle.side = :BOTH
+      surfacestyle.side = :both
       surfacestyle.styles = IfcManager::Ifc_Set.new([surfacestylerendering])
 
       surfacestylerendering.surfacecolour = colourrgb
-      surfacestylerendering.reflectancemethod = :NOTDEFINED
+      surfacestylerendering.reflectancemethod = :notdefined
 
       if material
 

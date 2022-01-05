@@ -19,34 +19,18 @@
 #
 #
 
-
 module BimTools
+  # relating_object must be a IfcRelAggregates
+  # relating_object must be a IfcRelContainedInSpatialStructure
   module IfcSpatialStructureElement_su
     @relating_object = nil
     @related_objects = nil
     attr_accessor :relating_object, :related_objects
+
     def initialize(ifc_model, sketchup)
-      
       # set default CompositionType
-      @compositiontype = ".ELEMENT."
+      @compositiontype = :element
       super
-    end # def ifcspatialstructureelement_su
-      
-    # relating_object must be a IfcRelAggregates
-    def relating_object=(obj)
-      @relating_object = obj
-      return @relating_object
     end
-    
-    # relating_object must be a IfcRelContainedInSpatialStructure
-    def related_objects=(obj)
-      @related_objects = obj
-      return @related_objects
-    end
-    
-    # def related_objects
-    #   return @related_objects
-    # end
-      
-  end # module IfcSpatialStructureElement
-end # module BimTools
+  end
+end
