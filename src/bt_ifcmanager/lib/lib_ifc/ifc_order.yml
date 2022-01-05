@@ -1674,6 +1674,7 @@ IfcRelDefinesByProperties:
   - :RelatingPropertyDefinition
 IfcRelDefinesByType:
   :explicit:
+  - :RelatedObjects
   - :RelatingType
 IfcRelFillsElement:
   :explicit:
