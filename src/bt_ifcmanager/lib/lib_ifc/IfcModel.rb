@@ -41,8 +41,9 @@ module BimTools
       # - add_ifc_object
 
       attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications,
-                    :classificationassociations
-      attr_reader :su_model, :project, :ifc_objects, :export_summary, :options, :su_entities, :units, :default_location, :default_axis, :default_refdirection, :default_placement
+                    :classificationassociations, :property_enumerations
+      attr_reader :su_model, :project, :ifc_objects, :export_summary, :options, :su_entities, :units,
+                  :default_location, :default_axis, :default_refdirection, :default_placement
 
       # creates an IFC model based on given su model
       # (?) could be enhanced to also accept other sketchup objects
@@ -87,6 +88,9 @@ module BimTools
         # create empty hash that will contain all Mapped Representations (Component Definitions)
         @mapped_representations = {}
 
+        # Re use property enumerations when possible
+        @property_enumerations = {}
+
         # create IfcOwnerHistory for all IFC objects
         @owner_history = create_ownerhistory
 
@@ -103,10 +107,10 @@ module BimTools
 
         # Create default origin and axes for re-use throughout the model
         transformation = Geom::Transformation.new
-        @default_placement = IfcAxis2Placement3D.new( self, transformation )
-        @default_location = IfcCartesianPoint.new( self, transformation.origin )
-        @default_axis = IfcDirection.new( self, transformation.zaxis )
-        @default_refdirection = IfcDirection.new( self, transformation.xaxis )
+        @default_placement = IfcAxis2Placement3D.new(self, transformation)
+        @default_location = IfcCartesianPoint.new(self, transformation.origin)
+        @default_axis = IfcDirection.new(self, transformation.zaxis)
+        @default_refdirection = IfcDirection.new(self, transformation.xaxis)
         @default_placement.location = @default_location
         @default_placement.axis = @default_axis
         @default_placement.refdirection = @default_refdirection
