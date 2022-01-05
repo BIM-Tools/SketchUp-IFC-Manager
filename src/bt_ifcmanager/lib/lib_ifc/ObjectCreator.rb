@@ -77,8 +77,13 @@ module BimTools::IfcManager
       end
 
       # (?) catch ent_type_name.nil? with if before catch block?
-      begin
+      # begin
+
+        # All unclassified objects are mapped to IfcBuildingElementProxy
+        ent_type_name ||= 'IfcBuildingElementProxy'
+
         entity_type = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name)
+
 
         # if a IfcProject then add su_object to the existing project
         # (?) what if there are multiple projects defined?
@@ -98,23 +103,29 @@ module BimTools::IfcManager
         @entity_path.add(ifc_entity)
         construct_entity(ifc_entity, placement_parent)
         faces = create_nested_objects(ifc_entity, su_instance, su_material)
-        create_geometry(ifc_entity, su_material,faces)
 
-      # LoadError added because require errors are not catched by StandardError
-      rescue StandardError, LoadError
-        # If not classified as IFC in sketchup AND the parent is an IfcSpatialStructureElement then this is an IfcBuildingElementProxy
-        if placement_parent.is_a?(IfcSpatialStructureElement) || placement_parent.is_a?(IfcProject)
-          ifc_entity = IfcBuildingElementProxy.new(@ifc_model, su_instance)
-          ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
-          @entity_path.add(ifc_entity)
-          construct_entity(ifc_entity, placement_parent)
-          faces = create_nested_objects(ifc_entity, su_instance, su_material)
+        # if !ifc_entity.type_product
           create_geometry(ifc_entity, su_material,faces)
-        else # this instance is pure geometry and will be part of the parent entity
-          faces = create_nested_objects(placement_parent, su_instance, su_material)
-          create_geometry(placement_parent, su_material,faces)
-        end
-      end
+        # else
+
+        #   create_geometry(ifc_entity.type_product, su_material,faces)
+        # end
+
+      # # LoadError added because require errors are not catched by StandardError
+      # rescue StandardError, LoadError
+      #   # If not classified as IFC in sketchup AND the parent is an IfcSpatialStructureElement then this is an IfcBuildingElementProxy
+      #   if placement_parent.is_a?(IfcSpatialStructureElement) || placement_parent.is_a?(IfcProject)
+      #     ifc_entity = IfcBuildingElementProxy.new(@ifc_model, su_instance)
+      #     ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
+      #     @entity_path.add(ifc_entity)
+      #     construct_entity(ifc_entity, placement_parent)
+      #     faces = create_nested_objects(ifc_entity, su_instance, su_material)
+      #     create_geometry(ifc_entity, su_material,faces)
+      #   else # this instance is pure geometry and will be part of the parent entity
+      #     faces = create_nested_objects(placement_parent, su_instance, su_material)
+      #     create_geometry(placement_parent, su_material,faces)
+      #   end
+      # end
     end
 
     # Constructs the IFC entity
@@ -202,8 +213,8 @@ module BimTools::IfcManager
       unless faces.empty? # && ifc_entity.is_a?(IfcProduct)
         if ifc_entity
           ifc_entity.create_representation(faces, brep_transformation, su_material)
-        else
-          ifc_entity.parent.create_representation(faces, brep_transformation, su_material)
+        # else
+        #   ifc_entity.parent.create_representation(faces, brep_transformation, su_material)
         end
       end
     end

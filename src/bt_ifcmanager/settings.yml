@@ -12,7 +12,7 @@
   :geometry: true
   :fast_guid: false
   :dynamic_attributes: true
-  :mapped_items: false
+  :mapped_items: true
 :load:
   :classifications:
     NL-SfB 2005, tabel 1.skc: true

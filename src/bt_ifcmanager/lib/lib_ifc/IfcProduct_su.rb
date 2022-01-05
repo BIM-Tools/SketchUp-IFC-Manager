@@ -48,9 +48,6 @@ module BimTools
         # get properties from su object and add them to ifc object
         definition = @su_object.definition
 
-        #(?) set name, here? is this a duplicate?
-        @name = BimTools::IfcManager::IfcLabel.new(definition.name)
-
         # also set "tag" to component instance name?
         # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
         
@@ -107,6 +104,12 @@ module BimTools
           end
         end
         
+        #(?) set name, here? is this a duplicate?
+        @name = BimTools::IfcManager::IfcLabel.new(@su_object.name)
+
+        # Set IfcProductType
+        set_product_type()
+        
         # set material if sketchup @su_object has a material
         if ifc_model.options[:materials]
           unless (self.is_a? IfcFeatureElementSubtraction)||(self.is_a? IfcVirtualElement)||(self.is_a? IfcSpatialStructureElement)
@@ -154,6 +157,22 @@ module BimTools
       end
     end
 
+    def set_product_type()
+      definition = @su_object.definition      
+
+      # # Set IfcProductType
+      # type_product = BimTools::IfcManager::Settings.ifc_module.const_get( self.class.name.split('::').last << 'Type' )
+      # if type_product
+      #   if @ifc_model.product_types.key? definition
+          @type_product = @ifc_model.product_types[definition]
+      #   else
+      #     @type_product = type_product.new(@ifc_model, definition)
+      #     @ifc_model.product_types[definition] = @type_product
+      #   end
+        @type_product.objecttypeof.relatedobjects.add(self)
+      # end
+    end
+
     # Add representation to the IfcProduct, transform geometry with given transformation
     # @param [Sketchup::Transformation] transformation
     def create_representation(faces, transformation, su_material)
@@ -169,14 +188,40 @@ module BimTools
       # Check if Mapped representation should be used
       if representation.representationtype.value == "MappedRepresentation"
         mapped_item = IfcMappedItem.new( @ifc_model )
-        mappingsource = IfcRepresentationMap.new( @ifc_model )
-        mappingtarget = IfcCartesianTransformationOperator3D.new( @ifc_model )
-        mappingtarget.localorigin = IfcCartesianPoint.new( @ifc_model, Geom::Point3d.new )
-
-        mappingsource.mappingorigin = IfcAxis2Placement3D.new( @ifc_model, transformation )
-        mappingsource.mappingorigin.location = IfcCartesianPoint.new( @ifc_model, transformation.origin )
-        mappingsource.mappingorigin.axis = IfcDirection.new( @ifc_model, transformation.zaxis )
-        mappingsource.mappingorigin.refdirection = IfcDirection.new( @ifc_model, transformation.xaxis )
+        mappingtarget = IfcCartesianTransformationOperator3DnonUniform.new( @ifc_model )
+        if @type_product
+          mappingsource = @type_product.representationmaps[0]
+          t_array = transformation.to_a
+          scale = t_array[0]
+          scale2 = t_array[5]
+          scale3 = t_array[10]
+          axis1 = transformation.xaxis
+          axis2 = transformation.yaxis
+          axis3 = transformation.zaxis
+          if scale < 0
+            scale = (scale * -1)
+          end
+          if scale2 < 0
+            scale2 = (scale2 * -1)
+          end
+          if scale3 < 0
+            scale3 = (scale3 * -1)
+          end
+          mappingtarget.localorigin = IfcCartesianPoint.new( @ifc_model, transformation.origin )
+          mappingtarget.axis1 = IfcDirection.new( @ifc_model, axis1 )
+          mappingtarget.axis2 = IfcDirection.new( @ifc_model, axis2 )
+          mappingtarget.axis3 = IfcDirection.new( @ifc_model, axis3 )
+          mappingtarget.scale = BimTools::IfcManager::IfcReal.new(scale)
+          mappingtarget.scale2 = BimTools::IfcManager::IfcReal.new(scale2)
+          mappingtarget.scale3 = BimTools::IfcManager::IfcReal.new(scale3)
+        else
+          mappingtarget.localorigin = IfcCartesianPoint.new( @ifc_model, Geom::Point3d.new )
+          mappingsource = IfcRepresentationMap.new( @ifc_model )
+          mappingsource.mappingorigin = IfcAxis2Placement3D.new( @ifc_model, transformation )
+          mappingsource.mappingorigin.location = IfcCartesianPoint.new( @ifc_model, transformation.origin )
+          mappingsource.mappingorigin.axis = IfcDirection.new( @ifc_model, transformation.zaxis )
+          mappingsource.mappingorigin.refdirection = IfcDirection.new( @ifc_model, transformation.xaxis )
+        end
 
         mapped_item.mappingsource = mappingsource
         mapped_item.mappingtarget = mappingtarget

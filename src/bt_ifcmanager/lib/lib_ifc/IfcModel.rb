@@ -41,7 +41,7 @@ module BimTools
       # - add_ifc_object
 
       attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications,
-                    :classificationassociations
+                    :classificationassociations, :product_types, :property_enumerations
       attr_reader :su_model, :project, :ifc_objects, :export_summary, :options, :su_entities, :units, :default_location, :default_axis, :default_refdirection, :default_placement
 
       # creates an IFC model based on given su model
@@ -55,19 +55,19 @@ module BimTools
       #
       def initialize(su_model, options = {})
         defaults = {
-          ifc_entities:       false, # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
-          hidden:             false, # include hidden sketchup objects
-          attributes:         [], #    include specific attribute dictionaries given in array as IfcPropertySets, like ['SU_DefinitionSet', 'SU_InstanceSet'], false means all
-          classifications:    true, #  add all SketchUp classifications
-          layers:             true, #  create IfcPresentationLayerAssignments
-          materials:          true, #  create IfcMaterials
-          colors:             true, #  create IfcStyledItems
-          geometry:           true, #  create geometry for entities
-          fast_guid:          false, # create simplified guids
-          dynamic_attributes: true, #  export dynamic component data
-          mapped_items:       false, # export component definitions as mapped items
-          export_entities:    [],
-          root_entities:      []
+          ifc_entities: false, # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
+          hidden: false, # include hidden sketchup objects
+          attributes: [], # include specific attribute dictionaries given in array as IfcPropertySets, like ['SU_DefinitionSet', 'SU_InstanceSet'], false means all
+          classifications: true, # add all SketchUp classifications
+          layers: true, # create IfcPresentationLayerAssignments
+          materials: true, # create IfcMaterials
+          colors: true, # create IfcStyledItems
+          geometry: true, # create geometry for entities
+          fast_guid: false, # create simplified guids
+          dynamic_attributes: true, # export dynamic component data
+          mapped_items: false, # export component definitions as mapped items
+          export_entities: [],
+          root_entities: []
         }
         @options = defaults.merge(options)
 
@@ -86,6 +86,9 @@ module BimTools
 
         # create empty hash that will contain all Mapped Representations (Component Definitions)
         @mapped_representations = {}
+
+        # Re use property enumerations when possible
+        @property_enumerations = {}
 
         # create IfcOwnerHistory for all IFC objects
         @owner_history = create_ownerhistory
@@ -110,6 +113,9 @@ module BimTools
         @default_placement.location = @default_location
         @default_placement.axis = @default_axis
         @default_placement.refdirection = @default_refdirection
+
+        # create empty hash that will contain all Sketchup ComponentDefinitions and their IfcProductType counterparts
+        @product_types = get_product_types(@su_model)
 
         # When no entities are given for export, pass all model entities to create ifc objects
         # if nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked
@@ -193,6 +199,20 @@ module BimTools
         representationcontext.worldcoordinatesystem.location = IfcCartesianPoint.new(self, Geom::Point2d.new(0, 0))
         representationcontext.truenorth = IfcDirection.new(self, Geom::Vector2d.new(0, 1))
         representationcontext
+      end
+
+      def get_product_types(su_model)
+        product_types = {}
+        definitions = su_model.definitions
+        definitions.each do |definition|
+          next unless definition.count_used_instances > 0
+
+          ent_type_name = definition.get_attribute('AppliedSchemaTypes', BimTools::IfcManager::Settings.ifc_version)
+          ent_type_name ||= 'IfcBuildingElementProxy'
+          type_product = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name + 'Type')
+          product_types[definition] = type_product.new(self, definition)
+        end
+        product_types
       end
 
       # Recursively create IFC objects for all given SketchUp entities and add those to the model

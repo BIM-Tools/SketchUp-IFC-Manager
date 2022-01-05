@@ -84,7 +84,7 @@ module BimTools::IfcManager
         @export_geometry =           CheckboxOption.new("geometry", "Export geometry", @options[:export][:geometry])
         @export_fast_guid =          CheckboxOption.new("fast_guid", "Improve export speed by using fake GUID's", @options[:export][:fast_guid])
         @export_dynamic_attributes = CheckboxOption.new("dynamic_attributes", "Export dynamic attributes", @options[:export][:dynamic_attributes])
-        # @export_mapped_items =       CheckboxOption.new("mapped_items", "Export IFC mapped items", @options[:export][:mapped_items]),
+        @export_mapped_items =       CheckboxOption.new("mapped_items", "Export IFC mapped items", @options[:export][:mapped_items])
       end
     end
 
@@ -101,7 +101,7 @@ module BimTools::IfcManager
       @options[:export][:geometry]           = @export_geometry.value
       @options[:export][:fast_guid]          = @export_fast_guid.value
       @options[:export][:dynamic_attributes] = @export_dynamic_attributes.value
-      # @options[:export][:mapped_items]       = @export_mapped_items.value
+      @options[:export][:mapped_items]       = @export_mapped_items.value
       File.open(@settings_file, "w") { |file| file.write(@options.to_yaml) }
       PropertiesWindow.reload
       load()
@@ -281,7 +281,7 @@ module BimTools::IfcManager
         @export_geometry.value            = false
         @export_fast_guid.value           = false
         @export_dynamic_attributes.value  = false
-        # @export_mapped_items.value        = false
+        @export_mapped_items.value        = false
 
         a_form_data = CGI.unescape(s_form_data).split('&')
         a_form_data.each do |s_setting|
@@ -332,7 +332,8 @@ module BimTools::IfcManager
         self.save()
       }
       @dialog.show
-    end # create_dialog
+    end
+
     def set_html()
       html = <<HTML
 <head>
@@ -391,7 +392,7 @@ HTML
       html << @export_geometry.html()
       html << @export_fast_guid.html()
       html << @export_dynamic_attributes.html()
-      # html << @export_mapped_items.html()
+      html << @export_mapped_items.html()
       html << "      </div>\n"
 
       # Default materials
