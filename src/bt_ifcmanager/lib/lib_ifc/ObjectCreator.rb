@@ -21,9 +21,9 @@
 #
 #
 
-require_relative('IfcGloballyUniqueId.rb')
-require_relative('IfcLengthMeasure.rb')
-require_relative('entity_path.rb')
+require_relative('IfcGloballyUniqueId')
+require_relative('IfcLengthMeasure')
+require_relative('entity_path')
 
 module BimTools::IfcManager
   require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')
@@ -43,25 +43,24 @@ module BimTools::IfcManager
     def initialize(ifc_model, su_instance, su_total_transformation, placement_parent = nil, entity_path = nil, su_material = nil)
       @ifc_model = ifc_model
       @entity_path = EntityPath.new(@ifc_model, entity_path)
-      ent_type_name = su_instance.definition.get_attribute('AppliedSchemaTypes', BimTools::IfcManager::Settings.ifc_version)
+      ent_type_name = su_instance.definition.get_attribute('AppliedSchemaTypes',
+                                                           BimTools::IfcManager::Settings.ifc_version)
       su_material = su_instance.material if su_instance.material
 
       # Add the current sketchup object's transformation to the total transformation
       @su_total_transformation = su_total_transformation * su_instance.transformation
 
       # check if entity is one of the entities that need to be exported (and possibly it's nested entities)
-      unless @ifc_model.su_entities.empty?
-        if @ifc_model.su_entities.include?(su_instance)
-          if @ifc_model.options[:ifc_entities] == false || @ifc_model.options[:ifc_entities].include?(ent_type_name)
-            create_ifc_entity(ent_type_name, su_instance, placement_parent, su_material)
-          end
-        else
-          create_nested_objects(placement_parent, su_instance, su_material)
-        end
-      else
+      if @ifc_model.su_entities.empty?
         if @ifc_model.options[:ifc_entities] == false || @ifc_model.options[:ifc_entities].include?(ent_type_name)
           create_ifc_entity(ent_type_name, su_instance, placement_parent, su_material)
         end
+      elsif @ifc_model.su_entities.include?(su_instance)
+        if @ifc_model.options[:ifc_entities] == false || @ifc_model.options[:ifc_entities].include?(ent_type_name)
+          create_ifc_entity(ent_type_name, su_instance, placement_parent, su_material)
+        end
+      else
+        create_nested_objects(placement_parent, su_instance, su_material)
       end
     end
 
@@ -72,49 +71,30 @@ module BimTools::IfcManager
       parent_hex_guid = placement_parent.globalid&.to_hex if placement_parent
 
       # Replace IfcWallStandardCase by IfcWall, due to geometry issues and deprecated in IFC 4
-      if ent_type_name == 'IfcWallStandardCase'
-        ent_type_name = 'IfcWall'
+      ent_type_name = 'IfcWall' if ent_type_name == 'IfcWallStandardCase'
+
+      entity_type = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name) if ent_type_name
+
+      # All unclassified and non-existent objects are mapped to IfcBuildingElementProxy
+      entity_type ||= BimTools::IfcManager::Settings.ifc_module::IfcBuildingElementProxy
+
+      # if a IfcProject then add su_object to the existing project
+      # (?) what if there are multiple projects defined?
+      if entity_type == IfcProject
+
+        # TODO: set all correct parameters for IfcProject!!!
+        @ifc_model.project.su_object = su_instance
+        ifc_entity = @ifc_model.project
+      else
+        ifc_entity = entity_type.new(@ifc_model, su_instance)
       end
 
-      # (?) catch ent_type_name.nil? with if before catch block?
-      begin
-        entity_type = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name)
+      ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid) if entity_type < IfcRoot
 
-        # if a IfcProject then add su_object to the existing project
-        # (?) what if there are multiple projects defined?
-        if entity_type == IfcProject
-
-          #TODO set all correct parameters for IfcProject!!!
-          @ifc_model.project.su_object = su_instance
-          ifc_entity = @ifc_model.project
-        else
-          ifc_entity = entity_type.new(@ifc_model, su_instance)
-        end
-        
-        if entity_type < IfcRoot
-          ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
-        end
-
-        @entity_path.add(ifc_entity)
-        construct_entity(ifc_entity, placement_parent)
-        faces = create_nested_objects(ifc_entity, su_instance, su_material)
-        create_geometry(ifc_entity, su_material,faces)
-
-      # LoadError added because require errors are not catched by StandardError
-      rescue StandardError, LoadError
-        # If not classified as IFC in sketchup AND the parent is an IfcSpatialStructureElement then this is an IfcBuildingElementProxy
-        if placement_parent.is_a?(IfcSpatialStructureElement) || placement_parent.is_a?(IfcProject)
-          ifc_entity = IfcBuildingElementProxy.new(@ifc_model, su_instance)
-          ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
-          @entity_path.add(ifc_entity)
-          construct_entity(ifc_entity, placement_parent)
-          faces = create_nested_objects(ifc_entity, su_instance, su_material)
-          create_geometry(ifc_entity, su_material,faces)
-        else # this instance is pure geometry and will be part of the parent entity
-          faces = create_nested_objects(placement_parent, su_instance, su_material)
-          create_geometry(placement_parent, su_material,faces)
-        end
-      end
+      @entity_path.add(ifc_entity)
+      construct_entity(ifc_entity, placement_parent)
+      faces = create_nested_objects(ifc_entity, su_instance, su_material)
+      create_geometry(su_instance.definition, ifc_entity, su_material, faces)
     end
 
     # Constructs the IFC entity
@@ -122,24 +102,22 @@ module BimTools::IfcManager
     # @parameter ifc_entity
     #
     def construct_entity(ifc_entity, placement_parent)
-
       # if parent is a IfcGroup, add entity to group
-      if placement_parent.is_a?(IfcGroup)
-        if ifc_entity.is_a?(IfcObjectDefinition)
-          if placement_parent.is_a?(IfcZone)
-            if ifc_entity.is_a?(IfcZone) || ifc_entity.is_a?(IfcSpace)
-              placement_parent.add(ifc_entity)
-            end
-          else
-            placement_parent.add(ifc_entity)
-          end
+      if placement_parent.is_a?(IfcGroup) && ifc_entity.is_a?(IfcObjectDefinition)
+        if placement_parent.is_a?(IfcZone)
+          placement_parent.add(ifc_entity) if ifc_entity.is_a?(IfcZone) || ifc_entity.is_a?(IfcSpace)
+        else
+          placement_parent.add(ifc_entity)
         end
       end
 
+      # create objectplacement for ifc_entity
+      # set objectplacement based on transformation
       if ifc_entity.is_a?(IfcProduct)
         @entity_path.set_parent(ifc_entity)
         if ifc_entity.parent.is_a?(IfcProduct)
-          ifc_entity.objectplacement = IfcLocalPlacement.new(@ifc_model, @su_total_transformation, ifc_entity.parent.objectplacement)
+          ifc_entity.objectplacement = IfcLocalPlacement.new(@ifc_model, @su_total_transformation,
+                                                             ifc_entity.parent.objectplacement)
         else
           ifc_entity.objectplacement = IfcLocalPlacement.new(@ifc_model, @su_total_transformation)
         end
@@ -164,6 +142,10 @@ module BimTools::IfcManager
     def create_nested_objects(ifc_entity, su_instance, su_material)
       faces = []
       definition = su_instance.definition
+
+      # (!)(?) Do we need to update su_material?
+      # su_material = su_instance.material if su_instance.material
+
       entities = definition.entities
       definition_count = entities.length
       i = 0
@@ -184,11 +166,10 @@ module BimTools::IfcManager
         end
         i += 1
       end
-      return faces
+      faces
     end
 
-    def create_geometry(ifc_entity,su_material,faces)
-
+    def create_geometry(definition, ifc_entity, su_material, faces)
       # calculate the local transformation
       # if the SU object if not an IFC entity, then BREP needs to be transformed with SU object transformation
       if !ifc_entity.is_a?(IfcProduct) || ifc_entity.is_a?(IfcGroup) || ifc_entity.parent.is_a?(IfcProject)
@@ -199,11 +180,11 @@ module BimTools::IfcManager
 
       # create geometry from faces
       # (!) skips any geometry placed inside objects NOT of the type IfcProduct
-      unless faces.empty? # && ifc_entity.is_a?(IfcProduct)
+      unless faces.empty?
         if ifc_entity
-          ifc_entity.create_representation(faces, brep_transformation, su_material)
+          ifc_entity.create_representation(definition, faces, brep_transformation, su_material)
         else
-          ifc_entity.parent.create_representation(faces, brep_transformation, su_material)
+          ifc_entity.parent.create_representation(definition, faces, brep_transformation, su_material)
         end
       end
     end

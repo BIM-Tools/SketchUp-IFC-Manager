@@ -37,20 +37,21 @@
 #   default_materials:   false  # {'beton'=>[142, 142, 142],'hout'=>[129, 90, 35],'staal'=>[198, 198, 198],'gips'=>[255, 255, 255],'zink'=>[198, 198, 198],'hsb'=>[204, 161, 0],'metselwerk'=>[102, 51, 0],'steen'=>[142, 142, 142],'zetwerk'=>[198, 198, 198],'tegel'=>[255, 255, 255],'aluminium'=>[198, 198, 198],'kunststof'=>[255, 255, 255],'rvs'=>[198, 198, 198],'pannen'=>[30, 30, 30],'bitumen'=>[30, 30, 30],'epdm'=>[30, 30, 30],'isolatie'=>[255, 255, 50],'kalkzandsteen'=>[255, 255, 255],'metalstud'=>[198, 198, 198],'gibo'=>[255, 255, 255],'glas'=>[204, 255, 255],'multiplex'=>[255, 216, 101],'cementdekvloer'=>[198, 198, 198]}
 
 require 'yaml'
-require "cgi"
+require 'cgi'
 
 module BimTools::IfcManager
-  require File.join(File.dirname(__FILE__),'lib', 'skc_reader.rb')
+  require File.join(File.dirname(__FILE__), 'lib', 'skc_reader.rb')
   module Settings
     extend self
     attr_accessor :visible, :ifc_version, :ifc_version_compact, :ifc_module, :filters
     attr_reader :ifc_classification, :ifc_classifications, :classifications, :classification_names, :common_psets
+
     @template_materials = false
     @common_psets = true
-    @settings_file = File.join(PLUGIN_PATH, "settings.yml")
-    @ifc_classifications = Hash.new
-    @classifications = Hash.new
-    @classification_names = Hash.new
+    @settings_file = File.join(PLUGIN_PATH, 'settings.yml')
+    @ifc_classifications = {}
+    @classifications = {}
+    @classification_names = {}
     @css_bootstrap = File.join(PLUGIN_PATH_CSS, 'bootstrap.min.css')
     @css_core = File.join(PLUGIN_PATH_CSS, 'dialog.css')
     @css_settings = File.join(PLUGIN_PATH_CSS, 'settings.css')
@@ -58,37 +59,37 @@ module BimTools::IfcManager
     @js_jquery = File.join(PLUGIN_PATH, 'js', 'jquery.min.js')
     @filters = {}
 
-    def load()
+    def load
       begin
         @options = YAML.load(File.read(@settings_file))
-      rescue
+      rescue StandardError
         message = "Unable to load settings from:\r\n'#{@settings_file}'\r\nDefault settings loaded."
         puts message
         UI::Notification.new(IFCMANAGER_EXTENSION, message).show
       end
-  
+
       # load classification schemes from settings
-      read_ifc_classifications()
-      read_classifications()
-      load_classifications()
-      load_materials()
+      read_ifc_classifications
+      read_classifications
+      load_classifications
+      load_materials
       load_ifc_skc(@ifc_classification)
 
       # Load export options from settings
       if @options[:export]
-        @export_hidden =             CheckboxOption.new("hidden", "Export hidden objects", @options[:export][:hidden])
-        @export_classifications =    CheckboxOption.new("classifications", "Export classifications", @options[:export][:classifications])
-        @export_layers =             CheckboxOption.new("layers", "Export tags/layers as IFC layers", @options[:export][:layers])
-        @export_materials =          CheckboxOption.new("materials", "Export materials", @options[:export][:materials])
-        @export_colors =             CheckboxOption.new("colors", "Export colors", @options[:export][:colors])
-        @export_geometry =           CheckboxOption.new("geometry", "Export geometry", @options[:export][:geometry])
-        @export_fast_guid =          CheckboxOption.new("fast_guid", "Improve export speed by using fake GUID's", @options[:export][:fast_guid])
-        @export_dynamic_attributes = CheckboxOption.new("dynamic_attributes", "Export dynamic attributes", @options[:export][:dynamic_attributes])
-        # @export_mapped_items =       CheckboxOption.new("mapped_items", "Export IFC mapped items", @options[:export][:mapped_items]),
+        @export_hidden =             CheckboxOption.new('hidden', 'Export hidden objects', @options[:export][:hidden])
+        @export_classifications =    CheckboxOption.new('classifications', 'Export classifications', @options[:export][:classifications])
+        @export_layers =             CheckboxOption.new('layers', 'Export tags/layers as IFC layers', @options[:export][:layers])
+        @export_materials =          CheckboxOption.new('materials', 'Export materials', @options[:export][:materials])
+        @export_colors =             CheckboxOption.new('colors', 'Export colors', @options[:export][:colors])
+        @export_geometry =           CheckboxOption.new('geometry', 'Export geometry', @options[:export][:geometry])
+        @export_fast_guid =          CheckboxOption.new('fast_guid', "Improve export speed by using fake GUID's", @options[:export][:fast_guid])
+        @export_dynamic_attributes = CheckboxOption.new('dynamic_attributes', 'Export dynamic attributes', @options[:export][:dynamic_attributes])
+        @export_mapped_items =       CheckboxOption.new('mapped_items', 'Export IFC mapped items', @options[:export][:mapped_items])
       end
     end
 
-    def save()
+    def save
       @options[:load][:ifc_classifications]  = @ifc_classifications
       @options[:load][:classifications]      = @classifications
       @options[:load][:template_materials]   = @template_materials
@@ -101,10 +102,10 @@ module BimTools::IfcManager
       @options[:export][:geometry]           = @export_geometry.value
       @options[:export][:fast_guid]          = @export_fast_guid.value
       @options[:export][:dynamic_attributes] = @export_dynamic_attributes.value
-      # @options[:export][:mapped_items]       = @export_mapped_items.value
-      File.open(@settings_file, "w") { |file| file.write(@options.to_yaml) }
+      @options[:export][:mapped_items]       = @export_mapped_items.value
+      File.open(@settings_file, 'w') { |file| file.write(@options.to_yaml) }
       PropertiesWindow.reload
-      load()
+      load
     end
 
     # Load skc and generate IFC classes
@@ -112,9 +113,9 @@ module BimTools::IfcManager
     def load_ifc_skc(ifc_classification)
       reader = SkcReader.new(ifc_classification)
       @filters[ifc_classification] = reader
-      ifc_version = reader.name()
+      ifc_version = reader.name
       parser = IfcXmlParser.new(ifc_version)
-      parser.from_string(reader.xsd_schema())
+      parser.from_string(reader.xsd_schema)
     end
 
     def set_ifc_classification(ifc_classification_name)
@@ -133,8 +134,8 @@ module BimTools::IfcManager
       end
     end
 
-    def read_ifc_classifications()
-      @ifc_classifications = Hash.new
+    def read_ifc_classifications
+      @ifc_classifications = {}
       if @options[:load][:ifc_classifications].is_a? Hash
         @options[:load][:ifc_classifications].each_pair do |ifc_classification_name, load|
           if load == true
@@ -161,11 +162,11 @@ module BimTools::IfcManager
       end
     end
 
-    def read_classifications()
-      @classifications = Hash.new
+    def read_classifications
+      @classifications = {}
       if @options[:load][:classifications].is_a? Hash
         @options[:load][:classifications].each_pair do |classification_file, load|
-          if(load == true)
+          if load == true
             skc_reader = SkcReader.new(classification_file)
             @filters[classification_file] = skc_reader
             @classification_names[skc_reader.name] = skc_reader
@@ -177,32 +178,32 @@ module BimTools::IfcManager
       end
     end
 
-    def get_classifications()
-      return @classifications
+    def get_classifications
+      @classifications
     end
 
     # Load enabled classification files from settings.yml
     #   Loads both IFC and other classifications
     #   First checks plugin classifications folder then check SketchUp support files
-    def load_classifications()
+    def load_classifications
       model = Sketchup.active_model
-      model.start_operation("Load IFC Manager classifications", true)
+      model.start_operation('Load IFC Manager classifications', true)
       classifications = Settings.ifc_classifications.merge(Settings.classifications)
-      classifications.each_pair do | classification_file, classification_active |
-        if classification_active
-          plugin_filepath = File.join(PLUGIN_PATH_CLASSIFICATIONS, classification_file)
-          if File.file?(plugin_filepath)
-            filepath = plugin_filepath
-          else
-            filepath = Sketchup.find_support_file(classification_file, "Classifications")
-          end
-          if filepath
-            model.classifications.load_schema(filepath)
-          else
-            message = "Unable to load classification:\r\n'#{classification_name}'"
-            puts message
-            UI::Notification.new(IFCMANAGER_EXTENSION, message).show
-          end
+      classifications.each_pair do |classification_file, classification_active|
+        next unless classification_active
+
+        plugin_filepath = File.join(PLUGIN_PATH_CLASSIFICATIONS, classification_file)
+        filepath = if File.file?(plugin_filepath)
+                     plugin_filepath
+                   else
+                     Sketchup.find_support_file(classification_file, 'Classifications')
+                   end
+        if filepath
+          model.classifications.load_schema(filepath)
+        else
+          message = "Unable to load classification:\r\n'#{classification_name}'"
+          puts message
+          UI::Notification.new(IFCMANAGER_EXTENSION, message).show
         end
       end
       model.commit_operation
@@ -210,23 +211,23 @@ module BimTools::IfcManager
 
     # @return [Hash] List of materials
     def materials
-      if(@options[:load][:template_materials] && @options[:material_list].is_a?(Hash))
+      if @options[:load][:template_materials] && @options[:material_list].is_a?(Hash)
         @template_materials = true
-        return @options[:material_list]
+        @options[:material_list]
       else
-        return false
+        false
       end
     end
 
     # creates new material for every material in Settings
     # unless a material with this name already exists
-    def load_materials()
+    def load_materials
       model = Sketchup.active_model
       if Settings.materials
-        model.start_operation("Load IFC Manager template materials", true)
-        Settings.materials.each do | name, color|
-          unless Sketchup.active_model.materials[ name ]
-            material = Sketchup.active_model.materials.add( name )
+        model.start_operation('Load IFC Manager template materials', true)
+        Settings.materials.each do |name, color|
+          unless Sketchup.active_model.materials[name]
+            material = Sketchup.active_model.materials.add(name)
             material.color = color
           end
         end
@@ -237,9 +238,9 @@ module BimTools::IfcManager
     # @return [Hash] List of export options
     def export
       if @options[:export].is_a? Hash
-        return @options[:export]
+        @options[:export]
       else
-        return {}
+        {}
       end
     end
 
@@ -249,25 +250,25 @@ module BimTools::IfcManager
       if @dialog && @dialog.visible?
         @dialog.close
       else
-        create_dialog()
+        create_dialog
       end
     end
 
-    def create_dialog()
-
+    def create_dialog
       @dialog = UI::HtmlDialog.new(
-      {
-        :dialog_title => "IFC Manager Settings",
-        :scrollable => true,
-        :resizable => true,
-        :width => 320,
-        :height => 480,
-        :left => 200,
-        :top => 200,
-        :style => UI::HtmlDialog::STYLE_UTILITY
-      })
-      set_html()
-      @dialog.add_action_callback("save_settings") { |action_context, s_form_data|
+        {
+          dialog_title: 'IFC Manager Settings',
+          scrollable: true,
+          resizable: true,
+          width: 320,
+          height: 480,
+          left: 200,
+          top: 200,
+          style: UI::HtmlDialog::STYLE_UTILITY
+        }
+      )
+      set_html
+      @dialog.add_action_callback('save_settings') do |_action_context, s_form_data|
         puts s_form_data
         update_classifications = []
         update_ifc_classifications = []
@@ -281,131 +282,132 @@ module BimTools::IfcManager
         @export_geometry.value            = false
         @export_fast_guid.value           = false
         @export_dynamic_attributes.value  = false
-        # @export_mapped_items.value        = false
+        @export_mapped_items.value        = false
 
         a_form_data = CGI.unescape(s_form_data).split('&')
         a_form_data.each do |s_setting|
           key, value = s_setting.split('=')
           case key
-          when "template_materials"
+          when 'template_materials'
             @template_materials = true
-          when "common_psets"
+          when 'common_psets'
             @common_psets = true
-          when "hidden"
+          when 'hidden'
             @export_hidden.value = true
-          when "classifications"
+          when 'classifications'
             @export_classifications.value = true
-          when "layers"
+          when 'layers'
             @export_layers.value = true
-          when "materials"
+          when 'materials'
             @export_materials.value = true
-          when "colors"
+          when 'colors'
             @export_colors.value = true
-          when "geometry"
+          when 'geometry'
             @export_geometry.value = true
-          when "fast_guid"
+          when 'fast_guid'
             @export_fast_guid.value = true
-          when "dynamic_attributes"
+          when 'dynamic_attributes'
             @export_dynamic_attributes.value = true
-          when "mapped_items"
+          when 'mapped_items'
             @export_mapped_items.value = true
-          when "ifc_classification"
+          when 'ifc_classification'
             update_ifc_classifications << value
-          when "classification"
+          when 'classification'
             update_classifications << value
           end
         end
         @classifications.each_key do |classification_name|
           if update_classifications.include? classification_name
-            self.set_classification(classification_name)
+            set_classification(classification_name)
           else
-            self.unset_classification(classification_name)
+            unset_classification(classification_name)
           end
         end
         @ifc_classifications.each_key do |ifc_classification|
           if update_ifc_classifications.include? ifc_classification
-            self.set_ifc_classification(ifc_classification)
+            set_ifc_classification(ifc_classification)
           else
-            self.unset_ifc_classification(ifc_classification)
+            unset_ifc_classification(ifc_classification)
           end
         end
-        self.save()
-      }
+        save
+      end
       @dialog.show
-    end # create_dialog
-    def set_html()
-      html = <<HTML
-<head>
-  <link rel='stylesheet' type='text/css' href='#{@css_bootstrap}'>
-  <link rel='stylesheet' type='text/css' href='#{@css_core}'>
-  <link rel='stylesheet' type='text/css' href='#{@css_settings}'>
-  <script type='text/javascript' src='#{@js_jquery}'></script>
-  <script type='text/javascript' src='#{ @js_bootstrap}'></script>
-  <script>
-    $(document).ready(function(){
-      $( 'form' ).on( 'submit', function( event ) {
-        event.preventDefault();
-        sketchup.save_settings($( this ).serialize());
-      });
-    });
-  </script>
-</head>
-<body>
-  <div class='container'>
-    <form>
-      <div class='form-group'>
-        <h1>IFC version</h1>
-HTML
-      # ifc_classifications = Sketchup.find_support_files('skc', 'Classifications').select {|path| File.basename(path).downcase.include? 'ifc' } 
+    end
+
+    def set_html
+      html = <<~HTML
+        <head>
+          <link rel='stylesheet' type='text/css' href='#{@css_bootstrap}'>
+          <link rel='stylesheet' type='text/css' href='#{@css_core}'>
+          <link rel='stylesheet' type='text/css' href='#{@css_settings}'>
+          <script type='text/javascript' src='#{@js_jquery}'></script>
+          <script type='text/javascript' src='#{@js_bootstrap}'></script>
+          <script>
+            $(document).ready(function(){
+              $( 'form' ).on( 'submit', function( event ) {
+                event.preventDefault();
+                sketchup.save_settings($( this ).serialize());
+              });
+            });
+          </script>
+        </head>
+        <body>
+          <div class='container'>
+            <form>
+              <div class='form-group'>
+                <h1>IFC version</h1>
+      HTML
+      # ifc_classifications = Sketchup.find_support_files('skc', 'Classifications').select {|path| File.basename(path).downcase.include? 'ifc' }
       @ifc_classifications.each_pair do |ifc_classification, load|
-        if load
-          checked = " checked"
-        else
-          checked = ""
-        end
-        ifc_classification_name = File.basename(ifc_classification, ".skc")
+        checked = if load
+                    ' checked'
+                  else
+                    ''
+                  end
+        ifc_classification_name = File.basename(ifc_classification, '.skc')
         html << "      <input type=\"radio\" id=\"#{ifc_classification_name}\" name=\"ifc_classification\" value=\"#{ifc_classification}\"#{checked}>\n"
         html << "      <label for=\"#{ifc_classification_name}\">#{ifc_classification_name}</label><br>\n"
       end
       html << "      <h1>Other classification systems</h1>\n"
 
       @classifications.each_pair do |classification, load|
-        if load
-          checked = " checked"
-        else
-          checked = ""
-        end
-        classification_name = File.basename(classification, ".skc")
+        checked = if load
+                    ' checked'
+                  else
+                    ''
+                  end
+        classification_name = File.basename(classification, '.skc')
         html << "         <div class=\"col-md-12 row\"><label class=\"check-inline\"><input type=\"checkbox\" name=\"classification\" value=\"#{classification}\"#{checked}> #{classification_name}</label></div>\n"
       end
 
       # Export settings
       html << "      </div>\n"
       html << "      <div class='form-group'>\n"
-      html << "        <h1>Export</h1>"
-      html << @export_hidden.html()
-      html << @export_classifications.html()
-      html << @export_layers.html()
-      html << @export_materials.html()
-      html << @export_colors.html()
-      html << @export_geometry.html()
-      html << @export_fast_guid.html()
-      html << @export_dynamic_attributes.html()
-      # html << @export_mapped_items.html()
+      html << '        <h1>Export</h1>'
+      html << @export_hidden.html
+      html << @export_classifications.html
+      html << @export_layers.html
+      html << @export_materials.html
+      html << @export_colors.html
+      html << @export_geometry.html
+      html << @export_fast_guid.html
+      html << @export_dynamic_attributes.html
+      html << @export_mapped_items.html
       html << "      </div>\n"
 
       # Default materials
-      if @template_materials
-        materials_checked = " checked"
-      else
-        materials_checked = ""
-      end
+      materials_checked = if @template_materials
+                            ' checked'
+                          else
+                            ''
+                          end
 
-      if @common_psets
-        common_psets_checked = "checked"
-      else
-        common_psets_checked = ""
-      end
+      common_psets_checked = if @common_psets
+                               'checked'
+                             else
+                               ''
+                             end
 
       footer = <<HTML
       <div class='form-group'>
@@ -430,23 +432,25 @@ HTML
   </div></body>
 HTML
       html << footer
-      @dialog.set_html( html )
+      @dialog.set_html(html)
     end
 
     class CheckboxOption
       attr_accessor :value
+
       def initialize(name, title, initial_value)
         @name = name
         @title = title
         @value = initial_value
       end
-      def html()
-        if @value
-          checked = " checked"
-        else
-          checked = ""
-        end
-        return <<HTML
+
+      def html
+        checked = if @value
+                    ' checked'
+                  else
+                    ''
+                  end
+        <<HTML
         <div class="col-md-12 row">
           <label class="check-inline"><input type="checkbox" name="#{@name}" value="#{@name}"#{checked}> #{@title}</label>
         </div>

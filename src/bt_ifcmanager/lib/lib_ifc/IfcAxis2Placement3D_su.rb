@@ -1,6 +1,6 @@
-#  IfcInteger.rb
+#  IfcAxis2Placement3D_su.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2022 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,26 +19,18 @@
 #
 #
 
-require_relative 'Ifc_Type'
+require_relative 'IfcReal'
 
-module BimTools::IfcManager
-  # A defined type of simple data type Integer. (Required since a select
-  #   type, i.e. IfcSimpleValue, cannot include directly simple types in
-  #   its select list).
-  class IfcInteger < Ifc_Type
-    def initialize(ifc_model, value, long = false)
+module BimTools
+  module IfcAxis2Placement3D_su
+    include BimTools::IfcManager::Settings.ifc_module
+    def initialize(ifc_model, transformation = nil)
       super
-      begin
-        @value = value.to_i
-      rescue StandardError, TypeError => e
-        print value << 'cannot be converted to a Integer' << e
+      if transformation.is_a? Geom::Transformation
+        @location = IfcCartesianPoint.new(ifc_model, transformation.origin)
+        @axis = IfcDirection.new(ifc_model, transformation.zaxis)
+        @refdirection = IfcDirection.new(ifc_model, transformation.xaxis)
       end
-    end
-
-    def step
-      val = @value.to_s
-      val = add_long(val) if @long
-      val
     end
   end
 end

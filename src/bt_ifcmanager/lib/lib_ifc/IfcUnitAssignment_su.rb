@@ -113,16 +113,17 @@ module BimTools
         unit_values = CONVERSIONBASEDUNITS[unit_type]
         conversionbasedunit = IfcConversionBasedUnit.new(@ifc_model)
         dimensions = IfcDimensionalExponents.new(@ifc_model)
-        dimensions.lengthexponent = BimTools::IfcManager::IfcInteger.new(unit_values[4][0])
-        dimensions.massexponent = BimTools::IfcManager::IfcInteger.new(unit_values[4][1])
-        dimensions.timeexponent = BimTools::IfcManager::IfcInteger.new(unit_values[4][2])
-        dimensions.electriccurrentexponent = BimTools::IfcManager::IfcInteger.new(unit_values[4][3])
-        dimensions.thermodynamictemperatureexponent = BimTools::IfcManager::IfcInteger.new(unit_values[4][4])
-        dimensions.amountofsubstanceexponent = BimTools::IfcManager::IfcInteger.new(unit_values[4][5])
-        dimensions.luminousintensityexponent = BimTools::IfcManager::IfcInteger.new(unit_values[4][6])
+        dimensions.lengthexponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, unit_values[4][0])
+        dimensions.massexponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, unit_values[4][1])
+        dimensions.timeexponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, unit_values[4][2])
+        dimensions.electriccurrentexponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, unit_values[4][3])
+        dimensions.thermodynamictemperatureexponent = BimTools::IfcManager::IfcInteger.new(@ifc_model,
+                                                                                           unit_values[4][4])
+        dimensions.amountofsubstanceexponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, unit_values[4][5])
+        dimensions.luminousintensityexponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, unit_values[4][6])
         conversionbasedunit.dimensions = dimensions
         conversionbasedunit.unittype = unit_values[1]
-        conversionbasedunit.name = BimTools::IfcManager::IfcLabel.new(unit_values[2])
+        conversionbasedunit.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, unit_values[2])
         measurewithunit = IfcMeasureWithUnit.new(@ifc_model)
         conversionbasedunit.conversionfactor = measurewithunit
         unit = IfcSIUnit.new(@ifc_model)
@@ -130,9 +131,9 @@ module BimTools
         when :lengthunit
           valuecomponent = BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, unit_values[3])
         when :areaunit
-          valuecomponent = BimTools::IfcManager::IfcAreaMeasure.new(unit_values[3])
+          valuecomponent = BimTools::IfcManager::IfcAreaMeasure.new(@ifc_model, unit_values[3])
         when :volumeunit
-          valuecomponent = BimTools::IfcManager::IfcVolumeMeasure.new(unit_values[3])
+          valuecomponent = BimTools::IfcManager::IfcVolumeMeasure.new(@ifc_model, unit_values[3])
         end
         valuecomponent.long = true
         measurewithunit.valuecomponent = valuecomponent

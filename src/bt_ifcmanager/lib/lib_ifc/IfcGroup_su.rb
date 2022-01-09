@@ -20,6 +20,7 @@
 #
 
 require_relative 'set'
+require_relative 'propertyset'
 
 module BimTools
   module IfcGroup_su
@@ -42,7 +43,7 @@ module BimTools
         definition = sketchup.definition
 
         # (?) set name, here? is this a duplicate?
-        @name = BimTools::IfcManager::IfcLabel.new(definition.name)
+        @name = BimTools::IfcManager::IfcLabel.new(ifc_model, definition.name)
 
         # also set "tag" to component instance name?
         # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
@@ -76,20 +77,20 @@ module BimTools
 
                   value_entity = case attribute_type
                                  when 'boolean'
-                                   BimTools::IfcManager::IfcBoolean.new(dict_value)
+                                   BimTools::IfcManager::IfcBoolean.new(ifc_model, dict_value)
                                  when 'double'
-                                   BimTools::IfcManager::IfcReal.new(dict_value)
+                                   BimTools::IfcManager::IfcReal.new(ifc_model, dict_value)
                                  when 'long'
-                                   BimTools::IfcManager::IfcInteger.new(dict_value)
+                                   BimTools::IfcManager::IfcInteger.new(ifc_model, dict_value)
                                  else # "string" and others?
-                                   BimTools::IfcManager::IfcLabel.new(dict_value)
+                                   BimTools::IfcManager::IfcLabel.new(ifc_model, dict_value)
                                  end
                 end
                 send("#{prop.downcase}=", value_entity)
               end
             elsif prop_dict.attribute_dictionaries && prop_dict.name != 'instanceAttributes'
-              reldef = IfcRelDefinesByProperties.new(ifc_model, prop_dict)
-              reldef.relatedobjects.add(self)
+              rel_defines = BimTools::IfcManager.create_propertyset(ifc_model, attr_dict)
+              rel_defines.relatedobjects.add(self) if rel_defines
             end
           end
         end

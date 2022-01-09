@@ -19,20 +19,18 @@
 #
 #
 
-require_relative( "IfcGloballyUniqueId.rb" )
+require_relative('IfcGloballyUniqueId')
 
 module BimTools
   module IfcRoot_su
-    def initialize( ifc_model, sketchup = nil )
+    def initialize(ifc_model, sketchup = nil)
       @sketchup = sketchup
       @ownerhistory = ifc_model.owner_history
+      super
     end
 
-    def globalid()
-      unless @globalid
-        @globalid = BimTools::IfcManager::IfcGloballyUniqueId.new( @sketchup )
-      end
-      return @globalid
+    def globalid
+      @globalid ||= BimTools::IfcManager::IfcGloballyUniqueId.new(@sketchup)
     end
   end
 end

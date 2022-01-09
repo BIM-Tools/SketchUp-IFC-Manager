@@ -23,7 +23,7 @@ require_relative 'Ifc_Type'
 
 module BimTools::IfcManager
   class IfcText < Ifc_Type
-    def initialize(value, long = false)
+    def initialize(ifc_model, value, long = false)
       super
       begin
         @value = value.to_s

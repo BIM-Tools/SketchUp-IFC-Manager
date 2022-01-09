@@ -19,16 +19,17 @@
 #
 #
 
-require_relative 'IfcLabel.rb'
-require_relative 'set.rb'
+require_relative 'IfcLabel'
+require_relative 'set'
 
 module BimTools
   module IfcPresentationLayerAssignment_su
     def initialize(ifc_model, sketchup)
-      if sketchup.is_a?( Sketchup::Layer )
+      super
+      if sketchup.is_a?(Sketchup::Layer)
         su_layer = sketchup
-        @name = BimTools::IfcManager::IfcLabel.new( su_layer.name )
-        @assigneditems = IfcManager::Ifc_Set.new()
+        @name = BimTools::IfcManager::IfcLabel.new(ifc_model, su_layer.name)
+        @assigneditems = IfcManager::Ifc_Set.new
       end
     end
   end

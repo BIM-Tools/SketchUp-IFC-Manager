@@ -29,9 +29,9 @@ module BimTools
       super
 
       # set parent placement
-      @placementrelto = placementrelto if placementrelto.is_a? IfcLocalPlacement
+      @placementrelto = placementrelto # if placementrelto.is_a?(IfcLocalPlacement)
 
-      if su_total_transformation.is_a? Geom::Transformation
+      if su_total_transformation.is_a?(Geom::Transformation)
 
         # fix y-axis direction if flipped
         t = su_total_transformation
@@ -50,7 +50,7 @@ module BimTools
 
         @ifc_total_transformation = no_scale * axis_fix
 
-        @transformation = if @placementrelto.nil? && @placementrelto.ifc_total_transformation
+        @transformation = if !@placementrelto.nil? && @placementrelto.ifc_total_transformation
                             @placementrelto.ifc_total_transformation.inverse * @ifc_total_transformation
                           else
                             @ifc_total_transformation

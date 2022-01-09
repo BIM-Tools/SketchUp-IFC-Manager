@@ -23,7 +23,7 @@ require_relative 'IfcRatioMeasure'
 
 module BimTools::IfcManager
   class IfcNormalisedRatioMeasure < IfcRatioMeasure
-    def initialize(value)
+    def initialize(ifc_model, value)
       super
       if @value < 0 || @value > 1
         raise 'Error creating IfcNormalisedRatioMeasure: Normalized ratio shall be a non-negative value less than or equal to 1.0'

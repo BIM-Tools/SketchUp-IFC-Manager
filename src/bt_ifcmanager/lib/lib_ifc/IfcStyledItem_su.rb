@@ -64,19 +64,21 @@ module BimTools
       if material
 
         # add transparency, converted from Sketchup's alpha value
-        surfacestylerendering.transparency = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(1 - material.alpha)
+        surfacestylerendering.transparency = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model,
+                                                                                                 1 - material.alpha)
 
         # add color values, converted from 0/255 to fraction
-        colourrgb.red = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(material.color.red.to_f / 255)
-        colourrgb.green = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(material.color.green.to_f / 255)
-        colourrgb.blue = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(material.color.blue.to_f / 255)
+        colourrgb.red = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model, material.color.red.to_f / 255)
+        colourrgb.green = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model,
+                                                                              material.color.green.to_f / 255)
+        colourrgb.blue = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model, material.color.blue.to_f / 255)
       else
 
         # (?) use default values == white
-        surfacestylerendering.transparency = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(0.0)
-        colourrgb.red = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(1.0)
-        colourrgb.green = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(1.0)
-        colourrgb.blue = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(1.0)
+        surfacestylerendering.transparency = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model, 0.0)
+        colourrgb.red = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model, 1.0)
+        colourrgb.green = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model, 1.0)
+        colourrgb.blue = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model, 1.0)
       end
     end
   end

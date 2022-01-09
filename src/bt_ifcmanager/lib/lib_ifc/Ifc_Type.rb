@@ -20,7 +20,6 @@
 #
 
 module BimTools::IfcManager
-
   # Basic IFC Type class inherited by most other IFC Types
   class Ifc_Type
     attr_accessor :value, :long
@@ -28,7 +27,8 @@ module BimTools::IfcManager
     @@not_boolean = "Parameter 'long' must be 'true' or 'false'"
     @@boolean = [true, false]
 
-    def initialize(value, long = false)
+    def initialize(ifc_model, value, long = false)
+      @ifc_model = ifc_model
       @value = value
       if @@boolean.include? long
         @long = long

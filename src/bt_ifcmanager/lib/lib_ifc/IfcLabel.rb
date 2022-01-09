@@ -26,7 +26,7 @@ module BimTools::IfcManager
   #   It is a string which represents the human-interpretable name of
   #   something and shall have a natural-language meaning.
   class IfcLabel < Ifc_Type
-    def initialize(value, long = false)
+    def initialize(ifc_model, value, long = false)
       super
       begin
         @value = @value.to_s
