@@ -25,6 +25,8 @@ require_relative 'IfcLabel'
 require_relative 'IfcIdentifier'
 require_relative 'IfcReal'
 require_relative 'IfcInteger'
+require_relative 'IfcText'
+
 require_relative 'propertyset'
 
 require_relative File.join('dynamic_attributes.rb')
@@ -40,18 +42,18 @@ module BimTools
     @parent = nil
 
     def initialize(ifc_model, sketchup)
-      @ifc_model = ifc_model
       super
-      ifc_version = BimTools::IfcManager::Settings.ifc_version
-      if sketchup.is_a?(Sketchup::Group) || sketchup.is_a?(Sketchup::ComponentInstance) # (?) Is this check neccesary?
 
+      # Check if this is an empty object (default object) or based on a Sketchup::ComponentInstance or Sketchup::Group
+      if sketchup.respond_to?(:definition)
+
+        ifc_version = BimTools::IfcManager::Settings.ifc_version
+        @ifc_model = ifc_model
         @su_object = sketchup
-
-        # get properties from su object and add them to ifc object
         definition = @su_object.definition
 
         # Set IfcProductType
-        if @ifc_model.product_types.key? definition
+        if @ifc_model.product_types.key?(definition)
           @type_product = @ifc_model.product_types[definition]
           @type_product.add_typed_object(self)
 
@@ -59,18 +61,31 @@ module BimTools
           @type_product.propertysets.map { |p| p.relatedobjects.add(self) }
         end
 
-        # also set "tag" to component instance name?
+        # (?) set "tag" to component instance name?
         # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
 
+
+        # get properties from su object and add them to ifc object
         if definition.attribute_dictionaries && definition.attribute_dictionaries[ifc_version] && props_ifc = definition.attribute_dictionaries[ifc_version].attribute_dictionaries
           props_ifc.each do |prop_dict|
             prop = prop_dict.name
             if attributes.include? prop.to_sym
 
-              property_reader = BimTools::PropertyReader.new(prop_dict)
-              dict_value = property_reader.value
-              value_type = property_reader.value_type
-              attribute_type = property_reader.attribute_type
+              if prop['value']
+                dict_value = prop['value']
+                value_type = nil
+                attribute_type = nil
+              else
+                property_reader = BimTools::PropertyReader.new(prop_dict)
+                dict_value = property_reader.value
+                value_type = property_reader.value_type
+                attribute_type = property_reader.attribute_type
+              end
+
+              # Don't fill empty properties
+              if dict_value.nil? || (dict_value.is_a?(String) && dict_value.empty?)
+                next
+              end
 
               if attribute_type == 'choice'
                 # Skip this attribute, this is not a value but a reference
@@ -80,14 +95,17 @@ module BimTools
                 entity_type = false
                 if value_type
                   begin
+                    valid_type = BimTools::IfcManager.const_defined?(value_type)
+                  rescue NameError
+                    # Skip all attributes that cannot be converted to a constant
+                    next
+                  end
+
+                  if valid_type
                     entity_type = BimTools::IfcManager.const_get(value_type)
                     value_entity = entity_type.new(ifc_model, dict_value)
-                  rescue StandardError => e
-                    puts "Error creating IfcProduct property type: #{self.class}, #{e}"
                   end
-                end
-                unless entity_type
-
+                else
                   value_entity = case attribute_type
                                  when 'boolean'
                                    BimTools::IfcManager::IfcBoolean.new(ifc_model, dict_value)

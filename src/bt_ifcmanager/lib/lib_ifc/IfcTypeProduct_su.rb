@@ -32,8 +32,8 @@ module BimTools
 
     # @param sketchup [Sketchup::ComponentDefinition]
     def initialize(ifc_model, definition, ifc_product)
-      @definition = definition
       super(ifc_model, definition)
+      @definition = definition
       ifc_version = BimTools::IfcManager::Settings.ifc_version
 
       # List of propertyset relationships
@@ -50,18 +50,30 @@ module BimTools
 
       # (!) duplicate code with IfcProduct_su
 
-      # also set "tag" to component instance name?
+      # (?) set "tag" to component instance name?
       # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
 
+      # get properties from su object and add them to ifc object
       if definition.attribute_dictionaries && definition.attribute_dictionaries[ifc_version] && props_ifc = definition.attribute_dictionaries[ifc_version].attribute_dictionaries
         props_ifc.each do |prop_dict|
           prop = prop_dict.name
           if attributes.include? prop.to_sym
 
-            property_reader = BimTools::PropertyReader.new(prop_dict)
-            dict_value = property_reader.value
-            value_type = property_reader.value_type
-            attribute_type = property_reader.attribute_type
+            if prop['value']
+              dict_value = prop['value']
+              value_type = nil
+              attribute_type = nil
+            else
+              property_reader = BimTools::PropertyReader.new(prop_dict)
+              dict_value = property_reader.value
+              value_type = property_reader.value_type
+              attribute_type = property_reader.attribute_type
+            end
+
+            # Don't fill empty properties
+            if dict_value.nil? || (dict_value.is_a?(String) && dict_value.empty?)
+              next
+            end
 
             if attribute_type == 'choice'
               # Skip this attribute, this is not a value but a reference
@@ -71,14 +83,17 @@ module BimTools
               entity_type = false
               if value_type
                 begin
+                  valid_type = BimTools::IfcManager.const_defined?(value_type)
+                rescue NameError
+                  # Skip all attributes that cannot be converted to a constant
+                  next
+                end
+
+                if valid_type
                   entity_type = BimTools::IfcManager.const_get(value_type)
                   value_entity = entity_type.new(ifc_model, dict_value)
-                rescue StandardError => e
-                  puts "Error creating IfcTypeProduct property type: #{self.class}, #{e}"
                 end
-              end
-              unless entity_type
-
+              else
                 value_entity = case attribute_type
                                when 'boolean'
                                  BimTools::IfcManager::IfcBoolean.new(ifc_model, dict_value)

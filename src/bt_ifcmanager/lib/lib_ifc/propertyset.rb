@@ -29,6 +29,7 @@ require_relative 'IfcInteger'
 require_relative 'IfcLabel'
 require_relative 'IfcLengthMeasure'
 require_relative 'IfcReal'
+require_relative 'IfcText'
 require_relative 'IfcVolumeMeasure'
 
 module BimTools
@@ -131,9 +132,6 @@ module BimTools
                 if value_type
                   begin
                     entity_type = BimTools::IfcManager.const_get(value_type)
-
-                    ###############################################
-
                     prop.nominalvalue = entity_type.new(dict_value)
                   rescue StandardError => e
                     puts "Error creating IFC property type: #{value_type}, #{e}"
