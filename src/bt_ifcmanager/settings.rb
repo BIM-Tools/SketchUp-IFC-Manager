@@ -85,6 +85,7 @@ module BimTools::IfcManager
         @export_geometry =           CheckboxOption.new('geometry', 'Export geometry', @options[:export][:geometry])
         @export_fast_guid =          CheckboxOption.new('fast_guid', "Improve export speed by using fake GUID's", @options[:export][:fast_guid])
         @export_dynamic_attributes = CheckboxOption.new('dynamic_attributes', 'Export dynamic attributes', @options[:export][:dynamic_attributes])
+        @export_types =              CheckboxOption.new('types', 'Export IFC Type products', @options[:export][:types])
         @export_mapped_items =       CheckboxOption.new('mapped_items', 'Export IFC mapped items', @options[:export][:mapped_items])
       end
     end
@@ -102,8 +103,10 @@ module BimTools::IfcManager
       @options[:export][:geometry]           = @export_geometry.value
       @options[:export][:fast_guid]          = @export_fast_guid.value
       @options[:export][:dynamic_attributes] = @export_dynamic_attributes.value
+      @options[:export][:types]              = @export_types.value
       @options[:export][:mapped_items]       = @export_mapped_items.value
       File.open(@settings_file, 'w') { |file| file.write(@options.to_yaml) }
+      @dialog.close
       PropertiesWindow.reload
       load
     end
@@ -114,8 +117,7 @@ module BimTools::IfcManager
       reader = SkcReader.new(ifc_classification)
       @filters[ifc_classification] = reader
       ifc_version = reader.name
-      parser = IfcXmlParser.new(ifc_version)
-      parser.from_string(reader.xsd_schema)
+      IfcXmlParser.new(ifc_version, reader.xsd_schema)
     end
 
     def set_ifc_classification(ifc_classification_name)
@@ -233,7 +235,7 @@ module BimTools::IfcManager
         end
         model.commit_operation
       end
-    end # end def load_materials
+    end
 
     # @return [Hash] List of export options
     def export
@@ -269,7 +271,6 @@ module BimTools::IfcManager
       )
       set_html
       @dialog.add_action_callback('save_settings') do |_action_context, s_form_data|
-        puts s_form_data
         update_classifications = []
         update_ifc_classifications = []
         @template_materials               = false
@@ -282,6 +283,7 @@ module BimTools::IfcManager
         @export_geometry.value            = false
         @export_fast_guid.value           = false
         @export_dynamic_attributes.value  = false
+        @export_types.value               = false
         @export_mapped_items.value        = false
 
         a_form_data = CGI.unescape(s_form_data).split('&')
@@ -308,6 +310,8 @@ module BimTools::IfcManager
             @export_fast_guid.value = true
           when 'dynamic_attributes'
             @export_dynamic_attributes.value = true
+          when 'types'
+            @export_types.value = true
           when 'mapped_items'
             @export_mapped_items.value = true
           when 'ifc_classification'
@@ -393,6 +397,7 @@ module BimTools::IfcManager
       html << @export_geometry.html
       html << @export_fast_guid.html
       html << @export_dynamic_attributes.html
+      html << @export_types.html
       html << @export_mapped_items.html
       html << "      </div>\n"
 

@@ -72,20 +72,19 @@ module BimTools::IfcManager
   end
 
   class Representation
-    include BimTools::IfcManager::Settings.ifc_module
-
     attr_reader :brep, :shaperepresentation, :representationmap
 
     def initialize(ifc_model, faces, transformation, material)
-      @brep = IfcFacetedBrep.new(ifc_model, faces, transformation)
-      @shaperepresentation = IfcShapeRepresentation.new(ifc_model, nil)
+      @ifc = BimTools::IfcManager::Settings.ifc_module
+      @brep = @ifc::IfcFacetedBrep.new(ifc_model, faces, transformation)
+      @shaperepresentation = @ifc::IfcShapeRepresentation.new(ifc_model, nil)
       @shaperepresentation.items.add(brep)
-      @representationmap = IfcRepresentationMap.new(ifc_model)
+      @representationmap = @ifc::IfcRepresentationMap.new(ifc_model)
       @representationmap.mappingorigin = ifc_model.default_placement
       @representationmap.mappedrepresentation = @shaperepresentation
 
       # add color from su-object material, or a su_parent's
-      IfcStyledItem.new(ifc_model, brep, material) if ifc_model.options[:colors] && material
+      @ifc::IfcStyledItem.new(ifc_model, brep, material) if ifc_model.options[:colors] && material
     end
   end
 end

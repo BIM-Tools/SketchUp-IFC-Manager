@@ -34,7 +34,6 @@ require_relative 'IfcVolumeMeasure'
 
 module BimTools
   module IfcManager
-    include BimTools::IfcManager::Settings.ifc_module
 
     # Create quantity and propertysets from attribute dictionaries
     #
@@ -42,6 +41,7 @@ module BimTools
     # @param attr_dict [Sketchup::AttributeDictionary] The attribute dictionary to extract properties from
     #
     def create_propertyset(ifc_model, attr_dict)
+      @ifc = BimTools::IfcManager::Settings.ifc_module
       if attr_dict.is_a?(Sketchup::AttributeDictionary)
         if attr_dict.name == 'BaseQuantities' # export as elementquantities
           quantities = IfcManager::Ifc_Set.new
@@ -50,17 +50,17 @@ module BimTools
 
             case qty_dict.name
             when 'Area', 'GrossArea'
-              prop = IfcQuantityArea.new(ifc_model, attr_dict)
+              prop = @ifc::IfcQuantityArea.new(ifc_model, attr_dict)
               prop.name = BimTools::IfcManager::IfcIdentifier.new(ifc_model, qty_dict.name)
               prop.areavalue = BimTools::IfcManager::IfcAreaMeasure.new(ifc_model, qty_dict['value'])
               qty.quantities.add(prop)
             when 'Volume'
-              prop = IfcQuantityVolume.new(ifc_model, attr_dict)
+              prop = @ifc::IfcQuantityVolume.new(ifc_model, attr_dict)
               prop.name = BimTools::IfcManager::IfcIdentifier.new(qty_dict.name)
               prop.volumevalue = BimTools::IfcManager::IfcVolumeMeasure.new(ifc_model, qty_dict['value'])
               qty.quantities.add(prop)
             when 'Width', 'Height', 'Depth', 'Perimeter'
-              prop = IfcQuantityLength.new(ifc_model, attr_dict)
+              prop = @ifc::IfcQuantityLength.new(ifc_model, attr_dict)
               prop.name = BimTools::IfcManager::IfcIdentifier.new(qty_dict.name)
               prop.lengthvalue = BimTools::IfcManager::IfcLengthMeasure.new(ifc_model, qty_dict['value'])
               qty.quantities.add(prop)
@@ -70,7 +70,7 @@ module BimTools
 
           # Create ElementQuantity if there are any quantities to export
           unless quantities.empty?
-            @relatingpropertydefinition = IfcElementQuantity.new(ifc_model, attr_dict)
+            @relatingpropertydefinition = @ifc::IfcElementQuantity.new(ifc_model, attr_dict)
             unless attr_dict.name.nil?
               @relatingpropertydefinition.name = BimTools::IfcManager::IfcLabel.new(ifc_model, attr_dict.name)
             end
@@ -108,7 +108,7 @@ module BimTools
               attribute_type = property_reader.attribute_type
 
               if attribute_type == 'enumeration'
-                prop = IfcPropertyEnumeratedValue.new(ifc_model)
+                prop = @ifc::IfcPropertyEnumeratedValue.new(ifc_model)
                 if property_reader.options
                   enumeration_values = IfcManager::Ifc_List.new(property_reader.options.map do |item|
                                                                   BimTools::IfcManager::IfcLabel.new(ifc_model, item,
@@ -117,7 +117,7 @@ module BimTools
                   if ifc_model.property_enumerations.key?(property_reader.value_type) && (ifc_model.property_enumerations[property_reader.value_type].enumerationvalues.step == enumeration_values.step)
                     prop_enum = ifc_model.property_enumerations[property_reader.value_type]
                   else
-                    prop_enum = IfcPropertyEnumeration.new(ifc_model)
+                    prop_enum = @ifc::IfcPropertyEnumeration.new(ifc_model)
                     prop_enum.name = BimTools::IfcManager::IfcLabel.new(ifc_model, property_reader.value_type)
                     prop_enum.enumerationvalues = enumeration_values
                     ifc_model.property_enumerations[property_reader.value_type] = prop_enum
@@ -127,7 +127,7 @@ module BimTools
                 value = BimTools::IfcManager::IfcLabel.new(ifc_model, dict_value, true)
                 prop.enumerationvalues = IfcManager::Ifc_List.new([value])
               else
-                prop = IfcPropertySingleValue.new(ifc_model)
+                prop = @ifc::IfcPropertySingleValue.new(ifc_model)
                 entity_type = false
                 if value_type
                   begin
@@ -158,7 +158,7 @@ module BimTools
               next unless value
               next if value.is_a?(String) && value.empty?
 
-              prop = IfcPropertySingleValue.new(ifc_model, attr_dict)
+              prop = @ifc::IfcPropertySingleValue.new(ifc_model, attr_dict)
               prop.name = BimTools::IfcManager::IfcIdentifier.new(ifc_model, key)
               prop.nominalvalue = case value
                                   when String
@@ -182,12 +182,10 @@ module BimTools
 
           # Create PropertySet if there are any properties to export
           unless properties.empty?
-            rel_defines = IfcRelDefinesByProperties.new(ifc_model)
-            relatingpropertydefinition = IfcPropertySet.new(ifc_model)
-            relatingpropertydefinition.name = BimTools::IfcManager::IfcLabel.new(ifc_model, attr_dict.name)
-            relatingpropertydefinition.hasproperties = properties
-            rel_defines.relatingpropertydefinition = relatingpropertydefinition
-            return rel_defines
+            propertyset = @ifc::IfcPropertySet.new(ifc_model)
+            propertyset.name = BimTools::IfcManager::IfcLabel.new(ifc_model, attr_dict.name)
+            propertyset.hasproperties = properties
+            return propertyset
           end
         end
       end

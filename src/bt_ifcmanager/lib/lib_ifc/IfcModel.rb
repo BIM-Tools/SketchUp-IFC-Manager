@@ -33,8 +33,6 @@ module BimTools
     require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')
 
     class IfcModel
-      include BimTools::IfcManager::Settings.ifc_module
-
       # (?) possible additional methods:
       # - get_ifc_objects(hash ifc->su)
       # - get_su_objects(hash su->ifc)
@@ -67,12 +65,14 @@ module BimTools
           geometry: true, #  create geometry for entities
           fast_guid: false, # create simplified guids
           dynamic_attributes: true, #  export dynamic component data
-          mapped_items: false, # export component definitions as mapped items
+          types: true,
+          mapped_items: true, # export component definitions as mapped items
           export_entities: [],
           root_entities: []
         }
         @options = defaults.merge(options)
 
+        @ifc = BimTools::IfcManager::Settings.ifc_module
         @su_model = su_model
         @su_entities = @options[:export_entities]
         @ifc_id = 0
@@ -100,7 +100,7 @@ module BimTools
         @owner_history = create_ownerhistory
 
         # create new IfcProject
-        @project = IfcProject.new(self, su_model)
+        @project = @ifc::IfcProject.new(self, su_model)
 
         # set_units
         @units = @project.unitsincontext
@@ -112,12 +112,12 @@ module BimTools
 
         # Create default origin and axes for re-use throughout the model
         transformation = Geom::Transformation.new
-        @default_placement = IfcAxis2Placement3D.new(self, transformation)
+        @default_placement = @ifc::IfcAxis2Placement3D.new(self, transformation)
         @default_location = @default_placement.location
         @default_axis = @default_placement.axis
         @default_refdirection = @default_placement.refdirection
 
-        # create empty hash that will contain all Sketchup ComponentDefinitions and their IfcProductType counterparts
+        # create IfcProductTypes for all ComponentDefintions
         @product_types = get_product_types(@su_model)
 
         # When no entities are given for export, pass all model entities to create ifc objects
@@ -158,17 +158,17 @@ module BimTools
       # Create new IfcOwnerHistory
       def create_ownerhistory
         creation_date = Time.now.to_i.to_s
-        owner_history = IfcOwnerHistory.new(self)
-        owninguser = IfcPersonAndOrganization.new(self)
-        owninguser.theperson = IfcPerson.new(self)
+        owner_history = @ifc::IfcOwnerHistory.new(self)
+        owninguser = @ifc::IfcPersonAndOrganization.new(self)
+        owninguser.theperson = @ifc::IfcPerson.new(self)
         owninguser.theperson.familyname = BimTools::IfcManager::IfcLabel.new(@ifc_model, '')
-        owninguser.theorganization = IfcOrganization.new(self)
+        owninguser.theorganization = @ifc::IfcOrganization.new(self)
         owninguser.theorganization.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, '')
-        # owninguser.theperson = IfcPerson.new(self)
-        # owninguser.theorganization = IfcOrganization.new(self)
+        # owninguser.theperson = @ifc::IfcPerson.new(self)
+        # owninguser.theorganization = @ifc::IfcOrganization.new(self)
         owner_history.owninguser = owninguser
-        owningapplication = IfcApplication.new(self)
-        applicationdeveloper = IfcOrganization.new(self)
+        owningapplication = @ifc::IfcApplication.new(self)
+        applicationdeveloper = @ifc::IfcOrganization.new(self)
         applicationdeveloper.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'BIM-Tools')
         owningapplication.applicationdeveloper = applicationdeveloper
         owningapplication.version = BimTools::IfcManager::IfcLabel.new(@ifc_model, VERSION)
@@ -186,34 +186,39 @@ module BimTools
 
       # Create new IfcGeometricRepresentationContext
       def create_representationcontext
-        representationcontext = IfcGeometricRepresentationContext.new(self)
+        representationcontext = @ifc::IfcGeometricRepresentationContext.new(self)
         representationcontext.contexttype = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'Model')
         representationcontext.coordinatespacedimension = '3'
-        representationcontext.worldcoordinatesystem = IfcAxis2Placement2D.new(self)
-        representationcontext.worldcoordinatesystem.location = IfcCartesianPoint.new(self, Geom::Point2d.new(0, 0))
-        representationcontext.truenorth = IfcDirection.new(self, Geom::Vector2d.new(0, 1))
+        representationcontext.worldcoordinatesystem = @ifc::IfcAxis2Placement2D.new(self)
+        representationcontext.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self, Geom::Point2d.new(0, 0))
+        representationcontext.truenorth = @ifc::IfcDirection.new(self, Geom::Vector2d.new(0, 1))
         representationcontext
       end
 
+      # create a hash with all Sketchup ComponentDefinitions and their IfcProductType counterparts
       def get_product_types(su_model)
         product_types = {}
-        definitions = su_model.definitions
-        definitions.each do |definition|
-          next unless definition.count_used_instances > 0
 
-          ent_type_name = definition.get_attribute('AppliedSchemaTypes', BimTools::IfcManager::Settings.ifc_version)
-          next unless ent_type_name
+        # Check if export option for types is set
+        if @options[:types]
+          definitions = su_model.definitions
+          definitions.each do |definition|
+            next unless definition.count_used_instances > 0
 
-          # Replace IfcWallStandardCase by IfcWall, due to geometry issues and deprecated in IFC 4
-          ent_type_name = 'IfcWall' if ent_type_name == 'IfcWallStandardCase'
+            ent_type_name = definition.get_attribute('AppliedSchemaTypes', BimTools::IfcManager::Settings.ifc_version)
+            next unless ent_type_name
 
-          unless BimTools::IfcManager::Settings.ifc_module.const_defined?(ent_type_name) && BimTools::IfcManager::Settings.ifc_module.const_defined?(ent_type_name + 'Type')
-            next
+            # Replace IfcWallStandardCase by IfcWall, due to geometry issues and deprecated in IFC 4
+            ent_type_name = 'IfcWall' if ent_type_name == 'IfcWallStandardCase'
+
+            unless BimTools::IfcManager::Settings.ifc_module.const_defined?(ent_type_name) && BimTools::IfcManager::Settings.ifc_module.const_defined?(ent_type_name + 'Type')
+              next
+            end
+
+            product = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name)
+            type_product = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name + 'Type')
+            product_types[definition] = type_product.new(self, definition, product)
           end
-
-          product = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name)
-          type_product = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name + 'Type')
-          product_types[definition] = type_product.new(self, definition, product)
         end
         product_types
       end
@@ -246,12 +251,12 @@ module BimTools
 
         # create a single IfcBuildingelementProxy from all 'loose' faces in the model
         unless faces.empty?
-          ifc_entity = IfcBuildingElementProxy.new(self, nil)
+          ifc_entity = @ifc::IfcBuildingElementProxy.new(self, nil)
           ifc_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'default building element')
-          ifc_entity.representation = IfcProductDefinitionShape.new(self, nil)
-          brep = IfcFacetedBrep.new(self, faces, Geom::Transformation.new)
+          ifc_entity.representation = @ifc::IfcProductDefinitionShape.new(self, nil)
+          brep = @ifc::IfcFacetedBrep.new(self, faces, Geom::Transformation.new)
           ifc_entity.representation.representations.first.items.add(brep)
-          ifc_entity.objectplacement = IfcLocalPlacement.new(self, Geom::Transformation.new)
+          ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(self, Geom::Transformation.new)
 
           # Add to spatial hierarchy
           entity_path.add(ifc_entity)

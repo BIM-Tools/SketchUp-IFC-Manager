@@ -23,13 +23,11 @@ require_relative 'set'
 
 module BimTools
   module IfcRelAssociatesMaterial_su
-    include BimTools::IfcManager::Settings.ifc_module
-
     def initialize(ifc_model, sketchup)
       super
+      @ifc = BimTools::IfcManager::Settings.ifc_module
       material_name = sketchup
-
-      @relatingmaterial = IfcMaterial.new(ifc_model)
+      @relatingmaterial = @ifc::IfcMaterial.new(ifc_model)
       @relatingmaterial.name = BimTools::IfcManager::IfcLabel.new(ifc_model, material_name)
       @relatedobjects = IfcManager::Ifc_Set.new
     end

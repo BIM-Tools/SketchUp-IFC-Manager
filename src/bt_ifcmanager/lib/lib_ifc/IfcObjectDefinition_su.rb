@@ -23,11 +23,12 @@ require_relative 'set.rb'
 
 module BimTools
   module IfcObjectDefinition_su
-    include BimTools::IfcManager::Settings.ifc_module
+    
 
     attr_accessor :decomposes, :default_related_object
     def initialize(ifc_model, sketchup)
       super
+      @ifc = BimTools::IfcManager::Settings.ifc_module
       @ifc_model = ifc_model
     end
     
@@ -36,7 +37,7 @@ module BimTools
     #
     def add_contained_element( object )
       unless @contains_elements
-        @contains_elements = IfcRelContainedInSpatialStructure.new(@ifc_model)
+        @contains_elements = @ifc::IfcRelContainedInSpatialStructure.new(@ifc_model)
         @contains_elements.relatingstructure= self
         @contains_elements.relatedelements = BimTools::IfcManager::Ifc_Set.new()
       end
@@ -49,7 +50,7 @@ module BimTools
     #
     def add_related_object( object )
       unless @decomposes
-        @decomposes = IfcRelAggregates.new(@ifc_model)
+        @decomposes = @ifc::IfcRelAggregates.new(@ifc_model)
         @decomposes.relatingobject = self
         @decomposes.relatedobjects = BimTools::IfcManager::Ifc_Set.new()
       end

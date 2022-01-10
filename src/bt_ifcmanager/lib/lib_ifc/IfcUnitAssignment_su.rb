@@ -25,8 +25,6 @@ module BimTools
   module IfcUnitAssignment_su
     attr_reader :length_unit, :area_unit, :volume_unit
 
-    include BimTools::IfcManager::Settings.ifc_module
-
     LENGTH_UNITS = %i[
       Inches
       Feet
@@ -84,6 +82,7 @@ module BimTools
 
     def initialize(ifc_model)
       super
+      @ifc = BimTools::IfcManager::Settings.ifc_module
       @ifc_model = ifc_model
       @su_model = ifc_model.su_model
       set_units
@@ -103,7 +102,7 @@ module BimTools
     def ifc_unit(unit_type)
       if IFC_UNITS.key? unit_type
         unit_values = IFC_UNITS[unit_type]
-        unit = IfcSIUnit.new(@ifc_model)
+        unit = @ifc::IfcSIUnit.new(@ifc_model)
         unit.dimensions = '*'
         unit.unittype = unit_values[0]
         unit.prefix = unit_values[1]
@@ -111,8 +110,8 @@ module BimTools
         unit
       else
         unit_values = CONVERSIONBASEDUNITS[unit_type]
-        conversionbasedunit = IfcConversionBasedUnit.new(@ifc_model)
-        dimensions = IfcDimensionalExponents.new(@ifc_model)
+        conversionbasedunit = @ifc::IfcConversionBasedUnit.new(@ifc_model)
+        dimensions = @ifc::IfcDimensionalExponents.new(@ifc_model)
         dimensions.lengthexponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, unit_values[4][0])
         dimensions.massexponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, unit_values[4][1])
         dimensions.timeexponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, unit_values[4][2])
@@ -124,9 +123,9 @@ module BimTools
         conversionbasedunit.dimensions = dimensions
         conversionbasedunit.unittype = unit_values[1]
         conversionbasedunit.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, unit_values[2])
-        measurewithunit = IfcMeasureWithUnit.new(@ifc_model)
+        measurewithunit = @ifc::IfcMeasureWithUnit.new(@ifc_model)
         conversionbasedunit.conversionfactor = measurewithunit
-        unit = IfcSIUnit.new(@ifc_model)
+        unit = @ifc::IfcSIUnit.new(@ifc_model)
         case unit_values[1]
         when :lengthunit
           valuecomponent = BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, unit_values[3])

@@ -24,14 +24,14 @@ require_relative 'propertyset'
 
 module BimTools
   module IfcGroup_su
-    include BimTools::IfcManager::Settings.ifc_module
+    
 
     # @parameter ifc_model [IfcManager::IfcModel]
     # @parameter sketchup [Sketchup::ComponentDefinition]
     def initialize(ifc_model, sketchup = nil)
       super
-
-      @rel = IfcRelAssignsToGroup.new(ifc_model)
+      @ifc = BimTools::IfcManager::Settings.ifc_module
+      @rel = @ifc::IfcRelAssignsToGroup.new(ifc_model)
       @rel.relatinggroup = self
       @rel.relatedobjects = IfcManager::Ifc_Set.new
 

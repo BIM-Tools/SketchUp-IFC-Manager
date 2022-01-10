@@ -12,6 +12,7 @@
   :geometry: true
   :fast_guid: false
   :dynamic_attributes: true
+  :types: true
   :mapped_items: true
 :load:
   :classifications:

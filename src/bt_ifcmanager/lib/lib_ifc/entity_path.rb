@@ -23,20 +23,19 @@ module BimTools::IfcManager
   # The EntityPath class represents the entity path to a given entity within the IFC project spatial hierarchy.
   #
   class EntityPath
-    include BimTools::IfcManager::Settings.ifc_module
-
     # This creator class creates the EntityPath object for a specific IFC entity
     #
     # @parameter ifc_entity [BimTools::IfcManager::IFC2X3::IfcProduct] IFC Entity
     # @parameter spatial_hierarchy [Hash<BimTools::IfcManager::IFC2X3::IfcSpatialStructureElement>] Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
     #
     def initialize(ifc_model, entity_path = nil)
+      @ifc = BimTools::IfcManager::Settings.ifc_module
       @spatial_order = [
-        IfcProject,
-        IfcSite,
-        IfcBuilding,
-        IfcBuildingStorey,
-        IfcSpace
+        @ifc::IfcProject,
+        @ifc::IfcSite,
+        @ifc::IfcBuilding,
+        @ifc::IfcBuildingStorey,
+        @ifc::IfcSpace
       ].freeze
       @ifc_model = ifc_model
       @entity_path = if entity_path
@@ -60,78 +59,78 @@ module BimTools::IfcManager
     def add(ifc_entity)
       entity_path_types = path_types
       case ifc_entity
-      when IfcProject
+      when @ifc::IfcProject
         # (!) Check!!!
         @entity_path[0] = ifc_entity
-      when IfcSite
-        if entity_path_types.include? IfcSite
-          # Add as partial IfcSite
+      when @ifc::IfcSite
+        if entity_path_types.include? @ifc::IfcSite
+          # Add as partial @ifc::IfcSite
           # TODO fix option to use partial sites
-          # parent_site = @entity_path[path_types().rindex(IfcSite)]
-          # path = ["IFC 2x3", "IfcSite", "CompositionType", "IfcElementCompositionEnum"]
+          # parent_site = @entity_path[path_types().rindex(@ifc::IfcSite)]
+          # path = ["IFC 2x3", "@ifc::IfcSite", "CompositionType", "IfcElementCompositionEnum"]
           # if parent_site.su_object.definition.get_classification_value(path) == "complex" && ifc_entity.su_object.definition.get_classification_value(path) == "partial"
-          #   insert_after(ifc_entity,IfcSite)
+          #   insert_after(ifc_entity,@ifc::IfcSite)
           # else
-          #   @entity_path[path_types().rindex(IfcSite)] = ifc_entity
+          #   @entity_path[path_types().rindex(@ifc::IfcSite)] = ifc_entity
           # end
 
-          @entity_path[path_types.rindex(IfcSite)] = ifc_entity
-        elsif entity_path_types.include? IfcProject
-          insert_after(ifc_entity, IfcProject)
+          @entity_path[path_types.rindex(@ifc::IfcSite)] = ifc_entity
+        elsif entity_path_types.include? @ifc::IfcProject
+          insert_after(ifc_entity, @ifc::IfcProject)
         end
-      when IfcBuilding
-        if entity_path_types.include? IfcBuilding
+      when @ifc::IfcBuilding
+        if entity_path_types.include? @ifc::IfcBuilding
           # Add as partial IfcBuilding
-          # insert_after(ifc_entity,IfcBuilding)
-          @entity_path[path_types.rindex(IfcBuilding)] = ifc_entity
-        elsif entity_path_types.include? IfcSite
-          insert_after(ifc_entity, IfcSite)
+          # insert_after(ifc_entity,@ifc::IfcBuilding)
+          @entity_path[path_types.rindex(@ifc::IfcBuilding)] = ifc_entity
+        elsif entity_path_types.include? @ifc::IfcSite
+          insert_after(ifc_entity, @ifc::IfcSite)
         else
           # Create default Site and add there
-          add_default_spatialelement(IfcSite)
-          insert_after(ifc_entity, IfcSite)
+          add_default_spatialelement(@ifc::IfcSite)
+          insert_after(ifc_entity, @ifc::IfcSite)
         end
-      when IfcBuildingStorey
-        if entity_path_types.include? IfcBuildingStorey
+      when @ifc::IfcBuildingStorey
+        if entity_path_types.include? @ifc::IfcBuildingStorey
           # Add as partial IfcBuildingStorey
-          # insert_after(ifc_entity,IfcBuildingStorey)
-          @entity_path[path_types.rindex(IfcBuildingStorey)] = ifc_entity
-        elsif entity_path_types.include? IfcBuilding
-          insert_after(ifc_entity, IfcBuilding)
+          # insert_after(ifc_entity,@ifc::IfcBuildingStorey)
+          @entity_path[path_types.rindex(@ifc::IfcBuildingStorey)] = ifc_entity
+        elsif entity_path_types.include? @ifc::IfcBuilding
+          insert_after(ifc_entity, @ifc::IfcBuilding)
         else
           # Create default IfcBuilding and add there, and check for site
-          add_default_spatialelement(IfcBuilding)
-          insert_after(ifc_entity, IfcBuilding)
+          add_default_spatialelement(@ifc::IfcBuilding)
+          insert_after(ifc_entity, @ifc::IfcBuilding)
         end
-      when IfcSpace
-        if entity_path_types.include? IfcSpace
+      when @ifc::IfcSpace
+        if entity_path_types.include? @ifc::IfcSpace
           # Add as partial IfcBuildingStorey
-          # insert_after(ifc_entity,IfcSpace)
-          @entity_path[path_types.rindex(IfcSpace)] = ifc_entity
-        elsif entity_path_types.include? IfcBuildingStorey
-          # insert_after(ifc_entity,IfcBuildingStorey)
-          @entity_path[path_types.rindex(IfcBuildingStorey)] = ifc_entity
-        elsif entity_path_types.include? IfcSite
+          # insert_after(ifc_entity,@ifc::IfcSpace)
+          @entity_path[path_types.rindex(@ifc::IfcSpace)] = ifc_entity
+        elsif entity_path_types.include? @ifc::IfcBuildingStorey
+          # insert_after(ifc_entity,@ifc::IfcBuildingStorey)
+          @entity_path[path_types.rindex(@ifc::IfcBuildingStorey)] = ifc_entity
+        elsif entity_path_types.include? @ifc::IfcSite
           # Add as outside space
-          # insert_after(ifc_entity,IfcSite)
-          @entity_path[path_types.rindex(IfcSite)] = ifc_entity
+          # insert_after(ifc_entity,@ifc::IfcSite)
+          @entity_path[path_types.rindex(@ifc::IfcSite)] = ifc_entity
         else
           # Create default IfcBuildingStorey and add there, and check for IfcBuilding and site
-          add_default_spatialelement(IfcBuildingStorey)
-          insert_after(ifc_entity, IfcBuildingStorey)
+          add_default_spatialelement(@ifc::IfcBuildingStorey)
+          insert_after(ifc_entity, @ifc::IfcBuildingStorey)
         end
-      when IfcElementAssembly, IfcCurtainWall
+      when @ifc::IfcElementAssembly, @ifc::IfcCurtainWall
 
         # add to end but check for basic spatial hierarchy
-        if (entity_path_types & [IfcSpace, IfcBuildingStorey, IfcSite]).empty?
-          add_default_spatialelement(IfcBuildingStorey)
+        if (entity_path_types & [@ifc::IfcSpace, @ifc::IfcBuildingStorey, @ifc::IfcSite]).empty?
+          add_default_spatialelement(@ifc::IfcBuildingStorey)
         end
         @entity_path << ifc_entity
       else # IfcProduct
 
         # don't add but check for basic spatial hierarchy
-        if (entity_path_types & [IfcSpace, IfcBuildingStorey, IfcSite]).empty?
-          add_default_spatialelement(IfcBuildingStorey)
+        if (entity_path_types & [@ifc::IfcSpace, @ifc::IfcBuildingStorey, @ifc::IfcSite]).empty?
+          add_default_spatialelement(@ifc::IfcBuildingStorey)
         end
       end
     end
@@ -153,7 +152,7 @@ module BimTools::IfcManager
                                                                  'default ' << entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(' ').downcase)
 
         # Add ObjectPlacement
-        default_parent.objectplacement = IfcLocalPlacement.new(@ifc_model)
+        default_parent.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model)
         default_parent.objectplacement.relativeplacement = @ifc_model.default_placement
         default_parent.objectplacement.placementrelto = parent.objectplacement if parent.respond_to?(:objectplacement)
 
@@ -186,13 +185,13 @@ module BimTools::IfcManager
                end
       ifc_entity.parent = parent
       case ifc_entity
-      when IfcSpatialStructureElement
+      when @ifc::IfcSpatialStructureElement
         ifc_entity.parent.add_related_object(ifc_entity)
       else
         case ifc_entity.parent
-        when IfcSpatialStructureElement
+        when @ifc::IfcSpatialStructureElement
           ifc_entity.parent.add_contained_element(ifc_entity)
-        when IfcProject, IfcProduct, IfcCurtainWall, IfcElementAssembly
+        when @ifc::IfcProject, @ifc::IfcProduct, @ifc::IfcCurtainWall, @ifc::IfcElementAssembly
           ifc_entity.parent.add_related_object(ifc_entity)
         end
       end

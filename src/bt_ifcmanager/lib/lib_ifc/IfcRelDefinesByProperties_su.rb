@@ -26,7 +26,7 @@ require_relative File.join('PropertyReader.rb')
 
 module BimTools
   module IfcRelDefinesByProperties_su
-    include BimTools::IfcManager::Settings.ifc_module
+    
 
     # Create quantity and propertysets from attribute dictionaries
     #

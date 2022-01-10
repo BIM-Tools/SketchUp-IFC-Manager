@@ -372,6 +372,7 @@ IfcExternalReference:
   :explicit:
   - :Location
   - :ItemReference
+  - :Identification
   - :Name
 IfcClassificationReference:
   :explicit:

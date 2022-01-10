@@ -21,17 +21,16 @@
 
 module BimTools
   module IfcProject_su
-    include BimTools::IfcManager::Settings.ifc_module
-
     attr_accessor :su_object
 
     def initialize(ifc_model, sketchup)
       super
+      @ifc = BimTools::IfcManager::Settings.ifc_module
       self.su_object = (sketchup)
       @ifc_model = ifc_model
 
       # Set project units to sketchup units
-      @unitsincontext = IfcUnitAssignment.new(@ifc_model)
+      @unitsincontext = @ifc::IfcUnitAssignment.new(@ifc_model)
     end
 
     def su_object=(sketchup)

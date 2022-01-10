@@ -29,7 +29,6 @@ module BimTools::IfcManager
   require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')
 
   class ObjectCreator
-    include BimTools::IfcManager::Settings.ifc_module
 
     # This creator class creates the correct IFC entity for the given sketchup object and it's children
     #
@@ -41,6 +40,7 @@ module BimTools::IfcManager
     # @parameter su_material [Sketchup::Material] The parent sketchup objects material which will be used when the given one does not have a directly associated material
     #
     def initialize(ifc_model, su_instance, su_total_transformation, placement_parent = nil, entity_path = nil, su_material = nil)
+      @ifc = BimTools::IfcManager::Settings.ifc_module
       @ifc_model = ifc_model
       @entity_path = EntityPath.new(@ifc_model, entity_path)
       ent_type_name = su_instance.definition.get_attribute('AppliedSchemaTypes',
@@ -76,11 +76,11 @@ module BimTools::IfcManager
       entity_type = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name) if ent_type_name
 
       # All unclassified and non-existent objects are mapped to IfcBuildingElementProxy
-      entity_type ||= BimTools::IfcManager::Settings.ifc_module::IfcBuildingElementProxy
+      entity_type ||= @ifc::IfcBuildingElementProxy
 
       # if a IfcProject then add su_object to the existing project
       # (?) what if there are multiple projects defined?
-      if entity_type == IfcProject
+      if entity_type == @ifc::IfcProject
 
         # TODO: set all correct parameters for IfcProject!!!
         @ifc_model.project.su_object = su_instance
@@ -89,7 +89,7 @@ module BimTools::IfcManager
         ifc_entity = entity_type.new(@ifc_model, su_instance)
       end
 
-      ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid) if entity_type < IfcRoot
+      ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid) if entity_type < @ifc::IfcRoot
 
       @entity_path.add(ifc_entity)
       construct_entity(ifc_entity, placement_parent)
@@ -103,9 +103,9 @@ module BimTools::IfcManager
     #
     def construct_entity(ifc_entity, placement_parent)
       # if parent is a IfcGroup, add entity to group
-      if placement_parent.is_a?(IfcGroup) && ifc_entity.is_a?(IfcObjectDefinition)
-        if placement_parent.is_a?(IfcZone)
-          placement_parent.add(ifc_entity) if ifc_entity.is_a?(IfcZone) || ifc_entity.is_a?(IfcSpace)
+      if placement_parent.is_a?(@ifc::IfcGroup) && ifc_entity.is_a?(@ifc::IfcObjectDefinition)
+        if placement_parent.is_a?(@ifc::IfcZone)
+          placement_parent.add(ifc_entity) if ifc_entity.is_a?(@ifc::IfcZone) || ifc_entity.is_a?(@ifc::IfcSpace)
         else
           placement_parent.add(ifc_entity)
         end
@@ -113,19 +113,19 @@ module BimTools::IfcManager
 
       # create objectplacement for ifc_entity
       # set objectplacement based on transformation
-      if ifc_entity.is_a?(IfcProduct)
+      if ifc_entity.is_a?(@ifc::IfcProduct)
         @entity_path.set_parent(ifc_entity)
-        if ifc_entity.parent.is_a?(IfcProduct)
-          ifc_entity.objectplacement = IfcLocalPlacement.new(@ifc_model, @su_total_transformation,
+        if ifc_entity.parent.is_a?(@ifc::IfcProduct)
+          ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, @su_total_transformation,
                                                              ifc_entity.parent.objectplacement)
         else
-          ifc_entity.objectplacement = IfcLocalPlacement.new(@ifc_model, @su_total_transformation)
+          ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, @su_total_transformation)
         end
 
         # set elevation for buildingstorey
         # (?) is this the best place to define building storey elevation?
         #   could be better set from within IfcBuildingStorey?
-        if ifc_entity.is_a?(IfcBuildingStorey)
+        if ifc_entity.is_a?(@ifc::IfcBuildingStorey)
           elevation = ifc_entity.objectplacement.ifc_total_transformation.origin.z
           ifc_entity.elevation = BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, elevation)
         end
@@ -172,7 +172,7 @@ module BimTools::IfcManager
     def create_geometry(definition, ifc_entity, su_material, faces)
       # calculate the local transformation
       # if the SU object if not an IFC entity, then BREP needs to be transformed with SU object transformation
-      if !ifc_entity.is_a?(IfcProduct) || ifc_entity.is_a?(IfcGroup) || ifc_entity.parent.is_a?(IfcProject)
+      if !ifc_entity.is_a?(@ifc::IfcProduct) || ifc_entity.is_a?(@ifc::IfcGroup) || ifc_entity.parent.is_a?(@ifc::IfcProject)
         brep_transformation = @su_total_transformation
       else
         brep_transformation = ifc_entity.objectplacement.ifc_total_transformation.inverse * @su_total_transformation

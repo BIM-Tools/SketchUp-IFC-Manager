@@ -23,16 +23,17 @@ require_relative 'IfcNormalisedRatioMeasure'
 
 module BimTools
   module IfcStyledItem_su
-    include BimTools::IfcManager::Settings.ifc_module
+    
 
     def initialize(ifc_model, brep, material = nil)
       super
+      @ifc = BimTools::IfcManager::Settings.ifc_module      
       instance_variable_set(:@attr, ([:Item] + attributes))
 
-      styleassignment = IfcPresentationStyleAssignment.new(ifc_model, material)
-      surfacestyle = IfcSurfaceStyle.new(ifc_model, material)
-      surfacestylerendering = IfcSurfaceStyleRendering.new(ifc_model, material)
-      colourrgb = IfcColourRgb.new(ifc_model, material)
+      styleassignment = @ifc::IfcPresentationStyleAssignment.new(ifc_model, material)
+      surfacestyle = @ifc::IfcSurfaceStyle.new(ifc_model, material)
+      surfacestylerendering = @ifc::IfcSurfaceStyleRendering.new(ifc_model, material)
+      colourrgb = @ifc::IfcColourRgb.new(ifc_model, material)
 
       # Workaround for bug in IFC XSD's forward from IFC4, missing "item" attribute
       unless attributes.include? :Item

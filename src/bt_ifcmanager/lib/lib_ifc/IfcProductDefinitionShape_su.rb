@@ -22,14 +22,14 @@
 require_relative 'list.rb'
 
 module BimTools
-  module IfcProductDefinitionShape_su
-    include BimTools::IfcManager::Settings.ifc_module
-
+  module IfcProductDefinitionShape_su   
     attr_accessor :globalid
+    
     # @parameter ifc_model [IfcManager::IfcModel]
     # @parameter sketchup [Sketchup::ComponentDefinition]
     def initialize(ifc_model, sketchup)
       super
+      @ifc = BimTools::IfcManager::Settings.ifc_module
 
       # Check if Mapped representation should be used
       if (ifc_model.options[:mapped_items]) && (sketchup.count_instances > 1)
@@ -39,8 +39,8 @@ module BimTools
       end
 
       # set representation based on definition
-      representation = IfcShapeRepresentation.new( ifc_model , sketchup, representationtype)
+      representation = @ifc::IfcShapeRepresentation.new( ifc_model , sketchup, representationtype)
       @representations = IfcManager::Ifc_List.new([representation])
-    end # def initialize
-  end # module IfcProductDefinitionShape_su
-end # module BimTools
+    end
+  end
+end

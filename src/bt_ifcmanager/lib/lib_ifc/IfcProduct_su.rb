@@ -34,8 +34,6 @@ require_relative File.join('PropertyReader.rb')
 
 module BimTools
   module IfcProduct_su
-    include BimTools::IfcManager::Settings.ifc_module
-
     attr_accessor :su_object, :parent, :total_transformation, :type_product
 
     @su_object = nil
@@ -43,6 +41,7 @@ module BimTools
 
     def initialize(ifc_model, sketchup)
       super
+      @ifc = BimTools::IfcManager::Settings.ifc_module
 
       # Check if this is an empty object (default object) or based on a Sketchup::ComponentInstance or Sketchup::Group
       if sketchup.respond_to?(:definition)
@@ -56,16 +55,12 @@ module BimTools
         if @ifc_model.product_types.key?(definition)
           @type_product = @ifc_model.product_types[definition]
           @type_product.add_typed_object(self)
-
-          # Add all type propertysets to this object when IFC 2x3
-          @type_product.propertysets.map { |p| p.relatedobjects.add(self) }
         end
 
         # (?) set "tag" to component instance name?
         # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
 
-
-        # get properties from su object and add them to ifc object
+        # get attributes from su object and add them to IfcProduct
         if definition.attribute_dictionaries && definition.attribute_dictionaries[ifc_version] && props_ifc = definition.attribute_dictionaries[ifc_version].attribute_dictionaries
           props_ifc.each do |prop_dict|
             prop = prop_dict.name
@@ -83,9 +78,7 @@ module BimTools
               end
 
               # Don't fill empty properties
-              if dict_value.nil? || (dict_value.is_a?(String) && dict_value.empty?)
-                next
-              end
+              next if dict_value.nil? || (dict_value.is_a?(String) && dict_value.empty?)
 
               if attribute_type == 'choice'
                 # Skip this attribute, this is not a value but a reference
@@ -120,8 +113,11 @@ module BimTools
                 send("#{prop.downcase}=", value_entity)
               end
             elsif !@type_product && (prop_dict.attribute_dictionaries && prop_dict.name != 'instanceAttributes')
-              rel_defines = BimTools::IfcManager.create_propertyset(ifc_model, prop_dict)
-              rel_defines.relatedobjects.add(self) if rel_defines
+              if propertyset = BimTools::IfcManager.create_propertyset(ifc_model, prop_dict)
+                rel_defines = @ifc::IfcRelDefinesByProperties.new(ifc_model)
+                rel_defines.relatingpropertydefinition = propertyset
+                rel_defines.relatedobjects.add(self)
+              end
             end
           end
         end
@@ -131,7 +127,7 @@ module BimTools
 
         # set material if sketchup @su_object has a material
         # Material added to Product and not to TypeProduct because a Sketchup ComponentDefinition can have a different material for every Instance
-        if ifc_model.options[:materials] && !((is_a? IfcFeatureElementSubtraction) || (is_a? IfcVirtualElement) || (is_a? IfcSpatialStructureElement))
+        if ifc_model.options[:materials] && !((is_a? @ifc::IfcFeatureElementSubtraction) || (is_a? @ifc::IfcVirtualElement) || (is_a? @ifc::IfcSpatialStructureElement))
           material_name = if @su_object.material
                             @su_object.material.display_name
                           else
@@ -142,7 +138,7 @@ module BimTools
           unless ifc_model.materials[material_name]
 
             # create new materialassociation
-            ifc_model.materials[material_name] = IfcRelAssociatesMaterial.new(ifc_model, material_name)
+            ifc_model.materials[material_name] = @ifc::IfcRelAssociatesMaterial.new(ifc_model, material_name)
 
           end
 
@@ -186,26 +182,26 @@ module BimTools
       # '@representation' is set to IfcLabel as default because the Sketchup attribute value is ''
 
       # set representation based on definition
-      @representation = IfcProductDefinitionShape.new(@ifc_model, definition)
+      @representation = @ifc::IfcProductDefinitionShape.new(@ifc_model, definition)
 
       shape_representation = @representation.representations.first
 
       # Check if Mapped representation should be used
       if shape_representation.representationtype.value == 'MappedRepresentation'
-        mapped_item = IfcMappedItem.new(@ifc_model)
-        target = IfcCartesianTransformationOperator3D.new(@ifc_model)
-        target.localorigin = IfcCartesianPoint.new(@ifc_model, Geom::Point3d.new)
+        mapped_item = @ifc::IfcMappedItem.new(@ifc_model)
+        target = @ifc::IfcCartesianTransformationOperator3D.new(@ifc_model)
+        target.localorigin = @ifc::IfcCartesianPoint.new(@ifc_model, Geom::Point3d.new)
         definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
         definition_representation = definition_manager.get_representation(faces, transformation, su_material)
         mapped_item.mappingsource = definition_representation.representationmap
         mapped_item.mappingtarget = target
         shape_representation.items.add(mapped_item)
       else
-        brep = IfcFacetedBrep.new(@ifc_model, faces, transformation)
+        brep = @ifc::IfcFacetedBrep.new(@ifc_model, faces, transformation)
         shape_representation.items.add(brep)
 
         # add color from su-object material, or a su_parent's
-        IfcStyledItem.new(@ifc_model, brep, su_material) if @ifc_model.options[:colors]
+        @ifc::IfcStyledItem.new(@ifc_model, brep, su_material) if @ifc_model.options[:colors]
       end
 
       # set layer
@@ -215,7 +211,8 @@ module BimTools
         unless @ifc_model.layers[@su_object.layer.name]
 
           # create new IfcPresentationLayerAssignment
-          @ifc_model.layers[@su_object.layer.name] = IfcPresentationLayerAssignment.new(@ifc_model, @su_object.layer)
+          @ifc_model.layers[@su_object.layer.name] =
+            @ifc::IfcPresentationLayerAssignment.new(@ifc_model, @su_object.layer)
         end
 
         # add self to IfcPresentationLayerAssignment
@@ -251,18 +248,28 @@ module BimTools
           if ifc_model.classifications.keys.include?(attr_dict.name)
             ifc_classification = ifc_model.classifications[attr_dict.name]
           else
-            ifc_classification = IfcClassification.new(ifc_model)
+            ifc_classification = @ifc::IfcClassification.new(ifc_model)
             ifc_model.classifications[attr_dict.name] = ifc_classification
             classification_properties = skc_reader.properties
-            if classification_properties.key?('creator')
+            if classification_properties.key?('creator') && !classification_properties.creator.empty?
               ifc_classification.source = BimTools::IfcManager::IfcLabel.new(ifc_model,
                                                                              classification_properties.creator)
+            # Workaround mandatory value for IFC2x3
+            elsif BimTools::IfcManager::Settings.ifc_version == 'IFC 2x3'
+              ifc_classification.source = BimTools::IfcManager::IfcLabel.new(ifc_model, 'unknown')
             end
-            if classification_properties.key?('edition')
+            if classification_properties.key?('edition') && !classification_properties.edition.empty?
               ifc_classification.edition = BimTools::IfcManager::IfcLabel.new(ifc_model,
                                                                               classification_properties.edition)
+
+            # Workaround mandatory value for IFC2x3
+            elsif BimTools::IfcManager::Settings.ifc_version == 'IFC 2x3'
+              ifc_classification.edition = BimTools::IfcManager::IfcLabel.new(ifc_model, 'unknown')
             end
-            # ifc_classification.editiondate
+            if classification_properties.key?('editiondate') && !classification_properties.editiondate.empty?
+              ifc_classification.editiondate = BimTools::IfcManager::IfcLabel.new(ifc_model,
+                                                                              classification_properties.editiondate)
+            end
             ifc_classification.name = BimTools::IfcManager::IfcLabel.new(ifc_model, attr_dict.name)
           end
 
@@ -277,11 +284,11 @@ module BimTools
           ifc_classification_reference = ifc_classification.ifc_classification_references[attributes[0]]
           next if ifc_classification_reference
 
-          ifc_classification_reference = IfcClassificationReference.new(ifc_model)
+          ifc_classification_reference = @ifc::IfcClassificationReference.new(ifc_model)
           # ifc_classification_reference.location = ""
 
           # Catch IFC4 changes
-          if IfcClassificationReference.method_defined?(:itemreference)
+          if @ifc::IfcClassificationReference.method_defined?(:itemreference)
             ifc_classification_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(ifc_model,
                                                                                                  attributes[0])
           else
@@ -295,7 +302,7 @@ module BimTools
           ifc_classification.ifc_classification_references[attributes[0]] = ifc_classification_reference
 
           # create IfcRelAssociatesClassification
-          rel = IfcRelAssociatesClassification.new(ifc_model)
+          rel = @ifc::IfcRelAssociatesClassification.new(ifc_model)
           rel.relatedobjects = BimTools::IfcManager::Ifc_Set.new([self])
           rel.relatingclassification = ifc_classification_reference
           ifc_classification_reference.ifc_rel_associates_classification = rel

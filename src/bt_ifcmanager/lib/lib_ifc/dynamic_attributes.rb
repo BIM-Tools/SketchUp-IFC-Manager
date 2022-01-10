@@ -28,9 +28,10 @@ require_relative 'IfcReal'
 
 module BimTools
   module DynamicAttributes
-    include BimTools::IfcManager::Settings.ifc_module
+    
 
     def self.get_dynamic_attributes(ifc_model, ifc_object)
+      @ifc = BimTools::IfcManager::Settings.ifc_module
       @ifc_model = ifc_model
       instance = ifc_object.su_object
       definition = instance.definition
@@ -61,9 +62,9 @@ module BimTools
 
             # create new PropertySet with name pset_name
             unless pset_hash[pset_name]
-              reldef = IfcRelDefinesByProperties.new(ifc_model)
+              reldef = @ifc::IfcRelDefinesByProperties.new(ifc_model)
               reldef.relatedobjects.add(ifc_object)
-              pset = IfcPropertySet.new(ifc_model, attr_dict)
+              pset = @ifc::IfcPropertySet.new(ifc_model, attr_dict)
               pset.name = BimTools::IfcManager::IfcLabel.new(ifc_model, pset_name)
               pset.hasproperties = IfcManager::Ifc_Set.new
               reldef.relatingpropertydefinition = pset
@@ -71,7 +72,7 @@ module BimTools
             end
 
             # create Property with name prop_name
-            property = IfcPropertySingleValue.new(ifc_model)
+            property = @ifc::IfcPropertySingleValue.new(ifc_model)
             property.name = BimTools::IfcManager::IfcLabel.new(ifc_model, prop_name)
             property.nominalvalue = get_dynamic_attribute_value(instance, key)
             property.nominalvalue.long = true if property.nominalvalue
@@ -87,9 +88,9 @@ module BimTools
 
               # create new PropertySet with name "SU_DynamicAttributes"
               unless pset_hash['SU_DynamicAttributes']
-                reldef = IfcRelDefinesByProperties.new(ifc_model)
+                reldef = @ifc::IfcRelDefinesByProperties.new(ifc_model)
                 reldef.relatedobjects.add(ifc_object)
-                pset = IfcPropertySet.new(ifc_model, attr_dict)
+                pset = @ifc::IfcPropertySet.new(ifc_model, attr_dict)
                 pset.name = BimTools::IfcManager::IfcLabel.new(ifc_model, 'SU_DynamicAttributes')
                 pset.hasproperties = IfcManager::Ifc_Set.new
                 reldef.relatingpropertydefinition = pset
@@ -97,7 +98,7 @@ module BimTools
               end
 
               # create Property with name prop_name
-              property = IfcPropertySingleValue.new(ifc_model)
+              property = @ifc::IfcPropertySingleValue.new(ifc_model)
               property.name = BimTools::IfcManager::IfcLabel.new(ifc_model, prop_name)
               property.nominalvalue = get_dynamic_attribute_value(instance, key)
               property.nominalvalue.long = true if property.nominalvalue

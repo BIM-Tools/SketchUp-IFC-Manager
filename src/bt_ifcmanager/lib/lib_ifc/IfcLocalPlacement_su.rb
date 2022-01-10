@@ -21,12 +21,13 @@
 
 module BimTools
   module IfcLocalPlacement_su
-    include BimTools::IfcManager::Settings.ifc_module
+    
 
     attr_accessor :transformation, :ifc_total_transformation
 
     def initialize(ifc_model, su_total_transformation = nil, placementrelto = nil)
       super
+      @ifc = BimTools::IfcManager::Settings.ifc_module
 
       # set parent placement
       @placementrelto = placementrelto # if placementrelto.is_a?(IfcLocalPlacement)
@@ -57,7 +58,7 @@ module BimTools
                           end
 
         # set relativeplacement
-        @relativeplacement = IfcAxis2Placement3D.new(ifc_model, @transformation)
+        @relativeplacement = @ifc::IfcAxis2Placement3D.new(ifc_model, @transformation)
       end
     end
   end
