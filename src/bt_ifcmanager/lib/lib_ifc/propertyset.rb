@@ -34,7 +34,6 @@ require_relative 'IfcVolumeMeasure'
 
 module BimTools
   module IfcManager
-
     # Create quantity and propertysets from attribute dictionaries
     #
     # @param ifc_model [IfcModel] The model to which to add the properties
@@ -48,33 +47,33 @@ module BimTools
           attr_dict.attribute_dictionaries.each do |qty_dict|
             next unless qty_dict['value']
 
-            case qty_dict.name
-            when 'Area', 'GrossArea'
+            case qty_dict.name.upcase
+            when /AREA/
               prop = @ifc::IfcQuantityArea.new(ifc_model, attr_dict)
               prop.name = BimTools::IfcManager::IfcIdentifier.new(ifc_model, qty_dict.name)
               prop.areavalue = BimTools::IfcManager::IfcAreaMeasure.new(ifc_model, qty_dict['value'])
-              qty.quantities.add(prop)
-            when 'Volume'
+              quantities.add(prop)
+            when /VOLUME/
               prop = @ifc::IfcQuantityVolume.new(ifc_model, attr_dict)
-              prop.name = BimTools::IfcManager::IfcIdentifier.new(qty_dict.name)
+              prop.name = BimTools::IfcManager::IfcIdentifier.new(ifc_model, qty_dict.name)
               prop.volumevalue = BimTools::IfcManager::IfcVolumeMeasure.new(ifc_model, qty_dict['value'])
-              qty.quantities.add(prop)
-            when 'Width', 'Height', 'Depth', 'Perimeter'
+              quantities.add(prop)
+            when /LENGTH/, /WIDTH/, /HEIGHT/, /DEPTH/, /PERIMETER/
               prop = @ifc::IfcQuantityLength.new(ifc_model, attr_dict)
-              prop.name = BimTools::IfcManager::IfcIdentifier.new(qty_dict.name)
+              prop.name = BimTools::IfcManager::IfcIdentifier.new(ifc_model, qty_dict.name)
               prop.lengthvalue = BimTools::IfcManager::IfcLengthMeasure.new(ifc_model, qty_dict['value'])
-              qty.quantities.add(prop)
-              # else
+              quantities.add(prop)
             end
           end
 
           # Create ElementQuantity if there are any quantities to export
           unless quantities.empty?
-            @relatingpropertydefinition = @ifc::IfcElementQuantity.new(ifc_model, attr_dict)
+            elementquantity = @ifc::IfcElementQuantity.new(ifc_model, attr_dict)
             unless attr_dict.name.nil?
-              @relatingpropertydefinition.name = BimTools::IfcManager::IfcLabel.new(ifc_model, attr_dict.name)
+              elementquantity.name = BimTools::IfcManager::IfcLabel.new(ifc_model, attr_dict.name)
             end
-            @relatingpropertydefinition.quantities = quantities
+            elementquantity.quantities = quantities
+            return elementquantity
           end
 
         else # export as propertyset
