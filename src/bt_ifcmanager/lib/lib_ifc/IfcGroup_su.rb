@@ -48,51 +48,45 @@ module BimTools
         # also set "tag" to component instance name?
         # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
 
+
+        # get attributes from su object and add them to IfcProduct
         if definition.attribute_dictionaries && definition.attribute_dictionaries[ifc_version] && props_ifc = definition.attribute_dictionaries[ifc_version].attribute_dictionaries
-          props_ifc.each do |prop_dict|
-            prop = prop_dict.name
-            prop_sym = prop.to_sym
-            if attributes.include? prop_sym
-
-              property_reader = BimTools::PropertyReader.new(prop_dict)
-              dict_value = property_reader.value
-              value_type = property_reader.value_type
-              attribute_type = property_reader.attribute_type
-
-              if attribute_type == 'choice'
-                # Skip this attribute, this is not a value but a reference
-              elsif attribute_type == 'enumeration'
-                send("#{prop.downcase}=", dict_value)
-              else
-                entity_type = false
-                if value_type
-                  begin
-                    entity_type = BimTools::IfcManager.const_get(value_type)
-                    value_entity = entity_type.new(dict_value)
-                  rescue StandardError => e
-                    puts "Error creating IfcGroup property value: #{value_type}, #{e}"
-                  end
-                end
-                unless entity_type
-
-                  value_entity = case attribute_type
-                                 when 'boolean'
-                                   BimTools::IfcManager::IfcBoolean.new(ifc_model, dict_value)
-                                 when 'double'
-                                   BimTools::IfcManager::IfcReal.new(ifc_model, dict_value)
-                                 when 'long'
-                                   BimTools::IfcManager::IfcInteger.new(ifc_model, dict_value)
-                                 else # "string" and others?
-                                   BimTools::IfcManager::IfcLabel.new(ifc_model, dict_value)
-                                 end
-                end
-                send("#{prop.downcase}=", value_entity)
-              end
-            elsif prop_dict.attribute_dictionaries && prop_dict.name != 'instanceAttributes'
-              rel_defines = BimTools::IfcManager.create_propertyset(ifc_model, attr_dict)
-              rel_defines.relatedobjects.add(self) if rel_defines
+          dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(ifc_model, self, props_ifc)
+          dict_reader.set_attributes()
+          propertysets = dict_reader.get_propertysets()
+          i = 0
+          while(i < propertysets.length)
+            rel_defines = propertysets[i]
+            if rel_defines
+              rel_defines.relatedobjects.add(self)
             end
+            i+=1
           end
+
+          # (!) TODO
+          # Add ifc_model.options[:attributes] as parameter to dict_reader.set_properties()
+          # 
+          #
+          # if ifc_model.options[:attributes]
+          #   ifc_model.options[:attributes].each do |attr_dict_name|
+          #     # Only add definition propertysets when no TypeProduct is set
+          #     collect_psets(ifc_model, @su_object.definition.attribute_dictionary(attr_dict_name)) unless @type_product
+          #     collect_psets(ifc_model, @su_object.attribute_dictionary(attr_dict_name))
+          #   end
+          # else
+
+          # # Only add definition propertysets when no TypeProduct is set
+          # if !@type_product
+          #   @su_object.definition.attribute_dictionaries.each do |attr_dict|
+          #     collect_psets(ifc_model, attr_dict)
+          #   end
+          # end
+          # if @su_object.attribute_dictionaries
+          #   @su_object.attribute_dictionaries.each do |attr_dict|
+          #     collect_psets(ifc_model, attr_dict)
+          #   end
+          # end
+          
         end
       end
     end

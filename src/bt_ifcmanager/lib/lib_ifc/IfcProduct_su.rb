@@ -57,73 +57,50 @@ module BimTools
           @type_product.add_typed_object(self)
         end
 
+        # (?) set name, here? is this a duplicate?
+        @name = BimTools::IfcManager::IfcLabel.new(ifc_model, @su_object.name)
+        
         # (?) set "tag" to component instance name?
         # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
 
         # get attributes from su object and add them to IfcProduct
         if definition.attribute_dictionaries && definition.attribute_dictionaries[ifc_version] && props_ifc = definition.attribute_dictionaries[ifc_version].attribute_dictionaries
-          props_ifc.each do |prop_dict|
-            prop = prop_dict.name
-            if attributes.include? prop.to_sym
-
-              if prop['value']
-                dict_value = prop['value']
-                value_type = nil
-                attribute_type = nil
-              else
-                property_reader = BimTools::PropertyReader.new(prop_dict)
-                dict_value = property_reader.value
-                value_type = property_reader.value_type
-                attribute_type = property_reader.attribute_type
-              end
-
-              # Don't fill empty properties
-              next if dict_value.nil? || (dict_value.is_a?(String) && dict_value.empty?)
-
-              if attribute_type == 'choice'
-                # Skip this attribute, this is not a value but a reference
-              elsif attribute_type == 'enumeration'
-                send("#{prop.downcase}=", dict_value.to_sym)
-              else
-                entity_type = false
-                if value_type
-                  begin
-                    valid_type = BimTools::IfcManager.const_defined?(value_type)
-                  rescue NameError
-                    # Skip all attributes that cannot be converted to a constant
-                    next
-                  end
-
-                  if valid_type
-                    entity_type = BimTools::IfcManager.const_get(value_type)
-                    value_entity = entity_type.new(ifc_model, dict_value)
-                  end
-                else
-                  value_entity = case attribute_type
-                                 when 'boolean'
-                                   BimTools::IfcManager::IfcBoolean.new(ifc_model, dict_value)
-                                 when 'double'
-                                   BimTools::IfcManager::IfcReal.new(ifc_model, dict_value)
-                                 when 'long'
-                                   BimTools::IfcManager::IfcInteger.new(ifc_model, dict_value)
-                                 else # "string" and others?
-                                   BimTools::IfcManager::IfcLabel.new(ifc_model, dict_value)
-                                 end
-                end
-                send("#{prop.downcase}=", value_entity)
-              end
-            elsif !@type_product && (prop_dict.attribute_dictionaries && prop_dict.name != 'instanceAttributes')
-              if propertyset = BimTools::IfcManager.create_propertyset(ifc_model, prop_dict)
-                rel_defines = @ifc::IfcRelDefinesByProperties.new(ifc_model)
-                rel_defines.relatingpropertydefinition = propertyset
-                rel_defines.relatedobjects.add(self)
-              end
+          dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(ifc_model, self, props_ifc)
+          dict_reader.set_attributes()
+          propertysets = dict_reader.get_propertysets()
+          i = 0
+          while(i < propertysets.length)
+            if rel_defines = propertysets[i]
+              rel_defines.relatedobjects.add(self)
             end
+            i+=1
           end
-        end
 
-        # (?) set name, here? is this a duplicate?
-        @name = BimTools::IfcManager::IfcLabel.new(ifc_model, @su_object.name)
+          # (!) TODO
+          # Add ifc_model.options[:attributes] as parameter to dict_reader.set_properties()
+          # 
+          #
+          # if ifc_model.options[:attributes]
+          #   ifc_model.options[:attributes].each do |attr_dict_name|
+          #     # Only add definition propertysets when no TypeProduct is set
+          #     collect_psets(ifc_model, @su_object.definition.attribute_dictionary(attr_dict_name)) unless @type_product
+          #     collect_psets(ifc_model, @su_object.attribute_dictionary(attr_dict_name))
+          #   end
+          # else
+
+          # # Only add definition propertysets when no TypeProduct is set
+          # if !@type_product
+          #   @su_object.definition.attribute_dictionaries.each do |attr_dict|
+          #     collect_psets(ifc_model, attr_dict)
+          #   end
+          # end
+          # if @su_object.attribute_dictionaries
+          #   @su_object.attribute_dictionaries.each do |attr_dict|
+          #     collect_psets(ifc_model, attr_dict)
+          #   end
+          # end
+          
+        end
 
         # set material if sketchup @su_object has a material
         # Material added to Product and not to TypeProduct because a Sketchup ComponentDefinition can have a different material for every Instance
@@ -150,73 +127,7 @@ module BimTools
         # collect dynamic component attributes if export option is set
         BimTools::DynamicAttributes.get_dynamic_attributes(ifc_model, self) if ifc_model.options[:dynamic_attributes]
 
-        if ifc_model.options[:attributes]
-          ifc_model.options[:attributes].each do |attr_dict_name|
-            # Only add propertysets when no type
-            collect_psets(ifc_model, @su_object.definition.attribute_dictionary(attr_dict_name)) unless @type_product
-            collect_psets(ifc_model, @su_object.attribute_dictionary(attr_dict_name))
-          end
-        else
-
-          # Only add definition propertysets when no TypeProduct is set
-          if !@type_product && @su_object.definition.attribute_dictionaries
-            @su_object.definition.attribute_dictionaries.each do |attr_dict|
-              collect_psets(ifc_model, attr_dict)
-            end
-          end
-          if @su_object.attribute_dictionaries
-            @su_object.attribute_dictionaries.each do |attr_dict|
-              collect_psets(ifc_model, attr_dict)
-            end
-          end
-        end
         collect_classifications(ifc_model, definition)
-      end
-    end
-
-    # Add representation to the IfcProduct, transform geometry with given transformation
-    # @param [Sketchup::Transformation] transformation
-    def create_representation(definition, faces, transformation, su_material)
-      definition = @su_object.definition
-
-      # '@representation' is set to IfcLabel as default because the Sketchup attribute value is ''
-
-      # set representation based on definition
-      @representation = @ifc::IfcProductDefinitionShape.new(@ifc_model, definition)
-
-      shape_representation = @representation.representations.first
-
-      # Check if Mapped representation should be used
-      if shape_representation.representationtype.value == 'MappedRepresentation'
-        mapped_item = @ifc::IfcMappedItem.new(@ifc_model)
-        target = @ifc::IfcCartesianTransformationOperator3D.new(@ifc_model)
-        target.localorigin = @ifc::IfcCartesianPoint.new(@ifc_model, Geom::Point3d.new)
-        definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
-        definition_representation = definition_manager.get_representation(faces, transformation, su_material)
-        mapped_item.mappingsource = definition_representation.representationmap
-        mapped_item.mappingtarget = target
-        shape_representation.items.add(mapped_item)
-      else
-        brep = @ifc::IfcFacetedBrep.new(@ifc_model, faces, transformation)
-        shape_representation.items.add(brep)
-
-        # add color from su-object material, or a su_parent's
-        @ifc::IfcStyledItem.new(@ifc_model, brep, su_material) if @ifc_model.options[:colors]
-      end
-
-      # set layer
-      if @ifc_model.options[:layers]
-
-        # check if IfcPresentationLayerAssignment exists
-        unless @ifc_model.layers[@su_object.layer.name]
-
-          # create new IfcPresentationLayerAssignment
-          @ifc_model.layers[@su_object.layer.name] =
-            @ifc::IfcPresentationLayerAssignment.new(@ifc_model, @su_object.layer)
-        end
-
-        # add self to IfcPresentationLayerAssignment
-        @ifc_model.layers[@su_object.layer.name].assigneditems.add(shape_representation)
       end
     end
 

@@ -34,10 +34,7 @@ module BimTools
       @ifc = BimTools::IfcManager::Settings.ifc_module
       @definition = definition
       ifc_version = BimTools::IfcManager::Settings.ifc_version
-      @haspropertysets = BimTools::IfcManager::Ifc_Set.new
-
-      # Set PredefinedType to default value if it exists
-      @predefinedtype = :notdefined if attributes.include? :PredefinedType
+      haspropertysets = BimTools::IfcManager::Ifc_Set.new
 
       @rel_defines_by_type = @ifc::IfcRelDefinesByType.new(@ifc_model)
       @rel_defines_by_type.relatingtype = self
@@ -45,72 +42,17 @@ module BimTools
 
       # (!) duplicate code with IfcProduct_su
 
+      @name = BimTools::IfcManager::IfcLabel.new(ifc_model, definition.name)
+      @globalid = BimTools::IfcManager::IfcGloballyUniqueId.new(definition)
+
       # (?) set "tag" to component instance name?
       # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
 
       # get attributes from su object and add them to IfcTypeProduct
       if definition.attribute_dictionaries && definition.attribute_dictionaries[ifc_version] && props_ifc = definition.attribute_dictionaries[ifc_version].attribute_dictionaries
-        props_ifc.each do |prop_dict|
-          prop = prop_dict.name
-          if attributes.include? prop.to_sym
-
-            if prop['value']
-              dict_value = prop['value']
-              value_type = nil
-              attribute_type = nil
-            else
-              property_reader = BimTools::PropertyReader.new(prop_dict)
-              dict_value = property_reader.value
-              value_type = property_reader.value_type
-              attribute_type = property_reader.attribute_type
-            end
-
-            # Don't fill empty properties
-            next if dict_value.nil? || (dict_value.is_a?(String) && dict_value.empty?)
-
-            if attribute_type == 'choice'
-              # Skip this attribute, this is not a value but a reference
-            elsif attribute_type == 'enumeration'
-              send("#{prop.downcase}=", dict_value.to_sym)
-            else
-              entity_type = false
-              if value_type
-                begin
-                  valid_type = BimTools::IfcManager.const_defined?(value_type)
-                rescue NameError
-                  # Skip all attributes that cannot be converted to a constant
-                  next
-                end
-
-                if valid_type
-                  entity_type = BimTools::IfcManager.const_get(value_type)
-                  value_entity = entity_type.new(ifc_model, dict_value)
-                end
-              else
-                value_entity = case attribute_type
-                               when 'boolean'
-                                 BimTools::IfcManager::IfcBoolean.new(ifc_model, dict_value)
-                               when 'double'
-                                 BimTools::IfcManager::IfcReal.new(ifc_model, dict_value)
-                               when 'long'
-                                 BimTools::IfcManager::IfcInteger.new(ifc_model, dict_value)
-                               else # "string" and others?
-                                 BimTools::IfcManager::IfcLabel.new(ifc_model, dict_value)
-                               end
-              end
-              send("#{prop.downcase}=", value_entity)
-            end
-          elsif ifc_product.attributes.include? prop.to_sym
-            next
-          elsif prop_dict.attribute_dictionaries && prop_dict.name != 'instanceAttributes'
-            propertyset = BimTools::IfcManager.create_propertyset(ifc_model, prop_dict)
-            @haspropertysets.add(propertyset) if propertyset
-          end
-        end
+        dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(ifc_model, self, props_ifc)
+        dict_reader.set_attributes()
       end
-
-      @name = BimTools::IfcManager::IfcLabel.new(ifc_model, definition.name)
-      @globalid = BimTools::IfcManager::IfcGloballyUniqueId.new(definition)
 
       if ifc_model.options[:attributes]
         ifc_model.options[:attributes].each do |attr_dict_name|
@@ -121,6 +63,17 @@ module BimTools
           collect_psets(ifc_model, attr_dict)
         end
       end
+
+      # Only set property when not empty
+      if haspropertysets.length > 0
+        @haspropertysets = haspropertysets
+      end
+
+      # Set PredefinedType to default value when not set
+      if defined?(predefinedtype) && @predefinedtype.nil?
+        @predefinedtype = :notdefined
+      end
+
       collect_classifications(ifc_model, definition)
     end
 
@@ -131,7 +84,7 @@ module BimTools
     def collect_psets(ifc_model, attr_dict)
       if attr_dict.is_a?(Sketchup::AttributeDictionary) && !((attr_dict.name == 'AppliedSchemaTypes') || ifc_model.su_model.classifications[attr_dict.name])
         rel_defines = BimTools::IfcManager.create_propertyset(ifc_model, attr_dict)
-        @haspropertysets.add(propertyset) if rel_defines
+        haspropertysets.add(propertyset) if rel_defines
         if attr_dict.attribute_dictionaries
           attr_dict.attribute_dictionaries.each do |sub_attr_dict|
             collect_psets(ifc_model, sub_attr_dict)

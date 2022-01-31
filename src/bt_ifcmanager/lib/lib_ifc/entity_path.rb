@@ -108,8 +108,8 @@ module BimTools::IfcManager
           # insert_after(ifc_entity,@ifc::IfcSpace)
           @entity_path[path_types.rindex(@ifc::IfcSpace)] = ifc_entity
         elsif entity_path_types.include? @ifc::IfcBuildingStorey
-          # insert_after(ifc_entity,@ifc::IfcBuildingStorey)
-          @entity_path[path_types.rindex(@ifc::IfcBuildingStorey)] = ifc_entity
+          insert_after(ifc_entity,@ifc::IfcBuildingStorey)
+          # @entity_path[path_types.rindex(@ifc::IfcBuildingStorey)] = ifc_entity
         elsif entity_path_types.include? @ifc::IfcSite
           # Add as outside space
           # insert_after(ifc_entity,@ifc::IfcSite)
@@ -126,7 +126,7 @@ module BimTools::IfcManager
           add_default_spatialelement(@ifc::IfcBuildingStorey)
         end
         @entity_path << ifc_entity
-      else # IfcProduct
+      else # IfcProduct, IfcGroup
 
         # don't add but check for basic spatial hierarchy
         if (entity_path_types & [@ifc::IfcSpace, @ifc::IfcBuildingStorey, @ifc::IfcSite]).empty?
@@ -149,7 +149,7 @@ module BimTools::IfcManager
       unless parent.default_related_object
         default_parent = entity_class.new(@ifc_model)
         default_parent.name = BimTools::IfcManager::IfcLabel.new(@ifc_model,
-                                                                 'default ' << entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(' ').downcase)
+                                                                'default ' << entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(' ').downcase)
 
         # Add ObjectPlacement
         default_parent.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model)

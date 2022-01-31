@@ -32,7 +32,7 @@ module BimTools
       @ifc = BimTools::IfcManager::Settings.ifc_module
 
       # Check if Mapped representation should be used
-      if (ifc_model.options[:mapped_items]) && (sketchup.count_instances > 1)
+      if ifc_model.options[:mapped_items] # && (sketchup.count_instances > 1) # (?) Always use mapped items? also for objects that are used only once?
         representationtype = BimTools::IfcManager::IfcLabel.new(ifc_model, "MappedRepresentation" )
       else
         representationtype = BimTools::IfcManager::IfcLabel.new(ifc_model, "Brep" )

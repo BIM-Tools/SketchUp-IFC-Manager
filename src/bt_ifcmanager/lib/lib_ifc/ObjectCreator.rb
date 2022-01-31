@@ -181,10 +181,61 @@ module BimTools::IfcManager
       # create geometry from faces
       # (!) skips any geometry placed inside objects NOT of the type IfcProduct
       unless faces.empty?
-        if ifc_entity
-          ifc_entity.create_representation(definition, faces, brep_transformation, su_material)
+        case ifc_entity
+
+        # IfcZone is a special kind of IfcGroup that can only include IfcSpace objects
+        when @ifc::IfcZone
+          sub_entity = @ifc::IfcSpace.new(@ifc_model, nil)
+          sub_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'default space')
+          definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+          sub_entity.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
+          sub_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
+
+          if sub_entity.respond_to?(:compositiontype=)
+            sub_entity.compositiontype = :element
+          end
+          if sub_entity.respond_to?(:interiororexteriorspace=)
+            sub_entity.interiororexteriorspace = :notdefined
+          end
+
+          # Add to spatial hierarchy
+          @entity_path.add(sub_entity)
+          @entity_path.set_parent(sub_entity)
+
+          # Add created space to the zone
+          ifc_entity.add(sub_entity)
+
+        when @ifc::IfcProject
+          sub_entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
+          sub_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'default building element')
+          definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+          sub_entity.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
+          sub_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
+
+          # Add to spatial hierarchy
+          @entity_path.add(sub_entity)
+          @entity_path.set_parent(sub_entity)
+
+        # An IfcGroup or IfcProject has no geometry so all Sketchup geometry is embedded in a IfcBuildingElementProxy
+        #   IfcGroup is also the supertype of IfcSystem
+        #   (?) mapped items?
+        when @ifc::IfcGroup
+          sub_entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
+          sub_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'default building element')
+          definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+          sub_entity.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
+          sub_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
+
+          # Add to spatial hierarchy
+          @entity_path.add(sub_entity)
+          @entity_path.set_parent(sub_entity)
+          ifc_entity.add(sub_entity)
+        when ifc_entity.nil? # (?) does this ever occur?
+          definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+          placement_parent.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
         else
-          ifc_entity.parent.create_representation(definition, faces, brep_transformation, su_material)
+          definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+          ifc_entity.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
         end
       end
     end

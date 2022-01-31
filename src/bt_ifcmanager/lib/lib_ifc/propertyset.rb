@@ -99,27 +99,27 @@ module BimTools
               # end
 
               # Don't export empty properties
-              property_reader = BimTools::PropertyReader.new(prop_dict)
-              next unless dict_value = property_reader.value
+              property = BimTools::Property.new(prop_dict)
+              next unless dict_value = property.value
               next if dict_value.is_a?(String) && dict_value.empty?
 
-              value_type = property_reader.value_type
-              attribute_type = property_reader.attribute_type
+              value_type = property.value_type
+              attribute_type = property.attribute_type
 
               if attribute_type == 'enumeration'
                 prop = @ifc::IfcPropertyEnumeratedValue.new(ifc_model)
-                if property_reader.options
-                  enumeration_values = IfcManager::Ifc_List.new(property_reader.options.map do |item|
+                if property.options
+                  enumeration_values = IfcManager::Ifc_List.new(property.options.map do |item|
                                                                   BimTools::IfcManager::IfcLabel.new(ifc_model, item,
                                                                                                      true)
                                                                 end)
-                  if ifc_model.property_enumerations.key?(property_reader.value_type) && (ifc_model.property_enumerations[property_reader.value_type].enumerationvalues.step == enumeration_values.step)
-                    prop_enum = ifc_model.property_enumerations[property_reader.value_type]
+                  if ifc_model.property_enumerations.key?(property.value_type) && (ifc_model.property_enumerations[property.value_type].enumerationvalues.step == enumeration_values.step)
+                    prop_enum = ifc_model.property_enumerations[property.value_type]
                   else
                     prop_enum = @ifc::IfcPropertyEnumeration.new(ifc_model)
-                    prop_enum.name = BimTools::IfcManager::IfcLabel.new(ifc_model, property_reader.value_type)
+                    prop_enum.name = BimTools::IfcManager::IfcLabel.new(ifc_model, property.value_type)
                     prop_enum.enumerationvalues = enumeration_values
-                    ifc_model.property_enumerations[property_reader.value_type] = prop_enum
+                    ifc_model.property_enumerations[property.value_type] = prop_enum
                   end
                   prop.enumerationreference = prop_enum
                 end
