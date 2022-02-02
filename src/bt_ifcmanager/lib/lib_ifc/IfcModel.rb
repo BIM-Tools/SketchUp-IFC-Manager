@@ -40,7 +40,7 @@ module BimTools
       # - add_ifc_object
 
       attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications,
-                    :classificationassociations, :product_types, :property_enumerations
+      :classificationassociations, :product_types, :property_enumerations
       attr_reader :su_model, :project, :ifc_objects, :export_summary, :options, :su_entities, :units,
                   :default_location, :default_axis, :default_refdirection, :default_placement, :representation_manager
 
@@ -250,13 +250,24 @@ module BimTools
         end
 
         # create a single IfcBuildingelementProxy from all 'loose' faces in the model
-        unless faces.empty?
+        unless faces.empty?          
+          if @project.name
+            sub_entity_name = "#{@project.name.value} geometry"
+          else
+            sub_entity_name = 'project geometry'
+          end
           ifc_entity = @ifc::IfcBuildingElementProxy.new(self, nil)
-          ifc_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'default building element')
+          ifc_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, sub_entity_name)
           ifc_entity.representation = @ifc::IfcProductDefinitionShape.new(self, nil)
           brep = @ifc::IfcFacetedBrep.new(self, faces, Geom::Transformation.new)
           ifc_entity.representation.representations.first.items.add(brep)
           ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(self, Geom::Transformation.new)
+          if ifc_entity.respond_to?(:predefinedtype=)
+            ifc_entity.predefinedtype = :notdefined
+          end
+          if ifc_entity.respond_to?(:compositiontype=)
+            ifc_entity.compositiontype = :element
+          end
 
           # Add to spatial hierarchy
           entity_path.add(ifc_entity)
