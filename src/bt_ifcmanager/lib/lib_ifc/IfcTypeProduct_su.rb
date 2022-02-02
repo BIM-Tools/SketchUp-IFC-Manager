@@ -34,7 +34,7 @@ module BimTools
       @ifc = BimTools::IfcManager::Settings.ifc_module
       @definition = definition
       ifc_version = BimTools::IfcManager::Settings.ifc_version
-      haspropertysets = BimTools::IfcManager::Ifc_Set.new
+      @propertysets = BimTools::IfcManager::Ifc_Set.new
 
       @rel_defines_by_type = @ifc::IfcRelDefinesByType.new(@ifc_model)
       @rel_defines_by_type.relatingtype = self
@@ -64,10 +64,11 @@ module BimTools
         end
       end
 
-      # Only set property when not empty
-      if haspropertysets.length > 0
-        @haspropertysets = haspropertysets
-      end
+      # (?) Disable use of haspropertysets for Vico compatibility?
+      # # Only set property when not empty
+      # if @propertysets.length > 0
+      #   @haspropertysets = @propertysets
+      # end
 
       # Set PredefinedType to default value when not set
       if defined?(predefinedtype) && @predefinedtype.nil?
@@ -84,7 +85,10 @@ module BimTools
     def collect_psets(ifc_model, attr_dict)
       if attr_dict.is_a?(Sketchup::AttributeDictionary) && !((attr_dict.name == 'AppliedSchemaTypes') || ifc_model.su_model.classifications[attr_dict.name])
         rel_defines = BimTools::IfcManager.create_propertyset(ifc_model, attr_dict)
-        haspropertysets.add(propertyset) if rel_defines
+
+        # (?) Disable use of haspropertysets for Vico compatibility?
+        @propertysets.add(rel_defines) if rel_defines
+        # rel_defines.relatedobjects.add(self) if rel_defines
         if attr_dict.attribute_dictionaries
           attr_dict.attribute_dictionaries.each do |sub_attr_dict|
             collect_psets(ifc_model, sub_attr_dict)
