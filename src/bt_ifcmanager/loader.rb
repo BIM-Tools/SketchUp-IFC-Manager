@@ -65,7 +65,7 @@ module BimTools
 
     # Load settings from yaml file
     require File.join(PLUGIN_PATH, 'settings.rb')
-    Settings.load()
+    Settings.load_settings()
     
     require File.join(PLUGIN_PATH, 'window.rb')
     require File.join(PLUGIN_PATH, 'export.rb')

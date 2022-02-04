@@ -43,15 +43,16 @@ module BimTools
         @ifc_version = ifc_version
         ifc_version_compact = ifc_version.delete(' ').upcase
         if BimTools.const_defined?(ifc_version_compact)
-          puts "IFC version #{ifc_version} already loaded"
+          puts "#{ifc_version} already loaded"
+          @ifc_module = BimTools.const_get(ifc_version_compact)
         else
           @ifc_module = BimTools.const_set(ifc_version_compact, Module.new)
-          BimTools::IfcManager::Settings.ifc_version = ifc_version
-          BimTools::IfcManager::Settings.ifc_version_compact = ifc_version_compact
-          BimTools::IfcManager::Settings.ifc_module = @ifc_module
           create_ifcentity
           from_string(xsd_string) if xsd_string
         end
+        BimTools::IfcManager::Settings.ifc_version = ifc_version
+        BimTools::IfcManager::Settings.ifc_version_compact = ifc_version_compact
+        BimTools::IfcManager::Settings.ifc_module = @ifc_module
       end
 
       def from_file(xsd_path)

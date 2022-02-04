@@ -59,7 +59,7 @@ module BimTools::IfcManager
     @js_jquery = File.join(PLUGIN_PATH, 'js', 'jquery.min.js')
     @filters = {}
 
-    def load
+    def load_settings
       begin
         @options = YAML.load(File.read(@settings_file))
       rescue StandardError
@@ -78,15 +78,20 @@ module BimTools::IfcManager
       # Load export options from settings
       if @options[:export]
         @export_hidden =             CheckboxOption.new('hidden', 'Export hidden objects', @options[:export][:hidden])
-        @export_classifications =    CheckboxOption.new('classifications', 'Export classifications', @options[:export][:classifications])
-        @export_layers =             CheckboxOption.new('layers', 'Export tags/layers as IFC layers', @options[:export][:layers])
+        @export_classifications =    CheckboxOption.new('classifications', 'Export classifications',
+                                                        @options[:export][:classifications])
+        @export_layers =             CheckboxOption.new('layers', 'Export tags/layers as IFC layers',
+                                                        @options[:export][:layers])
         @export_materials =          CheckboxOption.new('materials', 'Export materials', @options[:export][:materials])
         @export_colors =             CheckboxOption.new('colors', 'Export colors', @options[:export][:colors])
         @export_geometry =           CheckboxOption.new('geometry', 'Export geometry', @options[:export][:geometry])
-        @export_fast_guid =          CheckboxOption.new('fast_guid', "Improve export speed by using fake GUID's", @options[:export][:fast_guid])
-        @export_dynamic_attributes = CheckboxOption.new('dynamic_attributes', 'Export dynamic attributes', @options[:export][:dynamic_attributes])
+        @export_fast_guid =          CheckboxOption.new('fast_guid', "Improve export speed by using fake GUID's",
+                                                        @options[:export][:fast_guid])
+        @export_dynamic_attributes = CheckboxOption.new('dynamic_attributes', 'Export dynamic attributes',
+                                                        @options[:export][:dynamic_attributes])
         @export_types =              CheckboxOption.new('types', 'Export IFC Type products', @options[:export][:types])
-        @export_mapped_items =       CheckboxOption.new('mapped_items', 'Export IFC mapped items', @options[:export][:mapped_items])
+        @export_mapped_items =       CheckboxOption.new('mapped_items', 'Export IFC mapped items',
+                                                        @options[:export][:mapped_items])
       end
     end
 
@@ -108,7 +113,7 @@ module BimTools::IfcManager
       File.open(@settings_file, 'w') { |file| file.write(@options.to_yaml) }
       @dialog.close
       PropertiesWindow.reload
-      load
+      load_settings
     end
 
     # Load skc and generate IFC classes
@@ -126,7 +131,6 @@ module BimTools::IfcManager
       unless @options[:load][:ifc_classifications].key? ifc_classification_name
         @options[:load][:ifc_classifications][ifc_classification_name] = true
       end
-      load_ifc_skc(@ifc_classification)
     end
 
     def unset_ifc_classification(ifc_classification_name)
@@ -263,7 +267,7 @@ module BimTools::IfcManager
           scrollable: true,
           resizable: true,
           width: 320,
-          height: 480,
+          height: 620,
           left: 200,
           top: 200,
           style: UI::HtmlDialog::STYLE_UTILITY
