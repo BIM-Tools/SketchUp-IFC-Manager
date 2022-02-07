@@ -50,6 +50,7 @@ module BimTools
         @ifc_model = ifc_model
         @su_object = sketchup
         definition = @su_object.definition
+        name = @su_object.name
 
         # Set IfcProductType
         if @ifc_model.product_types.key?(definition)
@@ -57,9 +58,11 @@ module BimTools
           @type_product.add_typed_object(self)
         end
 
+        # When instance name is set, use that, otherwise use definition name
         # (?) set name, here? is this a duplicate?
-        @name = BimTools::IfcManager::IfcLabel.new(ifc_model, @su_object.name)
-        
+        name = definition.name if name.length == 0
+        @name = BimTools::IfcManager::IfcLabel.new(ifc_model, name)
+
         # (?) set "tag" to component instance name?
         # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
 
