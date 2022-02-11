@@ -67,10 +67,7 @@ module BimTools
         definition = @su_object.definition
         
         #(?) set name, here? is this a duplicate?
-        @name = BimTools::IfcManager::IfcLabel.new(definition.name)
-
-        # also set "tag" to component instance name?
-        # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
+        @name = BimTools::IfcManager::IfcLabel.new( definition.name )
         
         if definition.attribute_dictionaries
           if definition.attribute_dictionaries["IFC 2x3"]
@@ -213,7 +210,7 @@ module BimTools
       end
       
       # add color from su-object material, or a su_parent's
-      if @ifc_model.options[:colors]
+      if @ifc_model.options[:styles]
         BimTools::IFC2X3::IfcStyledItem.new( @ifc_model, brep, su_material )
       end
         
@@ -305,9 +302,7 @@ module BimTools
           end #(mp) end of DIN 276-1 loop
           
           # temporarily allow only nlsfb classification
-		      #nlsfb_cls_names = ["NL-SfB tabel 1", "NL-SfB 2005, tabel 1"]
-          #if attr_dict.name.include? nlsfb_cls_names 
-          if attr_dict.name == "NL-SfB tabel 1"
+		  if attr_dict.name == "NL-SfB tabel 1 Classification"
             if su_model.classifications[ attr_dict.name ]
               
               # Create classifications if they don't exist
@@ -319,6 +314,7 @@ module BimTools
                 cls.edition = BimTools::IfcManager::IfcLabel.new("2005")
                 #cls.editiondate
                 cls.name = BimTools::IfcManager::IfcLabel.new( attr_dict.name )
+                
               end
               
               # retrieve classification value from su object
@@ -347,6 +343,7 @@ module BimTools
                     assoc.relatedobjects = BimTools::IfcManager::Ifc_Set.new( [self] )
                     assoc.relatingclassification = ifc_classification_reference
                     ifc_classification_reference.ifc_rel_associates_classification = assoc
+                    
                   end
                 end
               end

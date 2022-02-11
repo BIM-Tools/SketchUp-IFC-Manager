@@ -1,0 +1,1011 @@
+---
+- (0-) PROJECT TOTAAL
+- (0-.0) indirecte projectvoorzieningen
+- (0-.1) werkterreininrichtingen
+- (0-.10) indirecte projectvoorzieningen; werkterreininrichting, algemeen (verzamelniveau)
+- (0-.11) indirecte projectvoorzieningen; werkterreininrichting, bijkomende werken algemeen
+- (0-.12) indirecte projectvoorzieningen; werkterreininrichting, personen/materiaalvoorzieningen
+- (0-.13) indirecte projectvoorzieningen; werkterreininrichting, energievoorzieningen
+- (0-.14) indirecte projectvoorzieningen; werkterreininrichting, beveiligingsvoorzieningen
+- (0-.15) indirecte projectvoorzieningen; werkterreininrichting, doorwerkvoorzieningen
+- (0-.16) indirecte projectvoorzieningen; werkterreininrichting, voorzieningen belendende percelen
+- (0-.17) indirecte projectvoorzieningen; werkterreininrichting, onderhoudsvoorzieningen
+- (0-.2) materieelvoorzieningen
+- (0-.20) indirecte projectvoorzieningen; materieelvoorzieningen, algemeen (verzamelniveau)
+- (0-.21) indirecte projectvoorzieningen; materieelvoorzieningen, transport
+- (0-.22) indirecte projectvoorzieningen; materieelvoorzieningen, gereedschappen (algemeen)
+- (0-.3) risicodekking
+- (0-.30) indirecte projectvoorzieningen; risicodekking, algemeen (verzamelniveau)
+- (0-.31) indirecte projectvoorzieningen; risicodekking, verzekeringen
+- (0-.32) indirecte projectvoorzieningen; risicodekking, waarborgen
+- (0-.33) indirecte projectvoorzieningen; risicodekking, prijsstijgingen
+- (0-.4) projectorganisatie
+- (0-.40) indirecte projectvoorzieningen; projectorganisatie, algemeen (verzamelniveau)
+- (0-.41) indirecte projectvoorzieningen; projectorganisatie, administratie
+- (0-.42) indirecte projectvoorzieningen; projectorganisatie, uitvoering
+- (0-.43) indirecte projectvoorzieningen; projectorganisatie, documentatie
+- (0-.5) bedrijfsorganisatie
+- (0-.50) indirecte projectvoorzieningen; bedrijfsorganisatie, algemeen (verzamelniveau)
+- (0-.51) indirecte projectvoorzieningen; bedrijfsorganisatie, bestuur en directie
+- (0-.52) indirecte projectvoorzieningen; bedrijfsorganisatie, winstregelingen
+- (1-) FUNDERINGEN
+- (10) -gereserveerd-
+- (11) Bodemvoorzieningen
+- (11.0) bodemvoorzieningen; algemeen
+- (11.1) bodemvoorzieningen; grond
+- (11.10) bodemvoorzieningen; grond, algemeen (verzamelniveau)
+- (11.11) bodemvoorzieningen; grond, ontgravingen
+- (11.12) bodemvoorzieningen; grond, aanvullingen
+- (11.13) bodemvoorzieningen; grond, sloop- en rooiwerkzaamheden
+- (11.15) bodemvoorzieningen; grond, damwanden
+- (11.2) bodemvoorzieningen; water
+- (11.20) bodemvoorzieningen; water, algemeen (verzamelniveau)
+- (11.24) bodemvoorzieningen; water, bemalingen
+- (11.25) bodemvoorzieningen; water, damwanden
+- (12) -gereserveerd-
+- (13) Vloeren op grondslag
+- (13.0) vloeren op grondslag; algemeen
+- (13.1) vloeren op grondslag; niet constructief
+- (13.10) vloeren op grondslag; niet constructief, algemeen (verzamelniveau)
+- (13.11) vloeren op grondslag; niet constructief, bodemafsluitingen
+- (13.12) vloeren op grondslag; niet constructief, vloeren als gebouwonderdeel
+- (13.13) vloeren op grondslag; niet constructief, vloeren als bestrating
+- (13.2) vloeren op grondslag; constructief
+- (13.20) vloeren op grondslag; constructief, algemeen (verzamelniveau)
+- (13.21) vloeren op grondslag; constructief, bodemafsluitingen
+- (13.22) vloeren op grondslag; constructief, vloeren als gebouwonderdeel
+- (13.25) vloeren op grondslag; constructief, grondverbeteringen
+- (14) -gereserveerd-
+- (15) -gereserveerd-
+- (16) Funderingsconstructies
+- (16.0) funderingsconstructies; algemeen
+- (16.1) funderingsconstructies; voeten en balken
+- (16.10) funderingsconstructies; voeten en balken, algemeen (verzamelniveau)
+- (16.11) funderingsconstructies; voeten en balken, fundatie voeten
+- (16.12) funderingsconstructies; voeten en balken, fundatie balken
+- (16.13) funderingsconstructies; voeten en balken, fundatie poeren
+- (16.14) funderingsconstructies; voeten en balken, gevelwanden (-200)
+- (16.15) funderingsconstructies; voeten en balken, grondverbeteringen
+- (16.2) funderingsconstructies; keerwanden
+- (16.20) funderingsconstructies; keerwanden, algemeen (verzamelniveau)
+- (16.21) funderingsconstructies; keerwanden, grondkerende wanden
+- (16.22) funderingsconstructies; keerwanden, waterkerende wanden
+- (16.23) funderingsconstructies; keerwanden, gevelwanden (-200)
+- (16.25) funderingsconstructies; keerwanden, grondverbeteringen
+- (17) Paalfunderingen
+- (17.0) paalfunderingen; algemeen
+- (17.1) paalfunderingen; niet geheid
+- (17.10) paalfunderingen; niet geheid, algemeen (verzamelniveau)
+- (17.11) paalfunderingen; niet geheid, dragende palen; geboord
+- (17.12) paalfunderingen; niet geheid, dragende palen; geschroefd
+- (17.13) paalfunderingen; niet geheid, trekverankeringen
+- (17.14) paalfunderingen; niet geheid, pijler-putringfunderingen
+- (17.15) paalfunderingen; niet geheid, bodeminjecties
+- (17.2) paalfunderingen; geheid
+- (17.20) paalfunderingen; geheid, algemeen (verzamelniveau)
+- (17.21) paalfunderingen; geheid, dragende palen
+- (17.22) paalfunderingen; geheid, palen; ingeheide bekisting
+- (17.23) paalfunderingen; geheid, trekverankeringen
+- (17.25) paalfunderingen; geheid, damwandenfunderingen
+- (18) -gereserveerd-
+- (19) -gereserveerd-
+- (2-) RUWBOUW
+- (20) -gereserveerd-
+- (21) Buitenwanden
+- (21.0) buitenwanden; algemeen
+- (21.1) buitenwanden; niet constructief
+- (21.10) buitenwanden; niet constructief, algemeen (verzamelniveau)
+- (21.11) buitenwanden; niet constructief, massieve wanden
+- (21.12) buitenwanden; niet constructief, spouwwanden
+- (21.13) buitenwanden; niet constructief, systeemwanden
+- (21.14) buitenwanden; niet constructief, vlieswanden
+- (21.15) buitenwanden; niet constructief, borstweringen
+- (21.16) buitenwanden; niet constructief, boeiboorden
+- (21.2) buitenwanden; constructief
+- (21.20) buitenwanden; constructief, algemeen (verzamelniveau)
+- (21.21) buitenwanden; constructief, massieve wanden
+- (21.22) buitenwanden; constructief, spouwwanden
+- (21.23) buitenwanden; constructief, systeemwanden
+- (21.25) buitenwanden; constructief, borstweringen
+- (22) Binnenwanden
+- (22.0) binnenwanden; algemeen
+- (22.1) binnenwanden; niet constructief
+- (22.10) binnenwanden; niet constructief, algemeen (verzamelniveau)
+- (22.11) binnenwanden; niet constructief, massieve wanden
+- (22.12) binnenwanden; niet constructief, spouwwanden
+- (22.13) binnenwanden; niet constructief, systeemwanden; vast
+- (22.14) binnenwanden; niet constructief, systeemwanden; verplaatsbaar
+- (22.2) binnenwanden; constructief
+- (22.20) binnenwanden; constructief, algemeen (verzamelniveau)
+- (22.21) binnenwanden; constructief, massieve wanden
+- (22.22) binnenwanden; constructief, spouwwanden
+- (22.23) binnenwanden; constructief, systeemwanden; vast
+- (23) Vloeren
+- (23.0) vloeren; algemeen
+- (23.1) vloeren; niet constructief
+- (23.10) vloeren; niet constructief, algemeen (verzamelniveau)
+- (23.11) vloeren; niet constructief, vrijdragende vloeren
+- (23.12) vloeren; niet constructief, balkons
+- (23.13) vloeren; niet constructief, galerijen
+- (23.14) vloeren; niet constructief, bordessen
+- (23.15) vloeren; niet constructief, vloeren t.b.v. technische voorzieningen
+- (23.2) vloeren; constructief
+- (23.20) vloeren; constructief, algemeen (verzamelniveau)
+- (23.21) vloeren; constructief, vrijdragende vloeren
+- (23.22) vloeren; constructief, balkons
+- (23.23) vloeren; constructief, galerijen
+- (23.24) vloeren; constructief, bordessen
+- (23.25) vloeren; constructief, vloeren t.b.v. technische voorzieningen
+- (24) Trappen en hellingen
+- (24.0) trappen en hellingen; algemeen
+- (24.1) trappen en hellingen; trappen
+- (24.10) trappen en hellingen; trappen, algemeen (verzamelniveau)
+- (24.11) trappen en hellingen; trappen, rechte steektrappen
+- (24.12) trappen en hellingen; trappen, niet-rechte steektrappen
+- (24.13) trappen en hellingen; trappen, spiltrappen
+- (24.15) trappen en hellingen; trappen, bordessen
+- (24.2) trappen en hellingen; hellingen
+- (24.20) trappen en hellingen; hellingen, algemeen (verzamelniveau)
+- (24.21) trappen en hellingen; hellingen, beloopbare hellingen
+- (24.22) trappen en hellingen; hellingen, berijdbare hellingen
+- (24.25) trappen en hellingen; hellingen, bordessen
+- (24.3) trappen en hellingen; ladders en klimijzers
+- (24.30) trappen en hellingen; ladders en klimijzers, algemeen (verzamelniveau)
+- (24.31) trappen en hellingen; ladders en klimijzers, ladders
+- (24.32) trappen en hellingen; ladders en klimijzers, klimijzers
+- (24.35) trappen en hellingen; ladders en klimijzers, bordessen
+- (25) -gereserveerd-
+- (26) -gereserveerd-
+- (27) Daken
+- (27.0) daken; algemeen
+- (27.1) daken; niet constructief
+- (27.10) daken; niet constructief, algemeen (verzamelniveau)
+- (27.11) daken; niet constructief, vlakke daken
+- (27.12) daken; niet constructief, hellende daken
+- (27.13) daken; niet constructief, luifels
+- (27.14) daken; niet constructief, overkappingen
+- (27.16) daken; niet constructief, gootconstructies
+- (27.2) daken; constructief
+- (27.20) daken; constructief, algemeen (verzamelniveau)
+- (27.21) daken; constructief, vlakke daken
+- (27.22) daken; constructief, hellende daken
+- (27.23) daken; constructief, luifels
+- (27.24) daken; constructief, overkappingen
+- (27.26) daken; constructief, gootconstructies
+- (28) Hoofddraagconstructies
+- (28.0) hoofddraagconstructies; algemeen
+- (28.1) hoofddraagconstructies; kolommen en liggers
+- (28.10) hoofddraagconstructies; kolommen en liggers, algemeen (verzamelniveau)
+- (28.11) hoofddraagconstructies; kolommen en liggers, kolom-/liggerconstructies
+- (28.12) hoofddraagconstructies; kolommen en liggers, spanten
+- (28.2) hoofddraagconstructies; wanden en vloeren
+- (28.20) hoofddraagconstructies; wanden en vloeren, algemeen (verzamelniveau)
+- (28.21) hoofddraagconstructies; wanden en vloeren, wand-/vloerconstructies
+- (28.3) hoofddraagconstructies; ruimte-eenheden
+- (28.30) hoofddraagconstructies; ruimte-eenheden, algemeen (verzamelniveau)
+- (28.31) hoofddraagconstructies; ruimte-eenheden, doosconstructies
+- (29) -gereserveerd-
+- (3-) AFBOUW
+- (30) -gereserveerd-
+- (31) Buitenwandopeningen
+- (31.0) buitenwandopeningen; algemeen
+- (31.1) buitenwandopeningen; niet gevuld
+- (31.10) buitenwandopeningen; niet gevuld, algemeen (verzamelniveau)
+- (31.11) buitenwandopeningen; niet gevuld, daglichtopeningen
+- (31.12) buitenwandopeningen; niet gevuld, buitenluchtopeningen
+- (31.2) buitenwandopeningen; gevuld met ramen
+- (31.20) buitenwandopeningen; gevuld met ramen, algemeen (verzamelniveau)
+- (31.21) buitenwandopeningen; gevuld met ramen, gesloten ramen
+- (31.22) buitenwandopeningen; gevuld met ramen, ramen draaiend aan één kant
+- (31.23) buitenwandopeningen; gevuld met ramen, schuiframen
+- (31.24) buitenwandopeningen; gevuld met ramen, ramen draaiend op verticale of horizontale as
+- (31.25) buitenwandopeningen; gevuld met ramen, combinatieramen
+- (31.3) buitenwandopeningen; gevuld met deuren
+- (31.30) buitenwandopeningen; gevuld met deuren, algemeen (verzamelniveau)
+- (31.31) buitenwandopeningen; gevuld met deuren, draaideuren
+- (31.32) buitenwandopeningen; gevuld met deuren, schuifdeuren
+- (31.33) buitenwandopeningen; gevuld met deuren, tuimeldeuren
+- (31.34) buitenwandopeningen; gevuld met deuren, tourniquets
+- (31.4) buitenwandopeningen; gevuld met puien
+- (31.40) buitenwandopeningen; gevuld met puien, algemeen (verzamelniveau)
+- (31.41) buitenwandopeningen; gevuld met puien, gesloten puien
+- (32) Binnenwandopeningen
+- (32.0) binnenwandopeningen; algemeen
+- (32.1) binnenwandopeningen; niet gevuld
+- (32.10) binnenwandopeningen; niet gevuld, algemeen (verzamelniveau)
+- (32.11) binnenwandopeningen; niet gevuld, openingen als doorgang
+- (32.12) binnenwandopeningen; niet gevuld, openingen als doorzicht
+- (32.2) binnenwandopeningen; gevuld met ramen
+- (32.20) binnenwandopeningen; gevuld met ramen, algemeen (verzamelniveau)
+- (32.21) binnenwandopeningen; gevuld met ramen, gesloten ramen
+- (32.22) binnenwandopeningen; gevuld met ramen, ramen draaiend aan één kant
+- (32.23) binnenwandopeningen; gevuld met ramen, schuiframen
+- (32.24) binnenwandopeningen; gevuld met ramen, ramen draaiend op verticale of horizontale as
+- (32.25) binnenwandopeningen; gevuld met ramen, combinatieramen
+- (32.3) binnenwandopeningen; gevuld met deuren
+- (32.30) binnenwandopeningen; gevuld met deuren, algemeen (verzamelniveau)
+- (32.31) binnenwandopeningen; gevuld met deuren, draaideuren
+- (32.32) binnenwandopeningen; gevuld met deuren, schuifdeuren
+- (32.33) binnenwandopeningen; gevuld met deuren, tuimeldeuren
+- (32.34) binnenwandopeningen; gevuld met deuren, tourniquets
+- (32.4) binnenwandopeningen; gevuld met puien
+- (32.40) binnenwandopeningen; gevuld met puien, algemeen (verzamelniveau)
+- (32.41) binnenwandopeningen; gevuld met puien, gesloten puien
+- (33) Vloeropeningen
+- (33.0) vloeropeningen; algemeen
+- (33.1) vloeropeningen; niet gevuld
+- (33.10) vloeropeningen; niet gevuld, algemeen (verzamelniveau)
+- (33.11) vloeropeningen; niet gevuld, openingen als doorgang
+- (33.12) vloeropeningen; niet gevuld, openingen als doorzicht
+- (33.2) vloeropeningen; gevuld
+- (33.20) vloeropeningen; gevuld, algemeen (verzamelniveau)
+- (33.21) vloeropeningen; gevuld, beloopbare vullingen
+- (33.22) vloeropeningen; gevuld, niet-beloopbare vullingen
+- (34) Balustrades en leuningen
+- (34.0) balustrades en leuningen; algemeen
+- (34.1) balustrades en leuningen; balustrades
+- (34.10) balustrades en leuningen; balustrades, algemeen (verzamelniveau)
+- (34.11) balustrades en leuningen; balustrades, binnenbalustrades
+- (34.12) balustrades en leuningen; balustrades, buitenbalustrades
+- (34.2) balustrades en leuningen; leuningen
+- (34.20) balustrades en leuningen; leuningen, algemeen (verzamelniveau)
+- (34.21) balustrades en leuningen; leuningen, binnenleuningen
+- (34.22) balustrades en leuningen; leuningen, buitenleuningen
+- (35) -gereserveerd-
+- (36) -gereserveerd-
+- (37) Dakopeningen
+- (37.0) dakopeningen; algemeen
+- (37.1) dakopeningen; niet gevuld
+- (37.10) dakopeningen; niet gevuld, algemeen (verzamelniveau)
+- (37.11) dakopeningen; niet gevuld, daglichtopeningen
+- (37.12) dakopeningen; niet gevuld, buitenluchtopeningen
+- (37.2) dakopeningen; gevuld
+- (37.20) dakopeningen; gevuld, algemeen (verzamelniveau)
+- (37.21) dakopeningen; gevuld, gesloten ramen
+- (37.22) dakopeningen; gevuld, ramen draaiend aan één kant
+- (37.23) dakopeningen; gevuld, schuiframen
+- (37.24) dakopeningen; gevuld, ramen draaiend op een as
+- (37.25) dakopeningen; gevuld, combinatieramen
+- (38) Inbouwpakketten
+- (38.0) inbouwpakketten; algemeen
+- (38.1) inbouwpakketten
+- (38.10) inbouwpakketten; algemeen (verzamelniveau)
+- (38.11) inbouwpakketten; inbouwpakketten met te openen delen
+- (38.12) inbouwpakketten; inbouwpakketten met gesloten delen
+- (39) -gereserveerd-
+- (4-) AFWERKINGEN
+- (40) -gereserveerd-
+- (41) Buitenwandafwerkingen
+- (41.0) buitenwandafwerkingen; algemeen
+- (41.1) buitenwandafwerkingen
+- (41.10) buitenwandafwerkingen; algemeen (verzamelniveau)
+- (41.11) buitenwandafwerkingen; afwerklagen
+- (41.12) buitenwandafwerkingen; bekledingen
+- (41.13) buitenwandafwerkingen; voorzetwanden
+- (42) Binnenwandafwerkingen
+- (42.0) binnenwandafwerkingen; algemeen
+- (42.1) binnenwandafwerkingen
+- (42.10) binnenwandafwerkingen; algemeen (verzamelniveau)
+- (42.11) binnenwandafwerkingen; afwerklagen
+- (42.12) binnenwandafwerkingen; bekledingen
+- (43) Vloerafwerkingen
+- (43.0) vloerafwerkingen; algemeen
+- (43.1) vloerafwerkingen; verhoogd
+- (43.10) vloerafwerkingen; verhoogd, algemeen (verzamelniveau)
+- (43.11) vloerafwerkingen; verhoogd, podiums
+- (43.12) vloerafwerkingen; verhoogd, installatievloeren
+- (43.2) vloerafwerkingen; niet verhoogd
+- (43.20) vloerafwerkingen; niet verhoogd, algemeen (verzamelniveau)
+- (43.21) vloerafwerkingen; niet verhoogd, afwerklagen
+- (43.22) vloerafwerkingen; niet verhoogd, bekledingen
+- (43.23) vloerafwerkingen; niet verhoogd, systeemvloerafwerkingen
+- (44) Trap- en hellingafwerkingen
+- (44.0) trap- en hellingafwerkingen; algemeen
+- (44.1) trap- en hellingafwerkingen; trapafwerkingen
+- (44.10) trap- en hellingafwerkingen; trapafwerkingen, algemeen (verzamelniveau)
+- (44.11) trap- en hellingafwerkingen; trapafwerkingen, afwerklagen
+- (44.12) trap- en hellingafwerkingen; trapafwerkingen, bekledingen
+- (44.13) trap- en hellingafwerkingen; trapafwerkingen, systeemafwerkingen
+- (44.2) trap- en hellingafwerkingen; hellingafwerkingen
+- (44.20) trap- en hellingafwerkingen; hellingafwerkingen, algemeen (verzamelniveau)
+- (44.21) trap- en hellingafwerkingen; hellingafwerkingen, afwerklagen
+- (44.22) trap- en hellingafwerkingen; hellingafwerkingen, bekledingen
+- (44.23) trap- en hellingafwerkingen; hellingafwerkingen, systeemafwerkingen
+- (45) Plafondafwerkingen
+- (45.0) plafondafwerkingen; algemeen
+- (45.1) plafondafwerkingen; verlaagd
+- (45.10) plafondafwerkingen; verlaagd, algemeen (verzamelniveau)
+- (45.11) plafondafwerkingen; verlaagd, verlaagde plafonds
+- (45.12) plafondafwerkingen; verlaagd, systeemplafonds
+- (45.14) plafondafwerkingen; verlaagd, koofconstructies
+- (45.15) plafondafwerkingen; verlaagd, gordijnplanken
+- (45.2) plafondafwerkingen; niet verlaagd
+- (45.20) plafondafwerkingen; niet verlaagd, algemeen (verzamelniveau)
+- (45.21) plafondafwerkingen; niet verlaagd, afwerkingen
+- (45.22) plafondafwerkingen; niet verlaagd, bekledingen
+- (45.23) plafondafwerkingen; niet verlaagd, systeemafwerkingen
+- (45.24) plafondafwerkingen; niet verlaagd, koofconstructies
+- (45.25) plafondafwerkingen; niet verlaagd, gordijnplanken
+- (46) -gereserveerd-
+- (47) Dakafwerkingen
+- (47.0) dakafwerkingen; algemeen
+- (47.1) dakafwerkingen; afwerkingen
+- (47.10) dakafwerkingen; afwerkingen, algemeen (verzamelniveau)
+- (47.11) dakafwerkingen; afwerkingen, vlakke dakafwerkingen
+- (47.12) dakafwerkingen; afwerkingen, hellende dakafwerkingen
+- (47.13) dakafwerkingen; afwerkingen, luifelafwerkingen
+- (47.14) dakafwerkingen; afwerkingen, overkappingsafwerkingen
+- (47.15) dakafwerkingen; afwerkingen, beloopbare dakafwerkingen
+- (47.16) dakafwerkingen; afwerkingen, berijdbare dakafwerkingen
+- (47.2) dakafwerkingen; bekledingen
+- (47.20) dakafwerkingen; bekledingen, algemeen (verzamelniveau)
+- (47.21) dakafwerkingen; bekledingen, vlakke dak bekledingen
+- (47.22) dakafwerkingen; bekledingen, hellende dak bekledingen
+- (47.23) dakafwerkingen; bekledingen, luifel bekledingen
+- (47.24) dakafwerkingen; bekledingen, overkapping bekledingen
+- (47.25) dakafwerkingen; bekledingen, beloopbare dak bekledingen
+- (47.26) dakafwerkingen; bekledingen, berijdbare dak  bekledingen
+- (48) Afwerkingpakketten
+- (48.0) afwerkingspakketten; algemeen
+- (48.1) afwerkingspakketten
+- (48.10) afwerkingspakketten; algemeen (verzamelniveau)
+- (48.11) afwerkingspakketten; naadloze afwerkingen
+- (48.12) afwerkingspakketten; overige afwerkingen
+- (49) -gereserveerd-
+- (5-) INSTALLATIES WERKTUIGBOUWKUNDIG
+- (50) -gereserveerd-
+- (51) -gereserveerd-
+- (52) Afvoeren
+- (52.0) afvoeren; algemeen
+- (52.1) afvoeren; regenwater
+- (52.10) afvoeren; regenwater, algemeen (verzamelniveau)
+- (52.11) afvoeren; regenwater, afvoerinstallatie; in het gebouw
+- (52.12) afvoeren; regenwater, afvoerinstallatie; buiten het gebouw
+- (52.16) afvoeren; regenwater, pompsysteem, afscheiders, bezinkputten
+- (52.19) afvoeren; regenwater, berging, infiltratie 
+- (52.2) afvoeren; fecaliën
+- (52.20) afvoeren; fecaliën, algemeen (verzamelniveau)
+- (52.21) afvoeren; fecaliën, standaardsysteem
+- (52.22) afvoeren; fecaliën, vacuümsysteem
+- (52.23) afvoeren; fecaliën, overdruksysteem
+- (52.24) afvoeren; fecaliën, gescheiden (urine)
+- (52.26) afvoeren; fecaliën, pompsysteem, afscheiders, bezinkputten
+- (52.3) afvoeren; afvalwater
+- (52.30) afvoeren; afvalwater, algemeen (verzamelniveau)
+- (52.31) afvoeren; afvalwater, huishoudelijk afval
+- (52.32) afvoeren; afvalwater, bedrijfsafval
+- (52.36) afvoeren; afvalwater, pompsysteem, afscheiders, bezinkputten
+- (52.4) afvoeren; gecombineerd
+- (52.40) afvoeren; gecombineerd, algemeen (verzamelniveau)
+- (52.41) afvoeren; gecombineerd, geïntegreerd systeem
+- (52.46) afvoeren; gecombineerd, pompsysteem, afscheiders, bezinkputten
+- (52.5) afvoeren; vuilwaterafvoer speciaal
+- (52.50) afvoeren; vuilwaterafvoer speciaal, algemeen (verzamelniveau)
+- (52.51) afvoeren; vuilwaterafvoer speciaal, chemisch verontreinigd afvalwater
+- (52.52) afvoeren; vuilwaterafvoer speciaal, biologisch besmet afvalwater
+- (52.53) afvoeren; vuilwaterafvoer speciaal, radioactief besmet afvalwater
+- (52.56) afvoeren; vuilwaterafvoer speciaal, pompsysteem
+- (52.6) afvoeren; vaste stoffen
+- (52.60) afvoeren; vaste stoffen, algemeen (verzamelniveau)
+- (52.61) afvoeren; vaste stoffen, stortkokers
+- (52.62) afvoeren; vaste stoffen, vacuümsysteem
+- (52.63) afvoeren; vaste stoffen, persluchtsysteem
+- (52.64) afvoeren; vaste stoffen, verdichtingsysteem
+- (52.65) afvoeren; vaste stoffen, verbrandingsysteem
+- (52.9) vaste gebouwgebonden voorzieningen behorend bij afvoeren
+- (52.90) vaste gebouwgebonden voorzieningen behorend bij afvoeren, algemeen (verzamelniveau)
+- (53) Water
+- (53.0) water; algemeen
+- (53.1) water; drinkwater
+- (53.10) water; drinkwater, algemeen (verzamelniveau)
+- (53.11) water; drinkwater, netaansluiting
+- (53.12) water; drinkwater, bronaansluiting
+- (53.13) water; drinkwater, reinwaterkelderaansluiting / ringleiding
+- (53.16) water; drinkwater, drukverhogingsinstallatie
+- (53.19) water; drinkwater, voorraadvaten
+- (53.2) water; verwarmd tapwater
+- (53.20) water; verwarmd tapwater, algemeen (verzamelniveau)
+- (53.21) water; verwarmd tapwater, met voorraad
+- (53.23) water; verwarmd tapwater, doorstroom
+- (53.3) water; bedrijfswater
+- (53.30) water; bedrijfswater, algemeen (verzamelniveau)
+- (53.31) water; bedrijfswater, onthard-watersysteem
+- (53.32) water; bedrijfswater, demi-watersysteem
+- (53.33) water; bedrijfswater, gedistilleerd-watersysteem
+- (53.34) water; bedrijfswater, zwembad-watersysteem
+- (53.36) water; bedrijfswater; drukverhogingsinstallatie 
+- (53.37) water; bedrijfswater, onderbrekingsinstallatie (breektank)
+- (53.39) water; bedrijfswater, voorraadvaten
+- (53.4) water; gebruiksstoom en condens
+- (53.40) water; gebruiksstoom en condens, algemeen (verzamelniveau)
+- (53.41) water; gebruiksstoom en condens, lage-druk stoomsysteem
+- (53.42) water; gebruiksstoom en condens, hoge-druk stoomsysteem
+- (53.5) water; waterbehandeling
+- (53.50) water; waterbehandeling, algemeen (verzamelniveau)
+- (53.51) water; waterbehandeling, filtratiesysteem
+- (53.52) water; waterbehandeling, absorptiesysteem
+- (53.53) water; waterbehandeling, ontgassingsysteem
+- (53.54) water; waterbehandeling, destillatiesysteem
+- (53.9) vaste gebouwgebonden voorzieningen behorend bij water
+- (53.90) vaste gebouwgebonden voorzieningen behorend bij water, algemeen (verzamelniveau)
+- (54) Gassen
+- (54.0) gassen; algemeen
+- (54.1) gassen, brandstof
+- (54.10) gassen; brandstof, algemeen (verzamelniveau)
+- (54.11) gassen; brandstof, aardgasvoorziening / menggasvoorziening
+- (54.12) gassen; brandstof, butaanvoorziening
+- (54.13) gassen; brandstof, propaanvoorziening
+- (54.14) gassen; brandstof, LPG-voorziening
+- (54.15) gassen; brandstof, biogasvoorziening
+- (54.16) gassen; brandstof, waterstofvoorziening
+- (54.2) gassen; perslucht
+- (54.20) gassen; perslucht, algemeen (verzamelniveau)
+- (54.21) gassen; perslucht, persluchtvoorziening
+- (54.23) gassen; perslucht, compressor
+- (54.24) gassen; perslucht, buffertank
+- (54.3) gassen; medisch
+- (54.30) gassen; medisch, algemeen (verzamelniveau)
+- (54.31) gassen; medisch, zuurstofvoorziening
+- (54.32) gassen; medisch, carbogeenvoorziening
+- (54.33) gassen; medisch, lachgasvoorziening
+- (54.34) gassen; medisch, koolzuurvoorziening
+- (54.35) gassen; medisch, medische luchtvoorziening
+- (54.4) gassen; technisch
+- (54.40) gassen; technisch, algemeen (verzamelniveau)
+- (54.41) gassen; technisch, stikstofvoorziening
+- (54.42) gassen; technisch, waterstofvoorziening
+- (54.43) gassen; technisch, argonvoorziening
+- (54.44) gassen; technisch, heliumvoorziening
+- (54.45) gassen; technisch, acetyleenvoorziening
+- (54.46) gassen; technisch, propaanvoorziening
+- (54.47) gassen; technisch, koolzuurvoorziening
+- (54.48) gassen; technisch, zuurstofvoorziening
+- (54.49) gassen; technisch, methaanvoorziening
+- (54.5) gassen, bijzonder
+- (54.50) gassen; bijzonder, algemeen (verzamelniveau)
+- (54.51) gassen; bijzonder, voorziening; zuivere gassen
+- (54.52) gassen; bijzonder, voorziening; menggassen
+- (54.6) gassen; vacuüm
+- (54.60) gassen; vacuüm, algemeen (verzamelniveau)
+- (54.61) gassen; vacuüm, vacuümvoorziening
+- (54.63) gassen; vacuüm, pompsysteem
+- (54.9) vaste gebouwgebonden voorzieningen behorend bij gassen
+- (54.90) vaste gebouwgebonden voorzieningen behorend bij gassen, algemeen (verzamelniveau)
+- (55) Koeling
+- (55.0) koeling; algemeen
+- (55.1) koeling; opwekking lokaal
+- (55.10) koeling; lokaal, algemeen (verzamelniveau)
+- (55.11) koeling; lokaal, raamkoelers/splitsystemen
+- (55.13) koeling; lokaal, compactsystemen (packaged)
+- (55.2) koeling; opwekking centraal
+- (55.20) koeling; opwekking centraal, algemeen (verzamelniveau)
+- (55.21) koeling; opwekking centraal, warmtepompsystemen
+- (55.22) koeling; opwekking centraal, absorptiesystemen
+- (55.23) koeling; opwekking centraal, grondwatersystemen (incl. tegenstroomapparaat)
+- (55.24) koeling; opwekking centraal, oppervlaktewatersystemen (incl. tegenstroomapparaat)
+- (55.26) koeling; opwekking centraal, vrije-koeling
+- (55.27) koeling; opwekking centraal, warmte koude opslag (WKO compleet incl. tegenstroomapparaat)
+- (55.28) koeling; opwekking centraal, koudenet
+- (55.3) koeling; distributie hoofdverdeling (t/m verdeler/verzamelaar)
+- (55.30) koeling; distributie hoofdverdeling, algemeen (verzamelniveau)
+- (55.31) koeling; distributie hoofdverdeling, distributiesystemen
+- (55.4) koeling; distributie (vanaf verdeler/verzamelaar)
+- (55.40) koeling; distributie, algemeen (verzamelniveau)
+- (55.41) koeling; distributie, distributiesystemen
+- (55.5) koeling, opslag
+- (55.50) koeling; opslag, algemeen (verzamelniveau)
+- (55.8) koeling; afgifte
+- (55.80) koeling; afgifte, algemeen (verzamelniveau)
+- (55.81) koeling; afgifte, fancoil /inductie units, nakoelers
+- (55.83) koeling; afgifte, koel(klimaat)plafonds
+- (55.84) koeling; afgifte, vloerkoeling/wandkoeling
+- (55.9) vaste gebouwgebonden voorzieningen behorend bij koeling
+- (55.90) vaste gebouwgebonden voorzieningen behorend bij koeling, algemeen (verzamelniveau)
+- (56) Verwarming
+- (56.0) verwarming; algemeen
+- (56.1) verwarming; opwekking lokaal
+- (56.10) verwarming; opwekking lokaal, algemeen (verzamelniveau)
+- (56.11) verwarming; opwekking lokaal, direct gestookte toestellen
+- (56.12) verwarming; opwekking lokaal, stoombevochtigers
+- (56.2) verwarming; opwekking centraal
+- (56.20) verwarming; opwekking centraal, algemeen (verzamelniveau)
+- (56.21) verwarming; opwekking centraal, verwarmingstoestellen (ketels, HR, VR, biomassa)
+- (56.22) verwarming; opwekking centraal, stoomketels en toebehoren (ontgassers, etc.)
+- (56.23) verwarming; opwekking centraal, warmtekrachtkoppeling (WKK) en toebehoren 
+- (56.25) verwarming; opwekking centraal, zonnecollectoren
+- (56.26) verwarming; opwekking centraal, electrolyser, brandstofcel
+- (56.27) verwarming; opwekking centraal, aardwarmte (geothermie)
+- (56.28) verwarming; opwekking centraal, warmtenet
+- (56.3) verwarming; distributie hoofdverdeling (t/m verdeler/verzamelaar)
+- (56.30) verwarming; distributie hoofdverdeling , algemeen (verzamelniveau)
+- (56.31) verwarming; distributie hoofdverdeling, distributiesystemen
+- (56.4) verwarming; distributie (vanaf verdeler/verzamelaar)
+- (56.40) verwarming; distributie, algemeen (verzamelniveau)
+- (56.41) verwarming; distributie, distributiesystemen
+- (56.5) verwarming; opslag
+- (56.50) verwarming; opslag, algemeen (verzamelniveau)
+- (56.8) verwarming; afgifte
+- (56.80) verwarming; afgifte, algemeen (verzamelniveau)
+- (56.81) verwarming; afgifte, radiator/convectorsystemen
+- (56.83) verwarming; afgifte, warmte(klimaat)plafonds
+- (56.84) verwarming; afgifte, vloerverwarming/wandverwarming
+- (56.86) verwarming; afgifte, stralingspanelen
+- (56.9) vaste gebouwgebonden voorzieningen behorend bij verwarming
+- (56.90) vaste gebouwgebonden voorzieningen behorend bij verwarming, algemeen (verzamelniveau)
+- (57) Luchtbehandeling
+- (57.0) luchtbehandeling; algemeen
+- (57.1) luchtbehandeling; natuurlijk
+- (57.10) luchtbehandeling; natuurlijk, algemeen (verzamelniveau)
+- (57.11) luchtbehandeling; natuurlijk, voorzieningen; regelbaar
+- (57.12) luchtbehandeling; natuurlijk, voorzieningen; niet regelbaar
+- (57.2) luchtbehandeling; mechanisch lokaal
+- (57.20) luchtbehandeling; mechanisch lokaal, algemeen (verzamelniveau)
+- (57.21) luchtbehandeling; mechanisch lokaal, ventilatie-installatie
+- (57.22) luchtbehandeling; mechanisch lokaal, afzuiginstallatie
+- (57.3) luchtbehandeling; mechanisch centraal
+- (57.30) luchtbehandeling; mechanisch centraal, algemeen (verzamelniveau)
+- (57.31) luchtbehandeling; mechanisch centraal, ventilatie-installatie
+- (57.32) luchtbehandeling; mechanisch centraal, afzuiginstallatie
+- (57.4) luchtbehandeling; distributie
+- (57.40) luchtbehandeling; distributie, algemeen (verzamelniveau)
+- (57.41) luchtbehandeling; distributie, kanalen
+- (57.42) luchtbehandeling; distributie, kanalen separate afzuigsystemen
+- (57.8) luchtbehandeling; afgifte
+- (57.80) luchtbehandeling; afgifte, algemeen (verzamelniveau)
+- (57.81) luchtbehandeling; afgifte, appendages
+- (57.82) luchtbehandeling; afgifte, roosters
+- (57.9) vaste gebouwgebonden voorzieningen behorend bij luchtbehandeling
+- (57.90) vaste gebouwgebonden voorzieningen behorend bij luchtbehandeling, algemeen (verzamelniveau)
+- (58) Meet- en regelinstallaties
+- (58.0) meet- en regelinstallaties; algemeen
+- (58.1) meet- en regelinstallaties; verdeling lokaal inclusief regelapparatuur
+- (58.10) meet- en regelinstallaties; verdeling lokaal inclusief regelapparatuur, algemeen (verzamelniveau)
+- (58.11) meet- en regelinstallaties; verdeling lokaal inclusief regelapparatuur, specifieke regeling
+- (58.2) meet- en regelinstallaties; verdeling centraal Gebouw Beheer Systeem (GBS)
+- (58.20) meet- en regelinstallaties; verdeling centraal Gebouw Beheer Systeem (GBS), algemeen (verzamelniveau)
+- (58.21) meet- en regelinstallaties; verdeling centraal Gebouw Beheer Systeem (GBS), hardware
+- (58.22) meet- en regelinstallaties; verdeling centraal Gebouw Beheer Systeem (GBS), software
+- (58.6) meet- en regelinstallaties; distributie centraal
+- (58.60) meet- en regelinstallaties; distributie centraal, algemeen (verzamelniveau)
+- (58.61) meet- en regelinstallaties; distributie centraal, regelkasten voedingen / krachtstroom
+- (58.62) meet- en regelinstallaties; distributie centraal, regelkasten zwakstroom (DDC)
+- (58.66) meet- en regelinstallaties; distributie centraal, bekabeling, voedingsleidingen
+- (58.67) meet- en regelinstallaties; distributie centraal, bekabeling, signaalleidingen
+- (58.8) meet- en regelinstallaties; meting en sturing
+- (58.80) meet- en regelinstallaties; meting en sturing, veldapparatuur, algemeen (verzamelniveau)
+- (58.81) meet- en regelinstallaties; meting en sturing, veldapparatuur, centrale gebouwinstallaties
+- (58.82) meet- en regelinstallaties; meting en sturing, veldapparatuur, naregelingen
+- (58.9) vaste gebouwgebonden voorzieningen behorend bij regeling werktuigkundige installaties
+- (58.90) vaste gebouwgebonden voorzieningen behorend bij regeling werktuigkundige installaties, algemeen (verzamelniveau)
+- (59) Werktuigkundige brandveiligheid
+- (59.0) brandveiligheid; algemeen
+- (59.1) brandveiligheid; gasblusinstallatie
+- (59.10) brandveiligheid; gasblusinstallatie; algemeen (verzamelniveau)
+- (59.11) brandveiligheid; gasblusinstallatie; inergen
+- (59.12) brandveiligheid; gasblusinstallatie; chemisch
+- (59.13) brandveiligheid; gasblusinstallatie; zuurstofreductie
+- (59.2) brandveiligheid; waterblusinstallatie
+- (59.20) brandveiligheid; waterblusinstallatie, algemeen (verzamelniveau)
+- (59.21) brandveiligheid; waterblusinstallatie, sprinkler
+- (59.22) brandveiligheid; waterblusinstallatie, watermistinstallatie
+- (59.23) brandveiligheid; waterblusinstallatie, droge blusleiding
+- (59.24) brandveiligheid; waterblusinstallatie, brandslanghaspels
+- (59.3) brandveiligheid; brandventilatieinstallatie
+- (59.30) brandveiligheid; brandventilatieinstallatie, algemeen (verzamelniveau)
+- (59.31) brandveiligheid; brandventilatieinstallatie, rook/warmte afvoer
+- (59.32) brandveiligheid; brandventilatieinstallatie, overdrukinstallatie
+- (59.9) vaste gebouwgebonden voorzieningen behorend bij brandveiligheid
+- (59.90) vaste gebouwgebonden voorzieningen behorend bij brandveiligheid, algemeen (verzamelniveau)
+- (6-) INSTALLATIES ELEKTROTECHNISCH
+- (60) -gereserveerd-
+- (61) Centrale elektrotechnische voorzieningen
+- (61.0) centrale elektrotechnische voorzieningen; algemeen
+- (61.1) centrale elektrotechnische voorzieningen; energie-opwekking
+- (61.10) centrale elektrotechnische voorzieningen; energie-opwekking, algemeen (verzamelniveau)
+- (61.11) centrale elektrotechnische voorzieningen; energie-opwekking, noodverlichtingsunits, centraal
+- (61.12) centrale elektrotechnische voorzieningen; energie-opwekking, nobreak units statisch
+- (61.13) centrale elektrotechnische voorzieningen; energie-opwekking, noodstroomaggregaat
+- (61.14) centrale elektrotechnische voorzieningen; energie-opwekking, nobreak units dynamisch
+- (61.15) centrale elektrotechnische voorzieningen; energie-opwekking, Photo Voltaic (PV) panelen
+- (61.16) centrale elektrotechnische voorzieningen; energie-opwekking, wind-energie
+- (61.17) centrale elektrotechnische voorzieningen; energie-opwekking, brandstofcel
+- (61.2) centrale elektrotechnische voorzieningen; aarding en bliksembeveiliging
+- (61.20) centrale elektrotechnische voorzieningen; aarding, algemeen (verzamelniveau)
+- (61.21) centrale elektrotechnische voorzieningen; aarding, veiligheidsaarding/overspanning
+- (61.22) centrale elektrotechnische voorzieningen; aarding, medische aarding
+- (61.23) centrale elektrotechnische voorzieningen; aarding, speciale aarding
+- (61.24) centrale elektrotechnische voorzieningen; aarding, statische elektriciteit
+- (61.26) centrale elektrotechnische voorzieningen; aarding, potentiaalvereffening
+- (61.27) centrale elektrotechnische voorzieningen; bliksemafleiding, algemeen
+- (61.28) centrale elektrotechnische voorzieningen; bliksemafleiding
+- (61.3) centrale elektrotechnische voorzieningen; kanalisatie
+- (61.30) centrale elektrotechnische voorzieningen; kanalisatie, algemeen (verzamelniveau)
+- (61.31) centrale elektrotechnische voorzieningen; kanalisatie, t.b.v. installaties voor middenspanning
+- (61.32) centrale elektrotechnische voorzieningen; kanalisatie, t.b.v. installaties voor lage spanning
+- (61.33) centrale elektrotechnische voorzieningen; kanalisatie, t.b.v. installaties voor communicatie of beveiliging
+- (61.4) centrale elektrotechnische voorzieningen; energiedistributie middenspanning >1kV
+- (61.40) centrale elektrotechnische voorzieningen; energiedistributie middenspanning >1kV, algemeen (verzamelniveau)
+- (61.41) centrale elektrotechnische voorzieningen; energiedistributie middenspanning >1kV, voedingsleiding middenspanningverdeler
+- (61.42) centrale elektrotechnische voorzieningen; energiedistributie middenspanning >1kV, middenspanningsverdeler
+- (61.43) centrale elektrotechnische voorzieningen; energiedistributie middenspanning >1kV, voedingleiding MS
+- (61.44) centrale elektrotechnische voorzieningen; energiedistributie middenspanning >1kV, transformator
+- (61.5) centrale elektrotechnische voorzieningen; energiedistributie laagspanning ≤1kV 
+- (61.50) centrale elektrotechnische voorzieningen; energiedistributie laagspanning ≤1kV ,algemeen (verzamelniveau)
+- (61.51) centrale elektrotechnische voorzieningen; energiedistributie laagspanning ≤1kV, voedingsleiding laagspanningshoofdverdeler
+- (61.52) centrale elektrotechnische voorzieningen; energiedistributie laagspanning ≤1kV, laagspanningshoofdverdeler
+- (61.53) centrale elektrotechnische voorzieningen; energiedistributie laagspanning ≤1kV, voedingsleiding LS
+- (61.54) centrale elektrotechnische voorzieningen; energiedistributie laagspanning ≤1kV, sub- en eindverdeler
+- (61.55) centrale elektrotechnische voorzieningen; energiedistributie laagspanning ≤1kV, medische verdeler (scheidingstransformator)
+- (61.9) vaste gebouwgebonden voorzieningen behorend bij centrale elektrotechnische voorzieningen
+- (61.90) vaste gebouwgebonden voorzieningen behorend bij centrale elektrotechnische voorzieningen, algemeen (verzamelniveau)
+- (62) Energievoorziening gebruikersaansluitingen
+- (62.0) energievoorziening gebruikersaansluitingen algemeen
+- (62.1) energievoorziening gebruikersaansluitingen; generiek wissel
+- (62.10) energievoorziening gebruikersaansluitingen; generiek wissel, algemeen (verzamelniveau)
+- (62.11) energievoorziening gebruikersaansluitingen; generiek wissel, voedingsleiding
+- (62.12) energievoorziening gebruikersaansluitingen; generiek wissel, aansluitpunten
+- (62.2) energievoorziening gebruikersaansluitingen; specifiek wissel
+- (62.20) energievoorziening gebruikersaansluitingen; specifiek wissel, algemeen (verzamelniveau)
+- (62.21) energievoorziening gebruikersaansluitingen; specifiek wissel, voedingsleiding
+- (62.22) energievoorziening gebruikersaansluitingen; specifiek wissel, aansluitpunten
+- (62.3) energievoorziening gebruikersaansluitingen; generiek gelijk
+- (62.30) energievoorziening gebruikersaansluitingen; generiek gelijk, algemeen (verzamelniveau)
+- (62.31) energievoorziening gebruikersaansluitingen; generiek gelijk, voedingsleiding
+- (62.32) energievoorziening gebruikersaansluitingen; generiek gelijk, aansluitpunten
+- (62.4) energievoorziening gebruikersaansluitingen; specifiek gelijk
+- (62.40) energievoorziening gebruikersaansluitingen; specifiek gelijk, algemeen (verzamelniveau)
+- (62.41) energievoorziening gebruikersaansluitingen; specifiek gelijk, voedingsleiding
+- (62.42) energievoorziening gebruikersaansluitingen; specifiek gelijk, aansluitpunten
+- (62.9) vaste gebouwgebonden voorzieningen behorend bij energievoorziening gebruikersaansluitingen
+- (62.90) vaste gebouwgebonden voorzieningen behorend bij energievoorziening gebruikersaansluitingen, algemeen (verzamelniveau)
+- (63) Verlichting
+- (63.0) verlichting; algemeen
+- (63.1) verlichting; verlichting, bediening, regeling en signalering
+- (63.10) verlichting; verlichting, bediening, regeling en signalering, algemeen (verzamelniveau) 
+- (63.11) verlichting; verlichting, bediening, regeling en signalering, voedingsleidingen
+- (63.2) verlichting; verlichting standaard armaturen
+- (63.20) verlichting; verlichting standaard armaturen, algemeen (verzamelniveau)
+- (63.21) verlichting; verlichting standaard armaturen, armaturen
+- (63.22) verlichting; verlichting standaard armaturen, noodarmaturen
+- (63.3) verlichting; verlichting overige armaturen
+- (63.30) verlichting; verlichting overige armaturen, algemeen (verzamelniveau)
+- (63.31) verlichting; verlichting overige armaturen, reclameverlichting
+- (63.4) verlichting; vluchtwegsignalering
+- (63.40) verlichting; vluchtwegsignalering, algemeen (verzamelniveau)
+- (63.41) verlichting; vluchtwegsignalering, centrale signalering
+- (63.42) verlichting; vluchtwegsignalering, armaturen
+- (63.43) verlichting; vluchtwegsignalering, voedings/signaalleidingen
+- (63.9) vaste gebouwgebonden voorzieningen behorend bij verlichting
+- (63.90) vaste gebouwgebonden voorzieningen behorend bij verlichting, algemeen (verzamelniveau)
+- (64) Communicatie
+- (64.0) communicatie; algemeen
+- (64.1) communicatie; signalen
+- (64.10) communicatie; signalen, algemeen (verzamelniveau)
+- (64.11) communicatie; signalen, algemene signaleringen
+- (64.13) communicatie; signalen, tijdsignalering
+- (64.14) communicatie, signalen, aanwezigheids- en beletsignalering
+- (64.2) communicatie; geluiden
+- (64.20) communicatie; overdracht van geluid/spraak, algemeen (verzamelniveau)
+- (64.21) communicatie; overdracht van geluid/spraak, telefoon
+- (64.22) communicatie; overdracht van geluid/spraak, intercom
+- (64.23) communicatie; overdracht van geluid/spraak, radio/mobilofoon
+- (64.24) communicatie; overdracht van geluid/spraak, geluidsdistributie
+- (64.25) communicatie; overdracht van geluid/spraak, vertaalsystemen
+- (64.26) communicatie; overdracht van geluid/spraak, conferentiesystemen
+- (64.3) communicatie; beelden
+- (64.30) communicatie; beelden, algemeen (verzamelniveau)
+- (64.31) communicatie; beelden, gesloten televisiecircuits
+- (64.32) communicatie; beelden, beeldreproductie
+- (64.33) communicatie; beelden, film/dia/overhead
+- (64.34) communicatie; beelden, vergader- en presentatiesystemen
+- (64.5) communicatie; geïntegreerde systemen, data
+- (64.50) communicatie; geïntegreerde systemen, data, algemeen (verzamelniveau)
+- (64.51) communicatie; geïntegreerde systemen, data, centrale apparatuur
+- (64.52) communicatie; geïntegreerde systemen, data, distributie bekabeling
+- (64.53) communicatie; geïntegreerde systemen, data, generiek, aansluitpunten
+- (64.54) communicatie; geïntegreerde systemen, data, specifiek aansluitpunten
+- (64.55) communicatie; geïntegreerde systemen, data, decentrale apparatuur
+- (64.6) communicatie; antenne-inrichtingen
+- (64.60) communicatie; antenne-inrichtingen, algemeen (verzamelniveau)
+- (64.61) communicatie; antenne-inrichtingen, centrale apparatuur
+- (64.62) communicatie; antenne-inrichtingen, voedings- en signaalleidingen
+- (64.63) communicatie; antenne-inrichtingen, decentrale apparatuur
+- (64.9) vaste gebouwgebonden voorzieningen behorend bij communicatie
+- (64.90) vaste gebouwgebonden voorzieningen behorend bij communicatie, algemeen (verzamelniveau)
+- (65) Beveiliging
+- (65.0) beveiliging; algemeen
+- (65.1) beveiliging; brandmeldings- en ontruimingsinstallatie
+- (65.10) beveiliging; brandmeldings- en ontruimingsinstallatie, algemeen (verzamelniveau)
+- (65.11) beveiliging; brandmeldings- en ontruimingsinstallatie, detectie en alarmering
+- (65.2) beveiliging; braak-en toegangsbeheer
+- (65.20) beveiliging; braak-en toegangsbeheer, algemeen (verzamelniveau)
+- (65.21) beveiliging; braak-en toegangsbeheer, detectie en alarmering
+- (65.22) beveiliging; braak-en toegangsbeheer, toegangsbeheer
+- (65.23) beveiliging; braak-en toegangsbeheer, CCTV
+- (65.3) beveiliging; overlast-, detectie- en alarmeringsinstallatie
+- (65.30) beveiliging; overlast-, detectie- en alarmeringsinstallatie, algemeen (verzamelniveau)
+- (65.31) beveiliging; overlast-, detectie- en alarmeringsinstallatie, zon- en lichtwering
+- (65.32) beveiliging; overlast-, detectie- en alarmeringsinstallatie, elektromagnetische voorzieningen
+- (65.34) beveiliging; overlast-, detectie- en alarmeringsinstallatie, gassenbeveiligingsapparatuur
+- (65.4) beveiliging; overlast-, sociale alarmeringsinstallatie
+- (65.40) beveiliging; overlast-, sociale alarmeringsinstallatie, algemeen (verzamelniveau)
+- (65.41) beveiliging; overlast-, sociale alarmeringsinstallatie, sociale alarmeringsapparatuur
+- (65.42) beveiliging; overlast-, sociale alarmeringsinstallatie, algemene personenoproepapparatuur
+- (65.43) beveiliging; overlast-, sociale alarmeringsinstallatie, algemene zusteroproepapparatuur
+- (65.9) vaste gebouwgebonden voorzieningen behorend bij beveiliging
+- (65.90) vaste gebouwgebonden voorzieningen behorend bij beveiliging, algemeen (verzamelniveau)
+- (66) Transport
+- (66.0) transport; algemeen
+- (66.1) transport; liftinstallaties
+- (66.10) transport; liftinstallaties, algemeen (verzamelniveau)
+- (66.11) transport; liftinstallaties, tractieliften
+- (66.12) transport; liftinstallaties, hydraulische liften
+- (66.13) transport; liftinstallaties, trapliften
+- (66.14) transport; liftinstallaties, heftableaus
+- (66.2) transport; roltrappen, rolpaden en hellingbanen
+- (66.20) transport; roltrappen, rolpaden en hellingbanen, algemeen (verzamelniveau)
+- (66.21) transport; roltrappen, rolpaden en hellingbanen, roltrappen
+- (66.22) transport; roltrappen, rolpaden en hellingbanen, rolpaden
+- (66.23) transport; roltrappen, rolpaden en hellingbanen, hellingbanen
+- (66.3) transport; goederen
+- (66.30) transport; goederen, algemeen (verzamelniveau)
+- (66.31) transport; goederen, goederenliften
+- (66.32) transport; goederen, goederenheffers
+- (66.33) transport; goederen, baantransportmiddelen
+- (66.34) transport; goederen, bandtransportmiddelen
+- (66.35) transport; goederen, baktransportmiddelen
+- (66.36) transport; goederen, hijswerktuigen en takels
+- (66.37) transport; goederen, vrije-baan-transportvoertuigen
+- (66.4) transport; documenten
+- (66.40) transport; documenten, algemeen (verzamelniveau)
+- (66.41) transport; documenten, buizenpost
+- (66.42) transport; documenten, railcontainer banen
+- (66.44) transport; documenten, bandtransportmiddelen
+- (66.9) vaste gebouwgebonden voorzieningen behorend bij transport
+- (66.90) vaste gebouwgebonden voorzieningen behorend bij transport, algemeen (verzamelniveau)
+- (67) Gebouw management systeem
+- (67.0) gebouw management systeem; algemeen
+- (67.5) gebouw management systeem; centrale apparatuur
+- (67.50) gebouw management systeem; centrale apparatuur, algemeen (verzamelniveau)
+- (67.51) gebouw management systeem; centrale apparatuur, systeemconfiguratie hardware
+- (67.55) gebouw management systeem; centrale apparatuur, systeemconfiguratie software
+- (67.6) gebouw management systeem; distributie, bekabeling
+- (67.60) gebouw management systeem; distributie, bekabeling, algemeen (verzamelniveau)
+- (67.61) gebouw management systeem; distributie, bekabeling, schakelkasten, voedingsleidingen
+- (67.62) gebouw management systeem; distributie, bekabeling, regelkasten, signaalleidingen
+- (67.7) gebouw management systeem; meting en sturing
+- (67.70) gebouw management systeem; meting en sturing, veldapparatuur algemeen (verzamelniveau)
+- (67.71) gebouw management systeem; meting en sturing, veldapparatuur componenten managementsysteem
+- (67.72) gebouw management systeem; meting en sturing, veldapparatuur componenten signaleringen
+- (67.8) gebouw management systeem; bekabeling
+- (67.80) gebouw management systeem; bekabeling, algemeen (verzamelniveau)
+- (67.81) gebouw management systeem; bekabeling, voedingsleidingen
+- (67.82) gebouw management systeem; bekabeling, signaalleidingen
+- (67.9) vaste gebouwgebonden voorzieningen behorend bij gebouw management systeem
+- (67.90) vaste gebouwgebonden voorzieningen behorend bij gebouw management systeem, algemeen (verzamelniveau)
+- (68) Asset Management Systeem
+- (68.0) asset management systeem; algemeen
+- (68.5) asset management systeem; centrale apparatuur
+- (68.50) asset management systeem; centrale apparatuur, algemeen (verzamelniveau)
+- (68.51) asset management systeem; centrale apparatuur, systeemconfiguratie hardware
+- (68.55) asset management systeem; centrale apparatuur, systeemconfiguratie software
+- (68.6) asset management systeem; distributie, bekabeling
+- (68.60) asset management systeem; distributie, bekabeling, algemeen (verzamelniveau)
+- (68.61) asset management systeem; distributie, bekabeling, schakelkasten, voedingsleidingen
+- (68.62) asset management systeem; distributie, bekabeling, regelkasten, signaalleidingen
+- (68.7) asset management systeem; meting en sturing
+- (68.70) asset management systeem; meting en sturing, veldapparatuur algemeen (verzamelniveau)
+- (68.71) asset management systeem; meting en sturing, veldapparatuur componenten managementsysteem
+- (68.72) asset management systeem; meting en sturing, veldapparatuur componenten signaleringen
+- (68.9) vaste gebouwgebonden voorzieningen behorend bij asset management systeem
+- (68.90) vaste gebouwgebonden voorzieningen behorend bij asset management systeem, algemeen (verzamelniveau)
+- (69) -gereserveerd-
+- (7-) VASTE VOORZIENINGEN
+- (70) -gereserveerd-
+- (71) Vaste verkeersvoorzieningen
+- (71.0) vaste verkeersvoorzieningen; algemeen
+- (71.1) vaste verkeersvoorzieningen; standaard
+- (71.10) vaste verkeersvoorzieningen; standaard, algemeen (verzamelniveau)
+- (71.11) vaste verkeersvoorzieningen; standaard, meubileringen
+- (71.12) vaste verkeersvoorzieningen; standaard, bewegwijzeringen
+- (71.13) vaste verkeersvoorzieningen; standaard, kunstwerken
+- (71.14) vaste verkeersvoorzieningen; standaard, decoraties e.d.
+- (71.2) vaste verkeersvoorzieningen; bijzonder
+- (71.20) vaste verkeersvoorzieningen; bijzonder, algemeen (verzamelniveau)
+- (71.21) vaste verkeersvoorzieningen; bijzonder, meubileringen
+- (71.22) vaste verkeersvoorzieningen; bijzonder, bewegwijzeringen
+- (71.23) vaste verkeersvoorzieningen; bijzonder, specifieke voorzieningen
+- (72) Vaste gebruikersvoorzieningen
+- (72.0) vaste gebruikersvoorzieningen; algemeen
+- (72.1) vaste gebruikersvoorzieningen; standaard
+- (72.10) vaste gebruikersvoorzieningen; standaard, algemeen (verzamelniveau)
+- (72.11) vaste gebruikersvoorzieningen; standaard, meubilering
+- (72.12) vaste gebruikersvoorzieningen; standaard, lichtweringen
+- (72.13) vaste gebruikersvoorzieningen; standaard, gordijnvoorzieningen
+- (72.14) vaste gebruikersvoorzieningen; standaard, beschermende voorzieningen
+- (72.2) vaste gebruikersvoorzieningen; bijzonder
+- (72.20) vaste gebruikersvoorzieningen; bijzonder, algemeen (verzamelniveau)
+- (72.21) vaste gebruikersvoorzieningen; bijzonder, meubilering voor specifieke functiedoeleinden
+- (72.22) vaste gebruikersvoorzieningen; bijzonder, instrumenten/apparatuur
+- (73) Vaste keukenvoorzieningen
+- (73.0) vaste keukenvoorzieningen; algemeen
+- (73.1) vaste keukenvoorzieningen; standaard
+- (73.10) vaste keukenvoorzieningen; standaard, algemeen (verzamelniveau)
+- (73.11) vaste keukenvoorzieningen; standaard, keukenmeubilering
+- (73.12) vaste keukenvoorzieningen; standaard, keukenapparatuur
+- (73.2) vaste keukenvoorzieningen; bijzonder
+- (73.20) vaste keukenvoorzieningen; bijzonder, algemeen (verzamelniveau)
+- (73.21) vaste keukenvoorzieningen; bijzonder, keukenmeubilering
+- (73.22) vaste keukenvoorzieningen; bijzonder, keukenapparatuur
+- (74) Vaste sanitaire voorzieningen
+- (74.0) vaste sanitaire voorzieningen; algemeen
+- (74.1) vaste sanitaire voorzieningen; standaard
+- (74.10) vaste sanitaire voorzieningen; standaard, algemeen (verzamelniveau)
+- (74.11) vaste sanitaire voorzieningen; standaard, sanitaire toestellen; normaal
+- (74.12) vaste sanitaire voorzieningen; standaard, sanitaire toestellen; aangepast
+- (74.13) vaste sanitaire voorzieningen; standaard, accessoires
+- (74.2) vaste sanitaire voorzieningen; bijzonder
+- (74.20) vaste sanitaire voorzieningen; bijzonder, algemeen (verzamelniveau)
+- (74.21) vaste sanitaire voorzieningen; bijzonder, sanitaire toestellen voor bijzondere toepassing
+- (74.22) vaste sanitaire voorzieningen; bijzonder, ingebouwde sanitaire voorzieningen
+- (75) Vaste onderhoudsvoorzieningen
+- (75.0) vaste onderhoudsvoorzieningen; algemeen
+- (75.1) vaste onderhoudsvoorzieningen; standaard
+- (75.10) vaste onderhoudsvoorzieningen; standaard, algemeen (verzamelniveau)
+- (75.11) vaste onderhoudsvoorzieningen; standaard, gebouwonderhoudsvoorzieningen
+- (75.12) vaste onderhoudsvoorzieningen; standaard, interieur onderhoudsvoorzieningen
+- (75.13) vaste onderhoudsvoorzieningen; standaard, gevelonderhoudsvoorzieningen
+- (75.2) vaste onderhoudsvoorzieningen; bijzonder
+- (75.20) vaste onderhoudsvoorzieningen; bijzonder, algemeen (verzamelniveau)
+- (75.21) vaste onderhoudsvoorzieningen; bijzonder, gebouwonderhoudsvoorzieningen
+- (75.22) vaste onderhoudsvoorzieningen; bijzonder, interieuronderhoudsvoorzieningen
+- (75.23) vaste onderhoudsvoorzieningen; bijzonder, gemechaniseerde gevelonderhoudsvoorzieningen
+- (76) Vaste opslagvoorzieningen
+- (76.0) vaste opslagvoorzieningen; algemeen
+- (76.1) vaste opslagvoorzieningen; standaard
+- (76.10) vaste opslagvoorzieningen; standaard, algemeen (verzamelniveau)
+- (76.11) vaste opslagvoorzieningen; standaard, meubileringen
+- (76.2) vaste opslagvoorzieningen; bijzonder
+- (76.20) vaste opslagvoorzieningen; bijzonder, algemeen (verzamelniveau)
+- (76.21) vaste opslagvoorzieningen; bijzonder, gemechaniseerde voorzieningen
+- (76.22) vaste opslagvoorzieningen; bijzonder, specifieke voorzieningen
+- (77) -gereserveerd-
+- (78) -gereserveerd-
+- (79) -gereserveerd-
+- (8-) LOSSE INVENTARIS
+- (80) -gereserveerd-
+- (81) Losse verkeersinventaris
+- (81.0) losse verkeersinventaris; algemeen
+- (81.1) losse verkeersinventaris; standaard
+- (81.10) losse verkeersinventaris; standaard, algemeen (verzamelniveau)
+- (81.11) losse verkeersinventaris; standaard, meubilering
+- (81.12) losse verkeersinventaris; standaard, bewegwijzering
+- (81.13) losse verkeersinventaris; standaard, kunstwerken
+- (81.14) losse verkeersinventaris; standaard, decoraties e.d.
+- (81.2) losse verkeersinventaris; bijzonder
+- (81.20) losse verkeersinventaris; bijzonder, algemeen (verzamelniveau)
+- (81.21) losse verkeersinventaris; bijzonder, meubilering
+- (81.22) losse verkeersinventaris; bijzonder, bewegwijzering
+- (81.23) losse verkeersinventaris; bijzonder, specifieke voorzieningen
+- (82) Losse gebruikersinventaris
+- (82.0) losse gebruikersinventaris; algemeen
+- (82.1) losse gebruikersinventaris; standaard
+- (82.10) losse gebruikersinventaris; standaard, algemeen (verzamelniveau)
+- (82.11) losse gebruikersinventaris; standaard, meubilering
+- (82.12) losse gebruikersinventaris; standaard, lichtweringen/verduisteringen
+- (82.13) losse gebruikersinventaris; standaard, stofferingen
+- (82.2) losse gebruikersinventaris; bijzonder
+- (82.20) losse gebruikersinventaris; bijzonder, algemeen (verzamelniveau)
+- (82.21) losse gebruikersinventaris; bijzonder, meubilering voor specifieke functiedoeleinden
+- (82.22) losse gebruikersinventaris; bijzonder, instrumenten/apparatuur
+- (83) Losse keukeninventaris
+- (83.0) losse keukeninventaris; algemeen
+- (83.1) losse keukeninventaris; standaard
+- (83.10) losse keukeninventaris; standaard, algemeen (verzamelniveau)
+- (83.11) losse keukeninventaris; standaard, keukenmeubilering
+- (83.12) losse keukeninventaris; standaard, keukenapparatuur
+- (83.13) losse keukeninventaris; standaard, kleine keukeninventaris
+- (83.2) losse keukeninventaris; bijzonder
+- (83.20) losse keukeninventaris; bijzonder, algemeen (verzamelniveau)
+- (83.21) losse keukeninventaris; bijzonder, keukeninrichting
+- (83.22) losse keukeninventaris; bijzonder, keukenapparatuur
+- (83.23) losse keukeninventaris; bijzonder, kleine keukeninventaris
+- (83.24) losse keukeninventaris; bijzonder, transportmiddelen
+- (84) Losse sanitaire inventaris
+- (84.0) losse sanitaire inventaris; algemeen
+- (84.1) losse sanitaire inventaris; standaard
+- (84.10) losse sanitaire inventaris; standaard, algemeen (verzamelniveau)
+- (84.11) losse sanitaire inventaris; standaard, afvalvoorzieningen
+- (84.12) losse sanitaire inventaris; standaard, voorzieningen t.b.v. hygiëne
+- (84.13) losse sanitaire inventaris; standaard, accessoires
+- (84.2) losse sanitaire inventaris; bijzonder
+- (84.20) losse sanitaire inventaris; bijzonder, algemeen (verzamelniveau)
+- (84.21) losse sanitaire inventaris; bijzonder, sanitaire toestellen voor bijzondere toepassing
+- (85) Losse schoonmaakinventaris
+- (85.0) losse schoonmaakinventaris; algemeen
+- (85.1) losse schoonmaakinventaris; standaard
+- (85.10) losse schoonmaakinventaris; standaard, algemeen (verzamelniveau)
+- (85.11) losse schoonmaakinventaris; standaard, schoonmaakapparatuur
+- (85.12) losse schoonmaakinventaris; standaard, vuilopslag
+- (85.13) losse schoonmaakinventaris; standaard, vuiltransport
+- (85.2) losse schoonmaakinventaris; bijzonder
+- (85.20) losse schoonmaakinventaris; bijzonder, algemeen (verzamelniveau)
+- (85.21) losse schoonmaakinventaris; bijzonder, schoonmaakapparatuur
+- (85.22) losse schoonmaakinventaris; bijzonder, vuilopslag
+- (85.23) losse schoonmaakinventaris; bijzonder, vuiltransport
+- (86) Losse opslaginventaris
+- (86.0) losse opslaginventaris; algemeen
+- (86.1) losse opslaginventaris; standaard
+- (86.10) losse opslaginventaris; standaard, algemeen (verzamelniveau)
+- (86.11) losse opslaginventaris; standaard, meubileringen
+- (86.2) losse opslaginventaris; bijzonder
+- (86.20) losse opslaginventaris; bijzonder, algemeen (verzamelniveau)
+- (86.21) losse opslaginventaris; bijzonder, gemechaniseerde voorzieningen
+- (86.22) losse opslaginventaris; bijzonder, specifieke voorzieningen
+- (87) -gereserveerd-
+- (88) -gereserveerd-
+- (89) -gereserveerd-
+- (9-) TERREIN
+- (90) -gereserveerd-
+- (90.0) terrein
+- (90.1) grondvoorzieningen
+- (90.10) terrein; grondvoorzieningen, algemeen (verzamelniveau)
+- (90.11) terrein; grondvoorzieningen, verwijderen obstakels
+- (90.12) terrein; grondvoorzieningen, grondwaterverlagingen
+- (90.13) terrein; grondvoorzieningen, drainagevoorzieningen
+- (90.2) opstallen
+- (90.20) terrein; opstallen, algemeen (verzamelniveau)
+- (90.21) terrein; opstallen, gebouwtjes met speciale functie
+- (90.22) terrein; opstallen, overkappingen
+- (90.3) omheiningen
+- (90.30) terrein; omheiningen, algemeen (verzamelniveau)
+- (90.31) terrein; omheiningen, muren
+- (90.32) terrein; omheiningen, hekwerken
+- (90.33) terrein; omheiningen, overige afscheidingen
+- (90.34) terrein; omheiningen, toegangen
+- (90.4) terreinafwerkingen
+- (90.40) terrein; terreinafwerkingen, algemeen (verzamelniveau)
+- (90.41) terrein; terreinafwerkingen, verhardingen
+- (90.42) terrein; terreinafwerkingen, beplantingen
+- (90.43) terrein; terreinafwerkingen, waterpartijen
+- (90.44) terrein; terreinafwerkingen, keerwanden en balustrades
+- (90.45) terrein; terreinafwerkingen, pergola s
+- (90.5) terreinvoorzieningen; werktuigbouwkundig
+- (90.50) terrein; werktuigbouwkundig, algemeen (verzamelniveau)
+- (90.51) terrein; werktuigbouwkundig, verwarmingsvoorzieningen
+- (90.52) terrein; werktuigbouwkundig, afvoervoorzieningen
+- (90.53) terrein; werktuigbouwkundig, watervoorzieningen
+- (90.54) terrein; werktuigbouwkundig, gasvoorzieningen
+- (90.55) terrein; werktuigbouwkundig, koudeopwekkingsvoorzieningen
+- (90.56) terrein; werktuigbouwkundig, warmtedistributievoorzieningen
+- (90.57) terrein; werktuigbouwkundig, luchtbehandelingsvoorzieningen
+- (90.58) terrein; werktuigbouwkundig, regelingvoorzieningen
+- (90.6) terreinvoorzieningen; elektrotechnisch
+- (90.60) terrein; elektrotechnisch, algemeen (verzamelniveau)
+- (90.61) terrein; elektrotechnisch, elektrotechnische en aardingsvoorzieningen
+- (90.62) terrein; elektrotechnisch, krachtvoorzieningen
+- (90.63) terrein; elektrotechnisch, lichtvoorzieningen
+- (90.64) terrein; elektrotechnisch, communicatievoorzieningen
+- (90.65) terrein; elektrotechnisch, beveiligingsvoorzieningen
+- (90.66) terrein; elektrotechnisch, transportvoorzieningen
+- (90.67) terrein; elektrotechnisch, beheervoorzieningen
+- (90.7) terreininrichtingen; standaard
+- (90.70) terrein; terreininrichtingen, standaard, algemeen (verzamelniveau)
+- (90.71) terrein; terreininrichtingen, standaard, terreinmeubilering
+- (90.72) terrein; terreininrichtingen, standaard, bewegwijzering
+- (90.73) terrein; terreininrichtingen, standaard, kunstwerken
+- (90.74) terrein; terreininrichtingen, standaard, decoraties e.d.
+- (90.8) terreininrichtingen; bijzonder
+- (90.80) terrein; terreininrichtingen, bijzonder, algemeen (verzamelniveau)
+- (90.81) terrein; terreininrichtingen, bijzonder, terreinmeubilering
+- (90.82) terrein; terreininrichtingen, bijzonder, specifieke voorzieningen
+- (90.83) terrein; terreininrichtingen, bijzonder, bijzondere verhardingen
+- (91) -gereserveerd-
+- (92) -gereserveerd-
+- (93) -gereserveerd-
+- (94) -gereserveerd-
+- (95) -gereserveerd-
+- (96) -gereserveerd-
+- (97) -gereserveerd-
+- (98) -gereserveerd-
+- (99) -gereserveerd-

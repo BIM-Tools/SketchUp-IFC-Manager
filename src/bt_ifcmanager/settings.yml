@@ -9,13 +9,14 @@
   :layers: true
   :materials: true
   :colors: true
+  :styles: true
   :geometry: true
   :fast_guid: false
   :dynamic_attributes: true
   :mapped_items: false
 :load:
   :classifications:
-    NL-SfB tabel 1: true
+    NL-SfB tabel 1 Classification: true
     DIN 276-1: false
   :template_materials: false
 :properties:
