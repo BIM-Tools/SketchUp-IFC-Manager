@@ -19,25 +19,28 @@
 #
 #
 
-require_relative 'Ifc_Type.rb'
+require_relative 'Ifc_Type'
 
 module BimTools::IfcManager
   class IfcReal < Ifc_Type
-
-    def initialize( value )
+    def initialize(ifc_model, value, long = false)
+      super
       begin
         @value = value.to_f
       rescue StandardError, TypeError => e
-        print value << "cannot be converted to a Float: " << e
+        print value << 'cannot be converted to a Float: ' << e
       end
     end
-    
-    def step()
-      val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
-      if @long
-        val = add_long( val )
-      end
-      return val
+
+    # Convert float to STEP formatted STEP string taking into account possible scientific notation
+    def to_step_string(value)
+      val = value.to_s.upcase.gsub(/(\.)0+$/, '.')
+      val = add_long(val) if @long
+      val
+    end
+
+    def step
+      to_step_string(@value)
     end
   end
 end

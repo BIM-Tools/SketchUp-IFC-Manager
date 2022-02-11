@@ -42,7 +42,7 @@ module BimTools
     end
     def elevation
       if @latlong
-        return BimTools::IfcManager::IfcLengthMeasure.new( @latlong[2] )
+        return BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, @latlong[2] )
       end
     end
     

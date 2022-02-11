@@ -1,6 +1,6 @@
-#  IfcSpatialStructureElement_su.rb
+#  IfcNormalisedRatioMeasure.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2021 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,18 +19,15 @@
 #
 #
 
-module BimTools
-  # relating_object must be a IfcRelAggregates
-  # relating_object must be a IfcRelContainedInSpatialStructure
-  module IfcSpatialStructureElement_su
-    @relating_object = nil
-    @related_objects = nil
-    attr_accessor :relating_object, :related_objects
+require_relative 'IfcRatioMeasure'
 
-    def initialize(ifc_model, sketchup)
-      # set default CompositionType
-      @compositiontype = :element
+module BimTools::IfcManager
+  class IfcNormalisedRatioMeasure < IfcRatioMeasure
+    def initialize(ifc_model, value)
       super
+      if @value < 0 || @value > 1
+        raise 'Error creating IfcNormalisedRatioMeasure: Normalized ratio shall be a non-negative value less than or equal to 1.0'
+      end
     end
   end
 end

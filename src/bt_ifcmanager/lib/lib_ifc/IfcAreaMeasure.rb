@@ -1,4 +1,4 @@
-#  IfcSpatialStructureElement_su.rb
+#  IfcReal.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
 #
@@ -19,18 +19,23 @@
 #
 #
 
-module BimTools
-  # relating_object must be a IfcRelAggregates
-  # relating_object must be a IfcRelContainedInSpatialStructure
-  module IfcSpatialStructureElement_su
-    @relating_object = nil
-    @related_objects = nil
-    attr_accessor :relating_object, :related_objects
+require_relative 'Ifc_Type'
 
-    def initialize(ifc_model, sketchup)
-      # set default CompositionType
-      @compositiontype = :element
+module BimTools::IfcManager
+  class IfcAreaMeasure < Ifc_Type
+    def initialize(ifc_model, value, long = false)
       super
+      begin
+        @value = value.to_f
+      rescue StandardError, TypeError => e
+        print value << 'cannot be converted to an area: ' << e
+      end
+    end
+
+    def step
+      val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
+      val = add_long(val) if @long
+      val
     end
   end
 end

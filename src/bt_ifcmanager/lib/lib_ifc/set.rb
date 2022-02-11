@@ -19,34 +19,20 @@
 #
 #
 
-module BimTools::IfcManager
-  class Ifc_Set
-    attr_accessor :items
-    def initialize( items=nil )
-      if items
-        @items = items.to_set
-      else
-        @items = Set.new
-      end
-    end
+require_relative('step')
 
-    def add( entity )
-      unless @items.include?(entity)
-        @items << entity
-      end
-    end
+module BimTools
+  module IfcManager
+    class Ifc_Set < Set
+      include Step
 
-    def item_to_step(item)
-      if item.is_a? String
-        return item
-      else
-        return item.ref
+      def add(entity)
+        self << entity
       end
-    end
 
-    def step()
-      item_strings = @items.map { |item| item_to_step(item) }
-      return "(#{item_strings.join(",")})"
+      def step
+        "(#{map { |item| property_to_step(item) }.join(',')})"
+      end
     end
   end
 end

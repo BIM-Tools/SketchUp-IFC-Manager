@@ -2,11 +2,9 @@ html {
     font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
     font-size: 10px;
     line-height: 1.5;
-    height: 100%;
 }
 body {
     background-color: #f0f0f0;
-    height: 100%;
 }
 h1, h2, h3, h4 {
     font-size: 1rem;

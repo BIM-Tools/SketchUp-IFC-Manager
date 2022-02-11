@@ -21,28 +21,14 @@
 #
 #
 
-require_relative('IfcGloballyUniqueId.rb')
-require_relative('IfcLengthMeasure.rb')
-require_relative('entity_path.rb')
-
-require_relative(File.join('IFC2X3', 'IfcElementAssembly.rb'))
-require_relative(File.join('IFC2X3', 'IfcBuilding.rb'))
-require_relative(File.join('IFC2X3', 'IfcBuildingStorey.rb'))
-require_relative(File.join('IFC2X3', 'IfcBuildingElementProxy.rb'))
-require_relative(File.join('IFC2X3', 'IfcCurtainWall.rb'))
-require_relative(File.join('IFC2X3', 'IfcGroup.rb'))
-require_relative(File.join('IFC2X3', 'IfcLocalPlacement.rb'))
-require_relative(File.join('IFC2X3', 'IfcProject.rb'))
-require_relative(File.join('IFC2X3', 'IfcSite.rb'))
-require_relative(File.join('IFC2X3', 'IfcSpace.rb'))
-require_relative(File.join('IFC2X3', 'IfcSpatialStructureElement.rb'))
-require_relative(File.join('IFC2X3', 'IfcZone.rb'))
+require_relative('IfcGloballyUniqueId')
+require_relative('IfcLengthMeasure')
+require_relative('entity_path')
 
 module BimTools::IfcManager
   require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')
 
   class ObjectCreator
-    include BimTools::IFC2X3
 
     # This creator class creates the correct IFC entity for the given sketchup object and it's children
     #
@@ -54,27 +40,27 @@ module BimTools::IfcManager
     # @parameter su_material [Sketchup::Material] The parent sketchup objects material which will be used when the given one does not have a directly associated material
     #
     def initialize(ifc_model, su_instance, su_total_transformation, placement_parent = nil, entity_path = nil, su_material = nil)
+      @ifc = BimTools::IfcManager::Settings.ifc_module
       @ifc_model = ifc_model
       @entity_path = EntityPath.new(@ifc_model, entity_path)
-      ent_type_name = su_instance.definition.get_attribute('AppliedSchemaTypes', 'IFC 2x3')
+      ent_type_name = su_instance.definition.get_attribute('AppliedSchemaTypes',
+                                                           BimTools::IfcManager::Settings.ifc_version)
       su_material = su_instance.material if su_instance.material
 
       # Add the current sketchup object's transformation to the total transformation
       @su_total_transformation = su_total_transformation * su_instance.transformation
 
       # check if entity is one of the entities that need to be exported (and possibly it's nested entities)
-      unless @ifc_model.su_entities.empty?
-        if @ifc_model.su_entities.include?(su_instance)
-          if @ifc_model.options[:ifc_entities] == false || @ifc_model.options[:ifc_entities].include?(ent_type_name)
-            create_ifc_entity(ent_type_name, su_instance, placement_parent, su_material)
-          end
-        else
-          create_nested_objects(placement_parent, su_instance, su_material)
-        end
-      else
+      if @ifc_model.su_entities.empty?
         if @ifc_model.options[:ifc_entities] == false || @ifc_model.options[:ifc_entities].include?(ent_type_name)
           create_ifc_entity(ent_type_name, su_instance, placement_parent, su_material)
         end
+      elsif @ifc_model.su_entities.include?(su_instance)
+        if @ifc_model.options[:ifc_entities] == false || @ifc_model.options[:ifc_entities].include?(ent_type_name)
+          create_ifc_entity(ent_type_name, su_instance, placement_parent, su_material)
+        end
+      else
+        create_nested_objects(placement_parent, su_instance, su_material)
       end
     end
 
@@ -82,47 +68,33 @@ module BimTools::IfcManager
 
     # Create IFC entity based on the IFC classification in sketchup
     def create_ifc_entity(ent_type_name, su_instance, placement_parent = nil, su_material = nil)
-      parent_hex_guid = placement_parent.globalid&.to_s if placement_parent
+      parent_hex_guid = placement_parent.globalid&.to_hex if placement_parent
 
-      # (?) catch ent_type_name.nil? with if before catch block?
-      begin
-        require_relative File.join('IFC2X3', ent_type_name)
-        entity_type = eval(ent_type_name)
+      # Replace IfcWallStandardCase by IfcWall, due to geometry issues and deprecated in IFC 4
+      ent_type_name = 'IfcWall' if ent_type_name == 'IfcWallStandardCase'
 
-        # if a IfcProject then add su_object to the existing project
-        # (?) what if there are multiple projects defined?
-        if entity_type == IfcProject
+      entity_type = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name) if ent_type_name
 
-          #TODO set all correct parameters for IfcProject!!!
-          @ifc_model.project.su_object = su_instance
-          ifc_entity = @ifc_model.project
-          @ifc_model.project.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
-        else
-          ifc_entity = entity_type.new(@ifc_model, su_instance)
-          if entity_type < IfcRoot
-            ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
-          end
-        end
-        @entity_path.add(ifc_entity)
-        construct_entity(ifc_entity, placement_parent)
-        faces = create_nested_objects(ifc_entity, su_instance, su_material)
-        create_geometry(ifc_entity, su_material,faces)
+      # All unclassified and non-existent objects are mapped to IfcBuildingElementProxy
+      entity_type ||= @ifc::IfcBuildingElementProxy
 
-      # LoadError added because require errors are not catched by StandardError
-      rescue StandardError, LoadError
-        # If not classified as IFC in sketchup AND the parent is an IfcSpatialStructureElement then this is an IfcBuildingElementProxy
-        if placement_parent.is_a?(IfcSpatialStructureElement) || placement_parent.is_a?(IfcProject)
-          ifc_entity = IfcBuildingElementProxy.new(@ifc_model, su_instance)
-          ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid)
-          @entity_path.add(ifc_entity)
-          construct_entity(ifc_entity, placement_parent)
-          faces = create_nested_objects(ifc_entity, su_instance, su_material)
-          create_geometry(ifc_entity, su_material,faces)
-        else # this instance is pure geometry and will be part of the parent entity
-          faces = create_nested_objects(placement_parent, su_instance, su_material)
-          create_geometry(placement_parent, su_material,faces)
-        end
+      # if a IfcProject then add su_object to the existing project
+      # (?) what if there are multiple projects defined?
+      if entity_type == @ifc::IfcProject
+
+        # TODO: set all correct parameters for IfcProject!!!
+        @ifc_model.project.su_object = su_instance
+        ifc_entity = @ifc_model.project
+      else
+        ifc_entity = entity_type.new(@ifc_model, su_instance)
       end
+
+      ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid) if entity_type < @ifc::IfcRoot
+
+      @entity_path.add(ifc_entity)
+      construct_entity(ifc_entity, placement_parent)
+      faces = create_nested_objects(ifc_entity, su_instance, su_material)
+      create_geometry(su_instance.definition, ifc_entity, su_material, faces)
     end
 
     # Constructs the IFC entity
@@ -130,34 +102,32 @@ module BimTools::IfcManager
     # @parameter ifc_entity
     #
     def construct_entity(ifc_entity, placement_parent)
-
       # if parent is a IfcGroup, add entity to group
-      if placement_parent.is_a?(IfcGroup)
-        if ifc_entity.is_a?(IfcObjectDefinition)
-          if placement_parent.is_a?(IfcZone)
-            if ifc_entity.is_a?(IfcZone) || ifc_entity.is_a?(IfcSpace)
-              placement_parent.add(ifc_entity)
-            end
-          else
-            placement_parent.add(ifc_entity)
-          end
+      if placement_parent.is_a?(@ifc::IfcGroup) && ifc_entity.is_a?(@ifc::IfcObjectDefinition)
+        if placement_parent.is_a?(@ifc::IfcZone)
+          placement_parent.add(ifc_entity) if ifc_entity.is_a?(@ifc::IfcZone) || ifc_entity.is_a?(@ifc::IfcSpace)
+        else
+          placement_parent.add(ifc_entity)
         end
       end
 
-      if ifc_entity.is_a?(IfcProduct)
+      # create objectplacement for ifc_entity
+      # set objectplacement based on transformation
+      if ifc_entity.is_a?(@ifc::IfcProduct)
         @entity_path.set_parent(ifc_entity)
-        if ifc_entity.parent.is_a?(IfcProduct)
-          ifc_entity.objectplacement = IfcLocalPlacement.new(@ifc_model, @su_total_transformation, ifc_entity.parent.objectplacement)
+        if ifc_entity.parent.is_a?(@ifc::IfcProduct)
+          ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, @su_total_transformation,
+                                                             ifc_entity.parent.objectplacement)
         else
-          ifc_entity.objectplacement = IfcLocalPlacement.new(@ifc_model, @su_total_transformation)
+          ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, @su_total_transformation)
         end
 
         # set elevation for buildingstorey
         # (?) is this the best place to define building storey elevation?
         #   could be better set from within IfcBuildingStorey?
-        if ifc_entity.is_a?(IfcBuildingStorey)
-          elevation = ifc_entity.objectplacement.ifc_total_transformation.origin.z.to_mm
-          ifc_entity.elevation = BimTools::IfcManager::IfcLengthMeasure.new(elevation)
+        if ifc_entity.is_a?(@ifc::IfcBuildingStorey)
+          elevation = ifc_entity.objectplacement.ifc_total_transformation.origin.z
+          ifc_entity.elevation = BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, elevation)
         end
       end
     end
@@ -172,6 +142,10 @@ module BimTools::IfcManager
     def create_nested_objects(ifc_entity, su_instance, su_material)
       faces = []
       definition = su_instance.definition
+
+      # (!)(?) Do we need to update su_material?
+      # su_material = su_instance.material if su_instance.material
+
       entities = definition.entities
       definition_count = entities.length
       i = 0
@@ -192,14 +166,13 @@ module BimTools::IfcManager
         end
         i += 1
       end
-      return faces
+      faces
     end
 
-    def create_geometry(ifc_entity,su_material,faces)
-
+    def create_geometry(definition, ifc_entity, su_material, faces)
       # calculate the local transformation
       # if the SU object if not an IFC entity, then BREP needs to be transformed with SU object transformation
-      if !ifc_entity.is_a?(IfcProduct) || ifc_entity.is_a?(IfcGroup) || ifc_entity.parent.is_a?(IfcProject)
+      if !ifc_entity.is_a?(@ifc::IfcProduct) || ifc_entity.is_a?(@ifc::IfcGroup) || ifc_entity.parent.is_a?(@ifc::IfcProject)
         brep_transformation = @su_total_transformation
       else
         brep_transformation = ifc_entity.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
@@ -207,11 +180,91 @@ module BimTools::IfcManager
 
       # create geometry from faces
       # (!) skips any geometry placed inside objects NOT of the type IfcProduct
-      unless faces.empty? # && ifc_entity.is_a?(IfcProduct)
-        if ifc_entity
-          ifc_entity.create_representation(faces, brep_transformation, su_material)
+      unless faces.empty?
+        case ifc_entity
+
+        # IfcZone is a special kind of IfcGroup that can only include IfcSpace objects
+        when @ifc::IfcZone
+          if ifc_entity.name
+            sub_entity_name = "#{ifc_entity.name.value} geometry"
+          else
+            sub_entity_name = 'space geometry'
+          end
+          sub_entity = @ifc::IfcSpace.new(@ifc_model, nil)
+          sub_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, sub_entity_name)
+          definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+          sub_entity.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
+          sub_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
+
+          if sub_entity.respond_to?(:compositiontype=)
+            sub_entity.compositiontype = :element
+          end
+          if sub_entity.respond_to?(:interiororexteriorspace=)
+            sub_entity.interiororexteriorspace = :notdefined
+          end
+
+          # Add to spatial hierarchy
+          @entity_path.add(sub_entity)
+          @entity_path.set_parent(sub_entity)
+
+          # Add created space to the zone
+          ifc_entity.add(sub_entity)
+
+        when @ifc::IfcProject
+          if ifc_entity.name
+            sub_entity_name = "#{ifc_entity.name.value} geometry"
+          else
+            sub_entity_name = 'project geometry'
+          end
+          sub_entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
+          sub_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, sub_entity_name)
+          definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+          sub_entity.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
+          sub_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
+
+          if sub_entity.respond_to?(:predefinedtype=)
+            sub_entity.predefinedtype = :notdefined
+          end
+          if sub_entity.respond_to?(:compositiontype=)
+            sub_entity.compositiontype = :element
+          end
+
+          # Add to spatial hierarchy
+          @entity_path.add(sub_entity)
+          # @entity_path.set_parent(sub_entity)
+
+        # An IfcGroup or IfcProject has no geometry so all Sketchup geometry is embedded in a IfcBuildingElementProxy
+        #   IfcGroup is also the supertype of IfcSystem
+        #   (?) mapped items?
+        when @ifc::IfcGroup
+          if ifc_entity.name
+            sub_entity_name = "#{ifc_entity.name.value} geometry"
+          else
+            sub_entity_name = 'group geometry'
+          end
+          sub_entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
+          sub_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, sub_entity_name)
+          definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+          sub_entity.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
+          sub_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
+          
+          if sub_entity.respond_to?(:predefinedtype=)
+            sub_entity.predefinedtype = :notdefined
+          end
+          if sub_entity.respond_to?(:compositiontype=)
+            sub_entity.compositiontype = :element
+          end
+
+          # Add to spatial hierarchy
+          @entity_path.add(sub_entity)
+          @entity_path.set_parent(sub_entity)
+          ifc_entity.add(sub_entity)
+        when ifc_entity.nil? # (?) does this ever occur?
+          definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+          placement_parent.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
         else
-          ifc_entity.parent.create_representation(faces, brep_transformation, su_material)
+          definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+          ifc_entity.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
         end
       end
     end

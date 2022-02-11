@@ -26,35 +26,36 @@ module BimTools::IfcManager
   # @param [Sketchup::ComponentDefinition] definition
   # @param [String] ent_type_name
   def add_common_psets(definition, ent_type_name)
-    ifc_dict = definition.attribute_dictionary("IFC 2x3")
+    ifc_dict = definition.attribute_dictionary(BimTools::IfcManager::Settings.ifc_version)
     if ifc_dict
-      require_relative File.join("IFC2X3", ent_type_name)
-      entity_type = eval("BimTools::IFC2X3::#{ent_type_name}")
-      prefix = 'BimTools::IFC2X3::Ifc'
+      entity_type = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name)
+      prefix = BimTools::IfcManager::Settings.ifc_module
       entity_type.ancestors.each do |ancestor|
         name = ancestor.name
-        if name.start_with?(prefix)
-          basename = name.split(prefix).last
-          filename = File.join(PLUGIN_PATH_LIB, "lib_ifc", "psd", "Pset_#{basename}Common.xml" )
-          xml_file = File.file?(filename)
-          if xml_file
-            xmlfile = File.new(filename)
-            xmldoc = Document.new(xmlfile)
-            xmldoc.elements.each("PropertySetDef") do |e|
-              propertyset_name =  e.elements().to_a("Name").first.text
-              pset_dict = ifc_dict.attribute_dictionary(propertyset_name, true)
-              e.elements.each("PropertyDefs/PropertyDef") do |e|
-                property_name = e.elements().to_a("Name").first.text
-                property_type = e.elements().to_a("PropertyType").first.elements().to_a().first.name
+        split_name = ancestor.name.split('::Ifc')
+        if split_name.length == 2
+          basename = split_name.last
+          if !basename.end_with?("_su")
+            filename = File.join(PLUGIN_PATH_LIB, "lib_ifc", "psd", "Pset_#{basename}Common.xml" )
+            xml_file = File.file?(filename)
+            if xml_file
+              xmlfile = File.new(filename)
+              xmldoc = Document.new(xmlfile)
+              xmldoc.elements.each("PropertySetDef") do |e|
+                propertyset_name =  e.elements().to_a("Name").first.text
+                pset_dict = ifc_dict.attribute_dictionary(propertyset_name, true)
+                e.elements.each("PropertyDefs/PropertyDef") do |e|
+                  property_name = e.elements().to_a("Name").first.text
+                  property_type = e.elements().to_a("PropertyType").first.elements().to_a().first.name
 
-                # Only add TypePropertySingleValue and TypePropertyEnumeratedValue
-                # Possible property value types
-                # - TypePropertySingleValue
-                # - TypePropertyEnumeratedValue : "choice"?
-                # - TypePropertyBoundedValue
-                # - TypePropertyReferenceValue
-                if property_type == "TypePropertySingleValue"
-                  
+                  # Only add TypePropertySingleValue and TypePropertyEnumeratedValue
+                  # Possible property value types
+                  # - TypePropertySingleValue
+                  # - TypePropertyEnumeratedValue : "choice"?
+                  # - TypePropertyBoundedValue
+                  # - TypePropertyReferenceValue
+                  if property_type == "TypePropertySingleValue"
+                    
                     # Possible sketchup value types
                     # - boolean
                     # - choice
@@ -105,3 +106,4 @@ module BimTools::IfcManager
       return false
     end
   end
+end

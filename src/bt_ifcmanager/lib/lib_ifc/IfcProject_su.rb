@@ -19,63 +19,52 @@
 #
 #
 
-require_relative File.join('IFC2X3', 'IfcUnitAssignment.rb')
-require_relative File.join('IFC2X3', 'IfcSIUnit.rb')
-
 module BimTools
   module IfcProject_su
     attr_accessor :su_object
+
     def initialize(ifc_model, sketchup)
       super
-      self.su_object=(sketchup)
+      @ifc = BimTools::IfcManager::Settings.ifc_module
+      self.su_object = (sketchup)
       @ifc_model = ifc_model
-      
-      # IfcUnitAssignment
-      @unitsincontext = BimTools::IFC2X3::IfcUnitAssignment.new( ifc_model )
-      @unitsincontext.units = IfcManager::Ifc_Set.new()
-      mm = BimTools::IFC2X3::IfcSIUnit.new( ifc_model )
-      mm.dimensions = '*'
-      mm.unittype = '.LENGTHUNIT.'
-      mm.prefix = '.MILLI.'
-      mm.name = '.METRE.'
-      @unitsincontext.units.add( mm )
-      m2 = BimTools::IFC2X3::IfcSIUnit.new( ifc_model )
-      m2.dimensions = '*'
-      m2.unittype = '.AREAUNIT.'
-      m2.name = '.SQUARE_METRE.'
-      @unitsincontext.units.add( m2 )
-      m3 = BimTools::IFC2X3::IfcSIUnit.new( ifc_model )
-      m3.dimensions = '*'
-      m3.unittype = '.VOLUMEUNIT.'
-      m3.name = '.CUBIC_METRE.'
-      @unitsincontext.units.add( m3 )
-    end # def initialize
-    
+
+      # Set project units to sketchup units
+      @unitsincontext = @ifc::IfcUnitAssignment.new(@ifc_model)
+    end
+
     def su_object=(sketchup)
-      @name = BimTools::IfcManager::IfcLabel.new( "default project" )
-      @description = BimTools::IfcManager::IfcLabel.new( "Description of Default Project" )
+      @name = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'default project')
       if sketchup.is_a?(Sketchup::Group) || sketchup.is_a?(Sketchup::ComponentInstance)
         @su_object = sketchup
-        
-        # get properties from su object and add them to ifc object
-        unless @su_object.definition.name.nil? || @su_object.definition.name == ""
-          @name = BimTools::IfcManager::IfcLabel.new( @su_object.definition.name )
-          @description = BimTools::IfcManager::IfcLabel.new( @su_object.definition.description )
+
+        # get properties from Sketchup object and add them to ifc object
+        unless @su_object.definition.name.empty?
+          @name = BimTools::IfcManager::IfcLabel.new(@ifc_model,
+                                                     @su_object.definition.name)
+        end
+        unless @su_object.definition.description.empty?
+          @description = BimTools::IfcManager::IfcLabel.new(@ifc_model,
+                                                            @su_object.definition.description)
         end
       else
-        unless @ifc_model.su_model.name.nil? || @ifc_model.su_model.name == ""
-          @name = BimTools::IfcManager::IfcLabel.new( @ifc_model.su_model.name )
-          @description = BimTools::IfcManager::IfcLabel.new( @ifc_model.su_model.description )
+
+        # get properties from Sketchup Model and add them to ifc object
+        unless @ifc_model.su_model.name.empty?
+          @name = BimTools::IfcManager::IfcLabel.new(@ifc_model,
+                                                     @ifc_model.su_model.name)
+        end
+        unless @ifc_model.su_model.description.empty?
+          @description = BimTools::IfcManager::IfcLabel.new(@ifc_model,
+                                                            @ifc_model.su_model.description)
         end
       end
-      #@name = BimTools::IfcManager::IfcLabel.new( name )
-      #@description = BimTools::IfcManager::IfcText.new( description )
     end
-    
+
     # add export summary for IfcProducts
     def step
       @ifc_model.summary_add(self.class.name.split('::').last)
       super
     end
-  end # module IfcProject_su
-end # module BimTools
+  end
+end

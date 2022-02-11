@@ -19,96 +19,85 @@
 #
 #
 
-require_relative 'set.rb'
-require_relative File.join('IFC2X3', 'IfcRelAssignsToGroup.rb')
+require_relative 'set'
+require_relative 'propertyset'
 
 module BimTools
   module IfcGroup_su
+    
+
     # @parameter ifc_model [IfcManager::IfcModel]
     # @parameter sketchup [Sketchup::ComponentDefinition]
-    def initialize(ifc_model, sketchup=nil)
+    def initialize(ifc_model, sketchup = nil)
       super
-
-      # Create relationship object
-      @rel = BimTools::IFC2X3::IfcRelAssignsToGroup.new( ifc_model )
+      @ifc = BimTools::IfcManager::Settings.ifc_module
+      @rel = @ifc::IfcRelAssignsToGroup.new(ifc_model)
       @rel.relatinggroup = self
-      @rel.relatedobjects = IfcManager::Ifc_Set.new()
+      @rel.relatedobjects = IfcManager::Ifc_Set.new
 
-      #(!) Functionalty and code is similar to IfcProduct, should be merged
+      # (!) Functionalty and code is similar to IfcProduct, should be merged
       if sketchup.is_a?(Sketchup::Group) || sketchup.is_a?(Sketchup::ComponentInstance)
-        
+
         # get properties from su object and add them to ifc object
+        ifc_version = BimTools::IfcManager::Settings.ifc_version
         definition = sketchup.definition
-        
-        #(?) set name, here? is this a duplicate?
-        @name = BimTools::IfcManager::IfcLabel.new(definition.name)
+
+        # (?) set name, here? is this a duplicate?
+        @name = BimTools::IfcManager::IfcLabel.new(ifc_model, definition.name)
 
         # also set "tag" to component instance name?
         # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
-        
-        if definition.attribute_dictionaries
-          if definition.attribute_dictionaries["IFC 2x3"]
-            if props_ifc = definition.attribute_dictionaries["IFC 2x3"].attribute_dictionaries
-              props_ifc.each do |prop_dict|
-                prop = prop_dict.name
-                prop_sym = prop.to_sym
-                if properties.include? prop_sym
 
-                  property_reader = BimTools::PropertyReader.new(prop_dict)
-                  dict_value = property_reader.value
-                  value_type = property_reader.value_type
-                  attribute_type = property_reader.attribute_type
-                  
-                  if attribute_type == "choice"
-                    # Skip this attribute, this is not a value but a reference
-                  elsif attribute_type == "enumeration"
-                    send("#{prop.downcase}=", BimTools::IfcManager::Enumeration.new(dict_value))
-                  else
-                    entity_type = false
-                    if value_type
-                      begin
-                        # require_relative ent_type_name
-                        entity_type = eval("BimTools::IfcManager::#{value_type}")
-                        value_entity = entity_type.new(dict_value)
-                      rescue => e
-                        puts "Error creating IFC type: #{ e.to_s}"
-                      end
-                    end
-                    unless entity_type
-                      
-                      case attribute_type
-                      when "boolean"
-                        value_entity = BimTools::IfcManager::IfcBoolean.new(dict_value)
-                      when "double"
-                        value_entity = BimTools::IfcManager::IfcReal.new(dict_value)
-                      when "long"
-                        value_entity = BimTools::IfcManager::IfcInteger.new(dict_value)
-                      else # "string" and others?
-                        value_entity = BimTools::IfcManager::IfcLabel.new(dict_value)
-                      end
-                    end
-                    send("#{prop.downcase}=", value_entity)
-                  end
-                else
-                  if prop_dict.attribute_dictionaries && prop_dict.name != "instanceAttributes"
-                    reldef = BimTools::IFC2X3::IfcRelDefinesByProperties.new( ifc_model, prop_dict )
-                    reldef.relatedobjects.add( self )
-                  end
-                end
-              end
+
+        # get attributes from su object and add them to IfcProduct
+        if definition.attribute_dictionaries && definition.attribute_dictionaries[ifc_version] && props_ifc = definition.attribute_dictionaries[ifc_version].attribute_dictionaries
+          dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(ifc_model, self, props_ifc)
+          dict_reader.set_attributes()
+          propertysets = dict_reader.get_propertysets()
+          i = 0
+          while(i < propertysets.length)
+            rel_defines = propertysets[i]
+            if rel_defines
+              rel_defines.relatedobjects.add(self)
             end
+            i+=1
           end
+
+          # (!) TODO
+          # Add ifc_model.options[:attributes] as parameter to dict_reader.set_properties()
+          # 
+          #
+          # if ifc_model.options[:attributes]
+          #   ifc_model.options[:attributes].each do |attr_dict_name|
+          #     # Only add definition propertysets when no TypeProduct is set
+          #     collect_psets(ifc_model, @su_object.definition.attribute_dictionary(attr_dict_name)) unless @type_product
+          #     collect_psets(ifc_model, @su_object.attribute_dictionary(attr_dict_name))
+          #   end
+          # else
+
+          # # Only add definition propertysets when no TypeProduct is set
+          # if !@type_product
+          #   @su_object.definition.attribute_dictionaries.each do |attr_dict|
+          #     collect_psets(ifc_model, attr_dict)
+          #   end
+          # end
+          # if @su_object.attribute_dictionaries
+          #   @su_object.attribute_dictionaries.each do |attr_dict|
+          #     collect_psets(ifc_model, attr_dict)
+          #   end
+          # end
+          
         end
       end
     end
-    
+
     def add(entity)
       @rel.relatedobjects.add(entity)
     end
-    
+
     # add export summary for IfcProducts
     def step
-      @ifc_model.summary_add(self.class.name.split("::").last)
+      @ifc_model.summary_add(self.class.name.split('::').last)
       super
     end
   end

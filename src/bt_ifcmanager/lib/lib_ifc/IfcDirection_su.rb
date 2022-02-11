@@ -19,22 +19,20 @@
 #
 #
 
-require_relative 'IfcReal.rb'
+require_relative 'IfcReal'
 
 module BimTools
   module IfcDirection_su
     def initialize(ifc_model, sketchup)
       super
-      if sketchup.is_a? Geom::Vector3d
-        
+      case sketchup
+      when Geom::Vector3d, Geom::Vector2d
+
         # round values
-        @directionratios = IfcManager::Ifc_List.new([
-          IfcManager::IfcReal.new(sketchup.x).step,
-          IfcManager::IfcReal.new(sketchup.y).step,
-          IfcManager::IfcReal.new(sketchup.z).step
-        ])
+        @directionratios = IfcManager::Ifc_List.new(sketchup.to_a.map { |x| IfcManager::IfcReal.new(ifc_model, x) })
+      else
+        raise TypeError, 'Expected a vector type.'
       end
-      
-    end # def sketchup
-  end # module IfcDirection_su
-end # module BimTools
+    end
+  end
+end

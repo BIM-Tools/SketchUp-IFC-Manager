@@ -24,7 +24,7 @@
 # (!) Note: securerandom takes very long to load
 require 'securerandom'
 
-module BimTools  
+module BimTools
   module IfcManager
   
     PLATFORM_IS_OSX     = ( Object::RUBY_PLATFORM =~ /darwin/i ) ? true : false
@@ -56,7 +56,7 @@ module BimTools
     PLUGIN_PATH_UI = File.join(PLUGIN_PATH, 'ui')
     PLUGIN_PATH_TOOLS = File.join(PLUGIN_PATH, 'tools')
     PLUGIN_PATH_CLASSIFICATIONS = File.join(PLUGIN_PATH, 'classifications')
-
+    
     # Create export message collection
     @export_messages = Array.new
 
@@ -65,8 +65,8 @@ module BimTools
 
     # Load settings from yaml file
     require File.join(PLUGIN_PATH, 'settings.rb')
-    Settings.load()
-
+    Settings.load_settings()
+    
     require File.join(PLUGIN_PATH, 'window.rb')
     require File.join(PLUGIN_PATH, 'export.rb')
     require File.join(PLUGIN_PATH_TOOLS, 'paint_properties.rb')
@@ -109,10 +109,16 @@ module BimTools
       dirname = File.dirname(model_path)
 
       # enter save path
-      export_path = UI.savepanel('Export Model', dirname, filename)
+      export_path = UI.savepanel('Export to IFC (.ifc/.ifcZIP)', dirname, filename)
 
       # only start export if path is valid
       unless export_path.nil?
+
+        # make sure file_path ends in "ifc"
+        unless [".ifc",".ifczip"].include? File.extname(export_path).downcase
+          export_path << '.ifc'
+        end
+
         export( export_path )
       end
     }

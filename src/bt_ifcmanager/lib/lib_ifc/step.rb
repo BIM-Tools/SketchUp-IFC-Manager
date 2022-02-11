@@ -20,36 +20,57 @@
 #
 
 # mixin module to set the Step generation methods for all IFC classes
- 
+
 module BimTools
   module Step
-    def step()
-      attribute_strings = properties().map { |attribute| attribute_to_step(attribute) }
-      return "##{@ifc_id}=#{self.class.name.split('::').last.upcase}(#{attribute_strings.join(",")})"
+    # Returns the STEP representation for an object
+    #
+    # @return String
+    #
+    def step
+      attribute_strings = attributes.map { |attribute| attribute_to_step(attribute) }
+      "##{@ifc_id}=#{self.class.name.split('::').last.upcase}(#{attribute_strings.join(',')})"
     end
 
+    # Returns the STEP representation for an attribute
+    #
+    # @param property_name
+    #
+    # @return String
+    #
     def attribute_to_step(property_name)
-      property = self.send(property_name.downcase)
-      if property.nil?
-        return "$"
+      property = send(property_name.downcase)
+      property_to_step(property)
+    end
+
+    def property_to_step(property)
+      case property
+      when nil
+        '$'
+      when Symbol
+        ".#{property.upcase}."
+      when String
+        property
+      when TrueClass
+        '.T.'
+      when FalseClass
+        '.F.'
+      when IfcManager::IfcGloballyUniqueId, IfcManager::Ifc_List, IfcManager::Ifc_Set, IfcManager::Ifc_Type
+        property.step
       else
-        if property.is_a? String
-          return property
-        elsif property.is_a?(IfcManager::IfcGloballyUniqueId) || property.is_a?(IfcManager::Ifc_List) || property.is_a?(IfcManager::Ifc_Set) || property.is_a?(IfcManager::Ifc_Type)
-          return property.step
-        elsif property.is_a? TrueClass
-          return ".T."
-        elsif property.is_a? FalseClass
-          return ".F."
-        else
-          return property.ref
-        end
+        property.ref
       end
     end
 
-    # Instead of the full step object return a reference
-    def ref()
-      return "##{@ifc_id}"
+    # Instead of the full step object return a STEP reference
+    #   for example '#15'
+    #
+    # @return String
+    #
+    def ref
+      raise "Missing IFC object ID for: #{self}" unless @ifc_id
+
+      "##{@ifc_id}"
     end
   end
 end

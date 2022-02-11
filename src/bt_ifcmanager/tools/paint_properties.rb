@@ -19,7 +19,7 @@
 
 module BimTools
  module IfcManager
-  require File.join(PLUGIN_PATH_LIB, "set_ifc_entity_name.rb")
+  require File.join(PLUGIN_PATH, "update_ifc_fields.rb")
   module PaintProperties
     extend self
     attr_accessor :name

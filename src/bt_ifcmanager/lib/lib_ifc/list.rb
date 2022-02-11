@@ -19,38 +19,20 @@
 #
 #
 
+require_relative('step')
+
 module BimTools
- module IfcManager
-  class Ifc_List
-    attr_accessor :items
-    def initialize( items=nil )
-      if items
-        @items = items
-      else
-        @items = Array.new
+  module IfcManager
+    class Ifc_List < Array
+      include Step
+
+      def add(entity)
+        self << entity
+      end
+
+      def step
+        "(#{map { |item| property_to_step(item) }.join(',')})"
       end
     end
-    
-    def add( entity )
-      @items << entity
-    end
-    
-    def first()
-      return @items.first
-    end
-
-    def item_to_step(item)
-      if item.is_a? String
-        return item
-      else
-        return item.ref
-      end
-    end
-
-    def step()
-      item_strings = @items.map { |item| item_to_step(item) }
-      return "(#{item_strings.join(",")})"
-    end
-  end # class Ifc_List
- end # module IfcManager
-end # module BimTools
+  end
+end

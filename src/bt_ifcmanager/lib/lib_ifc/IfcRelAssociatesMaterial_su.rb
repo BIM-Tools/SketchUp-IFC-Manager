@@ -19,18 +19,17 @@
 #
 #
 
-require_relative File.join('IFC2X3', 'IfcMaterial.rb')
-require_relative 'set.rb'
+require_relative 'set'
 
 module BimTools
   module IfcRelAssociatesMaterial_su
     def initialize(ifc_model, sketchup)
-      @ownerhistory = ifc_model.owner_history
+      super
+      @ifc = BimTools::IfcManager::Settings.ifc_module
       material_name = sketchup
-      
-      @relatingmaterial = BimTools::IFC2X3::IfcMaterial.new( ifc_model )
-      @relatingmaterial.name = BimTools::IfcManager::IfcLabel.new( material_name )
-      @relatedobjects = IfcManager::Ifc_Set.new()
-    end # def sketchup
-  end # module IfcRelAssociatesMaterial_su
-end # module BimTools
+      @relatingmaterial = @ifc::IfcMaterial.new(ifc_model)
+      @relatingmaterial.name = BimTools::IfcManager::IfcLabel.new(ifc_model, material_name)
+      @relatedobjects = IfcManager::Ifc_Set.new
+    end
+  end
+end

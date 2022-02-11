@@ -1,6 +1,6 @@
-#  IfcSpatialStructureElement_su.rb
+#  IfcVolumeMeasure.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2021 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,18 +19,23 @@
 #
 #
 
-module BimTools
-  # relating_object must be a IfcRelAggregates
-  # relating_object must be a IfcRelContainedInSpatialStructure
-  module IfcSpatialStructureElement_su
-    @relating_object = nil
-    @related_objects = nil
-    attr_accessor :relating_object, :related_objects
+require_relative 'Ifc_Type'
 
-    def initialize(ifc_model, sketchup)
-      # set default CompositionType
-      @compositiontype = :element
+module BimTools::IfcManager
+  class IfcVolumeMeasure < Ifc_Type
+    def initialize(ifc_model, value, long = false)
       super
+      begin
+        @value = value.to_f
+      rescue StandardError, TypeError => e
+        puts value << 'cannot be converted to a volume: ' << e
+      end
+    end
+
+    def step
+      val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
+      val = add_long(val) if @long
+      val
     end
   end
 end

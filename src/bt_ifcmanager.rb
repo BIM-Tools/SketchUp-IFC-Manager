@@ -32,11 +32,11 @@ module BimTools
 
   module IfcManager
     # Version and release information.
-    VERSION = '3.6.0'
+    VERSION = '4.0.1'
 
     # load plugin only if SketchUp version is PRO
     # raised minimum version to 2017 due to switch to htmldialog
-    if Sketchup.is_pro? && Sketchup.version_number > 1_700_000_000
+    if Sketchup.version_number > 1_700_000_000
       PLUGIN_PATH       = File.join(PLUGIN_ROOT_PATH, 'bt_ifcmanager')
       PLUGIN_IMAGE_PATH = File.join(PLUGIN_PATH, 'images')
 
@@ -47,7 +47,7 @@ module BimTools
       IFCMANAGER_EXTENSION.copyright = '2017-2022'
       Sketchup.register_extension(IFCMANAGER_EXTENSION, true)
     else
-      UI.messagebox 'You need at least SketchUp Pro 2017 to use this extension.'
+      UI.messagebox 'You need at least SketchUp 2017 to use this extension.'
     end
   end
 end

@@ -30,11 +30,6 @@ module BimTools
 
     def export( file_path )
       su_model = Sketchup.active_model
-      
-      # check if it's possible to write IFC files
-      unless Sketchup.is_pro?
-        raise "You need SketchUp PRO to create IFC-files"
-      end
 
       # close previous export summary if still open
       if @summary_dialog
@@ -45,7 +40,7 @@ module BimTools
       BimTools::IfcManager::export_messages = Array.new
 
       # create new progressbar
-      pb = ProgressBar.new(4,"Exporting to IFC...")
+      pb = ProgressBar.new(4,"Exporting to #{ifc_version = BimTools::IfcManager::Settings.ifc_version}...")
       
       # start timer
       timer = Time.now
@@ -56,15 +51,10 @@ module BimTools
       # update all IFC name fields with the component definition name
       # (?) is this necessary, or should this already be 100% correct at the time of export?
       su_model.start_operation('Update IFC data', true)
-      update_ifc_fields( su_model )
+      BimTools::IfcManager::update_ifc_fields( su_model )
       su_model.commit_operation
       
       pb.update(1)
-
-      # make sure file_path ends in "ifc"
-      unless File.extname(file_path).downcase == ".ifc"
-        file_path << '.ifc'
-      end
       
       # create new IfcModel
       ifc_model = IfcModel.new( su_model, options )
@@ -72,7 +62,7 @@ module BimTools
       pb.update(2)
       
       # get total time
-      puts "finished creating IFC entities: #{(Time.now - timer).to_s}"
+      puts "finished creating #{ifc_version = BimTools::IfcManager::Settings.ifc_version} entities: #{(Time.now - timer).to_s}"
       
       # export model to IFC step file
       ifc_model.export( file_path )
@@ -109,7 +99,7 @@ module BimTools
 
     def show_summary( hash, file_path, time )
       css = File.join(PLUGIN_PATH_CSS, 'sketchup.css')
-      html = "<html><head><link rel='stylesheet' type='text/css' href='#{css}'></head><body><textarea readonly>IFC Entities exported:\n\n"
+      html = "<html><head><link rel='stylesheet' type='text/css' href='#{css}'></head><body><textarea readonly>#{ifc_version = BimTools::IfcManager::Settings.ifc_version} Entities exported:\n\n"
       hash.each_pair do | key, value |
         html << "#{value.to_s} #{key.to_s}\n"
       end

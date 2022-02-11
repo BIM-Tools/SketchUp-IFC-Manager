@@ -33,48 +33,60 @@ module BimTools::IfcManager
 
   module PropertiesWindow
     attr_reader :window, :ready
+
     extend self
     @window = false
     @visible = false
     @ready = false
-    @form_elements = Array.new
+    @form_elements = []
     @window_options = {
-      :dialog_title    => 'Edit IFC properties',
-      :preferences_key => 'BimTools-IfcManager-PropertiesWindow',
-      :width           => 400,
-      :height          => 400,
-      :resizable       => true
+      dialog_title: 'Edit IFC properties',
+      preferences_key: 'BimTools-IfcManager-PropertiesWindow',
+      width: 400,
+      height: 400,
+      resizable: true
     }
-  
+
     # create observers for updating form elements content
-    @observers = BimTools::IfcManager::Observers.new()
+    @observers = BimTools::IfcManager::Observers.new
 
     # create Sketchup HtmlDialog window
     # needs to be recreated only when settings change
-    def create()
+    def create
       model = Sketchup.active_model
       selection = model.selection
-      @form_elements = Array.new
-      @window = UI::HtmlDialog.new( @window_options )
-      @window.set_on_closed {
+      @form_elements = []
+      @window = UI::HtmlDialog.new(@window_options)
+      @window.set_on_closed do
         @observers.stop
-      }
+      end
 
       # Add title showing selected items
       @form_elements << Title.new(@window)
 
       # Add html select for classifications
-      classification_list = {"IFC 2x3" => true}.merge!(Settings.classifications)
-      classification_list.each_pair do | classification_name, active |
-        if active
-          classification = HtmlSelectClassifications.new(@window, classification_name)
+      classification_list = { Settings.ifc_classification => true }.merge!(Settings.classifications)
+      classification_list.each_pair do |classification_file, active|
+        next unless active
 
-          # Add "-" option to unset the classification
-          options_template = [{:id => "-", :text => "-"}]
+        next unless BimTools::IfcManager::Settings.filters.key?(classification_file)
 
-          # Load options from file
-          options = YAML.load_file(File.join(PLUGIN_PATH, "classifications", classification_name + ".yml"))
-          classification.set_js_options(options,options_template)
+        skc_reader = BimTools::IfcManager::Settings.filters[classification_file]
+        classification_name = skc_reader.name
+        classification = HtmlSelectClassifications.new(@window, classification_name)
+
+        # Add "-" option to unset the classification
+        options_template = [{ id: '-', text: '-' }]
+
+        # Load options from file
+        yml_path = File.join(PLUGIN_PATH, 'classifications', classification_name + '.yml')
+        if File.file?(yml_path)
+          options = YAML.load_file(yml_path)
+          classification.set_js_options(options, options_template)
+          @form_elements << classification
+        else
+          options = skc_reader.xsd_filter
+          classification.set_js_options(options, options_template)
           @form_elements << classification
         end
       end
@@ -83,61 +95,64 @@ module BimTools::IfcManager
       @form_elements << HtmlInputName.new(@window)
 
       # Add html select for materials
-      @form_elements << HtmlSelectMaterials.new(@window, "Material")
+      @form_elements << HtmlSelectMaterials.new(@window, 'Material')
 
       # Add html select for layers
-      @form_elements << HtmlSelectLayers.new(@window, "Tag/Layer")
-    end # def create
+      @form_elements << HtmlSelectLayers.new(@window, 'Tag/Layer')
+    end
 
     # close Sketchup HtmlDialog window
     def close
       @observers.stop
-      if @window && @window.visible?
-        @window.close
-      end
-    end # def close
+      @window.close if @window && @window.visible?
+    end
 
     # show Sketchup HtmlDialog window
     def show
-      unless @window
-        self.create()
-      end
+      create unless @window
       @observers.start
-      self.set_html()
-      unless @window.visible?
-        @window.show
+      set_html
+      @window.show unless @window.visible?
+    end
+
+    # Reload Sketchup HtmlDialog window
+    def reload
+      if @window && @window.visible?
+        close
+        create
+        show
       end
-    end # def show
+    end
 
     # toggle Sketchup HtmlDialog window visibility
     # close when visible, show otherwise
     def toggle
       if @window
-        if@window.visible?
-          self.close
+        if @window.visible?
+          close
         else
-          self.show
+          show
         end
       else
-        self.create()
-        self.show
+        create
+        show
       end
-    end # def toggle
-    
+    end
+
     # Refresh entire window contents
     # triggered from show and close window
-    def set_html()
+    def set_html
       ifc_able = false
-      javascript = ""
+      javascript = ''
       selection = Sketchup.active_model.selection
       selection_count = selection.length
-      html = html_header()
+      html = html_header
 
       # Check if object can be classified as an IFC entity
       i = 0
       while i < selection_count
         ent = selection[i]
-        if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
+        if ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group)
           ifc_able = true
           break
         end
@@ -149,9 +164,7 @@ module BimTools::IfcManager
       form_element_count = @form_elements.length
       while j < form_element_count
         form_element = @form_elements[j]
-        unless(ifc_able)
-          form_element.hide()
-        end
+        form_element.hide unless ifc_able
         html << form_element.html(selection)
         javascript << form_element.js
         javascript << form_element.onchange
@@ -159,22 +172,22 @@ module BimTools::IfcManager
       end
       html << html_footer(javascript)
       @window.set_html(html)
-      set_callbacks()
+      set_callbacks
     end
 
-    def set_callbacks()
+    def set_callbacks
       i = 0
       form_element_count = @form_elements.length
       while i < form_element_count
         form_element = @form_elements[i]
-        form_element.set_callback()
+        form_element.set_callback
         i += 1
       end
     end
-    
+
     # Update form elements content
     # triggered from observers on selection or object changes
-    def update()
+    def update
       selection = Sketchup.active_model.selection
       ifc_able = false
 
@@ -183,7 +196,7 @@ module BimTools::IfcManager
       i = 0
       while i < selection_count
         ent = selection[i]
-        if(ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group))
+        if ent.is_a?(Sketchup::ComponentInstance) || ent.is_a?(Sketchup::Group)
           ifc_able = true
           break
         end
@@ -196,14 +209,14 @@ module BimTools::IfcManager
         while j < form_element_count
           form_element = @form_elements[j]
           form_element.update(selection)
-          form_element.show()
+          form_element.show
           j += 1
         end
       else
         while j < form_element_count
           form_element = @form_elements[j]
           form_element.update(selection)
-          form_element.hide()
+          form_element.hide
           j += 1
         end
       end

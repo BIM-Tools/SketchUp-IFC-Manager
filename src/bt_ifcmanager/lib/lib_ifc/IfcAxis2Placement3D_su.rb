@@ -1,6 +1,6 @@
-#  IfcSpatialStructureElement_su.rb
+#  IfcAxis2Placement3D_su.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2022 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,18 +19,18 @@
 #
 #
 
-module BimTools
-  # relating_object must be a IfcRelAggregates
-  # relating_object must be a IfcRelContainedInSpatialStructure
-  module IfcSpatialStructureElement_su
-    @relating_object = nil
-    @related_objects = nil
-    attr_accessor :relating_object, :related_objects
+require_relative 'IfcReal'
 
-    def initialize(ifc_model, sketchup)
-      # set default CompositionType
-      @compositiontype = :element
+module BimTools
+  module IfcAxis2Placement3D_su
+    def initialize(ifc_model, transformation = nil)
       super
+      @ifc = BimTools::IfcManager::Settings.ifc_module
+      if transformation.is_a? Geom::Transformation
+        @location = @ifc::IfcCartesianPoint.new(ifc_model, transformation.origin)
+        @axis = @ifc::IfcDirection.new(ifc_model, transformation.zaxis)
+        @refdirection = @ifc::IfcDirection.new(ifc_model, transformation.xaxis)
+      end
     end
   end
 end

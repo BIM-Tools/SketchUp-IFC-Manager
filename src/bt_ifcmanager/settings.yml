@@ -12,11 +12,15 @@
   :geometry: true
   :fast_guid: false
   :dynamic_attributes: true
-  :mapped_items: false
+  :types: true
+  :mapped_items: true
 :load:
   :classifications:
     NL-SfB tabel 1 Classification: true
-    DIN 276-1: false
+    DIN 276-1.skc: false
+  :ifc_classifications:
+    IFC 2x3.skc: true
+    IFC4.skc: false
   :template_materials: false
 :properties:
   :common_psets: true

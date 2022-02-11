@@ -1,4 +1,4 @@
-#  IfcProduct_su.rb
+#  IfcTypeProduct_su.rb
 #
 #  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
 #
@@ -19,125 +19,76 @@
 #
 #
 
-# load types
-require_relative 'IfcBoolean'
+require_relative 'set'
+require_relative 'list'
+require_relative 'IfcGloballyUniqueId'
 require_relative 'IfcLabel'
-require_relative 'IfcIdentifier'
-require_relative 'IfcReal'
-require_relative 'IfcInteger'
-require_relative 'IfcText'
-
-require_relative 'propertyset'
-
-require_relative File.join('dynamic_attributes.rb')
-require_relative File.join('PropertyReader.rb')
 
 module BimTools
-  module IfcProduct_su
-    attr_accessor :su_object, :parent, :total_transformation, :type_product
+  module IfcTypeProduct_su
+    attr_accessor :su_object
 
-    @su_object = nil
-    @parent = nil
-
-    def initialize(ifc_model, sketchup)
-      super
+    # @param sketchup [Sketchup::ComponentDefinition]
+    def initialize(ifc_model, definition, ifc_product)
+      super(ifc_model, definition)
       @ifc = BimTools::IfcManager::Settings.ifc_module
+      @definition = definition
+      ifc_version = BimTools::IfcManager::Settings.ifc_version
+      @propertysets = BimTools::IfcManager::Ifc_Set.new
 
-      # Check if this is an empty object (default object) or based on a Sketchup::ComponentInstance or Sketchup::Group
-      if sketchup.respond_to?(:definition)
+      @rel_defines_by_type = @ifc::IfcRelDefinesByType.new(@ifc_model)
+      @rel_defines_by_type.relatingtype = self
+      @rel_defines_by_type.relatedobjects = BimTools::IfcManager::Ifc_Set.new
 
-        ifc_version = BimTools::IfcManager::Settings.ifc_version
-        @ifc_model = ifc_model
-        @su_object = sketchup
-        definition = @su_object.definition
-        name = @su_object.name
+      # (!) duplicate code with IfcProduct_su
 
-        # Set IfcProductType
-        if @ifc_model.product_types.key?(definition)
-          @type_product = @ifc_model.product_types[definition]
-          @type_product.add_typed_object(self)
-        end
+      @name = BimTools::IfcManager::IfcLabel.new(ifc_model, definition.name)
+      @globalid = BimTools::IfcManager::IfcGloballyUniqueId.new(definition)
 
-        # When instance name is set, use that, otherwise use definition name
-        # (?) set name, here? is this a duplicate?
-        name = definition.name if name.length == 0
-        @name = BimTools::IfcManager::IfcLabel.new(ifc_model, name)
+      # (?) set "tag" to component instance name?
+      # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
 
-        # (?) set "tag" to component instance name?
-        # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
-
-        # get attributes from su object and add them to IfcProduct
-        if definition.attribute_dictionaries && definition.attribute_dictionaries[ifc_version] && props_ifc = definition.attribute_dictionaries[ifc_version].attribute_dictionaries
-          dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(ifc_model, self, props_ifc)
-          dict_reader.set_attributes()
-          propertysets = dict_reader.get_propertysets()
-          i = 0
-          while(i < propertysets.length)
-            if rel_defines = propertysets[i]
-              rel_defines.relatedobjects.add(self)
-            end
-            i+=1
-          end
-
-          # (!) TODO
-          # Add ifc_model.options[:attributes] as parameter to dict_reader.set_properties()
-          # 
-          #
-          # if ifc_model.options[:attributes]
-          #   ifc_model.options[:attributes].each do |attr_dict_name|
-          #     # Only add definition propertysets when no TypeProduct is set
-          #     collect_psets(ifc_model, @su_object.definition.attribute_dictionary(attr_dict_name)) unless @type_product
-          #     collect_psets(ifc_model, @su_object.attribute_dictionary(attr_dict_name))
-          #   end
-          # else
-
-          # # Only add definition propertysets when no TypeProduct is set
-          # if !@type_product
-          #   @su_object.definition.attribute_dictionaries.each do |attr_dict|
-          #     collect_psets(ifc_model, attr_dict)
-          #   end
-          # end
-          # if @su_object.attribute_dictionaries
-          #   @su_object.attribute_dictionaries.each do |attr_dict|
-          #     collect_psets(ifc_model, attr_dict)
-          #   end
-          # end
-          
-        end
-
-        # set material if sketchup @su_object has a material
-        # Material added to Product and not to TypeProduct because a Sketchup ComponentDefinition can have a different material for every Instance
-        if ifc_model.options[:materials] && !((is_a? @ifc::IfcFeatureElementSubtraction) || (is_a? @ifc::IfcVirtualElement) || (is_a? @ifc::IfcSpatialStructureElement))
-          material_name = if @su_object.material
-                            @su_object.material.display_name
-                          else
-                            'Default'
-                          end
-
-          # check if materialassociation exists
-          unless ifc_model.materials[material_name]
-
-            # create new materialassociation
-            ifc_model.materials[material_name] = @ifc::IfcRelAssociatesMaterial.new(ifc_model, material_name)
-
-          end
-
-          # add self to materialassociation
-          ifc_model.materials[material_name].relatedobjects.add(self)
-          # puts ifc_model.materials[material_name].step
-        end
-
-        # collect dynamic component attributes if export option is set
-        BimTools::DynamicAttributes.get_dynamic_attributes(ifc_model, self) if ifc_model.options[:dynamic_attributes]
-
-        collect_classifications(ifc_model, definition)
+      # get attributes from su object and add them to IfcTypeProduct
+      if definition.attribute_dictionaries && definition.attribute_dictionaries[ifc_version] && props_ifc = definition.attribute_dictionaries[ifc_version].attribute_dictionaries
+        dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(ifc_model, self, props_ifc)
+        dict_reader.set_attributes()
       end
+
+      if ifc_model.options[:attributes]
+        ifc_model.options[:attributes].each do |attr_dict_name|
+          collect_psets(ifc_model, @definition.attribute_dictionary(attr_dict_name))
+        end
+      elsif @definition.attribute_dictionaries
+        @definition.attribute_dictionaries.each do |attr_dict|
+          collect_psets(ifc_model, attr_dict)
+        end
+      end
+
+      # (?) Disable use of haspropertysets for Vico compatibility?
+      # # Only set property when not empty
+      # if @propertysets.length > 0
+      #   @haspropertysets = @propertysets
+      # end
+
+      # Set PredefinedType to default value when not set
+      if defined?(predefinedtype) && @predefinedtype.nil?
+        @predefinedtype = :notdefined
+      end
+
+      collect_classifications(ifc_model, definition)
+    end
+
+    def add_typed_object(product)
+      @rel_defines_by_type.relatedobjects.add(product)
     end
 
     def collect_psets(ifc_model, attr_dict)
-      if attr_dict.is_a?(Sketchup::AttributeDictionary) && !(attr_dict.name == 'AppliedSchemaTypes' || ifc_model.su_model.classifications[attr_dict.name])
+      if attr_dict.is_a?(Sketchup::AttributeDictionary) && !((attr_dict.name == 'AppliedSchemaTypes') || ifc_model.su_model.classifications[attr_dict.name])
         rel_defines = BimTools::IfcManager.create_propertyset(ifc_model, attr_dict)
-        rel_defines.relatedobjects.add(self) if rel_defines
+
+        # (?) Disable use of haspropertysets for Vico compatibility?
+        @propertysets.add(rel_defines) if rel_defines
+        # rel_defines.relatedobjects.add(self) if rel_defines
         if attr_dict.attribute_dictionaries
           attr_dict.attribute_dictionaries.each do |sub_attr_dict|
             collect_psets(ifc_model, sub_attr_dict)
@@ -182,7 +133,7 @@ module BimTools
             end
             if classification_properties.key?('editiondate') && !classification_properties.editiondate.empty?
               ifc_classification.editiondate = BimTools::IfcManager::IfcLabel.new(ifc_model,
-                                                                              classification_properties.editiondate)
+                                                                                  classification_properties.editiondate)
             end
             ifc_classification.name = BimTools::IfcManager::IfcLabel.new(ifc_model, attr_dict.name)
           end
@@ -222,12 +173,6 @@ module BimTools
           ifc_classification_reference.ifc_rel_associates_classification = rel
         end
       end
-    end
-
-    # add export summary for IfcProducts
-    def step
-      @ifc_model.summary_add(self.class.name.split('::').last)
-      super
     end
   end
 end

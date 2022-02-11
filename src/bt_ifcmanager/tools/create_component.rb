@@ -19,7 +19,7 @@
 
 module BimTools
  module IfcManager
-  require File.join(PLUGIN_PATH_LIB, "set_ifc_entity_name.rb")
+  require File.join(PLUGIN_PATH, "update_ifc_fields.rb")
   module CreateComponent
     extend self
     attr_accessor :name
@@ -60,7 +60,7 @@ module BimTools
       instance = group.to_component
       
       # set IFC type
-      instance.definition.add_classification("IFC 2x3", ifc_type)
+      instance.definition.add_classification(BimTools::IfcManager::Settings.ifc_version, ifc_type)
       
       # Set name in definition, instance and ifc properties
       BimTools::IfcManager::set_ifc_entity_name(model, instance, name.downcase)
