@@ -305,9 +305,7 @@ module BimTools
           end #(mp) end of DIN 276-1 loop
           
           # temporarily allow only nlsfb classification
-		      #nlsfb_cls_names = ["NL-SfB tabel 1", "NL-SfB 2005, tabel 1"]
-          #if attr_dict.name.include? nlsfb_cls_names 
-          if attr_dict.name == "NL-SfB tabel 1"
+          if attr_dict.name == "NL-SfB tabel 1 Classification"
             if su_model.classifications[ attr_dict.name ]
               
               # Create classifications if they don't exist

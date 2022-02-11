@@ -15,7 +15,7 @@
   :mapped_items: false
 :load:
   :classifications:
-    NL-SfB tabel 1: true
+    NL-SfB tabel 1 Classification: true
     DIN 276-1: false
   :template_materials: false
 :properties:
