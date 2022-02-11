@@ -71,7 +71,7 @@ module BimTools
 
         # also set "tag" to component instance name?
         # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
-                
+        
         if definition.attribute_dictionaries
           if definition.attribute_dictionaries["IFC 2x3"]
             if props_ifc = definition.attribute_dictionaries["IFC 2x3"].attribute_dictionaries
@@ -305,9 +305,9 @@ module BimTools
           end #(mp) end of DIN 276-1 loop
           
           # temporarily allow only nlsfb classification
-		  #nlsfb_cls_names = ["NL-SfB tabel 1", "NL-SfB 2005, tabel 1"]
+		      #nlsfb_cls_names = ["NL-SfB tabel 1", "NL-SfB 2005, tabel 1"]
           #if attr_dict.name.include? nlsfb_cls_names 
-		  if attr_dict.name == "NL-SfB tabel 1"
+          if attr_dict.name == "NL-SfB tabel 1"
             if su_model.classifications[ attr_dict.name ]
               
               # Create classifications if they don't exist

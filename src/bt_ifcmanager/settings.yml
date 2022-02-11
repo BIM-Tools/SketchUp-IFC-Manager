@@ -9,7 +9,6 @@
   :layers: true
   :materials: true
   :colors: true
-  :styles: true
   :geometry: true
   :fast_guid: false
   :dynamic_attributes: true
