@@ -67,8 +67,11 @@ module BimTools
         definition = @su_object.definition
         
         #(?) set name, here? is this a duplicate?
-        @name = BimTools::IfcManager::IfcLabel.new( definition.name )
-        
+        @name = BimTools::IfcManager::IfcLabel.new(definition.name)
+
+        # also set "tag" to component instance name?
+        # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
+                
         if definition.attribute_dictionaries
           if definition.attribute_dictionaries["IFC 2x3"]
             if props_ifc = definition.attribute_dictionaries["IFC 2x3"].attribute_dictionaries
@@ -210,7 +213,7 @@ module BimTools
       end
       
       # add color from su-object material, or a su_parent's
-      if @ifc_model.options[:styles]
+      if @ifc_model.options[:colors]
         BimTools::IFC2X3::IfcStyledItem.new( @ifc_model, brep, su_material )
       end
         
@@ -316,13 +319,6 @@ module BimTools
                 cls.edition = BimTools::IfcManager::IfcLabel.new("2005")
                 #cls.editiondate
                 cls.name = BimTools::IfcManager::IfcLabel.new( attr_dict.name )
-                
-                # vico hack: store a copy of NL-SfB as unicode
-                #unicode_cls = BimTools::IFC2X3::IfcClassification.new( ifc_model )
-                #unicode_cls.source = BimTools::IfcManager::IfcLabel.new("http://www.csiorg.net/uniformat")
-                #unicode_cls.edition = BimTools::IfcManager::IfcLabel.new("1998")
-                #unicode_cls.editiondate
-                #unicode_cls.name = BimTools::IfcManager::IfcLabel.new("Uniformat")
               end
               
               # retrieve classification value from su object
@@ -351,20 +347,6 @@ module BimTools
                     assoc.relatedobjects = BimTools::IfcManager::Ifc_Set.new( [self] )
                     assoc.relatingclassification = ifc_classification_reference
                     ifc_classification_reference.ifc_rel_associates_classification = assoc
-                    
-                    # vico hack: store a copy of NL-SfB as unicode
-                    #unicode_reference = BimTools::IFC2X3::IfcClassificationReference.new( ifc_model )
-                    #unicode_reference.location = "'http://www.csiorg.net/uniformat'"
-                    #unicode_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(code)
-                    #unicode_reference.name = BimTools::IfcManager::IfcLabel.new(text)
-                    #unicode_reference.referencedsource = unicode_cls
-                    #unicode_assoc = BimTools::IFC2X3::IfcRelAssociatesClassification.new( ifc_model )
-                    #unicode_assoc.name = "'Uniformat Classification'"
-                    #unicode_assoc.description = ""
-                    #unicode_assoc.relatedobjects = IfcManager::Ifc_Set.new( [self] )
-                    #unicode_assoc.relatingclassification = unicode_reference
-                    #unicode_reference.ifc_rel_associates_classification = unicode_assoc
-                    
                   end
                 end
               end
