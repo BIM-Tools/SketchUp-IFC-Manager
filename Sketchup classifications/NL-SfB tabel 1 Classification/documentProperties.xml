@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <documentProperties xmlns="http://www.sketchup.com/schemas/1.0/documentproperties" xmlns:dp="http://www.sketchup.com/schemas/1.0/documentproperties" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sketchup.com/schemas/1.0/documentproperties http://www.sketchup.com/schemas/1.0/documentproperties.xsd">
 
-  <dp:title>NL-SfB 2005, tabel 1</dp:title>
+  <dp:title>NL-SfB tabel 1 Classification</dp:title>
 
   <dp:description>Het NL/SfB-systeem is de officiële Nederlandse versie van de internationaal erkende SfB-classificatie, een specifiek op de bouwsector gerichte indeling/codering methodiek.</dp:description>
 
@@ -11,11 +11,11 @@
 
   <dp:lastModifiedBy></dp:lastModifiedBy>
 
-  <dp:revision>2</dp:revision>
+  <dp:revision>4</dp:revision>
 
   <dp:created>2005-12-31T12:00:00</dp:created>
 
-  <dp:modified>2021-01-09T09:06:00</dp:modified>
+  <dp:modified>2021-12-15T16:05:00</dp:modified>
 
   <dp:thumbnail></dp:thumbnail>
 
