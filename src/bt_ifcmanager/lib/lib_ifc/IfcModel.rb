@@ -117,8 +117,8 @@ module BimTools
         @default_axis = @default_placement.axis
         @default_refdirection = @default_placement.refdirection
 
-        # create IfcProductTypes for all ComponentDefintions
-        @product_types = get_product_types(@su_model)
+        # create a hash with all Sketchup ComponentDefinitions and their IfcProductType counterparts
+        @product_types = {}
 
         # When no entities are given for export, pass all model entities to create ifc objects
         # if nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked
@@ -193,34 +193,6 @@ module BimTools
         representationcontext.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self, Geom::Point2d.new(0, 0))
         representationcontext.truenorth = @ifc::IfcDirection.new(self, Geom::Vector2d.new(0, 1))
         representationcontext
-      end
-
-      # create a hash with all Sketchup ComponentDefinitions and their IfcProductType counterparts
-      def get_product_types(su_model)
-        product_types = {}
-
-        # Check if export option for types is set
-        if @options[:types]
-          definitions = su_model.definitions
-          definitions.each do |definition|
-            next unless definition.count_used_instances > 0
-
-            ent_type_name = definition.get_attribute('AppliedSchemaTypes', BimTools::IfcManager::Settings.ifc_version)
-            next unless ent_type_name
-
-            # Replace IfcWallStandardCase by IfcWall, due to geometry issues and deprecated in IFC 4
-            ent_type_name = 'IfcWall' if ent_type_name == 'IfcWallStandardCase'
-
-            unless BimTools::IfcManager::Settings.ifc_module.const_defined?(ent_type_name) && BimTools::IfcManager::Settings.ifc_module.const_defined?(ent_type_name + 'Type')
-              next
-            end
-
-            product = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name)
-            type_product = BimTools::IfcManager::Settings.ifc_module.const_get(ent_type_name + 'Type')
-            product_types[definition] = type_product.new(self, definition, product)
-          end
-        end
-        product_types
       end
 
       # Recursively create IFC objects for all given SketchUp entities and add those to the model

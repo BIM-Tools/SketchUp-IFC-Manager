@@ -29,7 +29,7 @@ module BimTools
     attr_accessor :su_object
 
     # @param sketchup [Sketchup::ComponentDefinition]
-    def initialize(ifc_model, definition, ifc_product)
+    def initialize(ifc_model, definition)
       super(ifc_model, definition)
       @ifc = BimTools::IfcManager::Settings.ifc_module
       @definition = definition
@@ -51,7 +51,7 @@ module BimTools
       # get attributes from su object and add them to IfcTypeProduct
       if definition.attribute_dictionaries && definition.attribute_dictionaries[ifc_version] && props_ifc = definition.attribute_dictionaries[ifc_version].attribute_dictionaries
         dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(ifc_model, self, props_ifc)
-        dict_reader.set_attributes()
+        dict_reader.set_attributes
       end
 
       if ifc_model.options[:attributes]
@@ -71,9 +71,7 @@ module BimTools
       # end
 
       # Set PredefinedType to default value when not set
-      if defined?(predefinedtype) && @predefinedtype.nil?
-        @predefinedtype = :notdefined
-      end
+      @predefinedtype = :notdefined if defined?(predefinedtype) && @predefinedtype.nil?
 
       collect_classifications(ifc_model, definition)
     end
@@ -134,7 +132,7 @@ module BimTools
               date.monthcomponent = BimTools::IfcManager::IfcInteger.new(ifc_model, time.month)
               date.yearcomponent = BimTools::IfcManager::IfcInteger.new(ifc_model, time.year)
               ifc_classification.editiondate = date
-            end            
+            end
             ifc_classification.name = BimTools::IfcManager::IfcLabel.new(ifc_model, attr_dict.name)
           end
 
@@ -146,31 +144,29 @@ module BimTools
           # No way to map values with certainty, just pick the first 2
           next unless attributes.length > 1
 
-          ifc_classification_reference = ifc_classification.ifc_classification_references[attributes[0]]
-          next if ifc_classification_reference
+          classification_reference = ifc_classification.ifc_classification_references[attributes[0]]
+          next if classification_reference
 
-          ifc_classification_reference = @ifc::IfcClassificationReference.new(ifc_model)
-          # ifc_classification_reference.location = ""
+          classification_reference = @ifc::IfcClassificationReference.new(ifc_model)
+          classification_reference.name = BimTools::IfcManager::IfcLabel.new(ifc_model, attributes[1])
+          classification_reference.referencedsource = ifc_classification
+          identification = BimTools::IfcManager::IfcIdentifier.new(ifc_model, attributes[0])
 
           # Catch IFC4 changes
           if @ifc::IfcClassificationReference.method_defined?(:itemreference)
-            ifc_classification_reference.itemreference = BimTools::IfcManager::IfcIdentifier.new(ifc_model,
-                                                                                                 attributes[0])
+            classification_reference.itemreference = identification
           else
-            ifc_classification_reference.identification = BimTools::IfcManager::IfcIdentifier.new(ifc_model,
-                                                                                                  attributes[0])
+            classification_reference.identification = identification
           end
-          ifc_classification_reference.name = BimTools::IfcManager::IfcLabel.new(ifc_model, attributes[1])
-          ifc_classification_reference.referencedsource = ifc_classification
 
-          # add ifc_classification_reference to the list of references in the classification
-          ifc_classification.ifc_classification_references[attributes[0]] = ifc_classification_reference
+          # add classification_reference to the list of references in the classification
+          ifc_classification.ifc_classification_references[attributes[0]] = classification_reference
 
           # create IfcRelAssociatesClassification
           rel = @ifc::IfcRelAssociatesClassification.new(ifc_model)
           rel.relatedobjects = BimTools::IfcManager::Ifc_Set.new([self])
-          rel.relatingclassification = ifc_classification_reference
-          ifc_classification_reference.ifc_rel_associates_classification = rel
+          rel.relatingclassification = classification_reference
+          classification_reference.ifc_rel_associates_classification = rel
         end
       end
     end
