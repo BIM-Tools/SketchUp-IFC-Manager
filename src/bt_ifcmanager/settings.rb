@@ -90,6 +90,8 @@ module BimTools::IfcManager
         @export_dynamic_attributes = CheckboxOption.new('dynamic_attributes', 'Export dynamic attributes',
                                                         @options[:export][:dynamic_attributes])
         @export_types =              CheckboxOption.new('types', 'Export IFC Type products', @options[:export][:types])
+        @export_type_properties =    CheckboxOption.new('type_properties', 'Export IFC Type properties',
+                                                        @options[:export][:type_properties])
         @export_mapped_items =       CheckboxOption.new('mapped_items', 'Export IFC mapped items',
                                                         @options[:export][:mapped_items])
       end
@@ -109,6 +111,7 @@ module BimTools::IfcManager
       @options[:export][:fast_guid]          = @export_fast_guid.value
       @options[:export][:dynamic_attributes] = @export_dynamic_attributes.value
       @options[:export][:types]              = @export_types.value
+      @options[:export][:type_properties]    = @export_type_properties.value
       @options[:export][:mapped_items]       = @export_mapped_items.value
       File.open(@settings_file, 'w') { |file| file.write(@options.to_yaml) }
       @dialog.close
@@ -288,6 +291,7 @@ module BimTools::IfcManager
         @export_fast_guid.value           = false
         @export_dynamic_attributes.value  = false
         @export_types.value               = false
+        @export_type_properties.value     = false
         @export_mapped_items.value        = false
 
         a_form_data = CGI.unescape(s_form_data).split('&')
@@ -316,6 +320,8 @@ module BimTools::IfcManager
             @export_dynamic_attributes.value = true
           when 'types'
             @export_types.value = true
+          when 'type_properties'
+            @export_type_properties.value = true
           when 'mapped_items'
             @export_mapped_items.value = true
           when 'ifc_classification'
@@ -402,6 +408,7 @@ module BimTools::IfcManager
       html << @export_fast_guid.html
       html << @export_dynamic_attributes.html
       html << @export_types.html
+      html << @export_type_properties.html
       html << @export_mapped_items.html
       html << "      </div>\n"
 

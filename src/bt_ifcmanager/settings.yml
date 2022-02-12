@@ -13,6 +13,7 @@
   :fast_guid: false
   :dynamic_attributes: true
   :types: true
+  :type_properties: false
   :mapped_items: true
 :load:
   :classifications:

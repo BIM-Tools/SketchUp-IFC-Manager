@@ -24,10 +24,8 @@ require_relative 'propertyset'
 
 module BimTools
   module IfcGroup_su
-    
-
-    # @parameter ifc_model [IfcManager::IfcModel]
-    # @parameter sketchup [Sketchup::ComponentDefinition]
+    # @param ifc_model [IfcManager::IfcModel]
+    # @param sketchup [Sketchup::ComponentDefinition]
     def initialize(ifc_model, sketchup = nil)
       super
       @ifc = BimTools::IfcManager::Settings.ifc_module
@@ -48,46 +46,23 @@ module BimTools
         # also set "tag" to component instance name?
         # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
 
-
         # get attributes from su object and add them to IfcProduct
-        if definition.attribute_dictionaries && definition.attribute_dictionaries[ifc_version] && props_ifc = definition.attribute_dictionaries[ifc_version].attribute_dictionaries
-          dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(ifc_model, self, props_ifc)
-          dict_reader.set_attributes()
-          propertysets = dict_reader.get_propertysets()
-          i = 0
-          while(i < propertysets.length)
-            rel_defines = propertysets[i]
-            if rel_defines
-              rel_defines.relatedobjects.add(self)
-            end
-            i+=1
-          end
+        dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(ifc_model, self, definition.attribute_dictionaries)
+        dict_reader.set_attributes
+        dict_reader.add_propertysets
+        dict_reader.add_classifications
 
-          # (!) TODO
-          # Add ifc_model.options[:attributes] as parameter to dict_reader.set_properties()
-          # 
-          #
-          # if ifc_model.options[:attributes]
-          #   ifc_model.options[:attributes].each do |attr_dict_name|
-          #     # Only add definition propertysets when no TypeProduct is set
-          #     collect_psets(ifc_model, @su_object.definition.attribute_dictionary(attr_dict_name)) unless @type_product
-          #     collect_psets(ifc_model, @su_object.attribute_dictionary(attr_dict_name))
-          #   end
-          # else
-
-          # # Only add definition propertysets when no TypeProduct is set
-          # if !@type_product
-          #   @su_object.definition.attribute_dictionaries.each do |attr_dict|
-          #     collect_psets(ifc_model, attr_dict)
-          #   end
-          # end
-          # if @su_object.attribute_dictionaries
-          #   @su_object.attribute_dictionaries.each do |attr_dict|
-          #     collect_psets(ifc_model, attr_dict)
-          #   end
-          # end
-          
-        end
+        # (!) @todo
+        # Add ifc_model.options[:attributes] as parameter to dict_reader.set_properties()
+        #
+        #
+        # if ifc_model.options[:attributes]
+        #   ifc_model.options[:attributes].each do |attr_dict_name|
+        #     # Only add definition propertysets when no TypeProduct is set
+        #     collect_psets(ifc_model, @su_object.definition.attribute_dictionary(attr_dict_name)) unless @type_product
+        #     collect_psets(ifc_model, @su_object.attribute_dictionary(attr_dict_name))
+        #   end
+        # else
       end
     end
 
