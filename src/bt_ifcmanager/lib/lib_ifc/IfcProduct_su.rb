@@ -165,25 +165,22 @@ module BimTools
             ifc_classification = @ifc::IfcClassification.new(ifc_model)
             ifc_model.classifications[attr_dict.name] = ifc_classification
             classification_properties = skc_reader.properties
-            if classification_properties.key?('creator') && !classification_properties.creator.empty?
-              ifc_classification.source = BimTools::IfcManager::IfcLabel.new(ifc_model,
-                                                                             classification_properties.creator)
-            # Workaround mandatory value for IFC2x3
-            elsif BimTools::IfcManager::Settings.ifc_version == 'IFC 2x3'
-              ifc_classification.source = BimTools::IfcManager::IfcLabel.new(ifc_model, 'unknown')
-            end
-            if classification_properties.key?('edition') && !classification_properties.edition.empty?
-              ifc_classification.edition = BimTools::IfcManager::IfcLabel.new(ifc_model,
-                                                                              classification_properties.edition)
 
-            # Workaround mandatory value for IFC2x3
-            elsif BimTools::IfcManager::Settings.ifc_version == 'IFC 2x3'
-              ifc_classification.edition = BimTools::IfcManager::IfcLabel.new(ifc_model, 'unknown')
+            creator = classification_properties[:creator]
+            if creator && !creator.empty?
+              ifc_classification.source = BimTools::IfcManager::IfcLabel.new(ifc_model, creator)
             end
-            if classification_properties.key?('editiondate') && !classification_properties.editiondate.empty?
-              ifc_classification.editiondate = BimTools::IfcManager::IfcLabel.new(ifc_model,
-                                                                              classification_properties.editiondate)
+
+            edition = classification_properties[:revision]
+            if edition && !edition.empty?
+              ifc_classification.edition = BimTools::IfcManager::IfcLabel.new(ifc_model, edition)
             end
+
+            editiondate = classification_properties[:modified]
+            if editiondate && !editiondate.empty?
+              ifc_classification.editiondate = BimTools::IfcManager::IfcLabel.new(ifc_model, editiondate)
+            end
+
             ifc_classification.name = BimTools::IfcManager::IfcLabel.new(ifc_model, attr_dict.name)
           end
 

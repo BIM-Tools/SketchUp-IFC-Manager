@@ -22,11 +22,22 @@
 module BimTools
   module IfcClassification_su
     attr_accessor :ifc_classification_references
-    def initialize( ifc_model, sketchup=nil )
-      
+
+    DEFAULT_SOURCE_VALUE = 'unknown'
+    DEFAULT_EDITION_VALUE = 'unknown'
+    def initialize(ifc_model, sketchup = nil)
       # key must be reference name, value the IfcClassificationReference object
-      @ifc_classification_references = Hash.new
+      @ifc_classification_references = {}
       super
     end
-  end # module IfcClassification_su
-end # module BimTools
+
+    def step
+      # Workaround for mandatory values in IFC2x3
+      if BimTools::IfcManager::Settings.ifc_version == 'IFC 2x3'
+        @source ||= BimTools::IfcManager::IfcLabel.new(@ifc_model, DEFAULT_SOURCE_VALUE)
+        @edition ||= BimTools::IfcManager::IfcLabel.new(@ifc_model, DEFAULT_EDITION_VALUE)
+      end
+      super
+    end
+  end
+end

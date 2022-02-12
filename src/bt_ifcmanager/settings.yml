@@ -16,7 +16,7 @@
   :mapped_items: true
 :load:
   :classifications:
-    NL-SfB tabel 1 Classification: true
+    NL-SfB tabel 1 Classification.skc: true
     DIN 276-1.skc: false
   :ifc_classifications:
     IFC 2x3.skc: true

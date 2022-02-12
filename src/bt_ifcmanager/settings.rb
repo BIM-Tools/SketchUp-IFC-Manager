@@ -207,7 +207,7 @@ module BimTools::IfcManager
         if filepath
           model.classifications.load_schema(filepath)
         else
-          message = "Unable to load classification:\r\n'#{classification_name}'"
+          message = "Unable to load classification:\r\n'#{classification_file}'"
           puts message
           UI::Notification.new(IFCMANAGER_EXTENSION, message).show
         end
