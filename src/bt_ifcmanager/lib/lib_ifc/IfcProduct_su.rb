@@ -177,8 +177,12 @@ module BimTools
             end
 
             editiondate = classification_properties[:modified]
-            if editiondate && !editiondate.empty?
-              ifc_classification.editiondate = BimTools::IfcManager::IfcLabel.new(ifc_model, editiondate)
+            if editiondate && time = Time.parse(editiondate)
+              date = @ifc::IfcCalendarDate.new(ifc_model)
+              date.daycomponent = BimTools::IfcManager::IfcInteger.new(ifc_model, time.day)
+              date.monthcomponent = BimTools::IfcManager::IfcInteger.new(ifc_model, time.month)
+              date.yearcomponent = BimTools::IfcManager::IfcInteger.new(ifc_model, time.year)
+              ifc_classification.editiondate = date
             end
 
             ifc_classification.name = BimTools::IfcManager::IfcLabel.new(ifc_model, attr_dict.name)
