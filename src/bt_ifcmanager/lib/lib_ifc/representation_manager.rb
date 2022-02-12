@@ -56,10 +56,9 @@ module BimTools::IfcManager
     #   be possible to only do that once for a component definition
     #
     # @param [Sketchup::ComponentDefinition] definition
-    # @param [Array] faces
+    # @param [Array<Sketchup::Face>] faces
     # @param [Sketchup::Transformation] transformation
     # @param [Sketchup::Material] su_material
-    #
     # @return [BimTools::IFC2X3::IfcFacetedBrep]
     def get_representation(faces, transformation, material = nil)
       representation_string = transformation.to_a.to_s
@@ -72,6 +71,7 @@ module BimTools::IfcManager
     end
 
     # Add representation to the IfcProduct, transform geometry with given transformation
+    #
     # @param [Sketchup::Transformation] transformation
     def create_representation(faces, transformation, su_material)
       # definition = @su_object.definition

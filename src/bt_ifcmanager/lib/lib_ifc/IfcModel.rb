@@ -40,7 +40,7 @@ module BimTools
       # - add_ifc_object
 
       attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications,
-      :classificationassociations, :product_types, :property_enumerations
+                    :classificationassociations, :product_types, :property_enumerations
       attr_reader :su_model, :project, :ifc_objects, :export_summary, :options, :su_entities, :units,
                   :default_location, :default_axis, :default_refdirection, :default_placement, :representation_manager
 
@@ -49,10 +49,9 @@ module BimTools
 
       # Creates an IFC model based on given su model
       #
-      # @parameter su_model [Sketchup::Model]
-      # @parameter options [Hash] Optional options hash
-      # @parameter su_entities [Array<Sketchup::Entity>] Optional list of entities that have to be exported to IFC, nil exports all model entities.
-      #
+      # @param su_model [Sketchup::Model]
+      # @param options [Hash] Optional options hash
+      # @param su_entities [Array<Sketchup::Entity>] Optional list of entities that have to be exported to IFC, nil exports all model entities.
       def initialize(su_model, options = {})
         defaults = {
           ifc_entities: false, # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
@@ -190,15 +189,15 @@ module BimTools
         representationcontext.contexttype = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'Model')
         representationcontext.coordinatespacedimension = '3'
         representationcontext.worldcoordinatesystem = @ifc::IfcAxis2Placement2D.new(self)
-        representationcontext.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self, Geom::Point2d.new(0, 0))
+        representationcontext.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self,
+                                                                                           Geom::Point2d.new(0, 0))
         representationcontext.truenorth = @ifc::IfcDirection.new(self, Geom::Vector2d.new(0, 1))
         representationcontext
       end
 
       # Recursively create IFC objects for all given SketchUp entities and add those to the model
       #
-      # @parameter entities [Sketchup::Entities]
-      #
+      # @param entities [Sketchup::Entities]
       def create_ifc_objects(entities)
         faces = []
         entity_path = EntityPath.new(self)
@@ -222,24 +221,20 @@ module BimTools
         end
 
         # create a single IfcBuildingelementProxy from all 'loose' faces in the model
-        unless faces.empty?          
-          if @project.name
-            sub_entity_name = "#{@project.name.value} geometry"
-          else
-            sub_entity_name = 'project geometry'
-          end
+        unless faces.empty?
+          sub_entity_name = if @project.name
+                              "#{@project.name.value} geometry"
+                            else
+                              'project geometry'
+                            end
           ifc_entity = @ifc::IfcBuildingElementProxy.new(self, nil)
           ifc_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, sub_entity_name)
           ifc_entity.representation = @ifc::IfcProductDefinitionShape.new(self, nil)
           brep = @ifc::IfcFacetedBrep.new(self, faces, Geom::Transformation.new)
           ifc_entity.representation.representations.first.items.add(brep)
           ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(self, Geom::Transformation.new)
-          if ifc_entity.respond_to?(:predefinedtype=)
-            ifc_entity.predefinedtype = :notdefined
-          end
-          if ifc_entity.respond_to?(:compositiontype=)
-            ifc_entity.compositiontype = :element
-          end
+          ifc_entity.predefinedtype = :notdefined if ifc_entity.respond_to?(:predefinedtype=)
+          ifc_entity.compositiontype = :element if ifc_entity.respond_to?(:compositiontype=)
 
           # Add to spatial hierarchy
           entity_path.add(ifc_entity)

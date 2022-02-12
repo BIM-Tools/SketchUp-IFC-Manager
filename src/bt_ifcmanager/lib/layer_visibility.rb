@@ -18,24 +18,22 @@
 #  MA 02110-1301, USA.
 
 module BimTools::IfcManager
-
   # Helper method that figures out if a layer REALLY is visible
   #   due to the new folder structure in SketchUp 2021
+  #
   # @param [Sketchup::Layer] or [Sketchup::LayerFolder] layer
   # @return [true] if layer is visible
   def layer_visible?(layer)
     if layer.visible?
-      if Sketchup.version_number < 2100000000
-        return true
+      if Sketchup.version_number < 2_100_000_000
+        true
+      elsif layer.folder
+        layer_visible?(layer.folder)
       else
-        if layer.folder
-          return layer_visible?(layer.folder)
-        else
-          return true
-        end
+        true
       end
     else
-      return false
+      false
     end
   end
 end

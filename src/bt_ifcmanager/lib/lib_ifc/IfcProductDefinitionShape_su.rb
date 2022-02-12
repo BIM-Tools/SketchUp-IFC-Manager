@@ -19,27 +19,27 @@
 #
 #
 
-require_relative 'list.rb'
+require_relative 'list'
 
 module BimTools
-  module IfcProductDefinitionShape_su   
+  module IfcProductDefinitionShape_su
     attr_accessor :globalid
-    
-    # @parameter ifc_model [IfcManager::IfcModel]
-    # @parameter sketchup [Sketchup::ComponentDefinition]
+
+    # @param ifc_model [IfcManager::IfcModel]
+    # @param sketchup [Sketchup::ComponentDefinition]
     def initialize(ifc_model, sketchup)
       super
       @ifc = BimTools::IfcManager::Settings.ifc_module
 
       # Check if Mapped representation should be used
       if ifc_model.options[:mapped_items] # && (sketchup.count_instances > 1) # (?) Always use mapped items? also for objects that are used only once?
-        representationtype = BimTools::IfcManager::IfcLabel.new(ifc_model, "MappedRepresentation" )
+        representationtype = BimTools::IfcManager::IfcLabel.new(ifc_model, 'MappedRepresentation')
       else
-        representationtype = BimTools::IfcManager::IfcLabel.new(ifc_model, "Brep" )
+        representationtype = BimTools::IfcManager::IfcLabel.new(ifc_model, 'Brep')
       end
 
       # set representation based on definition
-      representation = @ifc::IfcShapeRepresentation.new( ifc_model , sketchup, representationtype)
+      representation = @ifc::IfcShapeRepresentation.new(ifc_model, sketchup, representationtype)
       @representations = IfcManager::Ifc_List.new([representation])
     end
   end

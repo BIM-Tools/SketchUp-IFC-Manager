@@ -26,7 +26,6 @@ module BimTools
     # Returns the STEP representation for an object
     #
     # @return String
-    #
     def step
       attribute_strings = attributes.map { |attribute| attribute_to_step(attribute) }
       "##{@ifc_id}=#{self.class.name.split('::').last.upcase}(#{attribute_strings.join(',')})"
@@ -35,9 +34,7 @@ module BimTools
     # Returns the STEP representation for an attribute
     #
     # @param property_name
-    #
     # @return String
-    #
     def attribute_to_step(property_name)
       property = send(property_name.downcase)
       property_to_step(property)
@@ -66,7 +63,6 @@ module BimTools
     #   for example '#15'
     #
     # @return String
-    #
     def ref
       raise "Missing IFC object ID for: #{self}" unless @ifc_id
 

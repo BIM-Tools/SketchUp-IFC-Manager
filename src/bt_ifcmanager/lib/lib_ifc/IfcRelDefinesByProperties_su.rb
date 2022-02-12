@@ -26,13 +26,10 @@ require_relative File.join('PropertyReader.rb')
 
 module BimTools
   module IfcRelDefinesByProperties_su
-    
-
     # Create quantity and propertysets from attribute dictionaries
     #
     # @param ifc_model [IfcModel] The model to which to add the properties
     # @param attr_dict [Sketchup::AttributeDictionary] The attribute dictionary to extract properties from
-    #
     def initialize(ifc_model)
       super
       @relatedobjects = IfcManager::Ifc_Set.new

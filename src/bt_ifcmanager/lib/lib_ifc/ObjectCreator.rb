@@ -29,16 +29,14 @@ module BimTools::IfcManager
   require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')
 
   class ObjectCreator
-
     # This creator class creates the correct IFC entity for the given sketchup object and it's children
     #
-    # @parameter ifc_model [IfcManager::IfcModel] The IFC model in which the new IFC entity must be added
-    # @parameter su_instance [Sketchup::ComponentInstance, Sketchup::Group] The sketchup component instance or group for which an IFC entity must be created
-    # @parameter su_total_transformation [Geom::Transformation] The combined transformation of all parent sketchup objects
-    # @parameter placement_parent [IFC ENTITY] The IFC entity that is the direct geometric parent in the sketchup model
-    # @parameter entity_path [Hash<BimTools::IfcManager::IFC2X3::IfcSpatialStructureElement>] Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
-    # @parameter su_material [Sketchup::Material] The parent sketchup objects material which will be used when the given one does not have a directly associated material
-    #
+    # @param ifc_model [IfcManager::IfcModel] The IFC model in which the new IFC entity must be added
+    # @param su_instance [Sketchup::ComponentInstance, Sketchup::Group] The sketchup component instance or group for which an IFC entity must be created
+    # @param su_total_transformation [Geom::Transformation] The combined transformation of all parent sketchup objects
+    # @param placement_parent [IFC ENTITY] The IFC entity that is the direct geometric parent in the sketchup model
+    # @param entity_path [Hash<BimTools::IfcManager::IFC2X3::IfcSpatialStructureElement>] Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
+    # @param su_material [Sketchup::Material] The parent sketchup objects material which will be used when the given one does not have a directly associated material
     def initialize(ifc_model, su_instance, su_total_transformation, placement_parent = nil, entity_path = nil, su_material = nil)
       @ifc = BimTools::IfcManager::Settings.ifc_module
       @ifc_model = ifc_model
@@ -82,7 +80,7 @@ module BimTools::IfcManager
       # (?) what if there are multiple projects defined?
       if entity_type == @ifc::IfcProject
 
-        # TODO: set all correct parameters for IfcProject!!!
+        # @todo: set all correct parameters for IfcProject!!!
         @ifc_model.project.su_object = su_instance
         ifc_entity = @ifc_model.project
       else
@@ -99,8 +97,7 @@ module BimTools::IfcManager
 
     # Constructs the IFC entity
     #
-    # @parameter ifc_entity
-    #
+    # @param ifc_entity
     def construct_entity(ifc_entity, placement_parent)
       # if parent is a IfcGroup, add entity to group
       if placement_parent.is_a?(@ifc::IfcGroup) && ifc_entity.is_a?(@ifc::IfcObjectDefinition)
@@ -117,7 +114,7 @@ module BimTools::IfcManager
         @entity_path.set_parent(ifc_entity)
         if ifc_entity.parent.is_a?(@ifc::IfcProduct)
           ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, @su_total_transformation,
-                                                             ifc_entity.parent.objectplacement)
+                                                                   ifc_entity.parent.objectplacement)
         else
           ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, @su_total_transformation)
         end
@@ -134,11 +131,10 @@ module BimTools::IfcManager
 
     # find nested objects (geometry and entities)
     #
-    # @parameter ifc_entity
-    # @parameter su_instance
-    # @parameter su_material
-    #
-    # @return [Array] direct sketchup geometry
+    # @param ifc_entity
+    # @param su_instance
+    # @param su_material
+    # @return [Array<Sketchup::Face>] direct sketchup geometry
     def create_nested_objects(ifc_entity, su_instance, su_material)
       faces = []
       definition = su_instance.definition
@@ -185,23 +181,19 @@ module BimTools::IfcManager
 
         # IfcZone is a special kind of IfcGroup that can only include IfcSpace objects
         when @ifc::IfcZone
-          if ifc_entity.name
-            sub_entity_name = "#{ifc_entity.name.value} geometry"
-          else
-            sub_entity_name = 'space geometry'
-          end
+          sub_entity_name = if ifc_entity.name
+                              "#{ifc_entity.name.value} geometry"
+                            else
+                              'space geometry'
+                            end
           sub_entity = @ifc::IfcSpace.new(@ifc_model, nil)
           sub_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, sub_entity_name)
           definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
-          sub_entity.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
+          sub_entity.representation = definition_manager.create_representation(faces, brep_transformation, su_material)
           sub_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
 
-          if sub_entity.respond_to?(:compositiontype=)
-            sub_entity.compositiontype = :element
-          end
-          if sub_entity.respond_to?(:interiororexteriorspace=)
-            sub_entity.interiororexteriorspace = :notdefined
-          end
+          sub_entity.compositiontype = :element if sub_entity.respond_to?(:compositiontype=)
+          sub_entity.interiororexteriorspace = :notdefined if sub_entity.respond_to?(:interiororexteriorspace=)
 
           # Add to spatial hierarchy
           @entity_path.add(sub_entity)
@@ -211,49 +203,41 @@ module BimTools::IfcManager
           ifc_entity.add(sub_entity)
 
         when @ifc::IfcProject
-          if ifc_entity.name
-            sub_entity_name = "#{ifc_entity.name.value} geometry"
-          else
-            sub_entity_name = 'project geometry'
-          end
+          sub_entity_name = if ifc_entity.name
+                              "#{ifc_entity.name.value} geometry"
+                            else
+                              'project geometry'
+                            end
           sub_entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
           sub_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, sub_entity_name)
           definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
-          sub_entity.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
+          sub_entity.representation = definition_manager.create_representation(faces, brep_transformation, su_material)
           sub_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
 
-          if sub_entity.respond_to?(:predefinedtype=)
-            sub_entity.predefinedtype = :notdefined
-          end
-          if sub_entity.respond_to?(:compositiontype=)
-            sub_entity.compositiontype = :element
-          end
+          sub_entity.predefinedtype = :notdefined if sub_entity.respond_to?(:predefinedtype=)
+          sub_entity.compositiontype = :element if sub_entity.respond_to?(:compositiontype=)
 
           # Add to spatial hierarchy
           @entity_path.add(sub_entity)
-          # @entity_path.set_parent(sub_entity)
+        # @entity_path.set_parent(sub_entity)
 
         # An IfcGroup or IfcProject has no geometry so all Sketchup geometry is embedded in a IfcBuildingElementProxy
         #   IfcGroup is also the supertype of IfcSystem
         #   (?) mapped items?
         when @ifc::IfcGroup
-          if ifc_entity.name
-            sub_entity_name = "#{ifc_entity.name.value} geometry"
-          else
-            sub_entity_name = 'group geometry'
-          end
+          sub_entity_name = if ifc_entity.name
+                              "#{ifc_entity.name.value} geometry"
+                            else
+                              'group geometry'
+                            end
           sub_entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
           sub_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, sub_entity_name)
           definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
-          sub_entity.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
+          sub_entity.representation = definition_manager.create_representation(faces, brep_transformation, su_material)
           sub_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
-          
-          if sub_entity.respond_to?(:predefinedtype=)
-            sub_entity.predefinedtype = :notdefined
-          end
-          if sub_entity.respond_to?(:compositiontype=)
-            sub_entity.compositiontype = :element
-          end
+
+          sub_entity.predefinedtype = :notdefined if sub_entity.respond_to?(:predefinedtype=)
+          sub_entity.compositiontype = :element if sub_entity.respond_to?(:compositiontype=)
 
           # Add to spatial hierarchy
           @entity_path.add(sub_entity)
@@ -261,10 +245,11 @@ module BimTools::IfcManager
           ifc_entity.add(sub_entity)
         when ifc_entity.nil? # (?) does this ever occur?
           definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
-          placement_parent.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
+          placement_parent.representation = definition_manager.create_representation(faces, brep_transformation,
+                                                                                     su_material)
         else
           definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
-          ifc_entity.representation = definition_manager.create_representation( faces, brep_transformation, su_material)
+          ifc_entity.representation = definition_manager.create_representation(faces, brep_transformation, su_material)
         end
       end
     end
