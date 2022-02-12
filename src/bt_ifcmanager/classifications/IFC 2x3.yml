@@ -8,6 +8,7 @@
 - IfcCovering
 - IfcCurtainWall
 - IfcDoor
+- IfcElement
 - IfcElementAssembly
 - IfcEquipmentElement
 - IfcFooting
@@ -25,5 +26,6 @@
 - IfcSpace
 - IfcStair
 - IfcStairFlight
+- IfcVirtualElement
 - IfcWall
 - IfcWindow
