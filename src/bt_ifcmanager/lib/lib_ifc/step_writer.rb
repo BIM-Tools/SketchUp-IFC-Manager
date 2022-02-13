@@ -21,6 +21,8 @@
 
 # create new ISO-10303-21/STEP object (the STEP object should do the formatting of the entire file, including header)
 
+require 'zip'
+
 module BimTools
  module IfcManager
   class IfcStepWriter
@@ -72,21 +74,6 @@ module BimTools
 
     def write( file_path, step_objects )
       if File.extname(file_path).downcase == '.ifczip'
-
-        # Make sure rubyzip is loaded
-        begin
-          require 'zip'
-        rescue LoadError
-          Gem::install('rubyzip')
-          begin
-            require 'zip'
-          rescue LoadError
-            message = "Unable to write ifcZIP, rubyzip not available"
-            puts message
-            UI::Notification.new(IFCMANAGER_EXTENSION, message).show
-          end
-        end
-
         file_name = File.basename(file_path, File.extname(file_path)) << '.ifc'
         Zip::OutputStream.open(file_path) do |zos|
           zos.put_next_entry(file_name)

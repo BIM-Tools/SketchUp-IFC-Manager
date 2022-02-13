@@ -20,24 +20,12 @@
 #
 
 require 'rexml/document'
+require 'zip'
 
 require File.join(File.dirname(__FILE__), 'lib_ifc', 'parse_xsd.rb')
 
 module BimTools
   module IfcManager
-
-    # Make sure rubyzip is loaded
-    begin
-      require 'zip'
-    rescue LoadError
-      Gem::install('rubyzip')
-      begin
-        require 'zip'
-      rescue LoadError
-        message = "Unable to read Sketchup Classification files (SKC), rubyzip not available"
-        UI::Notification.new(IFCMANAGER_EXTENSION, message).show
-      end
-    end
 
     MAX_SIZE = 10485760 # 10MiB
 
