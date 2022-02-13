@@ -68,13 +68,6 @@ module BimTools::IfcManager
         UI::Notification.new(IFCMANAGER_EXTENSION, message).show
       end
 
-      # load classification schemes from settings
-      read_ifc_classifications
-      read_classifications
-      load_classifications
-      load_materials
-      load_ifc_skc(@ifc_classification)
-
       # Load export options from settings
       if @options[:export]
         @export_hidden =             CheckboxOption.new('hidden', 'Export hidden objects', @options[:export][:hidden])
@@ -95,6 +88,13 @@ module BimTools::IfcManager
         @export_mapped_items =       CheckboxOption.new('mapped_items', 'Export IFC mapped items',
                                                         @options[:export][:mapped_items])
       end
+
+      # load classification schemes from settings
+      read_ifc_classifications
+      read_classifications
+      load_classifications
+      load_materials
+      load_ifc_skc(@ifc_classification)
     end
 
     def save
@@ -114,9 +114,13 @@ module BimTools::IfcManager
       @options[:export][:type_properties]    = @export_type_properties.value
       @options[:export][:mapped_items]       = @export_mapped_items.value
       File.open(@settings_file, 'w') { |file| file.write(@options.to_yaml) }
+      PropertiesWindow.close
       @dialog.close
-      PropertiesWindow.reload
       load_settings
+      message = "IFC Manager settings saved"
+      puts message
+      UI::Notification.new(IFCMANAGER_EXTENSION, message).show
+      PropertiesWindow.create
     end
 
     # Load skc and generate IFC classes

@@ -104,7 +104,7 @@ module BimTools::IfcManager
     # close Sketchup HtmlDialog window
     def close
       @observers.stop
-      @window.close if @window && @window.visible?
+      @window.close if visible?
     end
 
     # show Sketchup HtmlDialog window
@@ -112,15 +112,23 @@ module BimTools::IfcManager
       create unless @window
       @observers.start
       set_html
-      @window.show unless @window.visible?
+      @window.show unless visible?
     end
 
     # Reload Sketchup HtmlDialog window
     def reload
-      if @window && @window.visible?
+      if visible?
         close
-        create
         show
+      end
+    end
+
+    # Check of the window is visible
+    def visible?
+      if @window && @window.visible?
+        true
+      else
+        false
       end
     end
 
@@ -188,6 +196,7 @@ module BimTools::IfcManager
     # Update form elements content
     # triggered from observers on selection or object changes
     def update
+      puts 'updaye'
       selection = Sketchup.active_model.selection
       ifc_able = false
 
