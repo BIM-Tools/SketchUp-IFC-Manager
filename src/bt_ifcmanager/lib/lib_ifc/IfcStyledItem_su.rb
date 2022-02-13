@@ -29,8 +29,6 @@ module BimTools
       super
       @ifc = BimTools::IfcManager::Settings.ifc_module      
       instance_variable_set(:@attr, ([:Item] + attributes))
-
-      styleassignment = @ifc::IfcPresentationStyleAssignment.new(ifc_model, material)
       surfacestyle = @ifc::IfcSurfaceStyle.new(ifc_model, material)
       surfacestylerendering = @ifc::IfcSurfaceStyleRendering.new(ifc_model, material)
       colourrgb = @ifc::IfcColourRgb.new(ifc_model, material)
@@ -52,9 +50,15 @@ module BimTools
       end
 
       @item = brep
-      @styles = IfcManager::Ifc_Set.new([styleassignment])
-
-      styleassignment.styles = IfcManager::Ifc_Set.new([surfacestyle])
+      
+      # Workaround for mandatory IfcPresentationStyleAssignment in IFC2x3
+      if BimTools::IfcManager::Settings.ifc_version == 'IFC 2x3'
+        styleassignment = @ifc::IfcPresentationStyleAssignment.new(ifc_model, material)
+        styleassignment.styles = IfcManager::Ifc_Set.new([surfacestyle])
+        @styles = IfcManager::Ifc_Set.new([styleassignment])
+      else
+        @styles = IfcManager::Ifc_Set.new([surfacestyle])
+      end
 
       surfacestyle.side = :both
       surfacestyle.styles = IfcManager::Ifc_Set.new([surfacestylerendering])
