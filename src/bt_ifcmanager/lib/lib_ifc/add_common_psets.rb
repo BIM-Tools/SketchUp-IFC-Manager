@@ -65,7 +65,7 @@ module BimTools::IfcManager
               # - long # integer?
               # - double
               # - string
-              value_type = e.elements.to_a('PropertyType/TypePropertySingleValue/DataType').first['type']
+              value_type = e.elements.to_a('PropertyType/TypePropertySingleValue/DataType').first.attributes['type']
               if value_type
                 attribute_type = if value_type == 'IfcBoolean'
                                    'boolean'
@@ -90,7 +90,7 @@ module BimTools::IfcManager
                 puts 'DataType not found'
               end
             elsif property_type == 'TypePropertyEnumeratedValue'
-              value_type = e.elements.to_a('PropertyType/TypePropertyEnumeratedValue/EnumList').first['name']
+              value_type = e.elements.to_a('PropertyType/TypePropertyEnumeratedValue/EnumList').first.attributes['name']
               options = e.get_elements('PropertyType/TypePropertyEnumeratedValue/EnumList/EnumItem').map do |e|
                 e.text
               end

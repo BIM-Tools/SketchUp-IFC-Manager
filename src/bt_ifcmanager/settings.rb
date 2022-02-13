@@ -354,7 +354,7 @@ module BimTools::IfcManager
     end
 
     def set_html
-      html = <<~HTML
+      html = <<HTML
         <head>
           <link rel='stylesheet' type='text/css' href='#{@css_bootstrap}'>
           <link rel='stylesheet' type='text/css' href='#{@css_core}'>
@@ -375,7 +375,7 @@ module BimTools::IfcManager
             <form>
               <div class='form-group'>
                 <h1>IFC version</h1>
-      HTML
+HTML
       # ifc_classifications = Sketchup.find_support_files('skc', 'Classifications').select {|path| File.basename(path).downcase.include? 'ifc' }
       @ifc_classifications.each_pair do |ifc_classification, load|
         checked = if load

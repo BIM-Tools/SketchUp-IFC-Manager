@@ -196,7 +196,6 @@ module BimTools::IfcManager
     # Update form elements content
     # triggered from observers on selection or object changes
     def update
-      puts 'updaye'
       selection = Sketchup.active_model.selection
       ifc_able = false
 

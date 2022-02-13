@@ -59,7 +59,7 @@ module BimTools
         # pack('H*'): converts the hex string to a binary number (high nibble first)
         # unpack('B*'): converts the binary number to a bit string (128 0's and 1's) and places it into an array (Most Significant Block first)
         # [0]: gets the first (and only) value from the array
-        bit_string = [@hex_guid].pack('H*').unpack1('B*').to_s
+        bit_string = [@hex_guid].pack('H*').unpack('B*')[0].to_s
 
         # take the number (0 - 63) and find the matching character in guid64, add the found character to the guid string
         # start with the 2 leftover bits
@@ -93,9 +93,9 @@ module BimTools
 
         # and the digit at position 2 is always one of "8", "9", "A" or "B".
         # set the two most significant bits of the 9th byte to 10'B, so the high nibble will be one of "8", "9", "A", or "B".
-        bin = [guid[16]].pack('H*').unpack1('B*')
+        bin = [guid[16]].pack('H*').unpack('B*')[0]
         bin[0..1] = '10'
-        guid[16] = [bin].pack('B*').unpack1('H*')[0]
+        guid[16] = [bin].pack('B*').unpack('H*')[0][0]
         guid
       end
 
@@ -108,7 +108,7 @@ module BimTools
           bin = bin << n.to_s(2).rjust(length, '0')
           length = 6
         end
-        [bin].pack('B*').unpack1('H*')
+        [bin].pack('B*').unpack('H*')[0]
       end
 
       # convert IfcGloballyUniqueId into UUID

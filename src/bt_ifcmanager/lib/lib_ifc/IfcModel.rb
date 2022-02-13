@@ -185,14 +185,20 @@ module BimTools
 
       # Create new IfcGeometricRepresentationContext
       def create_representationcontext
-        representationcontext = @ifc::IfcGeometricRepresentationContext.new(self)
-        representationcontext.contexttype = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'Model')
-        representationcontext.coordinatespacedimension = '3'
-        representationcontext.worldcoordinatesystem = @ifc::IfcAxis2Placement2D.new(self)
-        representationcontext.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self,
-                                                                                           Geom::Point2d.new(0, 0))
-        representationcontext.truenorth = @ifc::IfcDirection.new(self, Geom::Vector2d.new(0, 1))
-        representationcontext
+        context = @ifc::IfcGeometricRepresentationContext.new(self)
+        context.contexttype = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'Model')
+        context.coordinatespacedimension = '3'
+        context.worldcoordinatesystem = @ifc::IfcAxis2Placement2D.new(self)
+
+        # Older Sketchup versions don't have Point2d and Vector2d
+        if Geom::const_defined?(:Point2d)
+          context.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self, Geom::Point2d.new(0, 0))
+          context.truenorth = @ifc::IfcDirection.new(self, Geom::Vector2d.new(0, 1))
+        else
+          context.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self, Geom::Point3d.new(0, 0,0))
+          context.truenorth = @ifc::IfcDirection.new(self, Geom::Vector3d.new(0, 1,0))
+        end
+        context
       end
 
       # Recursively create IFC objects for all given SketchUp entities and add those to the model

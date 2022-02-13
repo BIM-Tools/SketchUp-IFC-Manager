@@ -94,9 +94,25 @@ module BimTools
 
     def set_units
       unit_options = @su_model.options['UnitsOptions']
-      @length_unit = LENGTH_UNITS[unit_options['LengthUnit']]
-      @area_unit = AREA_UNITS[unit_options['AreaUnit']]
-      @volume_unit = VOLUME_UNITS[unit_options['VolumeUnit']]
+
+      length_unit = unit_options['LengthUnit']
+      @length_unit = LENGTH_UNITS[length_unit]
+
+      # In older versions of Sketchup AreaUnit is not available
+      area_unit = unit_options['AreaUnit']
+      @area_unit = if area_unit
+                     AREA_UNITS[area_unit]
+                   else
+                     AREA_UNITS[length_unit]
+                   end
+
+      # In older versions of Sketchup VolumeUnit is not available
+      volume_unit = unit_options['VolumeUnit']
+      @volume_unit = if volume_unit
+                       VOLUME_UNITS[volume_unit]
+                     else
+                       VOLUME_UNITS[length_unit]
+                     end
     end
 
     def ifc_unit(unit_type)

@@ -66,7 +66,9 @@ module BimTools::IfcManager
 
     # Create IFC entity based on the IFC classification in sketchup
     def create_ifc_entity(ent_type_name, su_instance, placement_parent = nil, su_material = nil)
-      parent_hex_guid = placement_parent.globalid&.to_hex if placement_parent
+      if placement_parent && placement_parent.globalid
+        parent_hex_guid = placement_parent.globalid.to_hex
+      end
 
       # Replace IfcWallStandardCase by IfcWall, due to geometry issues and deprecated in IFC 4
       ent_type_name = 'IfcWall' if ent_type_name == 'IfcWallStandardCase'
