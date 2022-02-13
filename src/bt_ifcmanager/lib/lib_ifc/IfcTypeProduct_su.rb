@@ -31,7 +31,7 @@ module BimTools
 
     # @param ifc_model [BimTools::IfcManager::IfcModel]
     # @param definition [Sketchup::ComponentDefinition]
-    def initialize(ifc_model, definition)
+    def initialize(ifc_model, definition, instance_class)
       super(ifc_model, definition)
       @ifc = BimTools::IfcManager::Settings.ifc_module
       @definition = definition
@@ -48,7 +48,7 @@ module BimTools
 
       # get attributes from su object and add them to IfcTypeProduct
       if dicts = definition.attribute_dictionaries
-        dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(ifc_model, self, dicts)
+        dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(ifc_model, self, dicts, instance_class)
         dict_reader.set_attributes
         if @type_properties
           propertysets = dict_reader.get_propertysets

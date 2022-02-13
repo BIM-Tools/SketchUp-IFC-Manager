@@ -67,7 +67,7 @@ module BimTools
             type_name = self.class.name.split('::').last + 'Type'
             if @ifc.const_defined?(type_name)
               type_product = @ifc.const_get(type_name)
-              @type_product = type_product.new(ifc_model, definition)
+              @type_product = type_product.new(ifc_model, definition, self.class)
               @ifc_model.product_types[definition] = @type_product
               @type_product.add_typed_object(self)
             end

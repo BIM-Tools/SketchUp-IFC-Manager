@@ -31,7 +31,7 @@ module BimTools
     class IfcDictionaryReader
       include BimTools::IfcManager::PropertyDictionary
 
-      def initialize(ifc_model, ifc_entity, entity_dict)
+      def initialize(ifc_model, ifc_entity, entity_dict, instance_class = nil)
         @ifc = BimTools::IfcManager::Settings.ifc_module
         ifc_version = BimTools::IfcManager::Settings.ifc_version
         @ifc_model = ifc_model
@@ -45,7 +45,15 @@ module BimTools
           names = @ifc_dict.map { |x| x.name.to_sym }
           names -= UNUSED_DICTS # filter out unwanted dictionaries
           @attributes = names & ifc_entity.attributes
-          @propertyset_names = names - @attributes
+
+          # Skip IfcProduct-only attributes for IfcTypeProduct
+          all_attributes = if instance_class
+                             names & (ifc_entity.attributes + instance_class.attributes).uniq
+                           else
+                             @attributes
+                           end
+
+          @propertyset_names = names - all_attributes
         end
       end
 
