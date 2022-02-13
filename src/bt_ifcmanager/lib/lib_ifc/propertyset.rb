@@ -180,7 +180,7 @@ module BimTools
       def add_sketchup_definition_properties(ifc_model, ifc_entity, sketchup, type_properties = false)
         attributes = ifc_model.options[:attributes]
         if attributes.include? 'SU_DefinitionSet'
-          if sketchup.attribute_dictionaries && dict = sketchup.attribute_dictionaries['SU_InstanceSet']
+          if sketchup.attribute_dictionaries && dict = sketchup.attribute_dictionaries['SU_DefinitionSet']
             if type_properties
               propertyset = get_propertyset(dict)
               ifc_entity.haspropertysets.add(propertyset) if propertyset
