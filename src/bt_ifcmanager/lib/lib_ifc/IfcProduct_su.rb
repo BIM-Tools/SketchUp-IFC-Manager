@@ -91,34 +91,6 @@ module BimTools
           dict_reader.add_sketchup_instance_properties(ifc_model, self, @su_object)
         end
 
-        # (!) @todo
-        # Add ifc_model.options[:attributes] as parameter to dict_reader.set_properties()
-        #
-
-        # if ifc_model.options[:attributes]
-        #   ifc_model.options[:attributes].each do |attr_dict_name|
-        #     # Only add definition propertysets when no TypeProduct is set
-        #     if !@type_product
-        #       if @su_object.attribute_dictionary(attr_dict_name)
-        #         non_ifc_pset = get_propertyset(@su_object.definition.attribute_dictionary(attr_dict_name))
-        #         if non_ifc_pset
-        #           non_ifc_pset.relatedobjects.add(self)
-        #         end
-        #       end
-        #     end
-        #     if @su_object.attribute_dictionary(attr_dict_name)
-        #       non_ifc_pset = get_propertyset(@su_object.attribute_dictionary(attr_dict_name))
-
-        #       if non_ifc_pset
-        #         non_ifc_pset.relatedobjects.add(self)
-        #       end
-        #     end
-
-        #     # collect_psets(ifc_model, @su_object.definition.attribute_dictionary(attr_dict_name)) unless @type_product
-        #     # collect_psets(ifc_model, @su_object.attribute_dictionary(attr_dict_name))
-        #   end
-        # end
-
         # set material if sketchup @su_object has a material
         # Material added to Product and not to TypeProduct because a Sketchup ComponentDefinition can have a different material for every Instance
         if ifc_model.options[:materials] && !((is_a? @ifc::IfcFeatureElementSubtraction) || (is_a? @ifc::IfcVirtualElement) || (is_a? @ifc::IfcSpatialStructureElement))

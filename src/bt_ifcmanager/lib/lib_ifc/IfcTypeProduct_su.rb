@@ -58,16 +58,6 @@ module BimTools
         end
       end
 
-      # if ifc_model.options[:attributes]
-      #   ifc_model.options[:attributes].each do |attr_dict_name|
-      #     collect_psets(ifc_model, @definition.attribute_dictionary(attr_dict_name))
-      #   end
-      # elsif @definition.attribute_dictionaries
-      #   @definition.attribute_dictionaries.each do |attr_dict|
-      #     collect_psets(ifc_model, attr_dict)
-      #   end
-      # end
-
       # Set PredefinedType to default value when not set
       @predefinedtype = :notdefined if defined?(predefinedtype) && @predefinedtype.nil?
     end
