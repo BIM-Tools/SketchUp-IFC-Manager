@@ -167,29 +167,30 @@ module BimTools
           # No way to map values with certainty, just pick the first 2
           next unless attributes.length > 1
 
-          classification_reference = ifc_classification.ifc_classification_references[attributes[0]]
-          next if classification_reference
+          classification_ref = ifc_classification.ifc_classification_references[attributes[0]]
+          unless classification_ref
+            classification_ref = @ifc::IfcClassificationReference.new(@ifc_model)
+            classification_ref.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, attributes[1])
+            classification_ref.referencedsource = ifc_classification
 
-          classification_reference = @ifc::IfcClassificationReference.new(@ifc_model)
-          classification_reference.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, attributes[1])
-          classification_reference.referencedsource = ifc_classification
-          identification = BimTools::IfcManager::IfcIdentifier.new(@ifc_model, attributes[0])
+            # add classification_ref to the list of references in the classification
+            ifc_classification.ifc_classification_references[attributes[0]] = classification_ref
 
-          # Catch IFC4 changes
-          if @ifc::IfcClassificationReference.method_defined?(:itemreference)
-            classification_reference.itemreference = identification
-          else
-            classification_reference.identification = identification
+            # Catch IFC4 atrribute name change
+            identification = BimTools::IfcManager::IfcIdentifier.new(@ifc_model, attributes[0])
+            if @ifc::IfcClassificationReference.method_defined?(:itemreference)
+              classification_ref.itemreference = identification
+            else
+              classification_ref.identification = identification
+            end
+
+            # create IfcRelAssociatesClassification
+            rel = @ifc::IfcRelAssociatesClassification.new(@ifc_model)
+            rel.relatedobjects = BimTools::IfcManager::Ifc_Set.new
+            rel.relatingclassification = classification_ref
+            classification_ref.ifc_rel_associates_classification = rel
           end
-
-          # add classification_reference to the list of references in the classification
-          ifc_classification.ifc_classification_references[attributes[0]] = classification_reference
-
-          # create IfcRelAssociatesClassification
-          rel = @ifc::IfcRelAssociatesClassification.new(@ifc_model)
-          rel.relatedobjects = BimTools::IfcManager::Ifc_Set.new([@ifc_entity])
-          rel.relatingclassification = classification_reference
-          classification_reference.ifc_rel_associates_classification = rel
+          classification_ref.ifc_rel_associates_classification.relatedobjects.add(@ifc_entity)
         end
       end
 
