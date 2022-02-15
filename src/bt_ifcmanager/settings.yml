@@ -18,6 +18,7 @@
 :load:
   :classifications:
     NL-SfB tabel 1 Classification.skc: true
+    NL-SfB 2005, tabel 1.skc: false
     DIN 276-1.skc: false
   :ifc_classifications:
     IFC 2x3.skc: true
