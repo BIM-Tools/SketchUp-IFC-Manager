@@ -90,14 +90,14 @@ module BimTools::IfcManager
               i += 1
             end
           else
-            notification = UI::Notification.new(IFCMANAGER_EXTENSION, "No material with name: " + value)
+            notification = UI::Notification.new(IFCMANAGER_EXTENSION, "No material with name: " << value)
             notification.show
           end
           PropertiesWindow::update()
         }
 
         # Add button callback
-        @dialog.add_action_callback("add_" + @id) { |action_context|
+        @dialog.add_action_callback("add_" << @id) { |action_context|
           input = UI.inputbox(["Name:"], [""], "Create material...")
           if input
           

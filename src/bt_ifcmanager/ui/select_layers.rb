@@ -103,7 +103,7 @@ module BimTools::IfcManager
         }
 
         # Add button callback
-        @dialog.add_action_callback("add_" + @id) { |action_context|
+        @dialog.add_action_callback("add_" << @id) { |action_context|
           input = UI.inputbox(["Name:"], [""], "Create tag...")
           if input
             model = Sketchup.active_model

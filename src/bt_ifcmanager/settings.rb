@@ -70,23 +70,25 @@ module BimTools::IfcManager
 
       # Load export options from settings
       if @options[:export]
-        @export_hidden =             CheckboxOption.new('hidden', 'Export hidden objects', @options[:export][:hidden])
-        @export_classifications =    CheckboxOption.new('classifications', 'Export classifications',
-                                                        @options[:export][:classifications])
-        @export_layers =             CheckboxOption.new('layers', 'Export tags/layers as IFC layers',
-                                                        @options[:export][:layers])
-        @export_materials =          CheckboxOption.new('materials', 'Export materials', @options[:export][:materials])
-        @export_colors =             CheckboxOption.new('colors', 'Export colors', @options[:export][:colors])
-        @export_geometry =           CheckboxOption.new('geometry', 'Export geometry', @options[:export][:geometry])
-        @export_fast_guid =          CheckboxOption.new('fast_guid', "Improve export speed by using fake GUID's",
-                                                        @options[:export][:fast_guid])
+        @export_hidden = CheckboxOption.new('hidden', 'Export hidden objects', @options[:export][:hidden])
+        @export_classifications = CheckboxOption.new('classifications', 'Export classifications',
+                                                     @options[:export][:classifications])
+        @export_layers = CheckboxOption.new('layers', 'Export tags/layers as IFC layers',
+                                            @options[:export][:layers])
+        @export_materials = CheckboxOption.new('materials', 'Export materials', @options[:export][:materials])
+        @export_colors = CheckboxOption.new('colors', 'Export colors', @options[:export][:colors])
+        @export_geometry = CheckboxOption.new('geometry', 'Export geometry', @options[:export][:geometry])
+        @export_fast_guid = CheckboxOption.new('fast_guid', "Improve export speed by using fake GUID's",
+                                               @options[:export][:fast_guid])
         @export_dynamic_attributes = CheckboxOption.new('dynamic_attributes', 'Export dynamic attributes',
                                                         @options[:export][:dynamic_attributes])
-        @export_types =              CheckboxOption.new('types', 'Export IFC Type products', @options[:export][:types])
-        @export_type_properties =    CheckboxOption.new('type_properties', 'Export IFC Type properties',
-                                                        @options[:export][:type_properties])
-        @export_mapped_items =       CheckboxOption.new('mapped_items', 'Export IFC mapped items',
-                                                        @options[:export][:mapped_items])
+        @export_types = CheckboxOption.new('types', 'Export IFC Type products', @options[:export][:types])
+        @export_type_properties = CheckboxOption.new('type_properties', 'Export IFC Type properties',
+                                                     @options[:export][:type_properties])
+        @export_mapped_items = CheckboxOption.new('mapped_items', 'Export IFC mapped items',
+                                                  @options[:export][:mapped_items])
+        @export_classification_suffix = CheckboxOption.new('classification_suffix',
+                                                           "Add 'Classification' suffix to all classifications", @options[:export][:mapped_items])
       end
 
       # load classification schemes from settings
@@ -98,26 +100,27 @@ module BimTools::IfcManager
     end
 
     def save
-      @options[:load][:ifc_classifications]  = @ifc_classifications
-      @options[:load][:classifications]      = @classifications
-      @options[:load][:template_materials]   = @template_materials
-      @options[:properties][:common_psets]   = @common_psets
-      @options[:export][:hidden]             = @export_hidden.value
-      @options[:export][:classifications]    = @export_classifications.value
-      @options[:export][:layers]             = @export_layers.value
-      @options[:export][:materials]          = @export_materials.value
-      @options[:export][:colors]             = @export_colors.value
-      @options[:export][:geometry]           = @export_geometry.value
-      @options[:export][:fast_guid]          = @export_fast_guid.value
+      @options[:load][:ifc_classifications] = @ifc_classifications
+      @options[:load][:classifications] = @classifications
+      @options[:load][:template_materials] = @template_materials
+      @options[:properties][:common_psets] = @common_psets
+      @options[:export][:hidden] = @export_hidden.value
+      @options[:export][:classifications] = @export_classifications.value
+      @options[:export][:layers] = @export_layers.value
+      @options[:export][:materials] = @export_materials.value
+      @options[:export][:colors] = @export_colors.value
+      @options[:export][:geometry] = @export_geometry.value
+      @options[:export][:fast_guid] = @export_fast_guid.value
       @options[:export][:dynamic_attributes] = @export_dynamic_attributes.value
-      @options[:export][:types]              = @export_types.value
-      @options[:export][:type_properties]    = @export_type_properties.value
-      @options[:export][:mapped_items]       = @export_mapped_items.value
+      @options[:export][:types] = @export_types.value
+      @options[:export][:type_properties] = @export_type_properties.value
+      @options[:export][:mapped_items] = @export_mapped_items.value
+      @options[:export][:classification_suffix] = @export_classification_suffix.value
       File.open(@settings_file, 'w') { |file| file.write(@options.to_yaml) }
       PropertiesWindow.close
       @dialog.close
       load_settings
-      message = "IFC Manager settings saved"
+      message = 'IFC Manager settings saved'
       puts message
       UI::Notification.new(IFCMANAGER_EXTENSION, message).show
       PropertiesWindow.create
@@ -328,6 +331,8 @@ module BimTools::IfcManager
             @export_type_properties.value = true
           when 'mapped_items'
             @export_mapped_items.value = true
+          when 'classification_suffix'
+            @export_classification_suffix.value = true
           when 'ifc_classification'
             update_ifc_classifications << value
           when 'classification'
@@ -414,6 +419,7 @@ HTML
       html << @export_types.html
       html << @export_type_properties.html
       html << @export_mapped_items.html
+      html << @export_classification_suffix.html
       html << "      </div>\n"
 
       # Default materials

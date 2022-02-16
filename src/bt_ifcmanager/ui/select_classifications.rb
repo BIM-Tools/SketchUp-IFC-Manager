@@ -114,7 +114,7 @@ module BimTools::IfcManager
               i += 1
             end
           else
-            notification = UI::Notification.new(IFCMANAGER_EXTENSION, "No classification with name: " + @name)
+            notification = UI::Notification.new(IFCMANAGER_EXTENSION, "No classification with name: " << @name)
             notification.show
           end
           PropertiesWindow::update()

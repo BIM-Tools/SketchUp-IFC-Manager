@@ -156,7 +156,11 @@ module BimTools
                 ifc_classification.editiondate = BimTools::IfcManager::IfcDate.new(@ifc_model, time)
               end
             end
-            ifc_classification.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, attr_dict.name)
+            if @ifc_model.options[:classification_suffix]
+              ifc_classification.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, attr_dict.name << ' Classification')
+            else
+              ifc_classification.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, attr_dict.name)
+            end
           end
 
           attributes = []

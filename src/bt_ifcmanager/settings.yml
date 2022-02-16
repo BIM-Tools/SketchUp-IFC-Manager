@@ -15,6 +15,7 @@
   :types: true
   :type_properties: false
   :mapped_items: true
+  :classification_suffix: true
 :load:
   :classifications:
     NL-SfB tabel 1 Classification.skc: true
