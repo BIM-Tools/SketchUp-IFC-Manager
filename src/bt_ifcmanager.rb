@@ -32,7 +32,7 @@ module BimTools
 
   module IfcManager
     # Version and release information.
-    VERSION = '4.1.1'
+    VERSION = '4.1.2'
 
     # load plugin only if SketchUp version is PRO
     # raised minimum version to 2017 due to switch to htmldialog
