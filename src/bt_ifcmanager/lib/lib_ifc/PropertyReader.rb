@@ -74,45 +74,36 @@ module BimTools
       # @return [Array<Propertyset>]
       def get_propertysets
         propertysets = []
-
-        # # Don't add definition properties when a TypeProduct is available
-        # unless @ifc_entity.respond_to?(:type_product=) && @ifc_entity.type_product
         if @propertyset_names
           i = 0
           while i < @propertyset_names.length
             name = @propertyset_names[i].to_s
-            # value = if quantity?(name) # check hier? of aan het eind na beoordelen alle properties?
-            # propertysets << get_elementquantity(@ifc_dict[name])
-            # else
-            propertyset = get_propertyset(@ifc_dict[name])
+            propertyset = if (name == 'BaseQuantities') || name.start_with?('Qto_') # export as elementquantities
+                            get_elementquantity(@ifc_dict[name])
+                          else
+                            get_propertyset(@ifc_dict[name])
+                          end
             propertysets << propertyset if propertyset
-            # end
-
             i += 1
           end
         end
-        # end
         propertysets
       end
 
       def add_propertysets
-        # # Don't add definition properties when a TypeProduct is available
-        # unless @ifc_entity.respond_to?(:type_product=) && @ifc_entity.type_product
         if @propertyset_names
           i = 0
           while i < @propertyset_names.length
             name = @propertyset_names[i].to_s
-            # value = if quantity?(name) # check hier? of aan het eind na beoordelen alle properties?
-            # propertysets << get_elementquantity(@ifc_dict[name])
-            # else
-            rel_defines = add_propertyset(@ifc_dict[name])
+            rel_defines = if (name == 'BaseQuantities') || name.start_with?('Qto_') # export as elementquantities
+                            add_elementquantity(@ifc_dict[name])
+                          else
+                            add_propertyset(@ifc_dict[name])
+                          end
             rel_defines.relatedobjects.add(@ifc_entity) if rel_defines
-            # end
-
             i += 1
           end
         end
-        # end
       end
 
       def add_classifications
@@ -157,7 +148,8 @@ module BimTools
               end
             end
             if @ifc_model.options[:classification_suffix]
-              ifc_classification.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, attr_dict.name << ' Classification')
+              ifc_classification.name = BimTools::IfcManager::IfcLabel.new(@ifc_model,
+                                                                           attr_dict.name << ' Classification')
             else
               ifc_classification.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, attr_dict.name)
             end
