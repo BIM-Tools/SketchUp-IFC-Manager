@@ -88,7 +88,7 @@ module BimTools::IfcManager
         @export_mapped_items = CheckboxOption.new('mapped_items', 'Export IFC mapped items',
                                                   @options[:export][:mapped_items])
         @export_classification_suffix = CheckboxOption.new('classification_suffix',
-                                                           "Add 'Classification' suffix to all classifications", @options[:export][:mapped_items])
+                                                           "Add 'Classification' suffix to all classifications", @options[:export][:classification_suffix])
       end
 
       # load classification schemes from settings
@@ -287,19 +287,20 @@ module BimTools::IfcManager
       @dialog.add_action_callback('save_settings') do |_action_context, s_form_data|
         update_classifications = []
         update_ifc_classifications = []
-        @template_materials               = false
-        @common_psets                     = false
-        @export_hidden.value              = false
-        @export_classifications.value     = false
-        @export_layers.value              = false
-        @export_materials.value           = false
-        @export_colors.value              = false
-        @export_geometry.value            = false
-        @export_fast_guid.value           = false
-        @export_dynamic_attributes.value  = false
-        @export_types.value               = false
-        @export_type_properties.value     = false
-        @export_mapped_items.value        = false
+        @template_materials = false
+        @common_psets = false
+        @export_hidden.value = false
+        @export_classifications.value = false
+        @export_layers.value = false
+        @export_materials.value = false
+        @export_colors.value = false
+        @export_geometry.value = false
+        @export_fast_guid.value = false
+        @export_dynamic_attributes.value = false
+        @export_types.value = false
+        @export_type_properties.value = false
+        @export_mapped_items.value = false
+        @export_classification_suffix.value = false
 
         a_form_data = CGI.unescape(s_form_data).split('&')
         a_form_data.each do |s_setting|
