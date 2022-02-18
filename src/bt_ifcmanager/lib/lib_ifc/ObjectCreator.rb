@@ -169,8 +169,8 @@ module BimTools::IfcManager
 
     def create_geometry(definition, ifc_entity, su_material, faces)
       # calculate the local transformation
-      # if the SU object if not an IFC entity, then BREP needs to be transformed with SU object transformation
-      if !ifc_entity.is_a?(@ifc::IfcProduct) || ifc_entity.is_a?(@ifc::IfcGroup) || ifc_entity.parent.is_a?(@ifc::IfcProject)
+      # if the SU object if not an IfcProduct (cannot have a representation ), then BREP needs to be transformed with SU object transformation
+      if !ifc_entity.is_a?(@ifc::IfcProduct)
         brep_transformation = @su_total_transformation
       else
         brep_transformation = ifc_entity.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
