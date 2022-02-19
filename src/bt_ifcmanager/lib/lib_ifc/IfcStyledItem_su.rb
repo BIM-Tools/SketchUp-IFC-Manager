@@ -23,15 +23,10 @@ require_relative 'IfcNormalisedRatioMeasure'
 
 module BimTools
   module IfcStyledItem_su
-    
-
-    def initialize(ifc_model, brep, material = nil)
+    def initialize(ifc_model, brep)
       super
-      @ifc = BimTools::IfcManager::Settings.ifc_module      
+      @ifc = BimTools::IfcManager::Settings.ifc_module
       instance_variable_set(:@attr, ([:Item] + attributes))
-      surfacestyle = @ifc::IfcSurfaceStyle.new(ifc_model, material)
-      surfacestylerendering = @ifc::IfcSurfaceStyleRendering.new(ifc_model, material)
-      colourrgb = @ifc::IfcColourRgb.new(ifc_model, material)
 
       # Workaround for bug in IFC XSD's forward from IFC4, missing "item" attribute
       unless attributes.include? :Item
@@ -50,41 +45,6 @@ module BimTools
       end
 
       @item = brep
-      
-      # Workaround for mandatory IfcPresentationStyleAssignment in IFC2x3
-      if BimTools::IfcManager::Settings.ifc_version == 'IFC 2x3'
-        styleassignment = @ifc::IfcPresentationStyleAssignment.new(ifc_model, material)
-        styleassignment.styles = IfcManager::Ifc_Set.new([surfacestyle])
-        @styles = IfcManager::Ifc_Set.new([styleassignment])
-      else
-        @styles = IfcManager::Ifc_Set.new([surfacestyle])
-      end
-
-      surfacestyle.side = :both
-      surfacestyle.styles = IfcManager::Ifc_Set.new([surfacestylerendering])
-
-      surfacestylerendering.surfacecolour = colourrgb
-      surfacestylerendering.reflectancemethod = :notdefined
-
-      if material
-
-        # add transparency, converted from Sketchup's alpha value
-        surfacestylerendering.transparency = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model,
-                                                                                                 1 - material.alpha)
-
-        # add color values, converted from 0/255 to fraction
-        colourrgb.red = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model, material.color.red.to_f / 255)
-        colourrgb.green = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model,
-                                                                              material.color.green.to_f / 255)
-        colourrgb.blue = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model, material.color.blue.to_f / 255)
-      else
-
-        # (?) use default values == white
-        surfacestylerendering.transparency = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model, 0.0)
-        colourrgb.red = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model, 1.0)
-        colourrgb.green = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model, 1.0)
-        colourrgb.blue = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(ifc_model, 1.0)
-      end
     end
   end
 end

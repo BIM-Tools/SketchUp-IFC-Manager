@@ -31,6 +31,7 @@ require_relative 'IfcText'
 require_relative 'dynamic_attributes'
 require_relative 'PropertyReader'
 require_relative 'propertyset'
+require_relative 'material_and_styling'
 
 module BimTools
   module IfcProduct_su
@@ -100,17 +101,14 @@ module BimTools
                             'Default'
                           end
 
-          # check if materialassociation exists
-          unless ifc_model.materials[material_name]
-
-            # create new materialassociation
-            ifc_model.materials[material_name] = @ifc::IfcRelAssociatesMaterial.new(ifc_model, material_name)
-
+          # create materialassociation
+          su_material = @su_object.material
+          unless ifc_model.materials[su_material]
+            ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
           end
 
-          # add self to materialassociation
-          ifc_model.materials[material_name].relatedobjects.add(self)
-          # puts ifc_model.materials[material_name].step
+          # add product to materialassociation
+          ifc_model.materials[su_material].add_to_material(self)
         end
 
         # collect dynamic component attributes if export option is set

@@ -19,6 +19,8 @@
 #
 #
 
+require_relative 'material_and_styling'
+
 module BimTools::IfcManager
   # Class that keeps track of all different shaperepresentations for
   #   the different sketchup component definitions
@@ -98,7 +100,15 @@ module BimTools::IfcManager
         shape_representation.items.add(brep)
 
         # add color from su-object material, or a su_parent's
-        @ifc::IfcStyledItem.new(@ifc_model, brep, su_material) if @ifc_model.options[:colors]
+        if ifc_model.options[:colors] && su_material
+          material_name = su_material.display_name
+          
+          # check if materialassociation exists
+          unless ifc_model.materials[su_material]
+            ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
+          end
+          ifc_model.materials[su_material].add_to_styling(brep)
+        end
       end
 
       # set layer
@@ -122,7 +132,7 @@ module BimTools::IfcManager
   class ShapeRepresentation
     attr_reader :brep, :shaperepresentation, :representationmap
 
-    def initialize(ifc_model, faces, transformation, material)
+    def initialize(ifc_model, faces, transformation, su_material)
       @ifc = BimTools::IfcManager::Settings.ifc_module
       @brep = @ifc::IfcFacetedBrep.new(ifc_model, faces, transformation)
       @shaperepresentation = @ifc::IfcShapeRepresentation.new(ifc_model, nil)
@@ -132,7 +142,15 @@ module BimTools::IfcManager
       @representationmap.mappedrepresentation = @shaperepresentation
 
       # add color from su-object material, or a su_parent's
-      @ifc::IfcStyledItem.new(ifc_model, brep, material) if ifc_model.options[:colors] && material
+      if ifc_model.options[:colors] && su_material
+        material_name = su_material.display_name
+        
+        # check if materialassociation exists
+        unless ifc_model.materials[su_material]
+          ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
+        end
+        ifc_model.materials[su_material].add_to_styling(brep)
+      end
     end
   end
 end
