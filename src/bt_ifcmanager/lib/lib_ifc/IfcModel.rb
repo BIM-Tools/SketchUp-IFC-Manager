@@ -42,7 +42,7 @@ module BimTools
       attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications,
                     :classificationassociations, :product_types, :property_enumerations
       attr_reader :su_model, :project, :ifc_objects, :export_summary, :options, :su_entities, :units,
-                  :default_location, :default_axis, :default_refdirection, :default_placement, :representation_manager
+                  :default_location, :default_axis, :default_refdirection, :default_placement, :representation_manager, :textures
 
       # creates an IFC model based on given su model
       # (?) could be enhanced to also accept other sketchup objects
@@ -66,6 +66,7 @@ module BimTools
           dynamic_attributes: true, #  export dynamic component data
           types: true,
           mapped_items: true, # export component definitions as mapped items
+          textures: false, # export component definitions as mapped items
           export_entities: [],
           root_entities: []
         }
@@ -81,6 +82,9 @@ module BimTools
         @materials = {}
         @layers = {}
         @classifications = {}
+
+        # if textures option is enabled set TextureWriter
+        @textures = (Sketchup.create_texture_writer if @options[:textures])
 
         # create empty array that will contain all IFC objects
         @ifc_objects = []

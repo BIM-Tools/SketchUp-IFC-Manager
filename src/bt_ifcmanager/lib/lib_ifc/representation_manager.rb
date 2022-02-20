@@ -104,7 +104,7 @@ module BimTools::IfcManager
           material_name = su_material.display_name
           
           # check if materialassociation exists
-          unless ifc_model.materials[su_material]
+          unless ifc_model.materials.key?(su_material)
             ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
           end
           ifc_model.materials[su_material].add_to_styling(brep)
@@ -145,8 +145,8 @@ module BimTools::IfcManager
       if ifc_model.options[:colors] && su_material
         material_name = su_material.display_name
         
-        # check if materialassociation exists
-        unless ifc_model.materials[su_material]
+        # check if material exists
+        unless ifc_model.materials.key?(su_material)
           ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
         end
         ifc_model.materials[su_material].add_to_styling(brep)

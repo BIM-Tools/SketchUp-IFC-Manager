@@ -2190,6 +2190,9 @@ IfcTextureCoordinateGenerator:
 IfcTextureMap:
   :explicit:
   - :TextureMaps
+  - :Maps
+  - :Vertices
+  - :MappedTo
 IfcTextureVertex:
   :explicit:
   - :Coordinates

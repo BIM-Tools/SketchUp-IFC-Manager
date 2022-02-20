@@ -32,6 +32,7 @@
 #   dynamic_attributes:  false, # export dynamic component data
 #   open_file:           false, # open created file in given/default application
 #   mapped_items:        true
+#   textures:        false
 # load:
 #   classifications:     [],    # ["NL-SfB 2005, tabel 1", "DIN 276-1"]
 #   default_materials:   false  # {'beton'=>[142, 142, 142],'hout'=>[129, 90, 35],'staal'=>[198, 198, 198],'gips'=>[255, 255, 255],'zink'=>[198, 198, 198],'hsb'=>[204, 161, 0],'metselwerk'=>[102, 51, 0],'steen'=>[142, 142, 142],'zetwerk'=>[198, 198, 198],'tegel'=>[255, 255, 255],'aluminium'=>[198, 198, 198],'kunststof'=>[255, 255, 255],'rvs'=>[198, 198, 198],'pannen'=>[30, 30, 30],'bitumen'=>[30, 30, 30],'epdm'=>[30, 30, 30],'isolatie'=>[255, 255, 50],'kalkzandsteen'=>[255, 255, 255],'metalstud'=>[198, 198, 198],'gibo'=>[255, 255, 255],'glas'=>[204, 255, 255],'multiplex'=>[255, 216, 101],'cementdekvloer'=>[198, 198, 198]}
@@ -87,6 +88,7 @@ module BimTools::IfcManager
                                                      @options[:export][:type_properties])
         @export_mapped_items = CheckboxOption.new('mapped_items', 'Export IFC mapped items',
                                                   @options[:export][:mapped_items])
+        @export_textures = CheckboxOption.new('textures', "Export textures", @options[:export][:textures])
         @export_classification_suffix = CheckboxOption.new('classification_suffix',
                                                            "Add 'Classification' suffix to all classifications", @options[:export][:classification_suffix])
       end
@@ -115,6 +117,7 @@ module BimTools::IfcManager
       @options[:export][:types] = @export_types.value
       @options[:export][:type_properties] = @export_type_properties.value
       @options[:export][:mapped_items] = @export_mapped_items.value
+      @options[:export][:textures] = @export_textures.value
       @options[:export][:classification_suffix] = @export_classification_suffix.value
       File.open(@settings_file, 'w') { |file| file.write(@options.to_yaml) }
       PropertiesWindow.close
@@ -300,6 +303,7 @@ module BimTools::IfcManager
         @export_types.value = false
         @export_type_properties.value = false
         @export_mapped_items.value = false
+        @export_textures.value = false
         @export_classification_suffix.value = false
 
         a_form_data = CGI.unescape(s_form_data).split('&')
@@ -332,6 +336,8 @@ module BimTools::IfcManager
             @export_type_properties.value = true
           when 'mapped_items'
             @export_mapped_items.value = true
+          when 'textures'
+            @export_textures.value = true
           when 'classification_suffix'
             @export_classification_suffix.value = true
           when 'ifc_classification'
@@ -420,6 +426,7 @@ HTML
       html << @export_types.html
       html << @export_type_properties.html
       html << @export_mapped_items.html
+      html << @export_textures.html
       html << @export_classification_suffix.html
       html << "      </div>\n"
 
