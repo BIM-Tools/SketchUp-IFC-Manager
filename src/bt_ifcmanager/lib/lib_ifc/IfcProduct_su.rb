@@ -103,7 +103,7 @@ module BimTools
 
           # create materialassociation
           su_material = @su_object.material
-          unless ifc_model.materials[su_material]
+          unless ifc_model.materials.include?(su_material)
             ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
           end
 
