@@ -28,6 +28,7 @@
 #   layers:              true,  # create IfcPresentationLayerAssignments
 #   materials:           true,  # create IfcMaterials
 #   colors:              true,  # create IfcStyledItems
+#   geometry:            'Brep' # ['Brep','Tessellation',false]
 #   fast_guid:           false, # create simplified guids
 #   dynamic_attributes:  false, # export dynamic component data
 #   open_file:           false, # open created file in given/default application
@@ -78,7 +79,7 @@ module BimTools::IfcManager
                                             @options[:export][:layers])
         @export_materials = CheckboxOption.new('materials', 'Export materials', @options[:export][:materials])
         @export_colors = CheckboxOption.new('colors', 'Export colors', @options[:export][:colors])
-        @export_geometry = CheckboxOption.new('geometry', 'Export geometry', @options[:export][:geometry])
+        @export_geometry = SelectOption.new('geometry', 'Export geometry', @options[:export][:geometry], ['Brep','Tessellation',false])
         @export_fast_guid = CheckboxOption.new('fast_guid', "Improve export speed by using fake GUID's",
                                                @options[:export][:fast_guid])
         @export_dynamic_attributes = CheckboxOption.new('dynamic_attributes', 'Export dynamic attributes',
@@ -325,7 +326,11 @@ module BimTools::IfcManager
           when 'colors'
             @export_colors.value = true
           when 'geometry'
-            @export_geometry.value = true
+            if value == 'false'
+              @export_geometry.value = false
+            else
+              @export_geometry.value = value
+            end
           when 'fast_guid'
             @export_fast_guid.value = true
           when 'dynamic_attributes'
@@ -489,6 +494,29 @@ HTML
           <label class="check-inline"><input type="checkbox" name="#{@name}" value="#{@name}"#{checked}> #{@title}</label>
         </div>
 HTML
+      end
+    end
+    class SelectOption
+      attr_accessor :value
+
+      def initialize(name, title, initial_value, options)
+        @name = name
+        @title = title
+        @value = initial_value
+        @options = options
+      end
+
+      def html
+        html_string = "<div class=\"col-md-12 row\">\n<select name=\"#{@name}\">\n"
+        @options.each do |option|
+          selected = if @value == option
+                      ' selected'
+                    else
+                      ''
+                    end
+          html_string << "  <option value=\"#{option}\"#{selected}>#{option}</option>\n"
+        end
+        html_string << "</select>\n<label style=\"margin-left:.5em\"class=\"check-inline\">#{@name}</label>\n</div>\n"
       end
     end
   end

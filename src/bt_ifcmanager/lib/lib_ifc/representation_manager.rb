@@ -102,7 +102,7 @@ module BimTools::IfcManager
         # add color from su-object material, or a su_parent's
         if ifc_model.options[:colors] && su_material
           material_name = su_material.display_name
-          
+
           # check if materialassociation exists
           unless ifc_model.materials.key?(su_material)
             ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
@@ -134,17 +134,32 @@ module BimTools::IfcManager
 
     def initialize(ifc_model, faces, transformation, su_material)
       @ifc = BimTools::IfcManager::Settings.ifc_module
-      @brep = @ifc::IfcFacetedBrep.new(ifc_model, faces, transformation)
-      @shaperepresentation = @ifc::IfcShapeRepresentation.new(ifc_model, nil)
-      @shaperepresentation.items.add(brep)
+      geometry_type = ifc_model.options[:geometry]
+      if geometry_type == 'Tessellation'
+        faces_by_material = faces.group_by{|face|[face.material,face.back_material]}
+
+        # Set object material for faces without material
+        # faces_by_material[su_material] = faces_by_material.delete nil if faces_by_material[nil]
+        representationtype = BimTools::IfcManager::IfcLabel.new(ifc_model, geometry_type)
+        @shaperepresentation = @ifc::IfcShapeRepresentation.new(ifc_model, nil, representationtype)
+        @shaperepresentation.items = BimTools::IfcManager::Ifc_List.new(faces_by_material.map do |face_materials, faces|
+                                                                          @ifc::IfcTriangulatedFaceSet.new(ifc_model,
+                                                                                                           faces, transformation, face_materials, su_material)
+                                                                        end)
+
+      else # 'Brep'
+        representationtype = BimTools::IfcManager::IfcLabel.new(ifc_model, geometry_type)
+        @shaperepresentation = @ifc::IfcShapeRepresentation.new(ifc_model, nil, representationtype)
+        @brep = @ifc::IfcFacetedBrep.new(ifc_model, faces, transformation)
+        @shaperepresentation.items.add(@brep)
+      end
       @representationmap = @ifc::IfcRepresentationMap.new(ifc_model)
       @representationmap.mappingorigin = ifc_model.default_placement
       @representationmap.mappedrepresentation = @shaperepresentation
-
       # add color from su-object material, or a su_parent's
       if ifc_model.options[:colors] && su_material
         material_name = su_material.display_name
-        
+
         # check if material exists
         unless ifc_model.materials.key?(su_material)
           ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
@@ -152,5 +167,17 @@ module BimTools::IfcManager
         ifc_model.materials[su_material].add_to_styling(brep)
       end
     end
+
+    # def group_on_materials(faces)
+    #   grouped = faces.group_by{|face|[face.material,face.back_material]}
+    #   grouped.each do |materials,faces|
+    #     if materials[0].nil?
+
+    #     end
+    #     if materials[1].nil?
+          
+    #     end
+    #   end
+    # end
   end
 end

@@ -110,6 +110,13 @@ module BimTools
           image_texture = @ifc::IfcImageTexture.new(@ifc_model)
           image_texture.repeats = true
           image_texture.repeatt = true
+          texturetransform = @ifc::IfcCartesianTransformationOperator2DnonUniform.new(@ifc_model)
+          texturetransform.axis1 = @ifc_model.default_axis
+          texturetransform.axis2 = @ifc_model.default_refdirection
+          texturetransform.localorigin = @ifc_model.default_location
+          texturetransform.scale = IfcManager::IfcReal.new(@ifc_model, IfcManager::IfcLengthMeasure.new(@ifc_model,su_texture.width).convert)
+          texturetransform.scale2 = IfcManager::IfcReal.new(@ifc_model, IfcManager::IfcLengthMeasure.new(@ifc_model,su_texture.height).convert)
+          image_texture.texturetransform = texturetransform
           image_texture.urlreference = BimTools::IfcManager::IfcURIReference.new(@ifc_model, File.basename(su_texture.filename))
           image_texture
         end

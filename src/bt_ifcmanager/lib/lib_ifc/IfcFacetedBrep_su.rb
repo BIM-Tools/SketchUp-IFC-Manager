@@ -43,7 +43,7 @@ module BimTools
     def add_face(su_face)
       create_points(su_face)
       ifc_face = @ifc::IfcFace.new(@ifc_model)
-      tex_map = nil
+      texture_map = nil
       su_material = su_face.material
 
       if @ifc_model.textures && su_material && su_material.texture
@@ -53,12 +53,12 @@ module BimTools
           @ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(@ifc_model, su_material)
         end
         image_texture = @ifc_model.materials[su_material].image_texture
-        if @ifc_model.textures && su_face.material && su_face.material.texture && image_texture
-          tex_map = @ifc::IfcTextureMap.new(@ifc_model)
+        if image_texture
+          texture_map = @ifc::IfcTextureMap.new(@ifc_model)
           uv_helper = su_face.get_UVHelper(true, true, @ifc_model.textures)
           @ifc_model.textures.load(su_face, true)
-          tex_map.maps = IfcManager::Ifc_List.new([image_texture])
-          tex_map.mappedto = ifc_face
+          texture_map.maps = IfcManager::Ifc_List.new([image_texture])
+          texture_map.mappedto = ifc_face
         end
       end
       bounds = su_face.loops.map { |loop| create_loop(loop, tex_map, uv_helper) }

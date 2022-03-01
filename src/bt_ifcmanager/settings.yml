@@ -9,7 +9,7 @@
   :layers: true
   :materials: true
   :colors: true
-  :geometry: true
+  :geometry: Tessellation
   :fast_guid: false
   :dynamic_attributes: true
   :types: true
