@@ -70,25 +70,25 @@ module BimTools::IfcManager
 
       # Load export options from settings
       if @options[:export]
-        @export_hidden = CheckboxOption.new('hidden', 'Export hidden objects', @options[:export][:hidden])
+        @export_hidden = CheckboxOption.new('hidden', 'Export hidden objects', @options[:export][:hidden], "Everything will be exported to IFC, including those that are hidden or on a disabled tag/layer.")
         @export_classifications = CheckboxOption.new('classifications', 'Export classifications',
-                                                     @options[:export][:classifications])
+                                                     @options[:export][:classifications], "Export selected classifications attached to objects as IfcClassification")
         @export_layers = CheckboxOption.new('layers', 'Export tags/layers as IFC layers',
-                                            @options[:export][:layers])
-        @export_materials = CheckboxOption.new('materials', 'Export materials', @options[:export][:materials])
-        @export_colors = CheckboxOption.new('colors', 'Export colors', @options[:export][:colors])
-        @export_geometry = CheckboxOption.new('geometry', 'Export geometry', @options[:export][:geometry])
+                                            @options[:export][:layers], "Exports Sketchup tags/layers as IfcPresentationLayerAssignment")
+        @export_materials = CheckboxOption.new('materials', 'Export materials', @options[:export][:materials], "Exports the Sketchup material name as IfcMaterial")
+        @export_colors = CheckboxOption.new('colors', 'Export colors', @options[:export][:colors], "Exports the Sketchup material colors as colored IfcSurfaceStyles")
+        @export_geometry = CheckboxOption.new('geometry', 'Export geometry', @options[:export][:geometry], "When unchecked NO geometry is exported, just the model structure and metadata like classifications and properties")
         @export_fast_guid = CheckboxOption.new('fast_guid', "Improve export speed by using fake GUID's",
-                                               @options[:export][:fast_guid])
+                                               @options[:export][:fast_guid], "This replaces the official UUID4 based GUID by a similar looking random string, not recomended but export might be a bit faster.")
         @export_dynamic_attributes = CheckboxOption.new('dynamic_attributes', 'Export dynamic attributes',
-                                                        @options[:export][:dynamic_attributes])
-        @export_types = CheckboxOption.new('types', 'Export IFC Type products', @options[:export][:types])
+                                                        @options[:export][:dynamic_attributes], "Export Dynamic Component attributes as Parametric PropertySets and Quantities as described here: https://github.com/BIM-Tools/SketchUp-IFC-Manager/wiki/Parametric-Property-Sets")
+        @export_types = CheckboxOption.new('types', 'Export IFC Type products', @options[:export][:types], "Create IfcTypeProducts for Sketchup Components that are shared between all instance entities. This nicely matches the Sketchup Component structure and results in a somewhat smaller and cleaner IFC file.")
         @export_type_properties = CheckboxOption.new('type_properties', 'Export IFC Type properties',
-                                                     @options[:export][:type_properties])
+                                                     @options[:export][:type_properties], "Attach IFC properties and classifications to the IfcTypeProduct (when enabled) instead of the Entity itself. This results in a somewhat smaller and cleaner IFC file, but support varies between tools.")
         @export_mapped_items = CheckboxOption.new('mapped_items', 'Export IFC mapped items',
-                                                  @options[:export][:mapped_items])
+                                                  @options[:export][:mapped_items], "The geometry for every (equally scaled) Component Definition is only exported once, this can make models much smaller")
         @export_classification_suffix = CheckboxOption.new('classification_suffix',
-                                                           "Add 'Classification' suffix to all classifications", @options[:export][:classification_suffix])
+                                                           "Add 'Classification' suffix to all classifications", @options[:export][:classification_suffix], "Add ' Classification' suffix to all classification for Revit compatibility, this can help in grouping classifications in model checkers")
       end
 
       # load classification schemes from settings
@@ -361,26 +361,26 @@ module BimTools::IfcManager
 
     def set_html
       html = <<HTML
-        <head>
-          <link rel='stylesheet' type='text/css' href='#{@css_bootstrap}'>
-          <link rel='stylesheet' type='text/css' href='#{@css_core}'>
-          <link rel='stylesheet' type='text/css' href='#{@css_settings}'>
-          <script type='text/javascript' src='#{@js_jquery}'></script>
-          <script type='text/javascript' src='#{@js_bootstrap}'></script>
-          <script>
-            $(document).ready(function(){
-              $( 'form' ).on( 'submit', function( event ) {
-                event.preventDefault();
-                sketchup.save_settings($( this ).serialize());
-              });
-            });
-          </script>
-        </head>
-        <body>
-          <div class='container'>
-            <form>
-              <div class='form-group'>
-                <h1>IFC version</h1>
+<head>
+  <link rel='stylesheet' type='text/css' href='#{@css_bootstrap}'>
+  <link rel='stylesheet' type='text/css' href='#{@css_core}'>
+  <link rel='stylesheet' type='text/css' href='#{@css_settings}'>
+  <script type='text/javascript' src='#{@js_jquery}'></script>
+  <script type='text/javascript' src='#{@js_bootstrap}'></script>
+  <script>
+    $(document).ready(function(){
+      $( 'form' ).on( 'submit', function( event ) {
+        event.preventDefault();
+        sketchup.save_settings($( this ).serialize());
+      });
+    });
+  </script>
+</head>
+<body>
+  <div class='container'>
+    <form>
+      <div class='form-group' title='Set the active IFC version that will be used for exporting and classifing objects'>
+        <h1>IFC version</h1>
 HTML
       # ifc_classifications = Sketchup.find_support_files('skc', 'Classifications').select {|path| File.basename(path).downcase.include? 'ifc' }
       @ifc_classifications.each_pair do |ifc_classification, load|
@@ -390,10 +390,12 @@ HTML
                     ''
                   end
         ifc_classification_name = File.basename(ifc_classification, '.skc')
-        html << "      <input type=\"radio\" id=\"#{ifc_classification_name}\" name=\"ifc_classification\" value=\"#{ifc_classification}\"#{checked}>\n"
-        html << "      <label for=\"#{ifc_classification_name}\">#{ifc_classification_name}</label><br>\n"
+        html << "        <input type=\"radio\" id=\"#{ifc_classification_name}\" name=\"ifc_classification\" value=\"#{ifc_classification}\"#{checked}>\n"
+        html << "        <label for=\"#{ifc_classification_name}\">#{ifc_classification_name}</label><br>\n"
       end
-      html << "      <h1>Other classification systems</h1>\n"
+      html << "      </div>\n"
+      html << "      <div class='form-group' title='Select additional classifications that will be exported to IFC as IfcClassification'>\n"
+      html << "        <h1>Other classification systems</h1>\n"
 
       @classifications.each_pair do |classification, load|
         checked = if load
@@ -402,13 +404,13 @@ HTML
                     ''
                   end
         classification_name = File.basename(classification, '.skc')
-        html << "         <div class=\"col-md-12 row\"><label class=\"check-inline\"><input type=\"checkbox\" name=\"classification\" value=\"#{classification}\"#{checked}> #{classification_name}</label></div>\n"
+        html << "        <div class=\"col-md-12 row\"><label class=\"check-inline\"><input type=\"checkbox\" name=\"classification\" value=\"#{classification}\"#{checked}> #{classification_name}</label></div>\n"
       end
 
       # Export settings
       html << "      </div>\n"
       html << "      <div class='form-group'>\n"
-      html << '        <h1>Export</h1>'
+      html << "        <h1>IFC export options</h1>\n"
       html << @export_hidden.html
       html << @export_classifications.html
       html << @export_layers.html
@@ -437,15 +439,12 @@ HTML
                              end
 
       footer = <<HTML
-      <div class='form-group'>
-        <h1>Load default materials</h1>
-        <div class="col-md-12 row">
+      <div class='form-group' title=''>
+        <h1>Modelling preferences</h1>
+        <div class="col-md-12 row" title="Always create default materials on opening a model (editable in 'settings.yml' config file).">
           <label class=\"check-inline\"><input type=\"checkbox\" name=\"template_materials\" value=\"template_materials\"#{materials_checked}> Template materials</label>
         </div>
-      </div>
-      <div class='form-group'>
-        <h1>Property sets</h1>
-        <div class="col-md-12 row">
+        <div class="col-md-12 row" title="When creating a IFC entity with the IFC Manager 'create' tools, always add the matching Common PropertySet (like PSet_WallCommon when creating an IfcWall).">
           <label class=\"check-inline\"><input type=\"checkbox\" name=\"common_psets\" value=\"common_psets\" #{common_psets_checked}> Common PropertySets</label>
         </div>
       </div>
@@ -456,7 +455,8 @@ HTML
         </div>
       </div>
     </form>
-  </div></body>
+  </div>
+</body>
 HTML
       html << footer
       @dialog.set_html(html)
@@ -465,10 +465,11 @@ HTML
     class CheckboxOption
       attr_accessor :value
 
-      def initialize(name, title, initial_value)
+      def initialize(name, title, initial_value, help="")
         @name = name
         @title = title
         @value = initial_value
+        @help = help
       end
 
       def html
@@ -477,11 +478,9 @@ HTML
                   else
                     ''
                   end
-        <<HTML
-        <div class="col-md-12 row">
-          <label class="check-inline"><input type="checkbox" name="#{@name}" value="#{@name}"#{checked}> #{@title}</label>
-        </div>
-HTML
+"        <div class=\"col-md-12 row\" title=\"#{@help}\">
+          <label class=\"check-inline\"><input type=\"checkbox\" name=\"#{@name}\" value=\"#{@name}\"#{checked}> #{@title}</label>
+        </div>\n"
       end
     end
   end
