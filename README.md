@@ -10,3 +10,6 @@ SketchUp-IFC-Manager is an extension that helps you to add more useful informati
 - Read the PDF documentation [Dutch: Basis ILS for SketchUp](https://github.com/BIM-Tools/SketchUp-IFC-Manager/blob/master/SketchUp_BIM%20basis%20ILS%202.0-handleiding_ppt.pdf) or [English: BIM basic IDM](/ILS_Native_SketchUp_v2.1%20ENG.PDF)
 - Watch the [video tutorial of the IFC manager plugin](https://vimeo.com/256742066)
 - Watch the [video tutorial of the paint properties tool](https://vimeo.com/256742112)
+
+## Rubyzip
+IFC Manager includes a (minimally modified) [copy](https://github.com/janbrouwer/rubyzip) of rubyzip which is licensed under the [Ruby license](http://www.ruby-lang.org/en/LICENSE.txt). Many thanks to the people at the Rubyzip project: [Robert Haines, John Lees-Miller, Oleksandr Simonov, Thomas Sondergaard](https://github.com/rubyzip/rubyzip).
