@@ -21,10 +21,9 @@
 
 # create new ISO-10303-21/STEP object (the STEP object should do the formatting of the entire file, including header)
 
-require 'zip'
-
 module BimTools
  module IfcManager
+  require File.join(PLUGIN_ZIP_PATH, 'zip.rb')
   class IfcStepWriter
     attr_reader :su_model
     attr_accessor :ifc_objects, :owner_history, :representationcontexts, :materials, :layers, :classifications, :classificationassociations #, :site, :building, :buildingstorey
@@ -75,7 +74,7 @@ module BimTools
     def write( file_path, step_objects )
       if File.extname(file_path).downcase == '.ifczip'
         file_name = File.basename(file_path, File.extname(file_path)) << '.ifc'
-        Zip::OutputStream.open(file_path) do |zos|
+        BimTools::Zip::OutputStream.open(file_path) do |zos|
           zos.put_next_entry(file_name)
           zos.puts (step_objects.join(";\n") << ";").encode("iso-8859-1")
         end

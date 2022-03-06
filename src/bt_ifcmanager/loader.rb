@@ -57,18 +57,11 @@ module BimTools
     PLUGIN_PATH_TOOLS = File.join(PLUGIN_PATH, 'tools')
     PLUGIN_PATH_CLASSIFICATIONS = File.join(PLUGIN_PATH, 'classifications')
 
-    # Install Rubyzip Gem
-    gem_ver_reqs = ('~> 1.3.0' if RUBY_VERSION.split('.')[1].to_i < 4)
-    gem_name = 'rubyzip'
-    gdep = Gem::Dependency.new(gem_name, gem_ver_reqs)
-    # find latest that satisifies
-    found_gspec = gdep.matching_specs.max_by(&:version)
-    unless found_gspec
-      message = "Rubyzip required by IFC Manager, Installing '#{gdep}' Gem..."
-      UI::Notification.new(IFCMANAGER_EXTENSION, message).show
-      # reqs_string will be in the format: "> 1.0, < 1.2"
-      reqs_string = gdep.requirements_list.join(', ')
-      Gem.install(gem_name, reqs_string)
+    # Set the path to the correct Rubyzip version for this Ruby version 
+    if RUBY_VERSION.split('.')[1].to_i < 4
+      PLUGIN_ZIP_PATH = File.join(PLUGIN_PATH, 'lib','rubyzip-1.3.0')
+    else
+      PLUGIN_ZIP_PATH = File.join(PLUGIN_PATH, 'lib','rubyzip-2.3.2')
     end
     
     # Create export message collection

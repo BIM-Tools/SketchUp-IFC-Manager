@@ -20,13 +20,12 @@
 #
 
 require 'rexml/document'
-require 'zip'
 
 require File.join(File.dirname(__FILE__), 'lib_ifc', 'parse_xsd.rb')
 
 module BimTools
   module IfcManager
-
+    require File.join(PLUGIN_ZIP_PATH, 'zip.rb')
     MAX_SIZE = 10485760 # 10MiB
 
     class SkcReader
@@ -54,7 +53,7 @@ module BimTools
 
       def set_properties()
         if @skc_filepath
-          Zip::File.open(@skc_filepath) do |zip_file|
+          BimTools::Zip::File.open(@skc_filepath) do |zip_file|
             if entry = zip_file.find_entry("documentProperties.xml")
               raise 'File too large when extracted' if entry.size > MAX_SIZE
               document_properties = REXML::Document.new(entry.get_input_stream.read)
@@ -73,7 +72,7 @@ module BimTools
       # (!) Better to read once and store in variable
       def classification_name()
         if @skc_filepath
-          Zip::File.open(@skc_filepath) do |zip_file|
+          BimTools::Zip::File.open(@skc_filepath) do |zip_file|
             if entry = zip_file.find_entry("documentProperties.xml")
               raise 'File too large when extracted' if entry.size > MAX_SIZE
               document_properties = REXML::Document.new(entry.get_input_stream.read)
@@ -89,7 +88,7 @@ module BimTools
 
       def xsd_schema()
         if @skc_filepath
-          Zip::File.open(@skc_filepath) do |zip_file|
+          BimTools::Zip::File.open(@skc_filepath) do |zip_file|
             xsd_file = nil
 
             # Find XSD file name
@@ -120,7 +119,7 @@ module BimTools
 
       def xsd_filter()
         if @skc_filepath
-          Zip::File.open(@skc_filepath) do |zip_file|
+          BimTools::Zip::File.open(@skc_filepath) do |zip_file|
             xsd_file = nil
 
             # Find XSD file name
@@ -189,7 +188,7 @@ module BimTools
 #     # Find schema file
 #     files.each do |skc_file|
 #       if File.basename(skc_file) == ifc_skc
-#         Zip::File.open(skc_file) do |zip_file|
+#         BimTools::Zip::File.open(skc_file) do |zip_file|
 
 #           # Find classification name
 #           if entry = zip_file.find_entry("documentProperties.xml")
@@ -229,7 +228,7 @@ module BimTools
 #           end
 #         end
         
-#         # Zip::InputStream.open(skc_file) do |io|      
+#         # BimTools::Zip::InputStream.open(skc_file) do |io|      
 #         #   while (entry = io.get_next_entry)
 #         #     case entry.name
 #         #     when "documentProperties.xml"
@@ -262,7 +261,7 @@ module BimTools
 #         #   if xsd_file
 #         #     puts "xsd_file"
 #         #     puts xsd_file
-#         #     # Zip::InputStream.open(schema_file) do |io|
+#         #     # BimTools::Zip::InputStream.open(schema_file) do |io|
 #         #       while (entry = io.get_next_entry)
 #         #         puts entry.name
 #         #         if entry.name == xsd_file
