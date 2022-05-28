@@ -61,7 +61,7 @@ module BimTools
     if RUBY_VERSION.split('.')[1].to_i < 4
       PLUGIN_ZIP_PATH = File.join(PLUGIN_PATH, 'lib','rubyzip-1.3.0')
     else
-      PLUGIN_ZIP_PATH = File.join(PLUGIN_PATH, 'lib','rubyzip-2.3.2')
+      PLUGIN_ZIP_PATH = File.join(PLUGIN_PATH, 'lib','rubyzip')
     end
     
     # Create export message collection
