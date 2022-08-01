@@ -25,7 +25,7 @@ require File.join(File.dirname(__FILE__), 'lib_ifc', 'parse_xsd.rb')
 
 module BimTools
   module IfcManager
-    require File.join(PLUGIN_ZIP_PATH, 'zip.rb')
+    require File.join(PLUGIN_ZIP_PATH, 'zip.rb') unless defined? BimTools::Zip
     MAX_SIZE = 10485760 # 10MiB
 
     class SkcReader

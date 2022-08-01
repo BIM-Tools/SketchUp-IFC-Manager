@@ -23,7 +23,7 @@
 
 module BimTools
  module IfcManager
-  require File.join(PLUGIN_ZIP_PATH, 'zip.rb')
+  require File.join(PLUGIN_ZIP_PATH, 'zip.rb') unless defined? BimTools::Zip
   class IfcStepWriter
     attr_reader :su_model
     attr_accessor :ifc_objects, :owner_history, :representationcontexts, :materials, :layers, :classifications, :classificationassociations #, :site, :building, :buildingstorey
