@@ -28,7 +28,7 @@ module BimTools
     require File.join(PLUGIN_ZIP_PATH, 'zip.rb') unless defined? BimTools::Zip
     MAX_SIZE = 10485760 # 10MiB
 
-    class SkcReader
+    class SKC
       attr_reader :filepath, :name, :properties
       def initialize(filename)
         @name = ""

@@ -28,6 +28,7 @@ require_relative('ObjectCreator')
 require_relative 'representation_manager'
 require_relative('step_writer')
 
+require_relative 'classifications'
 module BimTools
   module IfcManager
     require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')
@@ -80,7 +81,7 @@ module BimTools
         # create collections for materials and layers
         @materials = {}
         @layers = {}
-        @classifications = {}
+        @classifications = IfcManager::Classifications.new(self)
 
         # create empty array that will contain all IFC objects
         @ifc_objects = []

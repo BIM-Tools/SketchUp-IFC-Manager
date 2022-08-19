@@ -65,15 +65,15 @@ module BimTools::IfcManager
       @form_elements << Title.new(@window)
 
       # Add html select for classifications
-      classification_list = { Settings.ifc_classification => true }.merge!(Settings.classifications)
+      classification_list = { Settings.ifc_classification => true }.merge!(Settings.active_classifications)
       classification_list.each_pair do |classification_file, active|
         next unless active
 
         next unless BimTools::IfcManager::Settings.filters.key?(classification_file)
 
-        skc_reader = BimTools::IfcManager::Settings.filters[classification_file]
-        classification_name = skc_reader.name
-        classification = HtmlSelectClassifications.new(@window, classification_name)
+        classification = BimTools::IfcManager::Settings.filters[classification_file]
+        classification_name = classification.name
+        ui_classification = HtmlSelectClassifications.new(@window, classification_name)
 
         # Add "-" option to unset the classification
         options_template = [{ id: '-', text: '-' }]
@@ -82,12 +82,12 @@ module BimTools::IfcManager
         yml_path = File.join(PLUGIN_PATH, 'classifications', classification_name + '.yml')
         if File.file?(yml_path)
           options = YAML.load_file(yml_path)
-          classification.set_js_options(options, options_template)
-          @form_elements << classification
+          ui_classification.set_js_options(options, options_template)
+          @form_elements << ui_classification
         else
-          options = skc_reader.xsd_filter
-          classification.set_js_options(options, options_template)
-          @form_elements << classification
+          options = classification.xsd_filter
+          ui_classification.set_js_options(options, options_template)
+          @form_elements << ui_classification
         end
       end
 

@@ -40,18 +40,30 @@ require 'yaml'
 require 'cgi'
 
 module BimTools::IfcManager
-  require File.join(File.dirname(__FILE__), 'lib', 'skc_reader.rb')
+  require File.join(PLUGIN_PATH_LIB, 'skc_reader.rb')
   module Settings
     extend self
-    attr_accessor :visible, :ifc_version, :ifc_version_compact, :ifc_module, :filters
-    attr_reader :ifc_classification, :ifc_classifications, :classifications, :classification_names, :common_psets
+    attr_accessor :visible,
+                  :ifc_version,
+                  :ifc_version_compact,
+                  :ifc_module,
+                  :filters
+                  
+    attr_reader :ifc_classification,
+                :ifc_classifications,
+                :active_classifications,
+                :common_psets,
+                :export_classifications
 
     @template_materials = false
     @common_psets = true
     @settings_file = File.join(PLUGIN_PATH, 'settings.yml')
     @ifc_classifications = {}
+
+    # classifications shown in properties window
+    @active_classifications = {}
+
     @classifications = {}
-    @classification_names = {}
     @css_bootstrap = File.join(PLUGIN_PATH_CSS, 'bootstrap.min.css')
     @css_core = File.join(PLUGIN_PATH_CSS, 'dialog.css')
     @css_settings = File.join(PLUGIN_PATH_CSS, 'settings.css')
@@ -72,7 +84,7 @@ module BimTools::IfcManager
       if @options[:export]
         @export_hidden = CheckboxOption.new('hidden', 'Export hidden objects', @options[:export][:hidden], "Everything will be exported to IFC, including those that are hidden or on a disabled tag/layer.")
         @export_classifications = CheckboxOption.new('classifications', 'Export classifications',
-                                                     @options[:export][:classifications], "Export selected classifications attached to objects as IfcClassification")
+                                                     @options[:export][:classifications], "Export classifications attached to objects as IfcClassification")
         @export_layers = CheckboxOption.new('layers', 'Export tags/layers as IFC layers',
                                             @options[:export][:layers], "Exports Sketchup tags/layers as IfcPresentationLayerAssignment")
         @export_materials = CheckboxOption.new('materials', 'Export materials', @options[:export][:materials], "Exports the Sketchup material name as IfcMaterial")
@@ -101,7 +113,7 @@ module BimTools::IfcManager
 
     def save
       @options[:load][:ifc_classifications] = @ifc_classifications
-      @options[:load][:classifications] = @classifications
+      @options[:load][:classifications] = @active_classifications
       @options[:load][:template_materials] = @template_materials
       @options[:properties][:common_psets] = @common_psets
       @options[:export][:hidden] = @export_hidden.value
@@ -129,7 +141,7 @@ module BimTools::IfcManager
     # Load skc and generate IFC classes
     # (?) First check if already loaded?
     def load_ifc_skc(ifc_classification)
-      reader = SkcReader.new(ifc_classification)
+      reader = SKC.new(ifc_classification)
       @filters[ifc_classification] = reader
       ifc_version = reader.name
       IfcXmlParser.new(ifc_version, reader.xsd_schema)
@@ -165,37 +177,37 @@ module BimTools::IfcManager
     end
 
     def set_classification(classification_name)
-      @classifications[classification_name] = true
+      @active_classifications[classification_name] = true
       unless @options[:load][:classifications].key? classification_name
         @options[:load][:classifications][classification_name] = true
       end
     end
 
     def unset_classification(classification_name)
-      @classifications[classification_name] = false
+      @active_classifications[classification_name] = false
       if @options[:load][:classifications].include? classification_name
         @options[:load][:classifications][classification_name] = false
       end
     end
 
     def read_classifications
-      @classifications = {}
+      @active_classifications = {}
       if @options[:load][:classifications].is_a? Hash
         @options[:load][:classifications].each_pair do |classification_file, load|
           if load == true
-            skc_reader = SkcReader.new(classification_file)
-            @filters[classification_file] = skc_reader
-            @classification_names[skc_reader.name] = skc_reader
-            @classifications[classification_file] = load
+            classification = SKC.new(classification_file)
+            @filters[classification_file] = classification
+            @classifications[classification.name] = classification
+            @active_classifications[classification_file] = load
           elsif load == false
-            @classifications[classification_file] = load
+            @active_classifications[classification_file] = load
           end
         end
       end
     end
 
     def get_classifications
-      @classifications
+      @active_classifications
     end
 
     # Load enabled classification files from settings.yml
@@ -204,7 +216,7 @@ module BimTools::IfcManager
     def load_classifications
       model = Sketchup.active_model
       model.start_operation('Load IFC Manager classifications', true)
-      classifications = Settings.ifc_classifications.merge(Settings.classifications)
+      classifications = Settings.ifc_classifications.merge(@active_classifications)
       classifications.each_pair do |classification_file, classification_active|
         next unless classification_active
 
@@ -340,7 +352,7 @@ module BimTools::IfcManager
             update_classifications << value
           end
         end
-        @classifications.each_key do |classification_name|
+        @active_classifications.each_key do |classification_name|
           if update_classifications.include? classification_name
             set_classification(classification_name)
           else
@@ -397,7 +409,7 @@ HTML
       html << "      <div class='form-group' title='Select additional classifications that will be exported to IFC as IfcClassification'>\n"
       html << "        <h1>Other classification systems</h1>\n"
 
-      @classifications.each_pair do |classification, load|
+      @active_classifications.each_pair do |classification, load|
         checked = if load
                     ' checked'
                   else

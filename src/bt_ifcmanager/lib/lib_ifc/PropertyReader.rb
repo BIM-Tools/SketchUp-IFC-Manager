@@ -107,86 +107,16 @@ module BimTools
       end
 
       def add_classifications
-        active_classifications = BimTools::IfcManager::Settings.classification_names
-
-        # Collect all attached classifications except for IFC
-        @entity_dict.each do |attr_dict|
-          next unless active_classifications.keys.include? attr_dict.name
-
-          skc_reader = active_classifications[attr_dict.name]
-
-          # Create classifications if they don't exist
-          if @ifc_model.classifications.keys.include?(attr_dict.name)
-            ifc_classification = @ifc_model.classifications[attr_dict.name]
-          else
-            ifc_classification = @ifc::IfcClassification.new(@ifc_model)
-            @ifc_model.classifications[attr_dict.name] = ifc_classification
-            classification_properties = skc_reader.properties
-
-            creator = classification_properties[:creator]
-            if creator && !creator.empty?
-              ifc_classification.source = BimTools::IfcManager::IfcLabel.new(@ifc_model, creator)
-            end
-
-            edition = classification_properties[:revision]
-            if edition && !edition.empty?
-              ifc_classification.edition = BimTools::IfcManager::IfcLabel.new(@ifc_model, edition)
-            end
-
-            editiondate = classification_properties[:modified]
-            if editiondate && time = Time.parse(editiondate)
-
-              # Catch IFC4 changes
-              if @ifc.const_defined?(:IfcCalendarDate)
-                date = @ifc::IfcCalendarDate.new(@ifc_model)
-                date.daycomponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, time.day)
-                date.monthcomponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, time.month)
-                date.yearcomponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, time.year)
-                ifc_classification.editiondate = date
-              else
-                ifc_classification.editiondate = BimTools::IfcManager::IfcDate.new(@ifc_model, time)
+        if BimTools::IfcManager::Settings.export_classifications
+          if schema_types = @entity_dict['AppliedSchemaTypes']
+            schema_types.each do |classification_name, classification_value|
+              
+              # (?) exclude ALL IFC classifications?
+              unless Settings.ifc_version == classification_name
+                @ifc_model.classifications.add_classification_to_entity(@ifc_entity, classification_name, classification_value, @entity_dict[classification_name])
               end
             end
-            if @ifc_model.options[:classification_suffix]
-              ifc_classification.name = BimTools::IfcManager::IfcLabel.new(@ifc_model,
-                                                                           attr_dict.name << ' Classification')
-            else
-              ifc_classification.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, attr_dict.name)
-            end
           end
-
-          attributes = []
-          attr_dict.attribute_dictionaries.each do |attribute|
-            attributes << attribute['value']
-          end
-
-          # No way to map values with certainty, just pick the first 2
-          next unless attributes.length > 1
-
-          classification_ref = ifc_classification.ifc_classification_references[attributes[0]]
-          unless classification_ref
-            classification_ref = @ifc::IfcClassificationReference.new(@ifc_model)
-            classification_ref.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, attributes[1])
-            classification_ref.referencedsource = ifc_classification
-
-            # add classification_ref to the list of references in the classification
-            ifc_classification.ifc_classification_references[attributes[0]] = classification_ref
-
-            # Catch IFC4 atrribute name change
-            identification = BimTools::IfcManager::IfcIdentifier.new(@ifc_model, attributes[0])
-            if @ifc::IfcClassificationReference.method_defined?(:itemreference)
-              classification_ref.itemreference = identification
-            else
-              classification_ref.identification = identification
-            end
-
-            # create IfcRelAssociatesClassification
-            rel = @ifc::IfcRelAssociatesClassification.new(@ifc_model)
-            rel.relatedobjects = BimTools::IfcManager::Ifc_Set.new
-            rel.relatingclassification = classification_ref
-            classification_ref.ifc_rel_associates_classification = rel
-          end
-          classification_ref.ifc_rel_associates_classification.relatedobjects.add(@ifc_entity)
         end
       end
 
