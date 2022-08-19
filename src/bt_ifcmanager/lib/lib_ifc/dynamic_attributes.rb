@@ -23,13 +23,12 @@ require_relative 'set'
 require_relative 'IfcLengthMeasure'
 require_relative 'IfcLabel'
 require_relative 'IfcReal'
+require_relative 'ifc_rel_defines_by_properties_builder'
 
 # method that collects all dynamic component attributes in the given objects and creates IfcPropertySets and Quantities
 
 module BimTools
   module DynamicAttributes
-    
-
     def self.get_dynamic_attributes(ifc_model, ifc_object)
       @ifc = BimTools::IfcManager::Settings.ifc_module
       @ifc_model = ifc_model
@@ -62,13 +61,15 @@ module BimTools
 
             # create new PropertySet with name pset_name
             unless pset_hash[pset_name]
-              reldef = @ifc::IfcRelDefinesByProperties.new(ifc_model)
-              reldef.relatedobjects.add(ifc_object)
-              pset = @ifc::IfcPropertySet.new(ifc_model, attr_dict)
-              pset.name = BimTools::IfcManager::IfcLabel.new(ifc_model, pset_name)
-              pset.hasproperties = IfcManager::Ifc_Set.new
-              reldef.relatingpropertydefinition = pset
-              pset_hash[pset_name] = pset
+              propertyset = @ifc::IfcPropertySet.new(ifc_model, attr_dict)
+              propertyset.name = BimTools::IfcManager::IfcLabel.new(ifc_model, pset_name)
+              propertyset.hasproperties = IfcManager::Ifc_Set.new
+              pset_hash[pset_name] = propertyset
+
+              IfcRelDefinesByPropertiesBuilder.build(ifc_model) do |builder|
+                builder.set_relatingpropertydefinition(propertyset)
+                builder.add_related_object(ifc_object)
+              end
             end
 
             # create Property with name prop_name
@@ -88,13 +89,15 @@ module BimTools
 
               # create new PropertySet with name "SU_DynamicAttributes"
               unless pset_hash['SU_DynamicAttributes']
-                reldef = @ifc::IfcRelDefinesByProperties.new(ifc_model)
-                reldef.relatedobjects.add(ifc_object)
-                pset = @ifc::IfcPropertySet.new(ifc_model, attr_dict)
-                pset.name = BimTools::IfcManager::IfcLabel.new(ifc_model, 'SU_DynamicAttributes')
-                pset.hasproperties = IfcManager::Ifc_Set.new
-                reldef.relatingpropertydefinition = pset
-                pset_hash['SU_DynamicAttributes'] = pset
+                propertyset = @ifc::IfcPropertySet.new(ifc_model, attr_dict)
+                propertyset.name = BimTools::IfcManager::IfcLabel.new(ifc_model, 'SU_DynamicAttributes')
+                propertyset.hasproperties = IfcManager::Ifc_Set.new
+                pset_hash['SU_DynamicAttributes'] = propertyset
+
+                IfcRelDefinesByPropertiesBuilder.build(ifc_model) do |builder|
+                  builder.set_relatingpropertydefinition(propertyset)
+                  builder.add_related_object(ifc_object)
+                end
               end
 
               # create Property with name prop_name

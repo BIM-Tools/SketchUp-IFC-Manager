@@ -23,16 +23,17 @@
 
 module BimTools
   module IfcManager
-    require_relative 'classification_reference_builder'
+    require_relative 'ifc_classification_reference_builder'
 
     class ClassificationReference
       attr_reader :ifc_classification_reference
 
-      def initialize(ifc_model, classification, classification_value, identification=nil, location=nil)
+      def initialize(ifc_model, classification, classification_value, identification = nil, location = nil)
         @ifc = BimTools::IfcManager::Settings.ifc_module
         @ifc_model = ifc_model
         @classification = classification
-        @ifc_classification_reference = create_ifc_classification_reference(classification_value, identification, location)
+        @ifc_classification_reference = create_ifc_classification_reference(classification_value, identification,
+                                                                            location)
       end
 
       def add_ifc_entity(ifc_entity)
@@ -41,7 +42,7 @@ module BimTools
 
       private
 
-      def create_ifc_classification_reference(name = nil, identification = nil, location=nil)
+      def create_ifc_classification_reference(name = nil, identification = nil, location = nil)
         @ifc_classification_reference = IfcClassificationReferenceBuilder.build(@ifc_model) do |builder|
           builder.set_location(location) if location
           builder.set_referencedsource(@classification.get_ifc_classification)

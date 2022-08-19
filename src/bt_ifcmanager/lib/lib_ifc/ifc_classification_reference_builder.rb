@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  classification_reference_builder.rb
+#  ifc_classification_reference_builder.rb
 #
 #  Copyright 2022 Jan Brouwer <jan@brewsky.nl>
 #
@@ -39,8 +39,7 @@ module BimTools
       end
 
       def set_location(location)
-
-        # TODO catch IFC4 change IfcLabel to IfcURIReference
+        # TODO: catch IFC4 change IfcLabel to IfcURIReference
         @ifc_classification_reference.location = BimTools::IfcManager::IfcLabel.new(@ifc_model, location)
       end
 

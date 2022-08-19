@@ -31,6 +31,7 @@ require_relative 'IfcLengthMeasure'
 require_relative 'IfcReal'
 require_relative 'IfcText'
 require_relative 'IfcVolumeMeasure'
+require_relative 'ifc_rel_defines_by_properties_builder'
 
 module BimTools
   module IfcManager
@@ -42,7 +43,7 @@ module BimTools
         edo
         instanceAttributes
       ]
-      
+
       def get_propertyset(attr_dict)
         # Create PropertySet if there are any properties to export
         properties = IfcManager::Ifc_Set.new
@@ -97,16 +98,16 @@ module BimTools
             properties << ifc_property
           end
 
-          else # Any other AttributeDictionaries like 'SU_DefinitionSet' and 'SU_InstanceSet'
-            attr_dict.each do |key, value|
-              next unless value
-              next if value.is_a?(String) && value.empty?
+        else # Any other AttributeDictionaries like 'SU_DefinitionSet' and 'SU_InstanceSet'
+          attr_dict.each do |key, value|
+            next unless value
+            next if value.is_a?(String) && value.empty?
 
-              prop = @ifc::IfcPropertySingleValue.new(@ifc_model)
-              prop.name = BimTools::IfcManager::IfcIdentifier.new(@ifc_model, key)
-              prop.nominalvalue = get_ifc_property_value(value, nil, true)
-              properties.add(prop)
-            end
+            prop = @ifc::IfcPropertySingleValue.new(@ifc_model)
+            prop.name = BimTools::IfcManager::IfcIdentifier.new(@ifc_model, key)
+            prop.nominalvalue = get_ifc_property_value(value, nil, true)
+            properties.add(prop)
+          end
         end
 
         if properties.empty?
@@ -120,14 +121,12 @@ module BimTools
       end
 
       def add_propertyset(attr_dict)
-        propertyset = get_propertyset(attr_dict)
-        if propertyset
-          rel_defines = @ifc::IfcRelDefinesByProperties.new(@ifc_model)
-          rel_defines.relatingpropertydefinition = propertyset
-          rel_defines
-        else
-          false
+        if propertyset = get_propertyset(attr_dict)
+          return IfcRelDefinesByPropertiesBuilder.build(@ifc_model) do |builder|
+            builder.set_relatingpropertydefinition(propertyset)
+          end
         end
+        false
       end
 
       def get_ifc_property_value(value, attribute_type, long = false)
@@ -219,15 +218,13 @@ module BimTools
       #   if defined in settings attributes
       def add_sketchup_definition_properties(ifc_model, ifc_entity, sketchup, type_properties = false)
         attributes = ifc_model.options[:attributes]
-        if attributes.include? 'SU_DefinitionSet'
-          if sketchup.attribute_dictionaries && dict = sketchup.attribute_dictionaries['SU_DefinitionSet']
-            if type_properties
-              propertyset = get_propertyset(dict)
-              ifc_entity.haspropertysets.add(propertyset) if propertyset
-            else
-              rel_defines = add_propertyset(dict)
-              rel_defines.relatedobjects.add(ifc_entity) if rel_defines
-            end
+        if attributes.include? 'SU_DefinitionSet' && (sketchup.attribute_dictionaries && dict = sketchup.attribute_dictionaries['SU_DefinitionSet'])
+          if type_properties
+            propertyset = get_propertyset(dict)
+            ifc_entity.haspropertysets.add(propertyset) if propertyset
+          else
+            rel_defines = add_propertyset(dict)
+            rel_defines.relatedobjects.add(ifc_entity) if rel_defines
           end
         end
       end
@@ -236,14 +233,11 @@ module BimTools
       #   if defined in settings attributes
       def add_sketchup_instance_properties(ifc_model, ifc_entity, sketchup)
         attributes = ifc_model.options[:attributes]
-        if attributes.include? 'SU_InstanceSet'
-          if sketchup.attribute_dictionaries && dict = sketchup.attribute_dictionaries['SU_InstanceSet']
-            rel_defines = add_propertyset(dict)
-            rel_defines.relatedobjects.add(ifc_entity) if rel_defines
-          end
+        if attributes.include? 'SU_InstanceSet' && (sketchup.attribute_dictionaries && dict = sketchup.attribute_dictionaries['SU_InstanceSet'])
+          rel_defines = add_propertyset(dict)
+          rel_defines.relatedobjects.add(ifc_entity) if rel_defines
         end
       end
-
     end
   end
 end

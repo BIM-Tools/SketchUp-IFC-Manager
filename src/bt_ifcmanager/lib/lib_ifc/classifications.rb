@@ -36,11 +36,11 @@ module BimTools
       # Get classification by name and create if it doesn't exist
       #
       # @return [IfcManager::Classification]
-      def get_classification_by_name(name, file_name = nil)
+      def get_classification_by_name(name, skc_file = nil)
         if @classifications.key? name
           @classifications[name]
         else
-          @classifications[name] = Classification.new(@ifc_model, name)
+          @classifications[name] = Classification.new(@ifc_model, name, skc_file)
         end
       end
 
