@@ -19,135 +19,149 @@
 #
 #
 
+require_relative 'ifc_mapped_item_builder'
+require_relative 'ifc_product_definition_shape_builder'
 require_relative 'material_and_styling'
 
-module BimTools::IfcManager
-  # Class that keeps track of all different shaperepresentations for
-  #   the different sketchup component definitions
-  class RepresentationManager
-    def initialize(ifc_model)
-      @ifc_model = ifc_model
-      @definition_managers = {}
-    end
-
-    def get_definition_manager(definition)
-      unless @definition_managers.key?(definition)
-        @definition_managers[definition] = BimTools::IfcManager::DefinitionManager.new(@ifc_model, definition)
+module BimTools
+  module IfcManager
+    # Class that keeps track of all different shaperepresentations for
+    #   the different sketchup component definitions
+    class RepresentationManager
+      def initialize(ifc_model)
+        @ifc_model = ifc_model
+        @definition_managers = {}
       end
-      @definition_managers[definition]
-    end
-  end
 
-  # Class that keeps track of all different shaperepresentations for
-  #   a sketchup component definition
-  class DefinitionManager
-    attr_reader :definition
-
-    def initialize(ifc_model, definition)
-      @ifc = BimTools::IfcManager::Settings.ifc_module
-      @ifc_model = ifc_model
-      @definition = definition
-      @representations = {}
-    end
-
-    # Get IFC representation for a component instance
-    #   creates a new one when one does not yet exist for the definition
-    #   with the given transformation otherwise returns the matching one
-    #
-    # (?) Faces are extracted for every instance of a component, it should
-    #   be possible to only do that once for a component definition
-    #
-    # @param [Sketchup::ComponentDefinition] definition
-    # @param [Array<Sketchup::Face>] faces
-    # @param [Sketchup::Transformation] transformation
-    # @param [Sketchup::Material] su_material
-    # @return [BimTools::IFC2X3::IfcFacetedBrep]
-    def get_representation(faces, transformation, material = nil, layer = nil)
-      material_name = material ? material.name : ''
-      layer_name = layer ? layer.name : ''
-      representation_string = "#{transformation.to_a}_#{material_name}_#{layer_name}"
-      unless @representations.key?(representation_string)
-        @representations[representation_string] =
-          BimTools::IfcManager::ShapeRepresentation.new(@ifc_model, faces, transformation, material, layer)
+      def get_definition_manager(definition)
+        unless @definition_managers.key?(definition)
+          @definition_managers[definition] = BimTools::IfcManager::DefinitionManager.new(@ifc_model, definition)
+        end
+        @definition_managers[definition]
       end
-      @representations[representation_string]
     end
 
-    # Add representation to the IfcProduct, transform geometry with given transformation
-    #
-    # @param [Sketchup::Transformation] transformation
-    def create_representation(faces, transformation, su_material, su_layer)
-      # definition = @su_object.definition
+    # Class that keeps track of all different shaperepresentations for
+    #   a sketchup component definition
+    class DefinitionManager
+      attr_reader :definition
 
-      # '@representation' is set to IfcLabel as default because the Sketchup attribute value is ''
+      def initialize(ifc_model, definition)
+        @ifc = BimTools::IfcManager::Settings.ifc_module
+        @ifc_model = ifc_model
+        @definition = definition
+        @representations = {}
+      end
 
-      # set representation based on definition
-      representation = @ifc::IfcProductDefinitionShape.new(@ifc_model, @definition)
+      # Get IFC representation for a component instance
+      #   creates a new one when one does not yet exist for the definition
+      #   with the given transformation otherwise returns the matching one
+      #
+      # (?) Faces are extracted for every instance of a component, it should
+      #   be possible to only do that once for a component definition
+      #
+      # @param [Sketchup::ComponentDefinition] definition
+      # @param [Array<Sketchup::Face>] faces
+      # @param [Sketchup::Transformation] transformation
+      # @param [Sketchup::Material] su_material
+      # @return [BimTools::IFC2X3::IfcFacetedBrep]
+      def get_representation(faces, transformation, material = nil, layer = nil)
+        material_name = material ? material.name : ''
+        layer_name = layer ? layer.name : ''
+        representation_string = "#{transformation.to_a}_#{material_name}_#{layer_name}"
+        unless @representations.key?(representation_string)
+          @representations[representation_string] =
+            IfcManager::ShapeRepresentation.new(@ifc_model, faces, transformation, material, layer)
+        end
+        @representations[representation_string]
+      end
 
-      shape_representation = representation.representations.first
+      # Add representation to the IfcProduct, transform geometry with given transformation
+      #
+      # @param [Sketchup::Transformation] transformation
+      # @param [Sketchup::Material] su_material
+      # @param [Sketchup::Layer] su_layer
+      def create_representation(faces, transformation, su_material, su_layer)
+        # Check if Mapped representation should be used
+        if @ifc_model.options[:mapped_items]
+          definition_representation = get_representation(faces, transformation, su_material, su_layer)
+          target = @ifc::IfcCartesianTransformationOperator3D.new(@ifc_model)
+          target.localorigin = @ifc::IfcCartesianPoint.new(@ifc_model, Geom::Point3d.new)
 
-      # Check if Mapped representation should be used
-      if shape_representation.representationtype.value == 'MappedRepresentation'
-        mapped_item = @ifc::IfcMappedItem.new(@ifc_model)
-        target = @ifc::IfcCartesianTransformationOperator3D.new(@ifc_model)
-        target.localorigin = @ifc::IfcCartesianPoint.new(@ifc_model, Geom::Point3d.new)
-        # definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
-        definition_representation = get_representation(faces, transformation, su_material, su_layer)
-        mapped_item.mappingsource = definition_representation.representationmap
-        mapped_item.mappingtarget = target
-        shape_representation.items.add(mapped_item)
-      else
-        brep = @ifc::IfcFacetedBrep.new(@ifc_model, faces, transformation)
-        shape_representation.items.add(brep)
+          mapped_item = IfcMappedItemBuilder.build(@ifc_model) do |builder|
+            builder.set_mappingsource(definition_representation.representationmap)
+            builder.set_mappingtarget(target)
+          end
 
-        # add color from su-object material, or a su_parent's
+          shape_representation = IfcShapeRepresentationBuilder.build(@ifc_model) do |builder|
+            builder.set_contextofitems(@ifc_model.representationcontext)
+            builder.set_representationtype
+            builder.add_item(mapped_item)
+          end
+        else
+          brep = @ifc::IfcFacetedBrep.new(@ifc_model, faces, transformation)
+          shape_representation = IfcShapeRepresentationBuilder.build(@ifc_model) do |builder|
+            builder.set_contextofitems(@ifc_model.representationcontext)
+            builder.set_representationtype
+            builder.add_item(brep)
+          end
+          add_styling(@ifc_model, brep, su_material)
+        end
+
+        representation = IfcProductDefinitionShapeBuilder.build(@ifc_model) do |builder|
+          builder.add_representation(shape_representation)
+        end
+      end
+
+      def add_styling(ifc_model, brep, su_material)
         if ifc_model.options[:colors] && su_material
-          material_name = su_material.display_name
-
-          # check if materialassociation exists
           unless ifc_model.materials[su_material]
             ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
           end
           ifc_model.materials[su_material].add_to_styling(brep)
         end
       end
-      representation
     end
-  end
 
-  class ShapeRepresentation
-    attr_reader :brep, :shaperepresentation, :representationmap
+    class ShapeRepresentation
+      attr_reader :brep, :shaperepresentation, :representationmap
 
-    def initialize(ifc_model, faces, transformation, su_material, su_layer)
-      @ifc = BimTools::IfcManager::Settings.ifc_module
-      @brep = @ifc::IfcFacetedBrep.new(ifc_model, faces, transformation)
-      @shaperepresentation = @ifc::IfcShapeRepresentation.new(ifc_model, nil)
-      @shaperepresentation.items.add(brep)
-      @representationmap = @ifc::IfcRepresentationMap.new(ifc_model)
-      @representationmap.mappingorigin = ifc_model.default_placement
-      @representationmap.mappedrepresentation = @shaperepresentation
+      def initialize(ifc_model, faces, transformation, su_material, su_layer)
+        @ifc = BimTools::IfcManager::Settings.ifc_module
+        @brep = @ifc::IfcFacetedBrep.new(ifc_model, faces, transformation)
 
-      # add color from su-object material, or a su_parent's
-      if ifc_model.options[:colors] && su_material
-        material_name = su_material.display_name
-
-        # check if materialassociation exists
-        unless ifc_model.materials[su_material]
-          ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
+        @shaperepresentation = IfcShapeRepresentationBuilder.build(ifc_model) do |builder|
+          builder.set_contextofitems(ifc_model.representationcontext)
+          builder.set_representationtype('Brep')
+          builder.add_item(@brep)
         end
-        ifc_model.materials[su_material].add_to_styling(brep)
+
+        @representationmap = @ifc::IfcRepresentationMap.new(ifc_model)
+        @representationmap.mappingorigin = ifc_model.default_placement
+        @representationmap.mappedrepresentation = @shaperepresentation
+
+        add_styling(ifc_model, brep, su_material)
+
+        # set layer
+        if ifc_model.options[:layers]
+
+          # check if IfcPresentationLayerAssignment exists
+          unless ifc_model.layers[su_layer.name]
+            ifc_model.layers[su_layer.name] = @ifc::IfcPresentationLayerAssignment.new(ifc_model, su_layer)
+          end
+
+          # add self to IfcPresentationLayerAssignment
+          ifc_model.layers[su_layer.name].assigneditems.add(@shaperepresentation)
+        end
       end
 
-      # set layer
-      if ifc_model.options[:layers]
-
-        # check if IfcPresentationLayerAssignment exists
-        unless ifc_model.layers[su_layer.name]
-          ifc_model.layers[su_layer.name] = @ifc::IfcPresentationLayerAssignment.new(ifc_model, su_layer)
+      def add_styling(ifc_model, brep, su_material)
+        if ifc_model.options[:colors] && su_material
+          unless ifc_model.materials[su_material]
+            ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
+          end
+          ifc_model.materials[su_material].add_to_styling(brep)
         end
-
-        # add self to IfcPresentationLayerAssignment
-        ifc_model.layers[su_layer.name].assigneditems.add(@shaperepresentation)
       end
     end
   end

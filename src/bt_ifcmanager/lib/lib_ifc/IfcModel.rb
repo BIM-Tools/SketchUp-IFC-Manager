@@ -23,6 +23,8 @@
 
 require_relative('IfcLabel')
 require_relative('IfcIdentifier')
+require_relative 'ifc_product_definition_shape_builder'
+require_relative 'ifc_shape_representation_builder'
 require_relative('entity_path')
 require_relative('ObjectCreator')
 require_relative 'representation_manager'
@@ -234,14 +236,21 @@ module BimTools
                             else
                               'project geometry'
                             end
+
+          shape_representation = IfcShapeRepresentationBuilder.build(@ifc_model) do |builder|
+            builder.set_contextofitems(@ifc_model.representationcontext)
+            builder.set_representationtype
+            builder.add_item(@ifc::IfcFacetedBrep.new(self, faces, Geom::Transformation.new))
+          end
+
           ifc_entity = @ifc::IfcBuildingElementProxy.new(self, nil)
-          ifc_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, sub_entity_name)
-          ifc_entity.representation = @ifc::IfcProductDefinitionShape.new(self, nil)
-          brep = @ifc::IfcFacetedBrep.new(self, faces, Geom::Transformation.new)
-          ifc_entity.representation.representations.first.items.add(brep)
+          ifc_entity.name = BimTools::IfcManager::IfcLabel.new(self, sub_entity_name)
           ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(self, Geom::Transformation.new)
           ifc_entity.predefinedtype = :notdefined if ifc_entity.respond_to?(:predefinedtype=)
           ifc_entity.compositiontype = :element if ifc_entity.respond_to?(:compositiontype=)
+          ifc_entity.representation = IfcProductDefinitionShapeBuilder.build(self) do |builder|
+            builder.add_representation(shape_representation)
+          end
 
           # Add to spatial hierarchy
           entity_path.add(ifc_entity)
