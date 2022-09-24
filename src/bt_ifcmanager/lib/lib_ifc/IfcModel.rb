@@ -21,19 +21,18 @@
 #
 #
 
-require_relative('IfcLabel')
-require_relative('IfcIdentifier')
+require_relative 'ifc_types'
 require_relative 'ifc_product_definition_shape_builder'
 require_relative 'ifc_shape_representation_builder'
-require_relative('entity_path')
-require_relative('ObjectCreator')
+require_relative 'entity_path'
+require_relative 'ObjectCreator'
 require_relative 'representation_manager'
-require_relative('step_writer')
+require_relative 'step_writer'
 
 require_relative 'classifications'
 module BimTools
   module IfcManager
-    require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')
+    require File.join(PLUGIN_PATH_LIB, 'layer_visibility')
 
     class IfcModel
       # (?) possible additional methods:
@@ -110,7 +109,7 @@ module BimTools
         # create IfcGeometricRepresentationContext for all IFC geometry objects
         @representationcontext = create_representationcontext
 
-        @project.representationcontexts = IfcManager::Ifc_Set.new([@representationcontext])
+        @project.representationcontexts = Types::Set.new([@representationcontext])
 
         # Create default origin and axes for re-use throughout the model
         transformation = Geom::Transformation.new
@@ -163,20 +162,20 @@ module BimTools
         owner_history = @ifc::IfcOwnerHistory.new(self)
         owninguser = @ifc::IfcPersonAndOrganization.new(self)
         owninguser.theperson = @ifc::IfcPerson.new(self)
-        owninguser.theperson.familyname = BimTools::IfcManager::IfcLabel.new(@ifc_model, '')
+        owninguser.theperson.familyname = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, '')
         owninguser.theorganization = @ifc::IfcOrganization.new(self)
-        owninguser.theorganization.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, '')
+        owninguser.theorganization.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, '')
         # owninguser.theperson = @ifc::IfcPerson.new(self)
         # owninguser.theorganization = @ifc::IfcOrganization.new(self)
         owner_history.owninguser = owninguser
         owningapplication = @ifc::IfcApplication.new(self)
         applicationdeveloper = @ifc::IfcOrganization.new(self)
-        applicationdeveloper.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'BIM-Tools')
+        applicationdeveloper.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, 'BIM-Tools')
         owningapplication.applicationdeveloper = applicationdeveloper
-        owningapplication.version = BimTools::IfcManager::IfcLabel.new(@ifc_model, VERSION)
-        owningapplication.applicationfullname = BimTools::IfcManager::IfcLabel.new(@ifc_model,
+        owningapplication.version = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, VERSION)
+        owningapplication.applicationfullname = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model,
                                                                                    'IFC manager for sketchup')
-        owningapplication.applicationidentifier = BimTools::IfcManager::IfcIdentifier.new(@ifc_model, 'su_ifcmanager')
+        owningapplication.applicationidentifier = BimTools::IfcManager::Types::IfcIdentifier.new(@ifc_model, 'su_ifcmanager')
         owner_history.owningapplication = owningapplication
         owner_history.changeaction = '.ADDED.'
         owner_history.lastmodifieddate = creation_date
@@ -189,7 +188,7 @@ module BimTools
       # Create new IfcGeometricRepresentationContext
       def create_representationcontext
         context = @ifc::IfcGeometricRepresentationContext.new(self)
-        context.contexttype = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'Model')
+        context.contexttype = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, 'Model')
         context.coordinatespacedimension = '3'
         context.worldcoordinatesystem = @ifc::IfcAxis2Placement2D.new(self)
 
@@ -244,7 +243,7 @@ module BimTools
           end
 
           ifc_entity = @ifc::IfcBuildingElementProxy.new(self, nil)
-          ifc_entity.name = BimTools::IfcManager::IfcLabel.new(self, sub_entity_name)
+          ifc_entity.name = BimTools::IfcManager::Types::IfcLabel.new(self, sub_entity_name)
           ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(self, Geom::Transformation.new)
           ifc_entity.predefinedtype = :notdefined if ifc_entity.respond_to?(:predefinedtype=)
           ifc_entity.compositiontype = :element if ifc_entity.respond_to?(:compositiontype=)

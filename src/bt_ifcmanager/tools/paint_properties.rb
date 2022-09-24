@@ -19,7 +19,7 @@
 
 module BimTools
  module IfcManager
-  require File.join(PLUGIN_PATH, "update_ifc_fields.rb")
+  require File.join(PLUGIN_PATH, 'update_ifc_fields')
   module PaintProperties
     extend self
     attr_accessor :name
@@ -132,7 +132,7 @@ module BimTools
       target_dicts = target.definition.attribute_dictionaries
       unless target_dicts.nil?
         target.definition.attribute_dictionaries.each do |dict|
-          unless dict.name == "GSU_ContributorsInfo" || dict.name == "dynamic_attributes"
+          unless dict.name == 'GSU_ContributorsInfo' || dict.name == 'dynamic_attributes'
             target_dicts.delete dict
           end
         end
@@ -173,7 +173,7 @@ module BimTools
       unless source.attribute_dictionaries.nil? # stop if there are no child dictionaries
         source.attribute_dictionaries.each do | source_dict |
 
-          unless source_dict.name == "GSU_ContributorsInfo" || source_dict.name == "dynamic_attributes" # Not allowed to create Contributors attribute. & Don't mess up dynamic components --> skip
+          unless source_dict.name == 'GSU_ContributorsInfo' || source_dict.name == 'dynamic_attributes' # Not allowed to create Contributors attribute. & Don't mess up dynamic components --> skip
             source_dict.each { | key, value |
               target.set_attribute source_dict.name, key, value # create the same dictionary in target
             }

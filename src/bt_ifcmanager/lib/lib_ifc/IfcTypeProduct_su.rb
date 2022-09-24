@@ -19,11 +19,8 @@
 #
 #
 
-require_relative 'set'
-require_relative 'list'
-require_relative 'IfcDate'
 require_relative 'IfcGloballyUniqueId'
-require_relative 'IfcLabel'
+require_relative 'ifc_types'
 
 module BimTools
   module IfcTypeProduct_su
@@ -31,28 +28,28 @@ module BimTools
 
     # @param ifc_model [BimTools::IfcManager::IfcModel]
     # @param definition [Sketchup::ComponentDefinition]
-    def initialize(ifc_model, definition, instance_class)
+    def initialize(ifc_model, definition, instance_class=nil)
       super(ifc_model, definition)
-      @ifc = BimTools::IfcManager::Settings.ifc_module
+      @ifc = IfcManager::Settings.ifc_module
       @definition = definition
-      ifc_version = BimTools::IfcManager::Settings.ifc_version
+      ifc_version = IfcManager::Settings.ifc_version
       @type_properties = ifc_model.options[:type_properties]
-      @propertysets = BimTools::IfcManager::Ifc_Set.new
+      @propertysets = IfcManager::Types::Set.new
 
       @rel_defines_by_type = @ifc::IfcRelDefinesByType.new(@ifc_model)
       @rel_defines_by_type.relatingtype = self
-      @rel_defines_by_type.relatedobjects = BimTools::IfcManager::Ifc_Set.new
+      @rel_defines_by_type.relatedobjects = IfcManager::Types::Set.new
 
-      @name = BimTools::IfcManager::IfcLabel.new(ifc_model, definition.name)
-      @globalid = BimTools::IfcManager::IfcGloballyUniqueId.new(definition)
+      @name = IfcManager::Types::IfcLabel.new(ifc_model, definition.name)
+      @globalid = IfcManager::IfcGloballyUniqueId.new(definition)
 
       # get attributes from su object and add them to IfcTypeProduct
       if dicts = definition.attribute_dictionaries
-        dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(ifc_model, self, dicts, instance_class)
+        dict_reader = IfcManager::IfcDictionaryReader.new(ifc_model, self, dicts, instance_class)
         dict_reader.set_attributes
         if @type_properties
           propertysets = dict_reader.get_propertysets
-          @haspropertysets = BimTools::IfcManager::Ifc_Set.new(propertysets) if propertysets.length > 0
+          @haspropertysets = IfcManager::Types::Set.new(propertysets) if propertysets.length > 0
           dict_reader.add_sketchup_definition_properties(ifc_model, self, definition, @type_properties)
           dict_reader.add_classifications
         end

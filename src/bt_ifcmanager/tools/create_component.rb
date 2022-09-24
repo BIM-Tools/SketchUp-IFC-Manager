@@ -19,7 +19,7 @@
 
 module BimTools
  module IfcManager
-  require File.join(PLUGIN_PATH, "update_ifc_fields.rb")
+  require File.join(PLUGIN_PATH, 'update_ifc_fields')
   module CreateComponent
     extend self
     attr_accessor :name

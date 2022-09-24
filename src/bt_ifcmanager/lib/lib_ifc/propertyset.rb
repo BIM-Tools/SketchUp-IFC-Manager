@@ -19,18 +19,7 @@
 #
 #
 
-# load types
-require_relative 'set'
-require_relative 'list'
-require_relative 'IfcAreaMeasure'
-require_relative 'IfcBoolean'
-require_relative 'IfcIdentifier'
-require_relative 'IfcInteger'
-require_relative 'IfcLabel'
-require_relative 'IfcLengthMeasure'
-require_relative 'IfcReal'
-require_relative 'IfcText'
-require_relative 'IfcVolumeMeasure'
+require_relative 'ifc_types'
 require_relative 'ifc_rel_defines_by_properties_builder'
 
 module BimTools
@@ -46,7 +35,7 @@ module BimTools
 
       def get_propertyset(attr_dict)
         # Create PropertySet if there are any properties to export
-        properties = IfcManager::Ifc_Set.new
+        properties = Types::Set.new
 
         if pset_dicts = attr_dict.attribute_dictionaries
           names = pset_dicts.map { |x| x.name.to_sym }
@@ -74,27 +63,27 @@ module BimTools
             if attribute_type == 'enumeration'
               ifc_property = @ifc::IfcPropertyEnumeratedValue.new(@ifc_model)
               if property.options
-                enumeration_values = IfcManager::Ifc_List.new(property.options.map do |item|
-                                                                BimTools::IfcManager::IfcLabel.new(@ifc_model, item,
+                enumeration_values = Types::List.new(property.options.map do |item|
+                                                                BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, item,
                                                                                                    true)
                                                               end)
                 if @ifc_model.property_enumerations.key?(property.name) && (@ifc_model.property_enumerations[property.name].enumerationvalues.step == enumeration_values.step)
                   prop_enum = @ifc_model.property_enumerations[property.name]
                 else
                   prop_enum = @ifc::IfcPropertyEnumeration.new(@ifc_model)
-                  prop_enum.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, property.name)
+                  prop_enum.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, property.name)
                   prop_enum.enumerationvalues = enumeration_values
                   @ifc_model.property_enumerations[property.name] = prop_enum
                 end
                 ifc_property.enumerationreference = prop_enum
               end
               ifc_value.long = true
-              ifc_property.enumerationvalues = IfcManager::Ifc_List.new([ifc_value])
+              ifc_property.enumerationvalues = Types::List.new([ifc_value])
             else
               ifc_property = @ifc::IfcPropertySingleValue.new(@ifc_model)
               ifc_property.nominalvalue = ifc_value
             end
-            ifc_property.name = BimTools::IfcManager::IfcIdentifier.new(@ifc_model, property.name)
+            ifc_property.name = BimTools::IfcManager::Types::IfcIdentifier.new(@ifc_model, property.name)
             properties << ifc_property
           end
 
@@ -104,7 +93,7 @@ module BimTools
             next if value.is_a?(String) && value.empty?
 
             prop = @ifc::IfcPropertySingleValue.new(@ifc_model)
-            prop.name = BimTools::IfcManager::IfcIdentifier.new(@ifc_model, key)
+            prop.name = BimTools::IfcManager::Types::IfcIdentifier.new(@ifc_model, key)
             prop.nominalvalue = get_ifc_property_value(value, nil, true)
             properties.add(prop)
           end
@@ -114,7 +103,7 @@ module BimTools
           false
         else
           propertyset = @ifc::IfcPropertySet.new(@ifc_model)
-          propertyset.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, attr_dict.name)
+          propertyset.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, attr_dict.name)
           propertyset.hasproperties = properties
           propertyset
         end
@@ -132,62 +121,62 @@ module BimTools
       def get_ifc_property_value(value, attribute_type, long = false)
         case attribute_type
         when 'string'
-          BimTools::IfcManager::IfcText.new(@ifc_model, value, long) # check string length?
+          BimTools::IfcManager::Types::IfcText.new(@ifc_model, value, long) # check string length?
         when 'boolean'
-          BimTools::IfcManager::IfcBoolean.new(@ifc_model, value, long)
+          BimTools::IfcManager::Types::IfcBoolean.new(@ifc_model, value, long)
         when 'double'
-          BimTools::IfcManager::IfcReal.new(@ifc_model, value, long)
+          BimTools::IfcManager::Types::IfcReal.new(@ifc_model, value, long)
         when 'long'
-          BimTools::IfcManager::IfcInteger.new(@ifc_model, value, long)
+          BimTools::IfcManager::Types::IfcInteger.new(@ifc_model, value, long)
         when 'choice'
           # Skip this attribute, this is not a value but a reference
           false
         when 'enumeration'
           if long
-            BimTools::IfcManager::IfcLabel.new(@ifc_model, value, long)
+            BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, value, long)
           else
             value.to_sym
           end
         else
           case value
           when String
-            BimTools::IfcManager::IfcText.new(@ifc_model, value, long) # check string length?
+            BimTools::IfcManager::Types::IfcText.new(@ifc_model, value, long) # check string length?
           when TrueClass
-            BimTools::IfcManager::IfcBoolean.new(@ifc_model, value, long)
+            BimTools::IfcManager::Types::IfcBoolean.new(@ifc_model, value, long)
           when FalseClass
-            BimTools::IfcManager::IfcBoolean.new(@ifc_model, value, long)
+            BimTools::IfcManager::Types::IfcBoolean.new(@ifc_model, value, long)
           when Float
-            BimTools::IfcManager::IfcReal.new(@ifc_model, value, long)
+            BimTools::IfcManager::Types::IfcReal.new(@ifc_model, value, long)
           when Integer
-            BimTools::IfcManager::IfcInteger.new(@ifc_model, value, long)
+            BimTools::IfcManager::Types::IfcInteger.new(@ifc_model, value, long)
           when Length
-            BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, value, long)
+            BimTools::IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, long)
           else # Map all others to string
-            BimTools::IfcManager::IfcText.new(@ifc_model, value, long)
+            BimTools::IfcManager::Types::IfcText.new(@ifc_model, value, long)
           end
         end
       end
 
       def get_elementquantity(attr_dict)
-        quantities = IfcManager::Ifc_Set.new
+        quantities = Types::Set.new
         attr_dict.attribute_dictionaries.each do |qty_dict|
           next unless qty_dict['value']
 
           case qty_dict.name.upcase
           when /AREA/
             prop = @ifc::IfcQuantityArea.new(@ifc_model, attr_dict)
-            prop.name = BimTools::IfcManager::IfcIdentifier.new(@ifc_model, qty_dict.name)
-            prop.areavalue = BimTools::IfcManager::IfcAreaMeasure.new(@ifc_model, qty_dict['value'])
+            prop.name = BimTools::IfcManager::Types::IfcIdentifier.new(@ifc_model, qty_dict.name)
+            prop.areavalue = BimTools::IfcManager::Types::IfcAreaMeasure.new(@ifc_model, qty_dict['value'])
             quantities.add(prop)
           when /VOLUME/
             prop = @ifc::IfcQuantityVolume.new(@ifc_model, attr_dict)
-            prop.name = BimTools::IfcManager::IfcIdentifier.new(@ifc_model, qty_dict.name)
-            prop.volumevalue = BimTools::IfcManager::IfcVolumeMeasure.new(@ifc_model, qty_dict['value'])
+            prop.name = BimTools::IfcManager::Types::IfcIdentifier.new(@ifc_model, qty_dict.name)
+            prop.volumevalue = BimTools::IfcManager::Types::IfcVolumeMeasure.new(@ifc_model, qty_dict['value'])
             quantities.add(prop)
           when /LENGTH/, /WIDTH/, /HEIGHT/, /DEPTH/, /PERIMETER/
             prop = @ifc::IfcQuantityLength.new(@ifc_model, attr_dict)
-            prop.name = BimTools::IfcManager::IfcIdentifier.new(@ifc_model, qty_dict.name)
-            prop.lengthvalue = BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, qty_dict['value'])
+            prop.name = BimTools::IfcManager::Types::IfcIdentifier.new(@ifc_model, qty_dict.name)
+            prop.lengthvalue = BimTools::IfcManager::Types::IfcLengthMeasure.new(@ifc_model, qty_dict['value'])
             quantities.add(prop)
           end
         end
@@ -197,7 +186,7 @@ module BimTools
           false
         else
           elementquantity = @ifc::IfcElementQuantity.new(@ifc_model, attr_dict)
-          elementquantity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, attr_dict.name)
+          elementquantity.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, attr_dict.name)
           elementquantity.quantities = quantities
           elementquantity
         end

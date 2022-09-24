@@ -50,7 +50,7 @@ module BimTools
           builder.set_name(name) if name
         end
         rel = @ifc::IfcRelAssociatesClassification.new(@ifc_model)
-        rel.relatedobjects = BimTools::IfcManager::Ifc_Set.new
+        rel.relatedobjects = BimTools::IfcManager::Types::Set.new
         rel.relatingclassification = @ifc_classification_reference
         @relatedobjects = rel.relatedobjects
         @ifc_classification_reference.ifc_rel_associates_classification = rel

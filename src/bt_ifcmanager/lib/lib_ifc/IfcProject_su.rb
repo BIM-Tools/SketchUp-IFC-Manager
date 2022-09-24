@@ -25,7 +25,7 @@ module BimTools
 
     def initialize(ifc_model, sketchup)
       super
-      @ifc = BimTools::IfcManager::Settings.ifc_module
+      @ifc = IfcManager::Settings.ifc_module
       self.su_object = (sketchup)
       @ifc_model = ifc_model
 
@@ -34,28 +34,28 @@ module BimTools
     end
 
     def su_object=(sketchup)
-      @name = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'default project')
+      @name = IfcManager::Types::IfcLabel.new(@ifc_model, 'default project')
       if sketchup.is_a?(Sketchup::Group) || sketchup.is_a?(Sketchup::ComponentInstance)
         @su_object = sketchup
 
         # get properties from Sketchup object and add them to ifc object
         unless @su_object.definition.name.empty?
-          @name = BimTools::IfcManager::IfcLabel.new(@ifc_model,
+          @name = IfcManager::Types::IfcLabel.new(@ifc_model,
                                                      @su_object.definition.name)
         end
         unless @su_object.definition.description.empty?
-          @description = BimTools::IfcManager::IfcLabel.new(@ifc_model,
+          @description = IfcManager::Types::IfcLabel.new(@ifc_model,
                                                             @su_object.definition.description)
         end
       else
 
         # get properties from Sketchup Model and add them to ifc object
         unless @ifc_model.su_model.name.empty?
-          @name = BimTools::IfcManager::IfcLabel.new(@ifc_model,
+          @name = IfcManager::Types::IfcLabel.new(@ifc_model,
                                                      @ifc_model.su_model.name)
         end
         unless @ifc_model.su_model.description.empty?
-          @description = BimTools::IfcManager::IfcLabel.new(@ifc_model,
+          @description = IfcManager::Types::IfcLabel.new(@ifc_model,
                                                             @ifc_model.su_model.description)
         end
       end

@@ -71,14 +71,14 @@ module BimTools
     @toolbar = UI::Toolbar.new "IFC Manager"
 
     # Load settings from yaml file
-    require File.join(PLUGIN_PATH, 'settings.rb')
+    require File.join(PLUGIN_PATH, 'settings')
     Settings.load_settings()
     
-    require File.join(PLUGIN_PATH, 'window.rb')
-    require File.join(PLUGIN_PATH, 'export.rb')
-    require File.join(PLUGIN_PATH_TOOLS, 'paint_properties.rb')
-    require File.join(PLUGIN_PATH_TOOLS, 'create_component.rb')
-    require File.join(PLUGIN_PATH_TOOLS, 'ifc_import.rb')
+    require File.join(PLUGIN_PATH, 'window')
+    require File.join(PLUGIN_PATH, 'export')
+    require File.join(PLUGIN_PATH_TOOLS, 'paint_properties')
+    require File.join(PLUGIN_PATH_TOOLS, 'create_component')
+    require File.join(PLUGIN_PATH_TOOLS, 'ifc_import')
     
     # add tools to toolbar  
     # Open window button

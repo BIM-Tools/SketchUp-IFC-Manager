@@ -22,14 +22,14 @@
 require 'yaml'
 
 module BimTools::IfcManager
-  require File.join(PLUGIN_PATH, 'observers.rb')
-  require File.join(PLUGIN_PATH_UI, 'html.rb')
-  require File.join(PLUGIN_PATH_UI, 'title.rb')
-  require File.join(PLUGIN_PATH_UI, 'input_name.rb')
-  require File.join(PLUGIN_PATH_UI, 'select.rb')
-  require File.join(PLUGIN_PATH_UI, 'select_classifications.rb')
-  require File.join(PLUGIN_PATH_UI, 'select_materials.rb')
-  require File.join(PLUGIN_PATH_UI, 'select_layers.rb')
+  require File.join(PLUGIN_PATH, 'observers')
+  require File.join(PLUGIN_PATH_UI, 'html')
+  require File.join(PLUGIN_PATH_UI, 'title')
+  require File.join(PLUGIN_PATH_UI, 'input_name')
+  require File.join(PLUGIN_PATH_UI, 'select')
+  require File.join(PLUGIN_PATH_UI, 'select_classifications')
+  require File.join(PLUGIN_PATH_UI, 'select_materials')
+  require File.join(PLUGIN_PATH_UI, 'select_layers')
 
   module PropertiesWindow
     attr_reader :window, :ready

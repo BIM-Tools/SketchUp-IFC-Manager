@@ -42,7 +42,7 @@ module BimTools
     end
     def elevation
       if @latlong
-        return BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, @latlong[2] )
+        return IfcManager::Types::IfcLengthMeasure.new(@ifc_model, @latlong[2] )
       end
     end
     
@@ -77,7 +77,7 @@ module BimTools
 
          # (!) values should be Ifc INTEGER objects instead of Strings(!)
          # (!) returned object should be of type IFC LIST instead of IFC SET
-        return BimTools::IfcManager::Ifc_List.new([deg.to_s, min.to_s, sec.to_s, msec.to_s])
+        return IfcManager::Types::List.new([deg.to_s, min.to_s, sec.to_s, msec.to_s])
       end
     end
   end # module IfcSite_su

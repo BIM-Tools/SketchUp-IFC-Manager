@@ -19,8 +19,6 @@
 #
 #
 
-require_relative 'IfcReal'
-
 module BimTools
   module IfcAxis2Placement3D_su
     def initialize(ifc_model, transformation = nil)

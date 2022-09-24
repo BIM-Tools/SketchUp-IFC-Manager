@@ -21,7 +21,7 @@
 #
 #
 
-require_relative 'list'
+require_relative 'ifc_types'
 
 module BimTools
   module IfcManager
@@ -38,7 +38,7 @@ module BimTools
         @ifc = BimTools::IfcManager::Settings.ifc_module
         @ifc_model = ifc_model
         @ifc_product_definition_shape = @ifc::IfcProductDefinitionShape.new(ifc_model)
-        @ifc_product_definition_shape.representations = IfcManager::Ifc_List.new
+        @ifc_product_definition_shape.representations = Types::List.new
       end
 
       def add_representation(representation)

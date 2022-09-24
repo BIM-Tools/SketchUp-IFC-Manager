@@ -21,11 +21,11 @@
 
 require 'rexml/document'
 
-require File.join(File.dirname(__FILE__), 'lib_ifc', 'parse_xsd.rb')
+require File.join(File.dirname(__FILE__), 'lib_ifc', 'parse_xsd')
 
 module BimTools
   module IfcManager
-    require File.join(PLUGIN_ZIP_PATH, 'zip.rb') unless defined? BimTools::Zip
+    require File.join(PLUGIN_ZIP_PATH, 'zip') unless defined? BimTools::Zip
     MAX_SIZE = 10485760 # 10MiB
 
     class SKC

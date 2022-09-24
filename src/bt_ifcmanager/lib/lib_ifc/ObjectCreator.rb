@@ -21,12 +21,12 @@
 #
 #
 
-require_relative('IfcGloballyUniqueId')
-require_relative('IfcLengthMeasure')
-require_relative('entity_path')
+require_relative 'ifc_types'
+require_relative 'IfcGloballyUniqueId'
+require_relative 'entity_path'
 
 module BimTools::IfcManager
-  require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')
+  require File.join(PLUGIN_PATH_LIB, 'layer_visibility')
 
   class ObjectCreator
     # This creator class creates the correct IFC entity for the given sketchup object and it's children
@@ -130,7 +130,7 @@ module BimTools::IfcManager
         #   could be better set from within IfcBuildingStorey?
         if ifc_entity.is_a?(@ifc::IfcBuildingStorey)
           elevation = ifc_entity.objectplacement.ifc_total_transformation.origin.z
-          ifc_entity.elevation = BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, elevation)
+          ifc_entity.elevation = BimTools::IfcManager::Types::IfcLengthMeasure.new(@ifc_model, elevation)
         end
       end
     end
@@ -197,7 +197,7 @@ module BimTools::IfcManager
                               'space geometry'
                             end
           sub_entity = @ifc::IfcSpace.new(@ifc_model, nil)
-          sub_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, sub_entity_name)
+          sub_entity.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, sub_entity_name)
           definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
           sub_entity.representation = definition_manager.create_representation(faces,
                                                                                brep_transformation,
@@ -222,7 +222,7 @@ module BimTools::IfcManager
                               'project geometry'
                             end
           sub_entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
-          sub_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, sub_entity_name)
+          sub_entity.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, sub_entity_name)
           definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
           sub_entity.representation = definition_manager.create_representation(faces,
                                                                                brep_transformation,
@@ -247,7 +247,7 @@ module BimTools::IfcManager
                               'group geometry'
                             end
           sub_entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
-          sub_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, sub_entity_name)
+          sub_entity.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, sub_entity_name)
           definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
           sub_entity.representation = definition_manager.create_representation(faces,
                                                                                brep_transformation,
@@ -285,7 +285,7 @@ module BimTools::IfcManager
             end
           else
             entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
-            entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, definition.name)
+            entity.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, definition.name)
             definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
             entity.representation = definition_manager.create_representation(faces,
                                                                              brep_transformation,

@@ -19,14 +19,14 @@
 #
 #
 
-require_relative File.join('lib', 'lib_ifc', 'IfcModel.rb')
+require_relative File.join('lib', 'lib_ifc', 'IfcModel')
 
 module BimTools
   module IfcManager
     require 'net/http'
     require 'uri'
-    require File.join(PLUGIN_PATH, 'update_ifc_fields.rb')
-    require File.join(PLUGIN_PATH_LIB, 'progressbar.rb')
+    require File.join(PLUGIN_PATH, 'update_ifc_fields')
+    require File.join(PLUGIN_PATH_LIB, 'progressbar')
 
     def export( file_path )
       su_model = Sketchup.active_model

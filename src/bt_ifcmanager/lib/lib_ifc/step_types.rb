@@ -1,6 +1,6 @@
-#  list.rb
+#  step_types.rb
 #
-#  Copyright 2020 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2022 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,19 +19,48 @@
 #
 #
 
-require_relative('step')
-
 module BimTools
   module IfcManager
-    class Ifc_List < Array
-      include Step
+    module Types
 
-      def add(entity)
-        self << entity
+      class List < Array
+        include Step
+
+        def add(entity)
+          self << entity
+        end
+
+        def step
+          "(#{map { |item| property_to_step(item) }.join(',')})"
+        end
       end
 
-      def step
-        "(#{map { |item| property_to_step(item) }.join(',')})"
+      class Set < Set
+        include Step
+
+        def add(entity)
+          self << entity
+        end
+
+        def step
+          "(#{map { |item| property_to_step(item) }.join(',')})"
+        end
+      end
+
+      class Enumeration
+        attr_reader :value
+
+        def initialize( value )
+          @value = value.to_s
+        end
+
+        def step()
+          val = ".#{@value.upcase}."
+          if @long
+            val = add_long( val )
+          end
+          return val
+        end
       end
     end
   end
