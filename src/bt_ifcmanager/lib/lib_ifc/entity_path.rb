@@ -149,7 +149,7 @@ module BimTools::IfcManager
       unless parent.default_related_object
         default_parent = entity_class.new(@ifc_model)
         default_parent.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model,
-                                                                 'default ' << entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(' ').downcase)
+                                                                 +'default ' << entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(' ').downcase)
 
         # Add ObjectPlacement
         default_parent.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcUnitAssignment_su.rb
 #
 #  Copyright 2021 Jan Brouwer <jan@brewsky.nl>

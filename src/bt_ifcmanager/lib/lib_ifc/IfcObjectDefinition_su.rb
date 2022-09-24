@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcObjectDefinition_su.rb
 #
 #  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
@@ -23,7 +25,7 @@ require_relative 'ifc_types'
 
 module BimTools
   module IfcObjectDefinition_su
-    
+
 
     attr_accessor :decomposes, :default_related_object
     def initialize(ifc_model, sketchup)
@@ -31,7 +33,7 @@ module BimTools
       @ifc = BimTools::IfcManager::Settings.ifc_module
       @ifc_model = ifc_model
     end
-    
+
     # Add an element for which this element is the spatial container
     # Like a wall thats contained in a building
     #
@@ -43,7 +45,7 @@ module BimTools
       end
       @contains_elements.relatedelements.add( object )
     end
-    
+
     # Add an object from which this element is decomposed
     # Like a building is decomposed into multiple buildingstoreys
     # Or a curtainwall is decomposed into muliple members/plates

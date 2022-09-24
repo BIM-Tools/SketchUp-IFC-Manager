@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcProject.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>

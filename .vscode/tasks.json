@@ -1,0 +1,36 @@
+  {
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Launch SketchUp in Ruby debug mode",
+        "type": "shell",
+        "command": "skippy",
+        "args": [
+          "sketchup:debug",
+          "${input:sketchupVersion}"
+        ],
+        "runOptions": {
+          "reevaluateOnRerun": false
+        },
+        "problemMatcher": []
+      }
+    ],
+    "inputs": [
+      {
+        "id": "sketchupVersion",
+        "type": "pickString",
+        "description": "SketchUp Version",
+        "options": [
+          "2022",
+          "2021",
+          "2020",
+          "2019",
+          "2018",
+          "2017"
+        ],
+        "default": "2022"
+      }
+    ]
+  }

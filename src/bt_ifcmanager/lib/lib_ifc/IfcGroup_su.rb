@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcGroup_su.rb
 #
 #  Copyright 2021 Jan Brouwer <jan@brewsky.nl>

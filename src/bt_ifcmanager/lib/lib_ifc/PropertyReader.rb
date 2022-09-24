@@ -118,6 +118,7 @@ module BimTools
         if BimTools::IfcManager::Settings.export_classifications
           if schema_types = @entity_dict['AppliedSchemaTypes']
             schema_types.each do |classification_name, classification_value|
+
               # (?) exclude ALL IFC classifications?
               unless Settings.ifc_version == classification_name
                 @ifc_model.classifications.add_classification_to_entity(@ifc_entity, classification_name, classification_value, @entity_dict[classification_name])
@@ -210,7 +211,7 @@ module BimTools
 
             # Never set empty values
             next if value.nil? || (value.is_a?(String) && value.empty?)
-            
+
             if quantities
               properties << IfcQuantityBuilder.build(@ifc_model, get_quantity_type(property.name)) do |builder|
                 builder.set_name(property.name)
@@ -219,10 +220,10 @@ module BimTools
             else
 
               ifc_value = ifc_type.new(@ifc_model, value, true) if ifc_type
-  
+
               # Check if IFC type is set, otherwise use basic types
               ifc_value ||= get_ifc_property_value(value, property.attribute_type, true)
-  
+
               next unless ifc_value
 
               properties << IfcPropertyBuilder.build(@ifc_model, property.attribute_type) do |builder|

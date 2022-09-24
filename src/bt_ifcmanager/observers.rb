@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  observers.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
@@ -70,7 +72,7 @@ module BimTools
       end
     end
   end
-  
+
   class IMAppObserver < Sketchup::AppObserver
     def onNewModel(model)
       switch_model()
@@ -78,14 +80,14 @@ module BimTools
     def onOpenModel(model)
       switch_model()
     end
-    
+
     # actions when switching/loading models
     def switch_model()
-      
+
       # when new model is loaded, close window (?) instantaneous re-open does not work?
       PropertiesWindow.close
       PropertiesWindow.create
-      
+
       # also load classifications and default materials into new model
       Settings.load_classifications
       Settings.load_materials()
