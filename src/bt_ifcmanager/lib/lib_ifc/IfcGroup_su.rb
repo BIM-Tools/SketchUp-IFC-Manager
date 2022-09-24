@@ -20,7 +20,7 @@
 #
 
 require_relative 'ifc_types'
-require_relative 'propertyset'
+require_relative 'PropertyReader'
 
 module BimTools
   module IfcGroup_su

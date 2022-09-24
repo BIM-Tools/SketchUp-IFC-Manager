@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  entity_path.rb
 #
 #  Copyright 2021 Jan Brouwer <jan@brewsky.nl>

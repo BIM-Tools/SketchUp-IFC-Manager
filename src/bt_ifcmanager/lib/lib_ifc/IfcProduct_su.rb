@@ -22,14 +22,11 @@
 require_relative 'ifc_types'
 require_relative 'dynamic_attributes'
 require_relative 'PropertyReader'
-require_relative 'propertyset'
 require_relative 'material_and_styling'
 
 module BimTools
   module IfcProduct_su
     attr_accessor :su_object, :parent, :total_transformation, :type_product
-
-    extend BimTools::IfcManager::PropertyDictionary
 
     @su_object = nil
     @parent = nil

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  ifc_classification_reference_builder.rb
+#  ifc_element_quantity_builder.rb
 #
 #  Copyright 2022 Jan Brouwer <jan@brewsky.nl>
 #
@@ -21,47 +21,40 @@
 #
 #
 
+require_relative 'ifc_types'
+
 module BimTools
   module IfcManager
-    class IfcClassificationReferenceBuilder
-      attr_reader :ifc_classification_reference
+    class IfcElementQuantityBuilder
+      attr_reader :ifc_element_quantity
 
       def self.build(ifc_model)
+        puts 'IfcElementQuantityBuilder'
         builder = new(ifc_model)
         yield(builder)
-        builder.ifc_classification_reference
+        builder.ifc_element_quantity
       end
 
       def initialize(ifc_model)
         @ifc = IfcManager::Settings.ifc_module
         @ifc_model = ifc_model
-        @ifc_classification_reference = @ifc::IfcClassificationReference.new(ifc_model)
-      end
-
-      def set_location(location)
-        # TODO: catch IFC4 change IfcLabel to IfcURIReference
-        @ifc_classification_reference.location = IfcManager::Types::IfcLabel.new(@ifc_model, location)
-      end
-
-      def set_identification(identification)
-        identifier = IfcManager::Types::IfcIdentifier.new(@ifc_model, identification)
-
-        # IFC 2x3
-        if @ifc::IfcClassificationReference.method_defined?(:itemreference)
-          @ifc_classification_reference.itemreference = identifier
-
-        # IFC 4
-        else
-          @ifc_classification_reference.identification = identifier
-        end
+        @ifc_element_quantity = @ifc::IfcElementQuantity.new(ifc_model)
+        @ifc_element_quantity.quantities = IfcManager::Types::Set.new
       end
 
       def set_name(name)
-        @ifc_classification_reference.name = IfcManager::Types::IfcLabel.new(@ifc_model, name)
+        @ifc_element_quantity.name = IfcManager::Types::IfcLabel.new(@ifc_model, name) if name
       end
 
-      def set_referencedsource(ifc_classification)
-        @ifc_classification_reference.referencedsource = ifc_classification
+      def add_related_object(ifc_object)
+        IfcRelDefinesByPropertiesBuilder.build(@ifc_model) do |builder|
+          builder.set_relatingpropertydefinition(@ifc_element_quantity)
+          builder.add_related_object(ifc_object)
+        end
+      end
+
+      def set_quantities(quantities)
+        @ifc_element_quantity.quantities = IfcManager::Types::Set.new(quantities)
       end
     end
   end

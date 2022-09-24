@@ -29,7 +29,7 @@ module BimTools
       attr_reader :ifc_classification_reference
 
       def initialize(ifc_model, classification, classification_value, identification = nil, location = nil)
-        @ifc = BimTools::IfcManager::Settings.ifc_module
+        @ifc = IfcManager::Settings.ifc_module
         @ifc_model = ifc_model
         @classification = classification
         @ifc_classification_reference = create_ifc_classification_reference(classification_value, identification,
@@ -50,7 +50,7 @@ module BimTools
           builder.set_name(name) if name
         end
         rel = @ifc::IfcRelAssociatesClassification.new(@ifc_model)
-        rel.relatedobjects = BimTools::IfcManager::Types::Set.new
+        rel.relatedobjects = IfcManager::Types::Set.new
         rel.relatingclassification = @ifc_classification_reference
         @relatedobjects = rel.relatedobjects
         @ifc_classification_reference.ifc_rel_associates_classification = rel

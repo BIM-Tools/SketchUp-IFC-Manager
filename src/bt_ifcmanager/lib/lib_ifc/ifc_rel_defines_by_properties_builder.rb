@@ -46,7 +46,7 @@ module BimTools
       end
 
       def add_related_object(related_object)
-        @ifc_rel_defines_by_properties.relatedobjects.relatedobjects.add(related_object)
+        @ifc_rel_defines_by_properties.relatedobjects.add(related_object)
       end
     end
   end
