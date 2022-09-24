@@ -21,15 +21,7 @@
 #
 #
 
-# load types
-require_relative 'set'
-require_relative 'IfcBoolean'
-require_relative 'IfcInteger'
-require_relative 'IfcLabel'
-require_relative 'IfcLengthMeasure'
-require_relative 'IfcReal'
-require_relative 'IfcText'
-
+require_relative 'ifc_types'
 require_relative 'ifc_property_builder'
 require_relative 'ifc_rel_defines_by_properties_builder'
 
@@ -53,8 +45,8 @@ module BimTools
       ].freeze
 
       def initialize(ifc_model, ifc_entity, entity_dict, instance_class = nil)
-        @ifc = BimTools::IfcManager::Settings.ifc_module
-        ifc_version = BimTools::IfcManager::Settings.ifc_version
+        @ifc = IfcManager::Settings.ifc_module
+        ifc_version = IfcManager::Settings.ifc_version
         @ifc_model = ifc_model
         @ifc_entity = ifc_entity
         if entity_dict && entity_dict[ifc_version]
@@ -115,7 +107,7 @@ module BimTools
       end
 
       def add_classifications
-        if BimTools::IfcManager::Settings.export_classifications
+        if IfcManager::Settings.export_classifications
           if schema_types = @entity_dict['AppliedSchemaTypes']
             schema_types.each do |classification_name, classification_value|
 
@@ -138,7 +130,7 @@ module BimTools
               if ifc_entity.haspropertysets
                 ifc_entity.haspropertysets.add(propertyset)
               else
-                ifc_entity.haspropertysets = BimTools::IfcManager::Ifc_Set.new([propertyset])
+                ifc_entity.haspropertysets = IfcManager::Types::Set.new([propertyset])
               end
             else
               IfcRelDefinesByPropertiesBuilder.build(@ifc_model) do |builder|
@@ -275,38 +267,38 @@ module BimTools
       def get_ifc_property_value(value, attribute_type, long = false)
         case attribute_type
         when 'string'
-          BimTools::IfcManager::IfcText.new(@ifc_model, value, long) # check string length?
+          IfcManager::Types::IfcText.new(@ifc_model, value, long) # check string length?
         when 'boolean'
-          BimTools::IfcManager::IfcBoolean.new(@ifc_model, value, long)
+          IfcManager::Types::IfcBoolean.new(@ifc_model, value, long)
         when 'double'
-          BimTools::IfcManager::IfcReal.new(@ifc_model, value, long)
+          IfcManager::Types::IfcReal.new(@ifc_model, value, long)
         when 'long'
-          BimTools::IfcManager::IfcInteger.new(@ifc_model, value, long)
+          IfcManager::Types::IfcInteger.new(@ifc_model, value, long)
         when 'choice'
           # Skip this attribute, this is not a value but a reference
           false
         when 'enumeration'
           if long
-            BimTools::IfcManager::IfcLabel.new(@ifc_model, value, long)
+            IfcManager::Types::IfcLabel.new(@ifc_model, value, long)
           else
             value.to_sym
           end
         else
           case value
           when String
-            BimTools::IfcManager::IfcText.new(@ifc_model, value, long) # check string length?
+            IfcManager::Types::IfcText.new(@ifc_model, value, long) # check string length?
           when TrueClass
-            BimTools::IfcManager::IfcBoolean.new(@ifc_model, value, long)
+            IfcManager::Types::IfcBoolean.new(@ifc_model, value, long)
           when FalseClass
-            BimTools::IfcManager::IfcBoolean.new(@ifc_model, value, long)
+            IfcManager::Types::IfcBoolean.new(@ifc_model, value, long)
           when Float
-            BimTools::IfcManager::IfcReal.new(@ifc_model, value, long)
+            IfcManager::Types::IfcReal.new(@ifc_model, value, long)
           when Integer
-            BimTools::IfcManager::IfcInteger.new(@ifc_model, value, long)
+            IfcManager::Types::IfcInteger.new(@ifc_model, value, long)
           when Length
-            BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, value, long, geometry=false)
+            IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, long, geometry=false)
           else # Map all others to string
-            BimTools::IfcManager::IfcText.new(@ifc_model, value, long)
+            IfcManager::Types::IfcText.new(@ifc_model, value, long)
           end
         end
       end
@@ -425,8 +417,8 @@ module BimTools
           @options = value_dict['options']
 
           # Check for IFC type
-          if ifc_type_name[0].upcase == ifc_type_name[0] && BimTools::IfcManager.const_defined?(ifc_type_name)
-            @ifc_type = BimTools::IfcManager.const_get(ifc_type_name)
+          if ifc_type_name[0].upcase == ifc_type_name[0] && IfcManager.const_defined?(ifc_type_name)
+            @ifc_type = IfcManager.const_get(ifc_type_name)
           end
 
           # Sometimes the value is even nested a level deeper
