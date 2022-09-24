@@ -21,6 +21,8 @@
 #
 #
 
+require_relative 'ifc_types'
+
 module BimTools
   module IfcManager
     class IfcRelDefinesByPropertiesBuilder
@@ -36,7 +38,7 @@ module BimTools
         @ifc = BimTools::IfcManager::Settings.ifc_module
         @ifc_model = ifc_model
         @ifc_rel_defines_by_properties = @ifc::IfcRelDefinesByProperties.new(ifc_model)
-        @ifc_rel_defines_by_properties.relatedobjects = IfcManager::Ifc_Set.new
+        @ifc_rel_defines_by_properties.relatedobjects = Types::Set.new
       end
 
       def set_relatingpropertydefinition(propertyset)

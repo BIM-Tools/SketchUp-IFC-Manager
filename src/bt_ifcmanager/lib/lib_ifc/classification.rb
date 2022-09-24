@@ -25,7 +25,7 @@ module BimTools
   module IfcManager
     require_relative 'ifc_classification_builder'
     require_relative 'classification_reference'
-    require File.join(PLUGIN_PATH_LIB, 'skc_reader.rb')
+    require File.join(PLUGIN_PATH_LIB, 'skc_reader')
 
     class Classification
       attr_reader :name, :creator, :revision, :modified, :classification_references, :ifc_classification

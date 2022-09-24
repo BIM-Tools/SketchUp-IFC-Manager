@@ -19,8 +19,6 @@
 #
 #
 
-require_relative 'IfcNormalisedRatioMeasure'
-
 module BimTools
   module IfcStyledItem_su
     def initialize(ifc_model, brep)

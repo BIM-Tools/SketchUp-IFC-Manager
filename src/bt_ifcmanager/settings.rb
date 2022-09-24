@@ -40,7 +40,7 @@ require 'yaml'
 require 'cgi'
 
 module BimTools::IfcManager
-  require File.join(PLUGIN_PATH_LIB, 'skc_reader.rb')
+  require File.join(PLUGIN_PATH_LIB, 'skc_reader')
   module Settings
     extend self
     attr_accessor :visible,

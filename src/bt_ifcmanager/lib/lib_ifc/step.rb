@@ -44,7 +44,7 @@ module BimTools
       case property
       when nil
         '$'
-      when Symbol
+      when Symbol # used for enumerations
         ".#{property.upcase}."
       when String
         property
@@ -52,7 +52,7 @@ module BimTools
         '.T.'
       when FalseClass
         '.F.'
-      when IfcManager::IfcGloballyUniqueId, IfcManager::Ifc_List, IfcManager::Ifc_Set, IfcManager::Ifc_Type
+      when IfcManager::IfcGloballyUniqueId, IfcManager::Types::List, IfcManager::Types::Set, IfcManager::Types::BaseType
         property.step
       else
         property.ref

@@ -21,7 +21,7 @@
 #
 #
 
-require_relative 'list'
+require_relative 'ifc_types'
 
 module BimTools
   module IfcManager

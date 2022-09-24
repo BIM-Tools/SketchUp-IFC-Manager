@@ -24,8 +24,8 @@
 # Create an entry in the Extension list that loads a script called
 # loader.rb.
 
-require 'sketchup.rb'
-require 'extensions.rb'
+require 'sketchup'
+require 'extensions'
 
 module BimTools
   PLUGIN_ROOT_PATH = File.dirname(__FILE__) unless defined? PLUGIN_ROOT_PATH
@@ -40,7 +40,7 @@ module BimTools
       PLUGIN_PATH       = File.join(PLUGIN_ROOT_PATH, 'bt_ifcmanager')
       PLUGIN_IMAGE_PATH = File.join(PLUGIN_PATH, 'images')
 
-      IFCMANAGER_EXTENSION = SketchupExtension.new('IFC Manager', File.join(PLUGIN_PATH, 'loader.rb'))
+      IFCMANAGER_EXTENSION = SketchupExtension.new('IFC Manager', File.join(PLUGIN_PATH, 'loader'))
       IFCMANAGER_EXTENSION.version = VERSION
       IFCMANAGER_EXTENSION.description = 'IFC data manager and exporter for SketchUp.'
       IFCMANAGER_EXTENSION.creator = 'BIM-Tools'

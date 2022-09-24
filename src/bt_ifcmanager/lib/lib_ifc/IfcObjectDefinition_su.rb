@@ -19,7 +19,7 @@
 #
 #
 
-require_relative 'set.rb'
+require_relative 'ifc_types'
 
 module BimTools
   module IfcObjectDefinition_su
@@ -39,7 +39,7 @@ module BimTools
       unless @contains_elements
         @contains_elements = @ifc::IfcRelContainedInSpatialStructure.new(@ifc_model)
         @contains_elements.relatingstructure= self
-        @contains_elements.relatedelements = BimTools::IfcManager::Ifc_Set.new()
+        @contains_elements.relatedelements = IfcManager::Types::Set.new()
       end
       @contains_elements.relatedelements.add( object )
     end
@@ -52,7 +52,7 @@ module BimTools
       unless @decomposes
         @decomposes = @ifc::IfcRelAggregates.new(@ifc_model)
         @decomposes.relatingobject = self
-        @decomposes.relatedobjects = BimTools::IfcManager::Ifc_Set.new()
+        @decomposes.relatedobjects = IfcManager::Types::Set.new()
       end
       @decomposes.relatedobjects.add( object )
     end

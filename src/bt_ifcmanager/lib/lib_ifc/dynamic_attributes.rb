@@ -19,10 +19,7 @@
 #
 #
 
-require_relative 'set'
-require_relative 'IfcLengthMeasure'
-require_relative 'IfcLabel'
-require_relative 'IfcReal'
+require_relative 'ifc_types'
 require_relative 'ifc_rel_defines_by_properties_builder'
 
 # method that collects all dynamic component attributes in the given objects and creates IfcPropertySets and Quantities
@@ -30,7 +27,7 @@ require_relative 'ifc_rel_defines_by_properties_builder'
 module BimTools
   module DynamicAttributes
     def self.get_dynamic_attributes(ifc_model, ifc_object)
-      @ifc = BimTools::IfcManager::Settings.ifc_module
+      @ifc = IfcManager::Settings.ifc_module
       @ifc_model = ifc_model
       instance = ifc_object.su_object
       definition = instance.definition
@@ -62,8 +59,8 @@ module BimTools
             # create new PropertySet with name pset_name
             unless pset_hash[pset_name]
               propertyset = @ifc::IfcPropertySet.new(ifc_model, attr_dict)
-              propertyset.name = BimTools::IfcManager::IfcLabel.new(ifc_model, pset_name)
-              propertyset.hasproperties = IfcManager::Ifc_Set.new
+              propertyset.name = IfcManager::Types::IfcLabel.new(ifc_model, pset_name)
+              propertyset.hasproperties = Types::Set.new
               pset_hash[pset_name] = propertyset
 
               IfcRelDefinesByPropertiesBuilder.build(ifc_model) do |builder|
@@ -74,7 +71,7 @@ module BimTools
 
             # create Property with name prop_name
             property = @ifc::IfcPropertySingleValue.new(ifc_model)
-            property.name = BimTools::IfcManager::IfcLabel.new(ifc_model, prop_name)
+            property.name = IfcManager::Types::IfcLabel.new(ifc_model, prop_name)
             property.nominalvalue = get_dynamic_attribute_value(instance, key)
             property.nominalvalue.long = true if property.nominalvalue
             pset_hash[pset_name].hasproperties.add(property)
@@ -90,8 +87,8 @@ module BimTools
               # create new PropertySet with name "SU_DynamicAttributes"
               unless pset_hash['SU_DynamicAttributes']
                 propertyset = @ifc::IfcPropertySet.new(ifc_model, attr_dict)
-                propertyset.name = BimTools::IfcManager::IfcLabel.new(ifc_model, 'SU_DynamicAttributes')
-                propertyset.hasproperties = IfcManager::Ifc_Set.new
+                propertyset.name = IfcManager::Types::IfcLabel.new(ifc_model, 'SU_DynamicAttributes')
+                propertyset.hasproperties = Types::Set.new
                 pset_hash['SU_DynamicAttributes'] = propertyset
 
                 IfcRelDefinesByPropertiesBuilder.build(ifc_model) do |builder|
@@ -102,7 +99,7 @@ module BimTools
 
               # create Property with name prop_name
               property = @ifc::IfcPropertySingleValue.new(ifc_model)
-              property.name = BimTools::IfcManager::IfcLabel.new(ifc_model, prop_name)
+              property.name = IfcManager::Types::IfcLabel.new(ifc_model, prop_name)
               property.nominalvalue = get_dynamic_attribute_value(instance, key)
               property.nominalvalue.long = true if property.nominalvalue
               pset_hash['SU_DynamicAttributes'].hasproperties.add(property)
@@ -124,7 +121,7 @@ module BimTools
               end
 
       # exception: Default fields lenx, leny and lenz are always "DEFAULT" meaning Length
-      return BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, value) if %w[lenx leny lenz].include? key
+      return BimTools::IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value) if %w[lenx leny lenz].include? key
 
       # get unit, use "formulaunits" if possible, if not use "units"
       unless units = dict["_#{key}_formulaunits"]
@@ -133,18 +130,18 @@ module BimTools
 
       case units
       when 'CENTIMETERS', 'INCHES'
-        BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, value)
+        IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value)
       when 'STRING'
-        BimTools::IfcManager::IfcLabel.new(@ifc_model, value)
+        BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, value)
       when 'FLOAT'
-        BimTools::IfcManager::IfcReal.new(@ifc_model, value.to_f)
+        BimTools::IfcManager::Types::IfcReal.new(@ifc_model, value.to_f)
       else # (?) when "DEFAULT"
         if value.is_a? Length
-          BimTools::IfcManager::IfcLengthMeasure.new(@ifc_model, value)
+          BimTools::IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value)
         elsif value.is_a? String
-          BimTools::IfcManager::IfcLabel.new(@ifc_model, value)
+          BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, value)
         elsif value.is_a? Float
-          BimTools::IfcManager::IfcReal.new(@ifc_model, value)
+          BimTools::IfcManager::Types::IfcReal.new(@ifc_model, value)
         end
       end
     end

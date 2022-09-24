@@ -19,15 +19,7 @@
 #
 #
 
-# load types
-require_relative 'IfcBoolean'
-require_relative 'IfcDate'
-require_relative 'IfcLabel'
-require_relative 'IfcIdentifier'
-require_relative 'IfcReal'
-require_relative 'IfcInteger'
-require_relative 'IfcText'
-
+require_relative 'ifc_types'
 require_relative 'dynamic_attributes'
 require_relative 'PropertyReader'
 require_relative 'propertyset'
@@ -57,7 +49,7 @@ module BimTools
         # (?) set name, here? is this a duplicate?
         name = @su_object.name
         name = definition.name if name.length == 0
-        @name = BimTools::IfcManager::IfcLabel.new(ifc_model, name)
+        @name = IfcManager::Types::IfcLabel.new(ifc_model, name)
 
         # Set IfcProductType
         if ifc_model.options[:types]

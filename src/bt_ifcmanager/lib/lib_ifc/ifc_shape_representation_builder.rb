@@ -21,7 +21,7 @@
 #
 #
 
-require_relative 'set'
+require_relative 'ifc_types'
 
 module BimTools
   module IfcManager
@@ -48,7 +48,7 @@ module BimTools
       end
 
       def set_representationidentifier(identifier = 'Body')
-        @ifc_shape_representation.representationidentifier = IfcManager::IfcLabel.new(@ifc_model, identifier)
+        @ifc_shape_representation.representationidentifier = Types::IfcLabel.new(@ifc_model, identifier)
       end
 
       def set_representationtype(type = nil)
@@ -62,11 +62,11 @@ module BimTools
             'Brep'
           end
         end
-        @ifc_shape_representation.representationtype = IfcManager::IfcLabel.new(@ifc_model, type)
+        @ifc_shape_representation.representationtype = Types::IfcLabel.new(@ifc_model, type)
       end
 
       def set_items(items=[])
-        @ifc_shape_representation.items = IfcManager::Ifc_Set.new(items)
+        @ifc_shape_representation.items = Types::Set.new(items)
       end
 
       def add_item(item)

@@ -19,7 +19,7 @@
 #
 #
 
-require_relative 'IfcReal'
+require_relative 'ifc_types'
 
 module BimTools
   module IfcCartesianPoint_su
@@ -33,8 +33,8 @@ module BimTools
       super
       case sketchup
       when Geom::Point3d, Geom::Point2d
-        @coordinates = IfcManager::Ifc_List.new(sketchup.to_a.map do |c|
-                                                  IfcManager::IfcLengthMeasure.new(ifc_model, c)
+        @coordinates = IfcManager::Types::List.new(sketchup.to_a.map do |c|
+          IfcManager::Types::IfcLengthMeasure.new(ifc_model, c)
                                                 end)
       else
         raise TypeError, 'Expected a point type.'

@@ -19,7 +19,7 @@
 #
 #
 
-require_relative 'set.rb'
+require_relative 'ifc_types'
 
 module BimTools
   module IfcFacetedBrep_su
@@ -43,14 +43,14 @@ module BimTools
 
       faces = su_faces.map { |face| add_face(face) }
       if faces.length != 0
-        ifcclosedshell.cfsfaces = IfcManager::Ifc_Set.new( faces )
+        ifcclosedshell.cfsfaces = IfcManager::Types::Set.new( faces )
       end
     end
     def add_face(su_face)
       create_points(su_face)
       face = @ifc::IfcFace.new( @ifc_model )
       bounds = su_face.loops.map{|loop| create_loop(loop)}
-      face.bounds = IfcManager::Ifc_Set.new(bounds)
+      face.bounds = IfcManager::Types::Set.new(bounds)
       return face
     end
     def create_loop(loop)
@@ -66,7 +66,7 @@ module BimTools
       polyloop = @ifc::IfcPolyLoop.new( @ifc_model )
       bound.bound = polyloop
       bound.orientation = @flipped
-      polyloop.polygon = IfcManager::Ifc_List.new( points )
+      polyloop.polygon = IfcManager::Types::List.new( points )
       return bound
     end
     def create_points(su_face)

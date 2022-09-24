@@ -24,7 +24,7 @@
 module BimTools
   module IfcManager
     require_relative 'classification'
-    require File.join(PLUGIN_PATH_LIB, 'skc_reader.rb')
+    require File.join(PLUGIN_PATH_LIB, 'skc_reader')
 
     # Keeps track of all classifications in a IFC model
     class Classifications
