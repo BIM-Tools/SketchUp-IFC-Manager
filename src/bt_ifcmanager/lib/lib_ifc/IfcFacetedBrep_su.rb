@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcFacetedBrep_su.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
@@ -23,8 +25,8 @@ require_relative 'ifc_types'
 
 module BimTools
   module IfcFacetedBrep_su
-    
-    
+
+
     def initialize( ifc_model, su_faces, su_transformation )
       super
       @ifc = BimTools::IfcManager::Settings.ifc_module
@@ -54,7 +56,7 @@ module BimTools
       return face
     end
     def create_loop(loop)
-        
+
       # differenciate between inner and outer loops/bounds
       if loop.outer?
         bound = @ifc::IfcFaceOuterBound.new( @ifc_model )

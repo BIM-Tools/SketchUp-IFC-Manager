@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  step_types.rb
 #
 #  Copyright 2022 Jan Brouwer <jan@brewsky.nl>

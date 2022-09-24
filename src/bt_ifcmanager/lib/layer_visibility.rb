@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  layer_visibility.rb
 #
 #  Copyright 2020 Jan Brouwer <jan@brewsky.nl>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcTypeProduct_su.rb
 #
 #  Copyright 2018 Jan Brouwer <jan@brewsky.nl>

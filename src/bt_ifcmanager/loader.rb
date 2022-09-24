@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  loader.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
@@ -26,10 +28,10 @@ require 'securerandom'
 
 module BimTools
   module IfcManager
-  
+
     PLATFORM_IS_OSX     = ( Object::RUBY_PLATFORM =~ /darwin/i ) ? true : false
     PLATFORM_IS_WINDOWS = !PLATFORM_IS_OSX
-    
+
     # set icon file type
     if Sketchup.version_number < 1600000000
       ICON_TYPE = ".png"
@@ -44,7 +46,7 @@ module BimTools
       ICON_SMALL = ""
       ICON_LARGE = ""
     end
-    
+
     attr_reader :toolbar
     attr_accessor :export_messages
 
@@ -57,13 +59,13 @@ module BimTools
     PLUGIN_PATH_TOOLS = File.join(PLUGIN_PATH, 'tools')
     PLUGIN_PATH_CLASSIFICATIONS = File.join(PLUGIN_PATH, 'classifications')
 
-    # Set the path to the correct Rubyzip version for this Ruby version 
+    # Set the path to the correct Rubyzip version for this Ruby version
     if RUBY_VERSION.split('.')[1].to_i < 4
       PLUGIN_ZIP_PATH = File.join(PLUGIN_PATH, 'lib','rubyzip-1.3.0')
     else
       PLUGIN_ZIP_PATH = File.join(PLUGIN_PATH, 'lib','rubyzip')
     end
-    
+
     # Create export message collection
     @export_messages = Array.new
 
@@ -73,14 +75,14 @@ module BimTools
     # Load settings from yaml file
     require File.join(PLUGIN_PATH, 'settings')
     Settings.load_settings()
-    
+
     require File.join(PLUGIN_PATH, 'window')
     require File.join(PLUGIN_PATH, 'export')
     require File.join(PLUGIN_PATH_TOOLS, 'paint_properties')
     require File.join(PLUGIN_PATH_TOOLS, 'create_component')
     require File.join(PLUGIN_PATH_TOOLS, 'ifc_import')
-    
-    # add tools to toolbar  
+
+    # add tools to toolbar
     # Open window button
     btn_ifc_window = UI::Command.new('Show IFC properties') {
       PropertiesWindow.toggle
@@ -89,7 +91,7 @@ module BimTools
     btn_ifc_window.large_icon = File.join(PLUGIN_PATH_IMAGE, "IfcEdit#{ICON_LARGE}#{ICON_TYPE}")
     btn_ifc_window.tooltip = "Show IFC properties"
     btn_ifc_window.status_bar_text = "Edit IFC properties"
-    
+
     # Import IFC file
     btn_ifc_import = UI::Command.new("Import IFC file") {
       ifc_import()

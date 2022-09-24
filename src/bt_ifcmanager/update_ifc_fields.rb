@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  update_ifc_fields.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
@@ -27,7 +29,7 @@ module BimTools::IfcManager
     ifc_type = definition.get_attribute 'AppliedSchemaTypes', ifc_version
     if ifc_type
       path = [ifc_version, ifc_type.to_s, 'Name', 'IfcLabel']
-      
+
       # overwrite the IFC label for name with the component name
       definition.set_classification_value(path, definition.name) # (?) first check if IFC type had a name attribute?
     end
@@ -40,14 +42,14 @@ module BimTools::IfcManager
     definition.name = model.definitions.unique_name(name)
     set_ifc_entity_definition_name(model, definition, name)
   end
-  
+
   # This method updates all IFC name fields with the component definition name
   def update_ifc_fields( model )
     ifc_version = Settings.ifc_version
-    
+
     # check if IFC classifications are loaded
     if ifc_version && model.classifications[ifc_version]
-    
+
       # update every component definition in the model
       definitions = model.definitions
       definition_count = definitions.length

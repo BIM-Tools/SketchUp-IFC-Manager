@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcSite_su.rb
 #
 #  Copyright 2019 Jan Brouwer <jan@brewsky.nl>
@@ -45,7 +47,7 @@ module BimTools
         return IfcManager::Types::IfcLengthMeasure.new(@ifc_model, @latlong[2] )
       end
     end
-    
+
     # convert sketchup latlong coordinate (decimal) to IFC notation (degrees)
     def lat_long_ifc( coordinate )
       if Sketchup.active_model.georeferenced?

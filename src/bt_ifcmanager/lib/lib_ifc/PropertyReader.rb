@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  PropertyReader.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
@@ -110,7 +112,7 @@ module BimTools
         if BimTools::IfcManager::Settings.export_classifications
           if schema_types = @entity_dict['AppliedSchemaTypes']
             schema_types.each do |classification_name, classification_value|
-              
+
               # (?) exclude ALL IFC classifications?
               unless Settings.ifc_version == classification_name
                 @ifc_model.classifications.add_classification_to_entity(@ifc_entity, classification_name, classification_value, @entity_dict[classification_name])

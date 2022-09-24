@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  add_common_psets.rb
 #
 #  Copyright 2020 Jan Brouwer <jan@brewsky.nl>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  window.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
@@ -151,7 +153,7 @@ module BimTools::IfcManager
     # triggered from show and close window
     def set_html
       ifc_able = false
-      javascript = ''
+      javascript = +''
       selection = Sketchup.active_model.selection
       selection_count = selection.length
       html = html_header

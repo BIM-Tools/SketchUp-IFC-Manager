@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcPresentationLayerAssignment_su.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>

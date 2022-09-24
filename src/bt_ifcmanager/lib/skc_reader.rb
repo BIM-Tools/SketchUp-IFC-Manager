@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  loader.rb
 #
 #  Copyright 2021 Jan Brouwer <jan@brewsky.nl>
@@ -62,7 +64,7 @@ module BimTools
                 if @properties.include? :title
                   @name = @properties[:title]
                 end
-              end        
+              end
             end
           end
         end
@@ -80,7 +82,7 @@ module BimTools
                 element.elements.each("dp:title") do |element|
                   return element.text
                 end
-              end        
+              end
             end
           end
         end
@@ -115,7 +117,7 @@ module BimTools
           end
         end
       end
-    
+
 
       def xsd_filter()
         if @skc_filepath
@@ -175,7 +177,7 @@ module BimTools
     #   if c.name.include? 'IFC'
     #     ifc_version = c.name
     #   end
-    #   break 
+    #   break
     # end
 
 
@@ -201,7 +203,7 @@ module BimTools
 #                 break
 #               end
 #               break
-#             end        
+#             end
 #           end
 
 #           # Find XSD file name
@@ -227,8 +229,8 @@ module BimTools
 #             raise 'Unable to read classification'
 #           end
 #         end
-        
-#         # BimTools::Zip::InputStream.open(skc_file) do |io|      
+
+#         # BimTools::Zip::InputStream.open(skc_file) do |io|
 #         #   while (entry = io.get_next_entry)
 #         #     case entry.name
 #         #     when "documentProperties.xml"
@@ -246,7 +248,7 @@ module BimTools
 #         #         end
 #         #         break
 #         #       end
-#         #     when "document.xml"   
+#         #     when "document.xml"
 #         #       document = REXML::Document.new(io.read)
 #         #       document.elements.each("classificationDocument") do |element|
 #         #         element.elements.each("cls:Classification") do |element|

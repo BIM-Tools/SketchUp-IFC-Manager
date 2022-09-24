@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcClassificationReference_su.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
@@ -21,7 +23,7 @@
 
 module BimTools
   module IfcClassificationReference_su
-  
+
     # the corresponding IfcRelAssociatesClassification object
     attr_accessor :ifc_rel_associates_classification
   end # module IfcClassificationReference_su

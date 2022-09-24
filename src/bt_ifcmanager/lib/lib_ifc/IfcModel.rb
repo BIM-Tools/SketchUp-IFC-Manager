@@ -144,7 +144,7 @@ module BimTools
       # (?) could be enhanced to also accept multiple ifc types like step / ifczip / ifcxml
       # (?) could be enhanced with export options hash
       def export(file_path)
-        IfcStepWriter.new(self, 'file_schema', 'file_description', file_path, @su_model)
+        IfcManager::IfcStepWriter.new(self, 'file_schema', 'file_description', file_path, @su_model)
       end
 
       # add object class name to export summary

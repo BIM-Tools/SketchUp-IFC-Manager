@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  propertyset.rb
 #
 #  Copyright 2022 Jan Brouwer <jan@brewsky.nl>

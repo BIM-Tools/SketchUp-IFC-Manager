@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #       settings.rb
 #
 #       Copyright (C) 2020 Jan Brouwer <jan@brewsky.nl>
@@ -48,7 +50,7 @@ module BimTools::IfcManager
                   :ifc_version_compact,
                   :ifc_module,
                   :filters
-                  
+
     attr_reader :ifc_classification,
                 :ifc_classifications,
                 :active_classifications,

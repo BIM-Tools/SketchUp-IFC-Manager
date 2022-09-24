@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  step_writer.rb
 #
 #  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
@@ -27,14 +29,14 @@ module BimTools
   class IfcStepWriter
     attr_reader :su_model
     attr_accessor :ifc_objects, :owner_history, :representationcontexts, :materials, :layers, :classifications, :classificationassociations #, :site, :building, :buildingstorey
-    
+
     def initialize( ifc_model, file_schema, file_description, file_path, sketchup_objects=nil )
       @ifc_model = ifc_model
-      
+
       step_objects = get_step_objects( file_schema, file_description, sketchup_objects )
       write( file_path, step_objects )
     end
-    
+
     def get_step_objects( file_schema, file_description, sketchup_objects )
       step_objects = Array.new
       step_objects << 'ISO-10303-21'
@@ -43,17 +45,17 @@ module BimTools
       step_objects << 'END-ISO-10303-21'
       return step_objects
     end
-    
+
     def create_header_section( file_schema, file_description )
-    
+
       # get timestamp
       time = Time.new
       timestamp = time.strftime("%Y-%m-%dT%H:%M:%S")
-      
+
       # get originating_system
       version_number = Sketchup.version_number/100000000.floor
       originating_system = "SketchUp 20#{version_number.to_s} (#{Sketchup.version})"
-          
+
       step_objects = Array.new
       step_objects << 'HEADER'
       step_objects << "FILE_DESCRIPTION (('ViewDefinition [CoordinationView]'), '2;1')"
@@ -62,7 +64,7 @@ module BimTools
       step_objects << 'ENDSEC'
       return step_objects
     end
-    
+
     def create_data_section( sketchup_objects )
 
       step_objects = @ifc_model.ifc_objects().map(&:step)
