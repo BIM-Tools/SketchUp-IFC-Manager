@@ -1,0 +1,9 @@
+require_paths:
+- "C:/Program Files/SketchUp/SketchUp 2022/Tools"
+- src
+
+require:
+- sketchup-api-stubs
+
+reporters:
+- rubocop
