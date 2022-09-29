@@ -73,6 +73,7 @@ module BimTools
           end
 
           surfacestyle.side = :both
+          surfacestyle.name = su_material.name
           surfacestyle.styles = Types::Set.new([surfacestylerendering])
 
           surfacestylerendering.surfacecolour = colourrgb
