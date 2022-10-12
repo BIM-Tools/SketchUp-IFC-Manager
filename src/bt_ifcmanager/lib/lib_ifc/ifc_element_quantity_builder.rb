@@ -29,7 +29,6 @@ module BimTools
       attr_reader :ifc_element_quantity
 
       def self.build(ifc_model)
-        puts 'IfcElementQuantityBuilder'
         builder = new(ifc_model)
         yield(builder)
         builder.ifc_element_quantity
