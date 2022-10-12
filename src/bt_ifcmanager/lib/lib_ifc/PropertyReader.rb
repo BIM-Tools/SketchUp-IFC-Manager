@@ -205,9 +205,25 @@ module BimTools
             next if value.nil? || (value.is_a?(String) && value.empty?)
 
             if quantities
-              properties << IfcQuantityBuilder.build(@ifc_model, get_quantity_type(property.name)) do |builder|
+
+              if value
+                case get_quantity_type(property.name)
+                when :length
+                  ifc_value = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, long=false, geometry=false)
+                when :area
+                  ifc_value = IfcManager::Types::IfcAreaMeasure.new(@ifc_model, value)
+                when :volume
+                  ifc_value = IfcManager::Types::IfcVolumeMeasure.new(@ifc_model, value)
+                when :weight
+                  ifc_value = IfcManager::Types::IfcMassMeasure.new(@ifc_model, value)
+                end
+              end
+
+              next unless ifc_value
+
+              properties << IfcQuantityBuilder.build(@ifc_model) do |builder|
+                builder.set_value(ifc_value)
                 builder.set_name(property.name)
-                builder.set_value(value)
               end
             else
 
@@ -313,42 +329,6 @@ module BimTools
           :weight
         else # when /LENGTH/, /WIDTH/, /HEIGHT/, /DEPTH/, /PERIMETER/
           :length
-        end
-      end
-
-      def get_elementquantity(attr_dict)
-        puts 'get_elementquantity'
-        attr_dict.attribute_dictionaries.each do |qty_dict|
-          puts qty_dict.name
-        end
-
-        quantities = attr_dict.attribute_dictionaries.map do |qty_dict|
-          puts 'IfcQuantityBuilder'
-          IfcQuantityBuilder.build(@ifc_model, get_quantity_type(qty_dict.name)) do |builder|
-            builder.set_name(qty_dict.name)
-            builder.set_value(qty_dict['value'])
-          end
-        end
-        puts quantities
-        if quantities.empty?
-          false
-        else
-          IfcElementQuantityBuilder.build(@ifc_model) do |builder|
-            builder.set_name(attr_dict.name)
-            builder.set_quantities(quantities)
-          end
-        end
-      end
-
-      def add_elementquantity(attr_dict)
-        puts 'add_elementquantity'
-        propertyset = get_elementquantity(attr_dict)
-        if propertyset
-          rel_defines = @ifc::IfcRelDefinesByProperties.new(@ifc_model)
-          rel_defines.relatingpropertydefinition = propertyset
-          rel_defines
-        else
-          false
         end
       end
 

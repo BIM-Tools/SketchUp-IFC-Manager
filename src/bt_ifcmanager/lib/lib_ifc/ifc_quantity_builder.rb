@@ -28,27 +28,15 @@ module BimTools
     class IfcQuantityBuilder
       attr_reader :ifc_quantity
 
-      def self.build(ifc_model, quantity_type = :length)
-        builder = new(ifc_model, quantity_type)
+      def self.build(ifc_model)
+        builder = new(ifc_model)
         yield(builder)
         builder.ifc_quantity
       end
 
-      def initialize(ifc_model, quantity_type)
+      def initialize(ifc_model)
         @ifc = IfcManager::Settings.ifc_module
         @ifc_model = ifc_model
-        @quantity_type = quantity_type
-
-        case @quantity_type
-        when :length
-          @ifc_quantity = @ifc::IfcQuantityLength.new(@ifc_model)
-        when :area
-          @ifc_quantity = @ifc::IfcQuantityArea.new(@ifc_model)
-        when :volume
-          @ifc_quantity = @ifc::IfcQuantityVolume.new(@ifc_model)
-        when :weight
-          @ifc_quantity = @ifc::IfcQuantityWeight.new(@ifc_model)
-        end
       end
 
       def set_name(name)
@@ -56,17 +44,19 @@ module BimTools
       end
 
       def set_value(value)
-        if value
-          case @quantity_type
-          when :length
-            @ifc_quantity.lengthvalue = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, long=false, geometry=false)
-          when :area
-            @ifc_quantity.areavalue = IfcManager::Types::IfcAreaMeasure.new(@ifc_model, value)
-          when :volume
-            @ifc_quantity.volumevalue = IfcManager::Types::IfcVolumeMeasure.new(@ifc_model, value)
-          when :weight
-            @ifc_quantity.weightvalue = IfcManager::Types::IfcMassMeasure.new(@ifc_model, value)
-          end
+        case value
+        when IfcManager::Types::IfcLengthMeasure
+          @ifc_quantity = @ifc::IfcQuantityLength.new(@ifc_model)
+          @ifc_quantity.lengthvalue = value
+        when IfcManager::Types::IfcAreaMeasure
+          @ifc_quantity = @ifc::IfcQuantityArea.new(@ifc_model)
+          @ifc_quantity.areavalue = value
+        when IfcManager::Types::IfcVolumeMeasure
+          @ifc_quantity = @ifc::IfcQuantityVolume.new(@ifc_model)
+          @ifc_quantity.volumevalue = value
+        when IfcManager::Types::IfcMassMeasure
+          @ifc_quantity = @ifc::IfcQuantityWeight.new(@ifc_model)
+          @ifc_quantity.weightvalue = value
         end
       end
 

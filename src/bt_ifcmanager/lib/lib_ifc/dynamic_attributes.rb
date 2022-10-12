@@ -77,7 +77,7 @@ module BimTools
             pset_hash[pset_name].hasproperties.add(property)
 
           # IfcElementQuantity
-          when 'Qty', 'BaseQuantities'
+          when 'Qto', 'Qty', 'BaseQuantities'
             pset_name = name_parts[0] if name_parts[0] == 'BaseQuantities'
 
             unless qty_hash[pset_name]
@@ -88,9 +88,9 @@ module BimTools
               qty_hash[pset_name] = propertyset
             end
 
-            property = IfcManager::IfcQuantityBuilder.build(ifc_model, get_quantity_type(prop_name)) do |builder|
-              builder.set_name(qty_dict.name)
-              builder.set_value(get_dynamic_attribute_value(instance, key).value)
+            property = IfcManager::IfcQuantityBuilder.build(ifc_model) do |builder|
+              builder.set_value(get_dynamic_attribute_value(instance, key, quantity = true))
+              builder.set_name(prop_name)
             end
             qty_hash[pset_name].quantities.add(property)
 
@@ -154,31 +154,18 @@ module BimTools
       case units
       when 'CENTIMETERS', 'INCHES'
         if quantity
-          IfcManager::IfcQuantityBuilder.build(ifc_model, get_quantity_type(key)) do |builder|
-            builder.set_name(key)
-            builder.set_value(value)
-          end
+          IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, geometry=true)
         else
           IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value)
         end
       when 'STRING'
         IfcManager::Types::IfcLabel.new(@ifc_model, value)
       when 'FLOAT'
-        if quantity
-          IfcManager::IfcQuantityBuilder.build(ifc_model, get_quantity_type(key)) do |builder|
-            builder.set_name(key)
-            builder.set_value(value)
-          end
-        else
-          IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value)
-        end
+        IfcManager::Types::IfcReal.new(@ifc_model, value.to_f)
       else # (?) when "DEFAULT"
         if value.is_a? Length
           if quantity
-            IfcManager::IfcQuantityBuilder.build(ifc_model, get_quantity_type(key)) do |builder|
-              builder.set_name(key)
-              builder.set_value(value)
-            end
+            IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, geometry=true)
           else
             IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value)
           end
@@ -186,14 +173,7 @@ module BimTools
           # @todo catch IfcText / IfcIdentifier?
           IfcManager::Types::IfcLabel.new(@ifc_model, value)
         elsif value.is_a? Float
-          if quantity
-            IfcManager::IfcQuantityBuilder.build(ifc_model, get_quantity_type(key)) do |builder|
-              builder.set_name(key)
-              builder.set_value(value)
-            end
-          else
-            IfcManager::Types::IfcReal.new(@ifc_model, value.to_f)
-          end
+          IfcManager::Types::IfcReal.new(@ifc_model, value.to_f)
         end
       end
     end
