@@ -61,7 +61,7 @@ module BimTools::IfcManager
           @text = "No selection"
         end
         return @text.to_s
-      end # get_text
+      end
 
       def html(selection)
         return "<h1 id='title'>#{get_text(selection)}</h1>"
@@ -69,6 +69,6 @@ module BimTools::IfcManager
       def update(selection)
         self.dialog.execute_script("$('#title').html('#{get_text(selection)}');")
       end
-    end # class Title
-  end # module PropertiesWindow
+    end
+  end
 end

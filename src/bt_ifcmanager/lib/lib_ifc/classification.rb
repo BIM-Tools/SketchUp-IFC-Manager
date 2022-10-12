@@ -43,20 +43,22 @@ module BimTools
 
       def load_skc(file_name = nil)
         file_name ||= "#{@name}.skc"
-        classification = SKC.new(file_name)
-        properties = classification.properties
+        properties = SKC.new(file_name).properties
         @creator = properties[:creator]
         @revision = properties[:revision]
         @modified = properties[:modified]
       end
 
       def get_ifc_classification
-        @ifc_classification || IfcClassificationBuilder.build(@ifc_model) do |builder|
-          builder.set_name(@name)
-          builder.set_creator(@creator)
-          builder.set_edition(@revision)
-          builder.set_editiondate(@modified) if @modified
+        unless @ifc_classification
+          @ifc_classification = IfcClassificationBuilder.build(@ifc_model) do |builder|
+            builder.set_name(@name)
+            builder.set_source(@creator)
+            builder.set_edition(@revision)
+            builder.set_editiondate(@modified) if @modified
+          end
         end
+        return @ifc_classification
       end
 
       def add_classification_reference(ifc_entity, classification_value, identification = nil, location = nil)

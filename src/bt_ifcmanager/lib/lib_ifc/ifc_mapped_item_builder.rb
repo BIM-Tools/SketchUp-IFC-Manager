@@ -21,8 +21,6 @@
 #
 #
 
-require_relative 'ifc_types'
-
 module BimTools
   module IfcManager
     class IfcMappedItemBuilder

@@ -36,8 +36,8 @@ module BimTools
       case sketchup
       when Geom::Point3d, Geom::Point2d
         @coordinates = IfcManager::Types::List.new(sketchup.to_a.map do |c|
-          IfcManager::Types::IfcLengthMeasure.new(ifc_model, c)
-                                                end)
+                                                     IfcManager::Types::IfcLengthMeasure.new(ifc_model, c)
+                                                   end)
       else
         raise TypeError, 'Expected a point type.'
       end

@@ -396,6 +396,7 @@ module BimTools::IfcManager
       <div class='form-group' title='Set the active IFC version that will be used for exporting and classifing objects'>
         <h1>IFC version</h1>
 HTML
+html = String.new(html)
       # ifc_classifications = Sketchup.find_support_files('skc', 'Classifications').select {|path| File.basename(path).downcase.include? 'ifc' }
       @ifc_classifications.each_pair do |ifc_classification, load|
         checked = if load

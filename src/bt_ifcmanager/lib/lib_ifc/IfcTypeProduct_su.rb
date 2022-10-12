@@ -36,7 +36,6 @@ module BimTools
       @definition = definition
       ifc_version = IfcManager::Settings.ifc_version
       @type_properties = ifc_model.options[:type_properties]
-      @propertysets = IfcManager::Types::Set.new
 
       @rel_defines_by_type = @ifc::IfcRelDefinesByType.new(@ifc_model)
       @rel_defines_by_type.relatingtype = self

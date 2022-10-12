@@ -26,7 +26,6 @@ require 'rexml/document'
 require 'yaml'
 
 require_relative File.join('.', 'step')
-# require_relative 'ifc_entity'
 
 module BimTools
   module IfcManager
