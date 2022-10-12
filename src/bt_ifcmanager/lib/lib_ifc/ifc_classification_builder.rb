@@ -43,13 +43,12 @@ module BimTools
       end
 
       def set_name(name)
-        name = name << ' Classification' if @ifc_model.options[:classification_suffix]
         @ifc_classification.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, name)
       end
 
-      def set_creator(creator = nil)
-        if creator
-          @ifc_classification.source = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, creator)
+      def set_source(source = nil)
+        if source
+          @ifc_classification.source = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, source)
         elsif BimTools::IfcManager::Settings.ifc_version == 'IFC 2x3'
 
           # IFC 2x3

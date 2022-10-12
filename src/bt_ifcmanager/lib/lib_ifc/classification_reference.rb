@@ -32,7 +32,7 @@ module BimTools
         @ifc = IfcManager::Settings.ifc_module
         @ifc_model = ifc_model
         @classification = classification
-        @ifc_classification_reference = create_ifc_classification_reference(classification_value, identification,
+        @ifc_classification_reference = create_ifc_classification_reference(classification.name, classification_value, identification,
                                                                             location)
       end
 
@@ -42,18 +42,23 @@ module BimTools
 
       private
 
-      def create_ifc_classification_reference(name = nil, identification = nil, location = nil)
-        @ifc_classification_reference = IfcClassificationReferenceBuilder.build(@ifc_model) do |builder|
+      def create_ifc_classification_reference(classification_name, classification_value = nil, identification = nil, location = nil)
+        ifc_classification_reference = IfcClassificationReferenceBuilder.build(@ifc_model) do |builder|
           builder.set_location(location) if location
           builder.set_referencedsource(@classification.get_ifc_classification)
           builder.set_identification(identification) if identification
-          builder.set_name(name) if name
+          builder.set_name(classification_value) if classification_value
         end
         rel = @ifc::IfcRelAssociatesClassification.new(@ifc_model)
+
+        # Revit compatibility setting
+        classification_name = classification_name + ' Classification' if @ifc_model.options[:classification_suffix]
+        rel.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, classification_name)
         rel.relatedobjects = IfcManager::Types::Set.new
-        rel.relatingclassification = @ifc_classification_reference
+        rel.relatingclassification = ifc_classification_reference
         @relatedobjects = rel.relatedobjects
-        @ifc_classification_reference.ifc_rel_associates_classification = rel
+        ifc_classification_reference.ifc_rel_associates_classification = rel
+        return ifc_classification_reference
       end
     end
   end
