@@ -36,33 +36,33 @@ module BimTools
       end
 
       def initialize(ifc_model)
-        @ifc = BimTools::IfcManager::Settings.ifc_module
+        @ifc = Settings.ifc_module
         @ifc_model = ifc_model
         @ifc_classification = @ifc::IfcClassification.new(@ifc_model)
         # @ifc_model.classifications[name] = @ifc_classification
       end
 
       def set_name(name)
-        @ifc_classification.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, name)
+        @ifc_classification.name = Types::IfcLabel.new(@ifc_model, name)
       end
 
       def set_source(source = nil)
         if source
-          @ifc_classification.source = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, source)
-        elsif BimTools::IfcManager::Settings.ifc_version == 'IFC 2x3'
+          @ifc_classification.source = Types::IfcLabel.new(@ifc_model, source)
+        elsif Settings.ifc_version == 'IFC 2x3'
 
           # IFC 2x3
-          @ifc_classification.source = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, DEFAULT_SOURCE_VALUE)
+          @ifc_classification.source = Types::IfcLabel.new(@ifc_model, DEFAULT_SOURCE_VALUE)
         end
       end
 
       def set_edition(edition = nil)
         if edition
-          @ifc_classification.edition = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, edition)
-        elsif BimTools::IfcManager::Settings.ifc_version == 'IFC 2x3'
+          @ifc_classification.edition = Types::IfcLabel.new(@ifc_model, edition)
+        elsif Settings.ifc_version == 'IFC 2x3'
 
           # IFC 2x3
-          @ifc_classification.edition = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, DEFAULT_EDITION_VALUE)
+          @ifc_classification.edition = Types::IfcLabel.new(@ifc_model, DEFAULT_EDITION_VALUE)
         end
       end
 
@@ -72,13 +72,13 @@ module BimTools
         # IFC 4
         if @ifc.const_defined?(:IfcCalendarDate)
           date = @ifc::IfcCalendarDate.new(@ifc_model)
-          date.daycomponent = BimTools::IfcManager::Types::IfcInteger.new(@ifc_model, time.day)
-          date.monthcomponent = BimTools::IfcManager::Types::IfcInteger.new(@ifc_model, time.month)
-          date.yearcomponent = BimTools::IfcManager::Types::IfcInteger.new(@ifc_model, time.year)
+          date.daycomponent = Types::IfcInteger.new(@ifc_model, time.day)
+          date.monthcomponent = Types::IfcInteger.new(@ifc_model, time.month)
+          date.yearcomponent = Types::IfcInteger.new(@ifc_model, time.year)
 
         # IFC 2x3
         else
-          date = BimTools::IfcManager::Types::IfcDate.new(@ifc_model, time)
+          date = Types::IfcDate.new(@ifc_model, time)
         end
         @ifc_classification.editiondate = date
       end

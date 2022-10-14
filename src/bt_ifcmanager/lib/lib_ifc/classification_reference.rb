@@ -58,8 +58,8 @@ module BimTools
 
         # Revit compatibility setting
         classification_name += ' Classification' if @ifc_model.options[:classification_suffix]
-        rel.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, classification_name)
-        rel.relatedobjects = IfcManager::Types::Set.new
+        rel.name = Types::IfcLabel.new(@ifc_model, classification_name)
+        rel.relatedobjects = Types::Set.new
         rel.relatingclassification = ifc_classification_reference
         @relatedobjects = rel.relatedobjects
         ifc_classification_reference.ifc_rel_associates_classification = rel

@@ -33,7 +33,7 @@ module BimTools
       end
 
       def initialize(ifc_model)
-        @ifc = BimTools::IfcManager::Settings.ifc_module
+        @ifc = Settings.ifc_module
         @ifc_model = ifc_model
         @ifc_mapped_item = @ifc::IfcMappedItem.new(ifc_model)
       end

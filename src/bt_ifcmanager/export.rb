@@ -98,7 +98,7 @@ module BimTools
 
     def show_summary(hash, file_path, time)
       css = File.join(PLUGIN_PATH_CSS, 'sketchup.css')
-      html = +"<html><head><link rel='stylesheet' type='text/css' href='#{css}'></head><body><textarea readonly>#{ifc_version = BimTools::IfcManager::Settings.ifc_version} Entities exported:\n\n"
+      html = +"<html><head><link rel='stylesheet' type='text/css' href='#{css}'></head><body><textarea readonly>#{ifc_version = Settings.ifc_version} Entities exported:\n\n"
       hash.each_pair do |key, value|
         html << "#{value} #{key}\n"
       end

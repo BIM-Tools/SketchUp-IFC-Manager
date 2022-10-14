@@ -73,7 +73,7 @@ module BimTools
         }
         @options = defaults.merge(options)
 
-        @ifc = BimTools::IfcManager::Settings.ifc_module
+        @ifc = Settings.ifc_module
         @su_model = su_model
         @su_entities = @options[:export_entities]
         @ifc_id = 0
@@ -89,7 +89,7 @@ module BimTools
 
         # create object that keeps track of all different shaperepresentations for
         #   the different sketchup component definitions
-        @representation_manager = BimTools::IfcManager::RepresentationManager.new(self)
+        @representation_manager = RepresentationManager.new(self)
 
         # # create empty hash that will contain all Mapped Representations (Component Definitions)
         # @mapped_representations = {}
@@ -162,20 +162,20 @@ module BimTools
         owner_history = @ifc::IfcOwnerHistory.new(self)
         owninguser = @ifc::IfcPersonAndOrganization.new(self)
         owninguser.theperson = @ifc::IfcPerson.new(self)
-        owninguser.theperson.familyname = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, '')
+        owninguser.theperson.familyname = Types::IfcLabel.new(@ifc_model, '')
         owninguser.theorganization = @ifc::IfcOrganization.new(self)
-        owninguser.theorganization.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, '')
+        owninguser.theorganization.name = Types::IfcLabel.new(@ifc_model, '')
         # owninguser.theperson = @ifc::IfcPerson.new(self)
         # owninguser.theorganization = @ifc::IfcOrganization.new(self)
         owner_history.owninguser = owninguser
         owningapplication = @ifc::IfcApplication.new(self)
         applicationdeveloper = @ifc::IfcOrganization.new(self)
-        applicationdeveloper.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, 'BIM-Tools')
+        applicationdeveloper.name = Types::IfcLabel.new(@ifc_model, 'BIM-Tools')
         owningapplication.applicationdeveloper = applicationdeveloper
-        owningapplication.version = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, VERSION)
-        owningapplication.applicationfullname = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model,
+        owningapplication.version = Types::IfcLabel.new(@ifc_model, VERSION)
+        owningapplication.applicationfullname = Types::IfcLabel.new(@ifc_model,
                                                                                           'IFC manager for sketchup')
-        owningapplication.applicationidentifier = BimTools::IfcManager::Types::IfcIdentifier.new(@ifc_model,
+        owningapplication.applicationidentifier = Types::IfcIdentifier.new(@ifc_model,
                                                                                                  'su_ifcmanager')
         owner_history.owningapplication = owningapplication
         owner_history.changeaction = '.ADDED.'
@@ -189,7 +189,7 @@ module BimTools
       # Create new IfcGeometricRepresentationContext
       def create_representationcontext
         context = @ifc::IfcGeometricRepresentationContext.new(self)
-        context.contexttype = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, 'Model')
+        context.contexttype = Types::IfcLabel.new(@ifc_model, 'Model')
         context.coordinatespacedimension = '3'
         context.worldcoordinatesystem = @ifc::IfcAxis2Placement2D.new(self)
 
@@ -217,7 +217,7 @@ module BimTools
           ent = entities[i]
 
           # skip hidden objects if skip-hidden option is set
-          unless @options[:hidden] == false && (ent.hidden? || !BimTools::IfcManager.layer_visible?(ent.layer))
+          unless @options[:hidden] == false && (ent.hidden? || !IfcManager.layer_visible?(ent.layer))
             case ent
             when Sketchup::Group, Sketchup::ComponentInstance
               transformation = Geom::Transformation.new
@@ -244,7 +244,7 @@ module BimTools
           end
 
           ifc_entity = @ifc::IfcBuildingElementProxy.new(self, nil)
-          ifc_entity.name = BimTools::IfcManager::Types::IfcLabel.new(self, sub_entity_name)
+          ifc_entity.name = Types::IfcLabel.new(self, sub_entity_name)
           ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(self, Geom::Transformation.new)
           ifc_entity.predefinedtype = :notdefined if ifc_entity.respond_to?(:predefinedtype=)
           ifc_entity.compositiontype = :element if ifc_entity.respond_to?(:compositiontype=)

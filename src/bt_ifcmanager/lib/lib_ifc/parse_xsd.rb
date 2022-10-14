@@ -49,9 +49,9 @@ module BimTools
           create_ifcentity
           from_string(xsd_string) if xsd_string
         end
-        BimTools::IfcManager::Settings.ifc_version = ifc_version
-        BimTools::IfcManager::Settings.ifc_version_compact = ifc_version_compact
-        BimTools::IfcManager::Settings.ifc_module = @ifc_module
+        Settings.ifc_version = ifc_version
+        Settings.ifc_version_compact = ifc_version_compact
+        Settings.ifc_module = @ifc_module
       end
 
       def from_file(xsd_path)

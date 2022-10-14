@@ -37,7 +37,7 @@ module BimTools
 
       def get_definition_manager(definition)
         unless @definition_managers.key?(definition)
-          @definition_managers[definition] = BimTools::IfcManager::DefinitionManager.new(@ifc_model, definition)
+          @definition_managers[definition] = DefinitionManager.new(@ifc_model, definition)
         end
         @definition_managers[definition]
       end
@@ -49,7 +49,7 @@ module BimTools
       attr_reader :definition
 
       def initialize(ifc_model, definition)
-        @ifc = BimTools::IfcManager::Settings.ifc_module
+        @ifc = Settings.ifc_module
         @ifc_model = ifc_model
         @definition = definition
         @representations = {}
@@ -118,7 +118,7 @@ module BimTools
       def add_styling(ifc_model, brep, su_material)
         if ifc_model.options[:colors] && su_material
           unless ifc_model.materials[su_material]
-            ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
+            ifc_model.materials[su_material] = MaterialAndStyling.new(ifc_model, su_material)
           end
           ifc_model.materials[su_material].add_to_styling(brep)
         end
@@ -129,7 +129,7 @@ module BimTools
       attr_reader :brep, :shaperepresentation, :representationmap
 
       def initialize(ifc_model, faces, transformation, su_material, su_layer)
-        @ifc = BimTools::IfcManager::Settings.ifc_module
+        @ifc = Settings.ifc_module
         @brep = @ifc::IfcFacetedBrep.new(ifc_model, faces, transformation)
 
         @shaperepresentation = IfcShapeRepresentationBuilder.build(ifc_model) do |builder|
@@ -160,7 +160,7 @@ module BimTools
       def add_styling(ifc_model, brep, su_material)
         if ifc_model.options[:colors] && su_material
           unless ifc_model.materials[su_material]
-            ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
+            ifc_model.materials[su_material] = MaterialAndStyling.new(ifc_model, su_material)
           end
           ifc_model.materials[su_material].add_to_styling(brep)
         end

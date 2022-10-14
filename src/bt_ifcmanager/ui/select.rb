@@ -22,9 +22,10 @@
 
 require 'json'
 
-module BimTools::IfcManager
-  require File.join(PLUGIN_PATH_UI, 'form_element')
-    module PropertiesWindow      
+module BimTools
+  module IfcManager
+    require File.join(PLUGIN_PATH_UI, 'form_element')
+    module PropertiesWindow
       class HtmlSelect < FormElement
         attr_reader:options
 
@@ -153,3 +154,4 @@ module BimTools::IfcManager
       end
     end
   end
+end

@@ -21,41 +21,43 @@
 #
 #
 
-module BimTools::IfcManager
-  # Helper method that sets the IFC entity name for given ComponentDefinition
-  def set_ifc_entity_definition_name(_model, definition, _name)
-    ifc_version = Settings.ifc_version
-    ifc_type = definition.get_attribute 'AppliedSchemaTypes', ifc_version
-    if ifc_type
-      path = [ifc_version, ifc_type.to_s, 'Name', 'IfcLabel']
+module BimTools
+  module IfcManager
+    # Helper method that sets the IFC entity name for given ComponentDefinition
+    def set_ifc_entity_definition_name(_model, definition, _name)
+      ifc_version = Settings.ifc_version
+      ifc_type = definition.get_attribute 'AppliedSchemaTypes', ifc_version
+      if ifc_type
+        path = [ifc_version, ifc_type.to_s, 'Name', 'IfcLabel']
 
-      # overwrite the IFC label for name with the component name
-      definition.set_classification_value(path, definition.name) # (?) first check if IFC type had a name attribute?
+        # overwrite the IFC label for name with the component name
+        definition.set_classification_value(path, definition.name) # (?) first check if IFC type had a name attribute?
+      end
     end
-  end
 
-  # Helper method that sets the IFC entity name for given ComponentInstance
-  def set_ifc_entity_name(model, instance, name)
-    instance.name = name
-    definition = instance.definition
-    definition.name = model.definitions.unique_name(name)
-    set_ifc_entity_definition_name(model, definition, name)
-  end
+    # Helper method that sets the IFC entity name for given ComponentInstance
+    def set_ifc_entity_name(model, instance, name)
+      instance.name = name
+      definition = instance.definition
+      definition.name = model.definitions.unique_name(name)
+      set_ifc_entity_definition_name(model, definition, name)
+    end
 
-  # This method updates all IFC name fields with the component definition name
-  def update_ifc_fields(model)
-    ifc_version = Settings.ifc_version
+    # This method updates all IFC name fields with the component definition name
+    def update_ifc_fields(model)
+      ifc_version = Settings.ifc_version
 
-    # check if IFC classifications are loaded
-    if ifc_version && model.classifications[ifc_version]
+      # check if IFC classifications are loaded
+      if ifc_version && model.classifications[ifc_version]
 
-      # update every component definition in the model
-      definitions = model.definitions
-      definition_count = definitions.length
-      i = 0
-      while i < definition_count
-        set_ifc_entity_definition_name(model, definitions[i], name.downcase)
-        i += 1
+        # update every component definition in the model
+        definitions = model.definitions
+        definition_count = definitions.length
+        i = 0
+        while i < definition_count
+          set_ifc_entity_definition_name(model, definitions[i], name.downcase)
+          i += 1
+        end
       end
     end
   end
