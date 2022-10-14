@@ -386,7 +386,7 @@ module BimTools
       #   like: path = ["IFC 2x3", "IfcWindow", "Name", "IfcLabel"]
       if !value && attr_dict.attribute_dictionaries
         value_dicts = attr_dict.attribute_dictionaries
-        names = value_dicts.map { |x| x.name }
+        names = value_dicts.map { |x| x.name.to_sym }
         names -= UNUSED_DICTS # filter out unwanted dictionaries
 
         # there should be only one dictionary left
