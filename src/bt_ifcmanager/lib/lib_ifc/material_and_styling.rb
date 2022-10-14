@@ -26,12 +26,12 @@ module BimTools
     # Class that manages the relationship between a Sketchup material and
     #  it's IFC counterparts (material and styling)
     #
-    # @param ifc_model [BimTools::IfcManager::IfcModel]
+    # @param ifc_model [IfcModel]
     # @param su_material [Sketchup::Material] Sketckup material for which IFC material and styles will be created
     class MaterialAndStyling
       def initialize(ifc_model, su_material = nil)
         @ifc_model = ifc_model
-        @ifc = BimTools::IfcManager::Settings.ifc_module
+        @ifc = Settings.ifc_module
         material_name = if su_material
                           su_material.display_name
                         else
@@ -48,7 +48,7 @@ module BimTools
       def create_material_assoc(material_name)
         material_assoc = @ifc::IfcRelAssociatesMaterial.new(@ifc_model)
         material_assoc.relatingmaterial = @ifc::IfcMaterial.new(@ifc_model)
-        material_assoc.relatingmaterial.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, material_name)
+        material_assoc.relatingmaterial.name = Types::IfcLabel.new(@ifc_model, material_name)
         material_assoc.relatedobjects = Types::Set.new
         material_assoc
       end
@@ -64,7 +64,7 @@ module BimTools
           colourrgb = @ifc::IfcColourRgb.new(@ifc_model, su_material)
 
           # Workaround for mandatory IfcPresentationStyleAssignment in IFC2x3
-          if BimTools::IfcManager::Settings.ifc_version == 'IFC 2x3'
+          if Settings.ifc_version == 'IFC 2x3'
             styleassignment = @ifc::IfcPresentationStyleAssignment.new(@ifc_model, su_material)
             styleassignment.styles = Types::Set.new([surfacestyle])
             surface_styles = Types::Set.new([styleassignment])
@@ -73,7 +73,7 @@ module BimTools
           end
 
           surfacestyle.side = :both
-          surfacestyle.name = su_material.name
+          surfacestyle.name = Types::IfcLabel.new(@ifc_model, su_material.name)
           surfacestyle.styles = Types::Set.new([surfacestylerendering])
 
           surfacestylerendering.surfacecolour = colourrgb
@@ -82,23 +82,23 @@ module BimTools
           if su_material
 
             # add transparency, converted from Sketchup's alpha value
-            surfacestylerendering.transparency = BimTools::IfcManager::Types::IfcNormalisedRatioMeasure.new(@ifc_model,
+            surfacestylerendering.transparency = Types::IfcNormalisedRatioMeasure.new(@ifc_model,
                                                                                                      1 - su_material.alpha)
 
             # add color values, converted from 0/255 to fraction
-            colourrgb.red = BimTools::IfcManager::Types::IfcNormalisedRatioMeasure.new(@ifc_model,
+            colourrgb.red = Types::IfcNormalisedRatioMeasure.new(@ifc_model,
                                                                                 su_material.color.red.to_f / 255)
-            colourrgb.green = BimTools::IfcManager::Types::IfcNormalisedRatioMeasure.new(@ifc_model,
+            colourrgb.green = Types::IfcNormalisedRatioMeasure.new(@ifc_model,
                                                                                   su_material.color.green.to_f / 255)
-            colourrgb.blue = BimTools::IfcManager::Types::IfcNormalisedRatioMeasure.new(@ifc_model,
+            colourrgb.blue = Types::IfcNormalisedRatioMeasure.new(@ifc_model,
                                                                                  su_material.color.blue.to_f / 255)
           else
 
             # (?) use default values == white
-            surfacestylerendering.transparency = BimTools::IfcManager::Types::IfcNormalisedRatioMeasure.new(@ifc_model, 0.0)
-            colourrgb.red = BimTools::IfcManager::Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
-            colourrgb.green = BimTools::IfcManager::Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
-            colourrgb.blue = BimTools::IfcManager::Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
+            surfacestylerendering.transparency = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 0.0)
+            colourrgb.red = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
+            colourrgb.green = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
+            colourrgb.blue = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
           end
           surface_styles
         end
