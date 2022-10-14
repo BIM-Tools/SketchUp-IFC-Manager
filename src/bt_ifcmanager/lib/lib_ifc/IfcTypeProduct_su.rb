@@ -30,7 +30,7 @@ module BimTools
 
     # @param ifc_model [BimTools::IfcManager::IfcModel]
     # @param definition [Sketchup::ComponentDefinition]
-    def initialize(ifc_model, definition, instance_class=nil)
+    def initialize(ifc_model, definition, instance_class = nil)
       super(ifc_model, definition)
       @ifc = IfcManager::Settings.ifc_module
       @definition = definition

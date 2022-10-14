@@ -43,22 +43,22 @@ module BimTools
         # get properties from Sketchup object and add them to ifc object
         unless @su_object.definition.name.empty?
           @name = IfcManager::Types::IfcLabel.new(@ifc_model,
-                                                     @su_object.definition.name)
+                                                  @su_object.definition.name)
         end
         unless @su_object.definition.description.empty?
           @description = IfcManager::Types::IfcLabel.new(@ifc_model,
-                                                            @su_object.definition.description)
+                                                         @su_object.definition.description)
         end
       else
 
         # get properties from Sketchup Model and add them to ifc object
         unless @ifc_model.su_model.name.empty?
           @name = IfcManager::Types::IfcLabel.new(@ifc_model,
-                                                     @ifc_model.su_model.name)
+                                                  @ifc_model.su_model.name)
         end
         unless @ifc_model.su_model.description.empty?
           @description = IfcManager::Types::IfcLabel.new(@ifc_model,
-                                                            @ifc_model.su_model.description)
+                                                         @ifc_model.su_model.description)
         end
       end
     end

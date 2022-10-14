@@ -49,9 +49,7 @@ module BimTools
         ifc_version = IfcManager::Settings.ifc_version
         @ifc_model = ifc_model
         @ifc_entity = ifc_entity
-        if entity_dict && entity_dict[ifc_version]
-          @ifc_dict = entity_dict[ifc_version].attribute_dictionaries
-        end
+        @ifc_dict = entity_dict[ifc_version].attribute_dictionaries if entity_dict && entity_dict[ifc_version]
         @entity_dict = entity_dict
         @propertyset_names = []
         if @ifc_dict
@@ -107,14 +105,12 @@ module BimTools
       end
 
       def add_classifications
-        if IfcManager::Settings.export_classifications
-          if schema_types = @entity_dict['AppliedSchemaTypes']
-            schema_types.each do |classification_name, classification_value|
-
-              # (?) exclude ALL IFC classifications?
-              unless Settings.ifc_version == classification_name
-                @ifc_model.classifications.add_classification_to_entity(@ifc_entity, classification_name, classification_value, @entity_dict[classification_name])
-              end
+        if IfcManager::Settings.export_classifications && schema_types = @entity_dict['AppliedSchemaTypes']
+          schema_types.each do |classification_name, classification_value|
+            # (?) exclude ALL IFC classifications?
+            unless Settings.ifc_version == classification_name
+              @ifc_model.classifications.add_classification_to_entity(@ifc_entity, classification_name,
+                                                                      classification_value, @entity_dict[classification_name])
             end
           end
         end
@@ -124,19 +120,17 @@ module BimTools
       #   if defined in settings attributes
       def add_sketchup_definition_properties(ifc_model, ifc_entity, sketchup, type_properties = false)
         attributes = ifc_model.options[:attributes]
-        if attributes.include?(DEFINITION_SET_NAME) && (sketchup.attribute_dictionaries && (attr_dict = sketchup.attribute_dictionaries[DEFINITION_SET_NAME]))
-          if propertyset = get_propertyset(attr_dict)
-            if type_properties
-              if ifc_entity.haspropertysets
-                ifc_entity.haspropertysets.add(propertyset)
-              else
-                ifc_entity.haspropertysets = IfcManager::Types::Set.new([propertyset])
-              end
+        if attributes.include?(DEFINITION_SET_NAME) && (sketchup.attribute_dictionaries && (attr_dict = sketchup.attribute_dictionaries[DEFINITION_SET_NAME])) && propertyset = get_propertyset(attr_dict)
+          if type_properties
+            if ifc_entity.haspropertysets
+              ifc_entity.haspropertysets.add(propertyset)
             else
-              IfcRelDefinesByPropertiesBuilder.build(@ifc_model) do |builder|
-                builder.set_relatingpropertydefinition(propertyset)
-                builder.add_related_object(ifc_entity)
-              end
+              ifc_entity.haspropertysets = IfcManager::Types::Set.new([propertyset])
+            end
+          else
+            IfcRelDefinesByPropertiesBuilder.build(@ifc_model) do |builder|
+              builder.set_relatingpropertydefinition(propertyset)
+              builder.add_related_object(ifc_entity)
             end
           end
         end
@@ -146,12 +140,10 @@ module BimTools
       #   if defined in settings attributes
       def add_sketchup_instance_properties(ifc_model, ifc_entity, sketchup)
         attributes = ifc_model.options[:attributes]
-        if attributes.include?(INSTANCE_SET_NAME) && (sketchup.attribute_dictionaries && (attr_dict = sketchup.attribute_dictionaries[INSTANCE_SET_NAME]))
-          if propertyset = get_propertyset(attr_dict)
-            IfcRelDefinesByPropertiesBuilder.build(@ifc_model) do |builder|
-              builder.set_relatingpropertydefinition(propertyset)
-              builder.add_related_object(ifc_entity)
-            end
+        if attributes.include?(INSTANCE_SET_NAME) && (sketchup.attribute_dictionaries && (attr_dict = sketchup.attribute_dictionaries[INSTANCE_SET_NAME])) && propertyset = get_propertyset(attr_dict)
+          IfcRelDefinesByPropertiesBuilder.build(@ifc_model) do |builder|
+            builder.set_relatingpropertydefinition(propertyset)
+            builder.add_related_object(ifc_entity)
           end
         end
       end
@@ -182,11 +174,11 @@ module BimTools
       #
       # @return [IfcPropertySet, IfcElementQuantity, False]
       def get_propertyset(attr_dict)
-        if (attr_dict.name == 'BaseQuantities') || attr_dict.name.start_with?('Qto_') # export as elementquantities
-          quantities = true
-        else
-          quantities = false
-        end
+        quantities = if (attr_dict.name == 'BaseQuantities') || attr_dict.name.start_with?('Qto_') # export as elementquantities
+                       true
+                     else
+                       false
+                     end
 
         properties = []
 
@@ -209,7 +201,7 @@ module BimTools
               if value
                 case get_quantity_type(property.name)
                 when :length
-                  ifc_value = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, long=false, geometry=false)
+                  ifc_value = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, long = false, geometry = false)
                 when :area
                   ifc_value = IfcManager::Types::IfcAreaMeasure.new(@ifc_model, value)
                 when :volume
@@ -256,17 +248,15 @@ module BimTools
 
         if properties.empty?
           false
+        elsif quantities
+          IfcElementQuantityBuilder.build(@ifc_model) do |builder|
+            builder.set_name(attr_dict.name)
+            builder.set_quantities(properties)
+          end
         else
-          if quantities
-            IfcElementQuantityBuilder.build(@ifc_model) do |builder|
-              builder.set_name(attr_dict.name)
-              builder.set_quantities(properties)
-            end
-          else
-            IfcPropertySetBuilder.build(@ifc_model) do |builder|
-              builder.set_name(attr_dict.name)
-              builder.set_properties(properties)
-            end
+          IfcPropertySetBuilder.build(@ifc_model) do |builder|
+            builder.set_name(attr_dict.name)
+            builder.set_properties(properties)
           end
         end
       end
@@ -312,7 +302,7 @@ module BimTools
           when Integer
             IfcManager::Types::IfcInteger.new(@ifc_model, value, long)
           when Length
-            IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, long, geometry=false)
+            IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, long, geometry = false)
           else # Map all others to string
             IfcManager::Types::IfcText.new(@ifc_model, value, long)
           end

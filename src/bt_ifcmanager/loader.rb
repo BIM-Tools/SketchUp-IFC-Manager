@@ -122,9 +122,7 @@ module BimTools
       unless export_path.nil?
 
         # make sure file_path ends in "ifc"
-        unless ['.ifc', '.ifczip'].include? File.extname(export_path).downcase
-          export_path << '.ifc'
-        end
+        export_path << '.ifc' unless ['.ifc', '.ifczip'].include? File.extname(export_path).downcase
 
         export(export_path)
       end
@@ -155,5 +153,5 @@ module BimTools
     # @param command [UI::Command]
     # @param name [UI::Command]
     def add_icons(command, name); end
-  end # module IfcManager
-end # module BimTools
+  end
+end

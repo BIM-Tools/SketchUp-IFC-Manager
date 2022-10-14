@@ -42,7 +42,12 @@ module BimTools
 
       private
 
-      def create_ifc_classification_reference(classification_name, classification_value = nil, identification = nil, location = nil)
+      def create_ifc_classification_reference(
+        classification_name,
+        classification_value = nil,
+        identification = nil,
+        location = nil
+      )
         ifc_classification_reference = IfcClassificationReferenceBuilder.build(@ifc_model) do |builder|
           builder.set_location(location) if location
           builder.set_referencedsource(@classification.get_ifc_classification)
@@ -52,13 +57,13 @@ module BimTools
         rel = @ifc::IfcRelAssociatesClassification.new(@ifc_model)
 
         # Revit compatibility setting
-        classification_name = classification_name + ' Classification' if @ifc_model.options[:classification_suffix]
+        classification_name += ' Classification' if @ifc_model.options[:classification_suffix]
         rel.name = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, classification_name)
         rel.relatedobjects = IfcManager::Types::Set.new
         rel.relatingclassification = ifc_classification_reference
         @relatedobjects = rel.relatedobjects
         ifc_classification_reference.ifc_rel_associates_classification = rel
-        return ifc_classification_reference
+        ifc_classification_reference
       end
     end
   end

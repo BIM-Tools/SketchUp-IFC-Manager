@@ -154,7 +154,7 @@ module BimTools
       case units
       when 'CENTIMETERS', 'INCHES'
         if quantity
-          IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, geometry=true)
+          IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, geometry = true)
         else
           IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value)
         end
@@ -165,7 +165,7 @@ module BimTools
       else # (?) when "DEFAULT"
         if value.is_a? Length
           if quantity
-            IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, geometry=true)
+            IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, geometry = true)
           else
             IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value)
           end

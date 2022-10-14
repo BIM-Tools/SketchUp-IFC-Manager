@@ -23,8 +23,7 @@
 
 module BimTools
   module IfcClassificationReference_su
-
     # the corresponding IfcRelAssociatesClassification object
     attr_accessor :ifc_rel_associates_classification
-  end # module IfcClassificationReference_su
-end # module BimTools
+  end
+end

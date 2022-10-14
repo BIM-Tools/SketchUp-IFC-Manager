@@ -40,7 +40,7 @@ module BimTools
         @ifc_shape_representation = @ifc::IfcShapeRepresentation.new(ifc_model)
 
         set_representationidentifier('Body')
-        set_items()
+        set_items
       end
 
       def set_contextofitems(representationcontext)
@@ -52,20 +52,17 @@ module BimTools
       end
 
       def set_representationtype(type = nil)
-
         # Check if Mapped representation should be used
         # (?) && (sketchup.count_instances > 1) # (?) Always use mapped items? also for objects that are used only once?
-        unless type
-          type = if @ifc_model.options[:mapped_items]
-            'MappedRepresentation'
-          else
-            'Brep'
-          end
-        end
+        type ||= if @ifc_model.options[:mapped_items]
+                   'MappedRepresentation'
+                 else
+                   'Brep'
+                 end
         @ifc_shape_representation.representationtype = Types::IfcLabel.new(@ifc_model, type)
       end
 
-      def set_items(items=[])
+      def set_items(items = [])
         @ifc_shape_representation.items = Types::Set.new(items)
       end
 

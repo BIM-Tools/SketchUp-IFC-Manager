@@ -84,23 +84,28 @@ module BimTools::IfcManager
 
       # Load export options from settings
       if @options[:export]
-        @export_hidden = CheckboxOption.new('hidden', 'Export hidden objects', @options[:export][:hidden], "Everything will be exported to IFC, including those that are hidden or on a disabled tag/layer.")
+        @export_hidden = CheckboxOption.new('hidden', 'Export hidden objects', @options[:export][:hidden],
+'Everything will be exported to IFC, including those that are hidden or on a disabled tag/layer.')
         @export_classifications = CheckboxOption.new('classifications', 'Export classifications',
-                                                     @options[:export][:classifications], "Export classifications attached to objects as IfcClassification")
+                                                     @options[:export][:classifications], 'Export classifications attached to objects as IfcClassification')
         @export_layers = CheckboxOption.new('layers', 'Export tags/layers as IFC layers',
-                                            @options[:export][:layers], "Exports Sketchup tags/layers as IfcPresentationLayerAssignment")
-        @export_materials = CheckboxOption.new('materials', 'Export materials', @options[:export][:materials], "Exports the Sketchup material name as IfcMaterial")
-        @export_colors = CheckboxOption.new('colors', 'Export colors', @options[:export][:colors], "Exports the Sketchup material colors as colored IfcSurfaceStyles")
-        @export_geometry = CheckboxOption.new('geometry', 'Export geometry', @options[:export][:geometry], "When unchecked NO geometry is exported, just the model structure and metadata like classifications and properties")
+                                            @options[:export][:layers], 'Exports Sketchup tags/layers as IfcPresentationLayerAssignment')
+        @export_materials = CheckboxOption.new('materials', 'Export materials', @options[:export][:materials],
+'Exports the Sketchup material name as IfcMaterial')
+        @export_colors = CheckboxOption.new('colors', 'Export colors', @options[:export][:colors],
+'Exports the Sketchup material colors as colored IfcSurfaceStyles')
+        @export_geometry = CheckboxOption.new('geometry', 'Export geometry', @options[:export][:geometry],
+'When unchecked NO geometry is exported, just the model structure and metadata like classifications and properties')
         @export_fast_guid = CheckboxOption.new('fast_guid', "Improve export speed by using fake GUID's",
-                                               @options[:export][:fast_guid], "This replaces the official UUID4 based GUID by a similar looking random string, not recomended but export might be a bit faster.")
+                                               @options[:export][:fast_guid], 'This replaces the official UUID4 based GUID by a similar looking random string, not recomended but export might be a bit faster.')
         @export_dynamic_attributes = CheckboxOption.new('dynamic_attributes', 'Export dynamic attributes',
-                                                        @options[:export][:dynamic_attributes], "Export Dynamic Component attributes as Parametric PropertySets and Quantities as described here: https://github.com/BIM-Tools/SketchUp-IFC-Manager/wiki/Parametric-Property-Sets")
-        @export_types = CheckboxOption.new('types', 'Export IFC Type products', @options[:export][:types], "Create IfcTypeProducts for Sketchup Components that are shared between all instance entities. This nicely matches the Sketchup Component structure and results in a somewhat smaller and cleaner IFC file.")
+                                                        @options[:export][:dynamic_attributes], 'Export Dynamic Component attributes as Parametric PropertySets and Quantities as described here: https://github.com/BIM-Tools/SketchUp-IFC-Manager/wiki/Parametric-Property-Sets')
+        @export_types = CheckboxOption.new('types', 'Export IFC Type products', @options[:export][:types],
+'Create IfcTypeProducts for Sketchup Components that are shared between all instance entities. This nicely matches the Sketchup Component structure and results in a somewhat smaller and cleaner IFC file.')
         @export_type_properties = CheckboxOption.new('type_properties', 'Export IFC Type properties',
-                                                     @options[:export][:type_properties], "Attach IFC properties and classifications to the IfcTypeProduct (when enabled) instead of the Entity itself. This results in a somewhat smaller and cleaner IFC file, but support varies between tools.")
+                                                     @options[:export][:type_properties], 'Attach IFC properties and classifications to the IfcTypeProduct (when enabled) instead of the Entity itself. This results in a somewhat smaller and cleaner IFC file, but support varies between tools.')
         @export_mapped_items = CheckboxOption.new('mapped_items', 'Export IFC mapped items',
-                                                  @options[:export][:mapped_items], "The geometry for every (equally scaled) Component Definition is only exported once, this can make models much smaller")
+                                                  @options[:export][:mapped_items], 'The geometry for every (equally scaled) Component Definition is only exported once, this can make models much smaller')
         @export_classification_suffix = CheckboxOption.new('classification_suffix',
                                                            "Add 'Classification' suffix to all classifications", @options[:export][:classification_suffix], "Add ' Classification' suffix to all classification for Revit compatibility, this can help in grouping classifications in model checkers")
       end
@@ -374,7 +379,7 @@ module BimTools::IfcManager
     end
 
     def set_html
-      html = <<HTML
+      html = <<~HTML
 <head>
   <link rel='stylesheet' type='text/css' href='#{@css_bootstrap}'>
   <link rel='stylesheet' type='text/css' href='#{@css_core}'>
@@ -396,7 +401,7 @@ module BimTools::IfcManager
       <div class='form-group' title='Set the active IFC version that will be used for exporting and classifing objects'>
         <h1>IFC version</h1>
 HTML
-html = String.new(html)
+      html = String.new(html)
       # ifc_classifications = Sketchup.find_support_files('skc', 'Classifications').select {|path| File.basename(path).downcase.include? 'ifc' }
       @ifc_classifications.each_pair do |ifc_classification, load|
         checked = if load
@@ -453,7 +458,7 @@ html = String.new(html)
                                ''
                              end
 
-      footer = <<HTML
+      footer = <<~HTML
       <div class='form-group' title=''>
         <h1>Modelling preferences</h1>
         <div class="col-md-12 row" title="Always create default materials on opening a model (editable in 'settings.yml' config file).">
@@ -480,7 +485,7 @@ HTML
     class CheckboxOption
       attr_accessor :value
 
-      def initialize(name, title, initial_value, help="")
+      def initialize(name, title, initial_value, help = '')
         @name = name
         @title = title
         @value = initial_value
@@ -493,7 +498,7 @@ HTML
                   else
                     ''
                   end
-"        <div class=\"col-md-12 row\" title=\"#{@help}\">
+        "        <div class=\"col-md-12 row\" title=\"#{@help}\">
           <label class=\"check-inline\"><input type=\"checkbox\" name=\"#{@name}\" value=\"#{@name}\"#{checked}> #{@title}</label>
         </div>\n"
       end

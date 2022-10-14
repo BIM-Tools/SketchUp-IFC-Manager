@@ -25,52 +25,46 @@ require_relative 'ifc_types'
 
 module BimTools
   module IfcFacetedBrep_su
-
-
-    def initialize( ifc_model, su_faces, su_transformation )
+    def initialize(ifc_model, su_faces, su_transformation)
       super
       @ifc = BimTools::IfcManager::Settings.ifc_module
-      ifcclosedshell = @ifc::IfcClosedShell.new( ifc_model, su_faces )
+      ifcclosedshell = @ifc::IfcClosedShell.new(ifc_model, su_faces)
       @ifc_model = ifc_model
       @su_transformation = su_transformation
       @outer = ifcclosedshell
-      @vertices = Hash.new
+      @vertices = {}
 
       # multiply all transformation values to see if the component is flipped
-      if @su_transformation.xaxis * @su_transformation.yaxis % @su_transformation.zaxis < 0
-        @flipped = false
-      else
-        @flipped = true
-      end
+      @flipped = !(@su_transformation.xaxis * @su_transformation.yaxis % @su_transformation.zaxis < 0)
 
       faces = su_faces.map { |face| add_face(face) }
-      if faces.length != 0
-        ifcclosedshell.cfsfaces = IfcManager::Types::Set.new( faces )
-      end
+      ifcclosedshell.cfsfaces = IfcManager::Types::Set.new(faces) if faces.length != 0
     end
+
     def add_face(su_face)
       create_points(su_face)
-      face = @ifc::IfcFace.new( @ifc_model )
-      bounds = su_face.loops.map{|loop| create_loop(loop)}
+      face = @ifc::IfcFace.new(@ifc_model)
+      bounds = su_face.loops.map { |loop| create_loop(loop) }
       face.bounds = IfcManager::Types::Set.new(bounds)
-      return face
+      face
     end
+
     def create_loop(loop)
-
       # differenciate between inner and outer loops/bounds
-      if loop.outer?
-        bound = @ifc::IfcFaceOuterBound.new( @ifc_model )
-      else
-        bound = @ifc::IfcFaceBound.new( @ifc_model )
-      end
+      bound = if loop.outer?
+                @ifc::IfcFaceOuterBound.new(@ifc_model)
+              else
+                @ifc::IfcFaceBound.new(@ifc_model)
+              end
 
-      points = loop.vertices.map{|vert| @vertices[vert]}
-      polyloop = @ifc::IfcPolyLoop.new( @ifc_model )
+      points = loop.vertices.map { |vert| @vertices[vert] }
+      polyloop = @ifc::IfcPolyLoop.new(@ifc_model)
       bound.bound = polyloop
       bound.orientation = @flipped
-      polyloop.polygon = IfcManager::Types::List.new( points )
-      return bound
+      polyloop.polygon = IfcManager::Types::List.new(points)
+      bound
     end
+
     def create_points(su_face)
       vertices = su_face.vertices
       vert_count = vertices.length
@@ -78,7 +72,7 @@ module BimTools
       while i < vert_count
         unless @vertices[vertices[i]]
           position = vertices[i].position.transform(@su_transformation)
-          @vertices[vertices[i]] = @ifc::IfcCartesianPoint.new( @ifc_model, position)
+          @vertices[vertices[i]] = @ifc::IfcCartesianPoint.new(@ifc_model, position)
         end
         i += 1
       end

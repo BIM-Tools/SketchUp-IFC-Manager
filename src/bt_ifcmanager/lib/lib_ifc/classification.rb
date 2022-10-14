@@ -50,15 +50,13 @@ module BimTools
       end
 
       def get_ifc_classification
-        unless @ifc_classification
-          @ifc_classification = IfcClassificationBuilder.build(@ifc_model) do |builder|
-            builder.set_name(@name)
-            builder.set_source(@creator)
-            builder.set_edition(@revision)
-            builder.set_editiondate(@modified) if @modified
-          end
+        @ifc_classification ||= IfcClassificationBuilder.build(@ifc_model) do |builder|
+          builder.set_name(@name)
+          builder.set_source(@creator)
+          builder.set_edition(@revision)
+          builder.set_editiondate(@modified) if @modified
         end
-        return @ifc_classification
+        @ifc_classification
       end
 
       def add_classification_reference(ifc_entity, classification_value, identification = nil, location = nil)

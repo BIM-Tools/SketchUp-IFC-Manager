@@ -22,17 +22,17 @@
 
 module BimTools
   module IfcManager
-    module PropertiesWindow    
-      def html_header()
+    module PropertiesWindow
+      def html_header
         css_bootstrap = File.join(PLUGIN_PATH_CSS, 'bootstrap.min.css')
         css_core = File.join(PLUGIN_PATH_CSS, 'dialog.css')
         css_select2 = File.join(PLUGIN_PATH_CSS, 'select2.min.css')
         css_entityinfo = File.join(PLUGIN_PATH_CSS, 'entity_info.css')
-        
+
         js_bootstrap = File.join(PLUGIN_PATH, 'js', 'bootstrap.min.js')
         js_jquery = File.join(PLUGIN_PATH, 'js', 'jquery.min.js')
         js_select2 = File.join(PLUGIN_PATH, 'js', 'select2.min.js')
-<<HTML
+        <<~HTML
 <head>
   <title>Edit IFC properties</title>
   <meta charset="utf-8">
@@ -51,7 +51,7 @@ HTML
       end
 
       def html_footer(script)
-<<HTML
+        <<HTML
   </div>
   <script>
     $(document).ready(function(){
@@ -60,6 +60,6 @@ HTML
   </script></body>
 HTML
       end
-    end # module PropertiesWindow
-  end # module IfcManager
-end # module BimTools
+    end
+  end
+end

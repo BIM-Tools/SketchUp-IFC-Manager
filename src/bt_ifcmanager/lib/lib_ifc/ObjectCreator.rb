@@ -37,7 +37,15 @@ module BimTools::IfcManager
     # @param placement_parent [IFC ENTITY] The IFC entity that is the direct geometric parent in the sketchup model
     # @param entity_path [Hash<BimTools::IfcManager::IFC2X3::IfcSpatialStructureElement>] Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
     # @param su_material [Sketchup::Material] The parent sketchup objects material which will be used when the given one does not have a directly associated material
-    def initialize(ifc_model, su_instance, su_total_transformation, placement_parent = nil, entity_path = nil, su_material = nil, su_layer = nil)
+    def initialize(
+      ifc_model,
+      su_instance,
+      su_total_transformation,
+      placement_parent = nil,
+      entity_path = nil,
+      su_material = nil,
+      su_layer = nil
+    )
       @ifc = BimTools::IfcManager::Settings.ifc_module
       @ifc_model = ifc_model
       @entity_path = EntityPath.new(@ifc_model, entity_path)

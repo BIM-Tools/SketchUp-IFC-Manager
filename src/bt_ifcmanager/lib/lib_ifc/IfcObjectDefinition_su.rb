@@ -25,9 +25,8 @@ require_relative 'ifc_types'
 
 module BimTools
   module IfcObjectDefinition_su
-
-
     attr_accessor :decomposes, :default_related_object
+
     def initialize(ifc_model, sketchup)
       super
       @ifc = BimTools::IfcManager::Settings.ifc_module
@@ -37,26 +36,26 @@ module BimTools
     # Add an element for which this element is the spatial container
     # Like a wall thats contained in a building
     #
-    def add_contained_element( object )
+    def add_contained_element(object)
       unless @contains_elements
         @contains_elements = @ifc::IfcRelContainedInSpatialStructure.new(@ifc_model)
-        @contains_elements.relatingstructure= self
-        @contains_elements.relatedelements = IfcManager::Types::Set.new()
+        @contains_elements.relatingstructure = self
+        @contains_elements.relatedelements = IfcManager::Types::Set.new
       end
-      @contains_elements.relatedelements.add( object )
+      @contains_elements.relatedelements.add(object)
     end
 
     # Add an object from which this element is decomposed
     # Like a building is decomposed into multiple buildingstoreys
     # Or a curtainwall is decomposed into muliple members/plates
     #
-    def add_related_object( object )
+    def add_related_object(object)
       unless @decomposes
         @decomposes = @ifc::IfcRelAggregates.new(@ifc_model)
         @decomposes.relatingobject = self
-        @decomposes.relatedobjects = IfcManager::Types::Set.new()
+        @decomposes.relatedobjects = IfcManager::Types::Set.new
       end
-      @decomposes.relatedobjects.add( object )
+      @decomposes.relatedobjects.add(object)
     end
   end
 end

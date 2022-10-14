@@ -23,35 +23,31 @@
 
 module BimTools
   module IfcSite_su
-
     # add project location, if set in sketchup model
     # (!) north angle still missing?
     def set_latlong
       if Sketchup.active_model.georeferenced?
-        local_point = Geom::Point3d.new( [0,0,0] )
-        @latlong = Sketchup.active_model.point_to_latlong( local_point )
-      end
-    end
-    def latitude
-      if @latlong
-        return lat_long_ifc(@latlong[1])
-      end
-    end
-    def longtitude
-      if @latlong
-        return lat_long_ifc(@latlong[0])
-      end
-    end
-    def elevation
-      if @latlong
-        return IfcManager::Types::IfcLengthMeasure.new(@ifc_model, @latlong[2] )
+        local_point = Geom::Point3d.new([0, 0, 0])
+        @latlong = Sketchup.active_model.point_to_latlong(local_point)
       end
     end
 
+    def latitude
+      return lat_long_ifc(@latlong[1]) if @latlong
+    end
+
+    def longtitude
+      return lat_long_ifc(@latlong[0]) if @latlong
+    end
+
+    def elevation
+      return IfcManager::Types::IfcLengthMeasure.new(@ifc_model, @latlong[2]) if @latlong
+    end
+
     # convert sketchup latlong coordinate (decimal) to IFC notation (degrees)
-    def lat_long_ifc( coordinate )
+    def lat_long_ifc(coordinate)
       if Sketchup.active_model.georeferenced?
-        d = coordinate.abs()
+        d = coordinate.abs
         neg_pos = (coordinate / d).to_int
 
         # degrees
@@ -59,28 +55,28 @@ module BimTools
         deg = i * neg_pos
 
         # minutes
-        d = d - i
-        d = d * 60
+        d -= i
+        d *= 60
         i = d.to_int
 
         min = i * neg_pos
 
         # seconds
-        d = d - i
-        d = d * 60
+        d -= i
+        d *= 60
         i = d.to_int
         sec = i * neg_pos
 
         # millionth-seconds
-        d = d - i
-        d = d * 1000000
+        d -= i
+        d *= 1_000_000
         i = d.to_int
         msec = i * neg_pos
 
-         # (!) values should be Ifc INTEGER objects instead of Strings(!)
-         # (!) returned object should be of type IFC LIST instead of IFC SET
-        return IfcManager::Types::List.new([deg.to_s, min.to_s, sec.to_s, msec.to_s])
+        # (!) values should be Ifc INTEGER objects instead of Strings(!)
+        # (!) returned object should be of type IFC LIST instead of IFC SET
+        IfcManager::Types::List.new([deg.to_s, min.to_s, sec.to_s, msec.to_s])
       end
     end
-  end # module IfcSite_su
-end # module BimTools
+  end
+end

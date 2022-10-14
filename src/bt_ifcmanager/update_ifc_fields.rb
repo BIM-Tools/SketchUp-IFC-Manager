@@ -22,9 +22,8 @@
 #
 
 module BimTools::IfcManager
-
   # Helper method that sets the IFC entity name for given ComponentDefinition
-  def set_ifc_entity_definition_name(model, definition, name)
+  def set_ifc_entity_definition_name(_model, definition, _name)
     ifc_version = Settings.ifc_version
     ifc_type = definition.get_attribute 'AppliedSchemaTypes', ifc_version
     if ifc_type
@@ -44,7 +43,7 @@ module BimTools::IfcManager
   end
 
   # This method updates all IFC name fields with the component definition name
-  def update_ifc_fields( model )
+  def update_ifc_fields(model)
     ifc_version = Settings.ifc_version
 
     # check if IFC classifications are loaded

@@ -24,7 +24,6 @@
 module BimTools
   module IfcManager
     module Types
-
       class List < Array
         include Step
 
@@ -52,16 +51,14 @@ module BimTools
       class Enumeration
         attr_reader :value
 
-        def initialize( value )
+        def initialize(value)
           @value = value.to_s
         end
 
-        def step()
+        def step
           val = ".#{@value.upcase}."
-          if @long
-            val = add_long( val )
-          end
-          return val
+          val = add_long(val) if @long
+          val
         end
       end
     end

@@ -135,7 +135,7 @@ module BimTools
         dimensions.timeexponent = IfcManager::Types::IfcInteger.new(@ifc_model, unit_values[4][2])
         dimensions.electriccurrentexponent = IfcManager::Types::IfcInteger.new(@ifc_model, unit_values[4][3])
         dimensions.thermodynamictemperatureexponent = IfcManager::Types::IfcInteger.new(@ifc_model,
-                                                                                           unit_values[4][4])
+                                                                                        unit_values[4][4])
         dimensions.amountofsubstanceexponent = IfcManager::Types::IfcInteger.new(@ifc_model, unit_values[4][5])
         dimensions.luminousintensityexponent = IfcManager::Types::IfcInteger.new(@ifc_model, unit_values[4][6])
         conversionbasedunit.dimensions = dimensions

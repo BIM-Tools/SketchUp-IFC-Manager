@@ -174,8 +174,9 @@ module BimTools
         owningapplication.applicationdeveloper = applicationdeveloper
         owningapplication.version = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model, VERSION)
         owningapplication.applicationfullname = BimTools::IfcManager::Types::IfcLabel.new(@ifc_model,
-                                                                                   'IFC manager for sketchup')
-        owningapplication.applicationidentifier = BimTools::IfcManager::Types::IfcIdentifier.new(@ifc_model, 'su_ifcmanager')
+                                                                                          'IFC manager for sketchup')
+        owningapplication.applicationidentifier = BimTools::IfcManager::Types::IfcIdentifier.new(@ifc_model,
+                                                                                                 'su_ifcmanager')
         owner_history.owningapplication = owningapplication
         owner_history.changeaction = '.ADDED.'
         owner_history.lastmodifieddate = creation_date
@@ -193,12 +194,12 @@ module BimTools
         context.worldcoordinatesystem = @ifc::IfcAxis2Placement2D.new(self)
 
         # Older Sketchup versions don't have Point2d and Vector2d
-        if Geom::const_defined?(:Point2d)
+        if Geom.const_defined?(:Point2d)
           context.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self, Geom::Point2d.new(0, 0))
           context.truenorth = @ifc::IfcDirection.new(self, Geom::Vector2d.new(0, 1))
         else
-          context.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self, Geom::Point3d.new(0, 0,0))
-          context.truenorth = @ifc::IfcDirection.new(self, Geom::Vector3d.new(0, 1,0))
+          context.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self, Geom::Point3d.new(0, 0, 0))
+          context.truenorth = @ifc::IfcDirection.new(self, Geom::Vector3d.new(0, 1, 0))
         end
         context
       end

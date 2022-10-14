@@ -82,16 +82,12 @@ module BimTools
           if su_material
 
             # add transparency, converted from Sketchup's alpha value
-            surfacestylerendering.transparency = Types::IfcNormalisedRatioMeasure.new(@ifc_model,
-                                                                                                     1 - su_material.alpha)
+            surfacestylerendering.transparency = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1 - su_material.alpha)
 
             # add color values, converted from 0/255 to fraction
-            colourrgb.red = Types::IfcNormalisedRatioMeasure.new(@ifc_model,
-                                                                                su_material.color.red.to_f / 255)
-            colourrgb.green = Types::IfcNormalisedRatioMeasure.new(@ifc_model,
-                                                                                  su_material.color.green.to_f / 255)
-            colourrgb.blue = Types::IfcNormalisedRatioMeasure.new(@ifc_model,
-                                                                                 su_material.color.blue.to_f / 255)
+            colourrgb.red = Types::IfcNormalisedRatioMeasure.new(@ifc_model, su_material.color.red.to_f / 255)
+            colourrgb.green = Types::IfcNormalisedRatioMeasure.new(@ifc_model, su_material.color.green.to_f / 255)
+            colourrgb.blue = Types::IfcNormalisedRatioMeasure.new(@ifc_model, su_material.color.blue.to_f / 255)
           else
 
             # (?) use default values == white
