@@ -36,7 +36,7 @@ module BimTools
       def initialize(sketchup = nil, parent_hex_guid = nil)
         # if sketchup object has a GUID, then use that, otherwise create new
         if sketchup && defined?(sketchup.guid)
-          @hex_guid = unformat_guid(sketchup.guid)
+          @hex_guid = get_sketchup_hex_guid(sketchup)
           @hex_guid = combined_guid(@hex_guid, parent_hex_guid) if parent_hex_guid
         else
           @hex_guid = new_guid
@@ -74,6 +74,15 @@ module BimTools
           block_counter += 6
         end
         ifc_guid.to_s
+      end
+
+      # Get sketchup guid including persistent_id
+      def get_sketchup_hex_guid(sketchup)
+        if defined?(sketchup.persistent_id)
+          (unformat_guid(sketchup.guid).to_i(16) ^ sketchup.persistent_id).to_s(16).rjust(32, '0')
+        else
+          unformat_guid(sketchup.guid)
+        end
       end
 
       # recognize guid type (IFC or UUID) and reformat to unformatted hex version without dashes
