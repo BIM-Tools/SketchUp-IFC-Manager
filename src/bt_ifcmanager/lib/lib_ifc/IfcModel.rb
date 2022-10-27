@@ -162,21 +162,19 @@ module BimTools
         owner_history = @ifc::IfcOwnerHistory.new(self)
         owninguser = @ifc::IfcPersonAndOrganization.new(self)
         owninguser.theperson = @ifc::IfcPerson.new(self)
-        owninguser.theperson.familyname = Types::IfcLabel.new(@ifc_model, '')
+        owninguser.theperson.familyname = Types::IfcLabel.new(self, '')
         owninguser.theorganization = @ifc::IfcOrganization.new(self)
-        owninguser.theorganization.name = Types::IfcLabel.new(@ifc_model, '')
+        owninguser.theorganization.name = Types::IfcLabel.new(self, '')
         # owninguser.theperson = @ifc::IfcPerson.new(self)
         # owninguser.theorganization = @ifc::IfcOrganization.new(self)
         owner_history.owninguser = owninguser
         owningapplication = @ifc::IfcApplication.new(self)
         applicationdeveloper = @ifc::IfcOrganization.new(self)
-        applicationdeveloper.name = Types::IfcLabel.new(@ifc_model, 'BIM-Tools')
+        applicationdeveloper.name = Types::IfcLabel.new(self, 'BIM-Tools')
         owningapplication.applicationdeveloper = applicationdeveloper
-        owningapplication.version = Types::IfcLabel.new(@ifc_model, VERSION)
-        owningapplication.applicationfullname = Types::IfcLabel.new(@ifc_model,
-                                                                                          'IFC manager for sketchup')
-        owningapplication.applicationidentifier = Types::IfcIdentifier.new(@ifc_model,
-                                                                                                 'su_ifcmanager')
+        owningapplication.version = Types::IfcLabel.new(self, VERSION)
+        owningapplication.applicationfullname = Types::IfcLabel.new(self, 'IFC manager for sketchup')
+        owningapplication.applicationidentifier = Types::IfcIdentifier.new(self, 'su_ifcmanager')
         owner_history.owningapplication = owningapplication
         owner_history.changeaction = '.ADDED.'
         owner_history.lastmodifieddate = creation_date
@@ -189,7 +187,7 @@ module BimTools
       # Create new IfcGeometricRepresentationContext
       def create_representationcontext
         context = @ifc::IfcGeometricRepresentationContext.new(self)
-        context.contexttype = Types::IfcLabel.new(@ifc_model, 'Model')
+        context.contexttype = Types::IfcLabel.new(self, 'Model')
         context.coordinatespacedimension = '3'
         context.worldcoordinatesystem = @ifc::IfcAxis2Placement2D.new(self)
 
@@ -236,9 +234,8 @@ module BimTools
                             else
                               'project geometry'
                             end
-
-          shape_representation = IfcShapeRepresentationBuilder.build(@ifc_model) do |builder|
-            builder.set_contextofitems(@ifc_model.representationcontext)
+          shape_representation = IfcShapeRepresentationBuilder.build(self) do |builder|
+            builder.set_contextofitems(self.representationcontext)
             builder.set_representationtype
             builder.add_item(@ifc::IfcFacetedBrep.new(self, faces, Geom::Transformation.new))
           end
