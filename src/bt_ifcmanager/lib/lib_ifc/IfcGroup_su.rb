@@ -45,9 +45,6 @@ module BimTools
         # (?) set name, here? is this a duplicate?
         @name = IfcManager::Types::IfcLabel.new(ifc_model, definition.name)
 
-        # also set "tag" to component instance name?
-        # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
-
         # get attributes from su object and add them to IfcProduct
         dict_reader = IfcManager::IfcDictionaryReader.new(ifc_model, self, definition.attribute_dictionaries)
         dict_reader.set_attributes

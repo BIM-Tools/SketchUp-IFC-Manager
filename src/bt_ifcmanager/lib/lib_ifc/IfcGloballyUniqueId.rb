@@ -33,11 +33,12 @@ module BimTools
       # possible characters in GUID
       GUID64 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$'
 
-      def initialize(sketchup = nil, parent_hex_guid = nil)
+      def initialize(sketchup = nil, parent_guid = nil)
+
         # if sketchup object has a GUID, then use that, otherwise create new
         if sketchup && defined?(sketchup.guid)
           @hex_guid = get_sketchup_hex_guid(sketchup)
-          @hex_guid = combined_guid(@hex_guid, parent_hex_guid) if parent_hex_guid
+          @hex_guid = combined_guid(@hex_guid, parent_guid.to_hex) if parent_guid
         else
           @hex_guid = new_guid
         end
@@ -77,12 +78,13 @@ module BimTools
       end
 
       # Get sketchup guid including persistent_id
+      # added persistent_id as workaround for duplicate guids in Sketchup
       def get_sketchup_hex_guid(sketchup)
-        if defined?(sketchup.persistent_id)
-          (unformat_guid(sketchup.guid).to_i(16) ^ sketchup.persistent_id).to_s(16).rjust(32, '0')
-        else
-          unformat_guid(sketchup.guid)
-        end
+        # if defined?(sketchup.persistent_id)
+        #   (unformat_guid(sketchup.guid).to_i(16) ^ sketchup.persistent_id).to_s(16).rjust(32, '0')
+        # else
+        unformat_guid(sketchup.guid)
+        # end
       end
 
       # recognize guid type (IFC or UUID) and reformat to unformatted hex version without dashes
@@ -94,9 +96,23 @@ module BimTools
         end
       end
 
+      BYTECOUNT = 16
+
       # combine guid with parent guid
       def combined_guid(sketchup_guid, parent_guid)
-        guid = (sketchup_guid.to_i(16) ^ parent_guid.to_i(16)).to_s(16).rjust(32, '0')
+        byte_guid = []
+        sketchup_byte_guid = [sketchup_guid].pack("H*").unpack("C*")
+        parent_byte_guid = [parent_guid].pack("H*").unpack("C*")
+        i = 0
+        while i < BYTECOUNT do
+          # if i == 6
+          #   byte_guid[i] = 0b100 #4
+          # else
+            byte_guid[i] = sketchup_byte_guid[i] ^ parent_byte_guid[i]
+          # end
+          i += 1
+        end
+        guid = byte_guid.pack("C*").unpack("H*").first
 
         # The digit at position 1 above is always "4"
         # set the four most significant bits of the 7th byte to 0100'B, so the high nibble is "4"

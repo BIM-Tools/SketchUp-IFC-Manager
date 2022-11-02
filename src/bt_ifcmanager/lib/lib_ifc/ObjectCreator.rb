@@ -44,12 +44,14 @@ module BimTools
         su_total_transformation,
         placement_parent = nil,
         entity_path = nil,
+        guid = nil,
         su_material = nil,
         su_layer = nil
       )
         @ifc = Settings.ifc_module
         @ifc_model = ifc_model
         @entity_path = EntityPath.new(@ifc_model, entity_path)
+        @guid = IfcManager::IfcGloballyUniqueId.new(su_instance, guid)
         ent_type_name = su_instance.definition.get_attribute(
           'AppliedSchemaTypes',
           Settings.ifc_version
@@ -83,8 +85,6 @@ module BimTools
 
         entity_type = Settings.ifc_module.const_get(ent_type_name) if ent_type_name
 
-        parent_hex_guid = placement_parent.globalid.to_hex if placement_parent && placement_parent.globalid
-
         case entity_type
         when nil
 
@@ -96,14 +96,14 @@ module BimTools
           # @todo: set all correct parameters for IfcProject!!!
           @ifc_model.project.su_object = su_instance
           ifc_entity = @ifc_model.project
-          ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid) if entity_type < @ifc::IfcRoot
+          ifc_entity.globalid = @guid if entity_type < @ifc::IfcRoot
           @entity_path.add(ifc_entity)
           construct_entity(ifc_entity, placement_parent)
           faces = create_nested_objects(ifc_entity, su_instance, su_material, su_layer)
           create_geometry(su_instance.definition, ifc_entity, placement_parent, su_material, su_layer, faces)
         else
           ifc_entity = entity_type.new(@ifc_model, su_instance)
-          ifc_entity.globalid = IfcGloballyUniqueId.new(su_instance, parent_hex_guid) if entity_type < @ifc::IfcRoot
+          ifc_entity.globalid = @guid if entity_type < @ifc::IfcRoot
 
           @entity_path.add(ifc_entity)
           construct_entity(ifc_entity, placement_parent)
@@ -172,9 +172,11 @@ module BimTools
             case ent
             when Sketchup::Group, Sketchup::ComponentInstance
               ObjectCreator.new(@ifc_model,
-                                ent, @su_total_transformation,
+                                ent,
+                                @su_total_transformation,
                                 ifc_entity,
                                 @entity_path,
+                                @guid,
                                 su_material,
                                 su_layer)
             when Sketchup::Face

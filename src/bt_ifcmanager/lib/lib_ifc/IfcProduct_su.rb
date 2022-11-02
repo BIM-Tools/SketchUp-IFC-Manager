@@ -50,6 +50,10 @@ module BimTools
         name = definition.name if name.length == 0
         @name = IfcManager::Types::IfcLabel.new(ifc_model, name)
 
+        # Set "tag" to component persistant_id like the other BIM Authoring Tools like Revit, Archicad and Tekla are doing
+        # (!) persistant_id in Sketchup is unique for the ComponentInstance placement, but not within the IFC model due to nested components
+        @tag = IfcManager::Types::IfcLabel.new(ifc_model, sketchup.persistent_id.to_s)
+
         # Set IfcProductType
         if ifc_model.options[:types]
           if @ifc_model.product_types.key?(definition)
@@ -66,9 +70,6 @@ module BimTools
           end
         end
         @type_properties = ifc_model.options[:type_properties] && @type_product
-
-        # (?) set "tag" to component instance name?
-        # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
 
         # get attributes from su object and add them to IfcProduct
         if dicts = definition.attribute_dictionaries
