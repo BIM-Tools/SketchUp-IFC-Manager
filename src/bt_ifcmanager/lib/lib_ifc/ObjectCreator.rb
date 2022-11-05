@@ -84,7 +84,7 @@ module BimTools
       # Custom version of InstancePath.persistent_id_path
       #  that also works with only ComponentInstances without a face/edge leaf
       def persistent_id_path(instance_path)
-        instance_path.to_a.map{|p| p.persistent_id.to_s}.join(".")
+        instance_path.to_a.map { |p| p.persistent_id.to_s }.join('.')
       end
 
       # Create IFC entity based on the IFC classification in sketchup
@@ -117,9 +117,7 @@ module BimTools
           # Set "tag" to component persistant_id like the other BIM Authoring Tools like Revit, Archicad and Tekla are doing
           # persistant_id in Sketchup is unique for the ComponentInstance placement, but not within the IFC model due to nested components
           # therefore the full persistent_id_path hierarchy is used
-          if defined?(ifc_entity.tag)
-            ifc_entity.tag = Types::IfcLabel.new(@ifc_model, @persistent_id_path)
-          end
+          ifc_entity.tag = Types::IfcLabel.new(@ifc_model, @persistent_id_path) if defined?(ifc_entity.tag)
 
           @entity_path.add(ifc_entity)
           construct_entity(ifc_entity, placement_parent)
@@ -147,7 +145,7 @@ module BimTools
           @entity_path.set_parent(ifc_entity)
           if ifc_entity.parent.is_a?(@ifc::IfcProduct)
             ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, @su_total_transformation,
-                                                                    ifc_entity.parent.objectplacement)
+                                                                     ifc_entity.parent.objectplacement)
           else
             ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, @su_total_transformation)
           end
@@ -229,9 +227,9 @@ module BimTools
             sub_entity.name = Types::IfcLabel.new(@ifc_model, sub_entity_name)
             definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
             sub_entity.representation = definition_manager.create_representation(faces,
-                                                                                brep_transformation,
-                                                                                su_material,
-                                                                                su_layer)
+                                                                                 brep_transformation,
+                                                                                 su_material,
+                                                                                 su_layer)
             sub_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
 
             sub_entity.compositiontype = :element if sub_entity.respond_to?(:compositiontype=)
@@ -254,9 +252,9 @@ module BimTools
             sub_entity.name = Types::IfcLabel.new(@ifc_model, sub_entity_name)
             definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
             sub_entity.representation = definition_manager.create_representation(faces,
-                                                                                brep_transformation,
-                                                                                su_material,
-                                                                                su_layer)
+                                                                                 brep_transformation,
+                                                                                 su_material,
+                                                                                 su_layer)
             sub_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
 
             sub_entity.predefinedtype = :notdefined if sub_entity.respond_to?(:predefinedtype=)
@@ -279,9 +277,9 @@ module BimTools
             sub_entity.name = Types::IfcLabel.new(@ifc_model, sub_entity_name)
             definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
             sub_entity.representation = definition_manager.create_representation(faces,
-                                                                                brep_transformation,
-                                                                                su_material,
-                                                                                su_layer)
+                                                                                 brep_transformation,
+                                                                                 su_material,
+                                                                                 su_layer)
             sub_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
 
             sub_entity.predefinedtype = :notdefined if sub_entity.respond_to?(:predefinedtype=)
@@ -308,18 +306,18 @@ module BimTools
                 end
               else
                 placement_parent.representation = definition_manager.create_representation(faces,
-                                                                                          transformation,
-                                                                                          su_material,
-                                                                                          su_layer)
+                                                                                           transformation,
+                                                                                           su_material,
+                                                                                           su_layer)
               end
             else
               entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
               entity.name = Types::IfcLabel.new(@ifc_model, definition.name)
               definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
               entity.representation = definition_manager.create_representation(faces,
-                                                                              brep_transformation,
-                                                                              su_material,
-                                                                              su_layer)
+                                                                               brep_transformation,
+                                                                               su_material,
+                                                                               su_layer)
               entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
 
               # IFC 4
@@ -343,9 +341,9 @@ module BimTools
           else
             definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
             ifc_entity.representation = definition_manager.create_representation(faces,
-                                                                                brep_transformation,
-                                                                                su_material,
-                                                                                su_layer)
+                                                                                 brep_transformation,
+                                                                                 su_material,
+                                                                                 su_layer)
           end
         end
       end

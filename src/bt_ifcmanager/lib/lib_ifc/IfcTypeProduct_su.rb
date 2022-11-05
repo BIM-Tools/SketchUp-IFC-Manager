@@ -40,7 +40,8 @@ module BimTools
       @rel_defines_by_type = @ifc::IfcRelDefinesByType.new(@ifc_model)
       @rel_defines_by_type.relatingtype = self
       @rel_defines_by_type.relatedobjects = IfcManager::Types::Set.new
-      @rel_defines_by_type.globalid = IfcManager::IfcGloballyUniqueId.new(ifc_model, "IfcTypeProduct.#{definition.name}")
+      @rel_defines_by_type.globalid = IfcManager::IfcGloballyUniqueId.new(ifc_model,
+                                                                          "IfcTypeProduct.#{definition.name}")
 
       @name = IfcManager::Types::IfcLabel.new(ifc_model, definition.name)
       @globalid = IfcManager::IfcGloballyUniqueId.new(ifc_model, "IfcRelDefinesByType.#{definition.name}")

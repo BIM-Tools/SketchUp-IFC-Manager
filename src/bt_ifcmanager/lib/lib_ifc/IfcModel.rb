@@ -242,7 +242,7 @@ module BimTools
                               'project geometry'
                             end
           shape_representation = IfcShapeRepresentationBuilder.build(self) do |builder|
-            builder.set_contextofitems(self.representationcontext)
+            builder.set_contextofitems(@representationcontext)
             builder.set_representationtype
             builder.add_item(@ifc::IfcFacetedBrep.new(self, faces, Geom::Transformation.new))
           end
