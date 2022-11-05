@@ -851,6 +851,23 @@ module BimTools::IfcManager::Types
 
   # TYPE IfcURIReference = STRING;
   # END_TYPE;
+  class IfcURIReference < BaseType
+    def initialize(ifc_model, value, long = false)
+      super
+      begin
+        @value = value.to_s
+      rescue StandardError, TypeError => e
+        puts "Value cannot be converted to a String: #{e}"
+      end
+    end
+
+    def step
+      str_replace = replace_char(@value)
+      val = "'#{str_replace}'"
+      val = add_long(val) if @long
+      val
+    end
+  end
 
   # TYPE IfcVaporPermeabilityMeasure = REAL;
   # END_TYPE;

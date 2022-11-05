@@ -67,20 +67,28 @@ module BimTools
       end
 
       def set_editiondate(editiondate)
-        time = Time.parse(editiondate)
+        if editiondate
+          time = Time.parse(editiondate)
 
-        # IFC 4
-        if @ifc.const_defined?(:IfcCalendarDate)
-          date = @ifc::IfcCalendarDate.new(@ifc_model)
-          date.daycomponent = Types::IfcInteger.new(@ifc_model, time.day)
-          date.monthcomponent = Types::IfcInteger.new(@ifc_model, time.month)
-          date.yearcomponent = Types::IfcInteger.new(@ifc_model, time.year)
+          # IFC 4
+          if @ifc.const_defined?(:IfcCalendarDate)
+            date = @ifc::IfcCalendarDate.new(@ifc_model)
+            date.daycomponent = Types::IfcInteger.new(@ifc_model, time.day)
+            date.monthcomponent = Types::IfcInteger.new(@ifc_model, time.month)
+            date.yearcomponent = Types::IfcInteger.new(@ifc_model, time.year)
 
-        # IFC 2x3
-        else
-          date = Types::IfcDate.new(@ifc_model, time)
+          # IFC 2x3
+          else
+            date = Types::IfcDate.new(@ifc_model, time)
+          end
+          @ifc_classification.editiondate = date
         end
-        @ifc_classification.editiondate = date
+      end
+
+      def set_location(location = nil)
+        if location && defined?(@ifc_classification.location)
+          @ifc_classification.location = IfcManager::Types::IfcURIReference.new(@ifc_model, location)
+        end
       end
     end
   end

@@ -39,8 +39,11 @@ module BimTools
       end
 
       def set_location(location)
-        # TODO: catch IFC4 change IfcLabel to IfcURIReference
-        @ifc_classification_reference.location = IfcManager::Types::IfcLabel.new(@ifc_model, location)
+        if Settings.ifc_version == 'IFC 2x3'
+          @ifc_classification_reference.location = IfcManager::Types::IfcLabel.new(@ifc_model, location)
+        else
+          @ifc_classification_reference.location = IfcManager::Types::IfcURIReference.new(@ifc_model, location)
+        end
       end
 
       def set_identification(identification)

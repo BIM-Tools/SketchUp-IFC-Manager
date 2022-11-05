@@ -35,28 +35,42 @@ module BimTools
         @name = classification_name
         @ifc_classification = nil
         @classification_references = {}
-        load_skc(skc_file)
-        @creator = nil
-        @revision = nil
-        @modified = nil
+        @source = nil
+        @edition = nil
+        @editiondate = nil
+        @location = nil
+        # load_skc(skc_file)
+        get_classifiction_details
       end
 
-      def load_skc(file_name = nil)
-        file_name ||= "#{@name}.skc"
-        properties = SKC.new(file_name).properties
-        @creator = properties[:creator]
-        @revision = properties[:revision]
-        @modified = properties[:modified]
-      end
+      # def load_skc(file_name = nil)
+      #   file_name ||= "#{@name}.skc"
+      #   properties = SKC.new(file_name).properties
+      #   @source = properties[:creator]
+      #   @edition = properties[:revision]
+      #   @editiondate = properties[:modified]
+      # end
 
       def get_ifc_classification
         @ifc_classification ||= IfcClassificationBuilder.build(@ifc_model) do |builder|
           builder.set_name(@name)
-          builder.set_source(@creator)
-          builder.set_edition(@revision)
-          builder.set_editiondate(@modified) if @modified
+          builder.set_source(@source)
+          builder.set_edition(@edition)
+          builder.set_editiondate(@editiondate)
+          builder.set_location(@location)
         end
-        @ifc_classification
+      end
+
+      def get_classifiction_details
+        su_model = @ifc_model.su_model
+        if project_data = su_model.attribute_dictionaries['IfcManager']
+          if classifications = project_data.attribute_dictionaries['Classifications']
+            @source = classifications.get_attribute(@name, 'source')
+            @edition = classifications.get_attribute(@name, 'edition')
+            @editiondate = classifications.get_attribute(@name, 'editiondate')
+            @location = classifications.get_attribute(@name, 'location')
+          end
+        end
       end
 
       def add_classification_reference(ifc_entity, classification_value, identification = nil, location = nil)

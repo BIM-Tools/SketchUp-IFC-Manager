@@ -64,7 +64,7 @@ module BimTools
       end
 
       def get_location(classification_dictionary)
-        if dictionary = classification_dictionary['Location']
+        if dictionary = classification_dictionary.attribute_dictionary('Location')
           if value = dictionary['value']
             return value
           elsif value_dictionary = dictionary.attribute_dictionaries[dictionary.name]
