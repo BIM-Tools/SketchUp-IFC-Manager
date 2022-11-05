@@ -88,7 +88,7 @@ module BimTools
         if @ifc_model.options[:mapped_items]
           definition_representation = get_representation(faces, transformation, su_material, su_layer)
           target = @ifc::IfcCartesianTransformationOperator3D.new(@ifc_model)
-          target.localorigin = @ifc::IfcCartesianPoint.new(@ifc_model, Geom::Point3d.new)
+          target.localorigin = @ifc_model.default_location
 
           mapped_item = IfcMappedItemBuilder.build(@ifc_model) do |builder|
             builder.set_mappingsource(definition_representation.representationmap)
