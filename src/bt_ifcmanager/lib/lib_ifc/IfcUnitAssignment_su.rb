@@ -59,14 +59,14 @@ module BimTools
     IFC_UNITS = {
       CubicMillimeter: %i[volumeunit milli cubic_metre],
       CubicCentimeter: %i[volumeunit centi cubic_metre],
-      CubicMeter: [:volumeunit, '*', :cubic_metre],
+      CubicMeter: [:volumeunit, nil, :cubic_metre],
       Liter: %i[volumeunit deci cubic_metre],
       Millimeter: %i[lengthunit milli metre],
       Centimeter: %i[lengthunit centi metre],
-      Meter: [:lengthunit, '*', :metre],
+      Meter: [:lengthunit, nil, :metre],
       SquareMillimeter: %i[areaunit milli square_metre],
       SquareCentimeter: %i[areaunit centi square_metre],
-      SquareMeter: [:areaunit, '*', :square_metre]
+      SquareMeter: [:areaunit, nil, :square_metre]
     }
 
     CONVERSIONBASEDUNITS = {
