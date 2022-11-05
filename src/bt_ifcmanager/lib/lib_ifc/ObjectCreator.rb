@@ -43,15 +43,18 @@ module BimTools
         su_instance,
         su_total_transformation,
         placement_parent = nil,
+        instance_path = nil,
         entity_path = nil,
-        guid = nil,
         su_material = nil,
         su_layer = nil
       )
         @ifc = Settings.ifc_module
         @ifc_model = ifc_model
+        instances = instance_path.to_a + [su_instance]
+        @instance_path = Sketchup::InstancePath.new(instances)
+        @persistent_id_path = persistent_id_path(@instance_path)
         @entity_path = EntityPath.new(@ifc_model, entity_path)
-        @guid = IfcManager::IfcGloballyUniqueId.new(su_instance, guid)
+        @guid = IfcManager::IfcGloballyUniqueId.new(@ifc_model, @persistent_id_path)
         ent_type_name = su_instance.definition.get_attribute(
           'AppliedSchemaTypes',
           Settings.ifc_version
@@ -77,6 +80,12 @@ module BimTools
       end
 
       private
+
+      # Custom version of InstancePath.persistent_id_path
+      #  that also works with only ComponentInstances without a face/edge leaf
+      def persistent_id_path(instance_path)
+        instance_path.to_a.map{|p| p.persistent_id.to_s}.join(".")
+      end
 
       # Create IFC entity based on the IFC classification in sketchup
       def create_ifc_entity(ent_type_name, su_instance, placement_parent = nil, su_material = nil, su_layer = nil)
@@ -104,6 +113,13 @@ module BimTools
         else
           ifc_entity = entity_type.new(@ifc_model, su_instance)
           ifc_entity.globalid = @guid if entity_type < @ifc::IfcRoot
+
+          # Set "tag" to component persistant_id like the other BIM Authoring Tools like Revit, Archicad and Tekla are doing
+          # persistant_id in Sketchup is unique for the ComponentInstance placement, but not within the IFC model due to nested components
+          # therefore the full persistent_id_path hierarchy is used
+          if defined?(ifc_entity.tag)
+            ifc_entity.tag = Types::IfcLabel.new(@ifc_model, @persistent_id_path)
+          end
 
           @entity_path.add(ifc_entity)
           construct_entity(ifc_entity, placement_parent)
@@ -175,8 +191,8 @@ module BimTools
                                 ent,
                                 @su_total_transformation,
                                 ifc_entity,
+                                @instance_path,
                                 @entity_path,
-                                @guid,
                                 su_material,
                                 su_layer)
             when Sketchup::Face

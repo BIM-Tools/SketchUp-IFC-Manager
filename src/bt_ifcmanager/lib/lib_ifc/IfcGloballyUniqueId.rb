@@ -33,12 +33,14 @@ module BimTools
       # possible characters in GUID
       GUID64 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$'
 
-      def initialize(sketchup = nil, parent_guid = nil)
-
-        # if sketchup object has a GUID, then use that, otherwise create new
-        if sketchup && defined?(sketchup.guid)
-          @hex_guid = get_sketchup_hex_guid(sketchup)
-          @hex_guid = combined_guid(@hex_guid, parent_guid.to_hex) if parent_guid
+      def initialize(ifc_model = nil, instance_path = nil)
+        if ifc_model && instance_path
+          uuid = ifc_model.project_data.get_attribute('uuid', instance_path)
+          unless uuid
+            uuid = SecureRandom.uuid
+            ifc_model.project_data.set_attribute('uuid', instance_path, uuid)
+          end
+          @hex_guid = unformat_guid(uuid)
         else
           @hex_guid = new_guid
         end
@@ -94,36 +96,6 @@ module BimTools
         else
           guid.tr('-', '')
         end
-      end
-
-      BYTECOUNT = 16
-
-      # combine guid with parent guid
-      def combined_guid(sketchup_guid, parent_guid)
-        byte_guid = []
-        sketchup_byte_guid = [sketchup_guid].pack("H*").unpack("C*")
-        parent_byte_guid = [parent_guid].pack("H*").unpack("C*")
-        i = 0
-        while i < BYTECOUNT do
-          # if i == 6
-          #   byte_guid[i] = 0b100 #4
-          # else
-            byte_guid[i] = sketchup_byte_guid[i] ^ parent_byte_guid[i]
-          # end
-          i += 1
-        end
-        guid = byte_guid.pack("C*").unpack("H*").first
-
-        # The digit at position 1 above is always "4"
-        # set the four most significant bits of the 7th byte to 0100'B, so the high nibble is "4"
-        guid[12] = '4'
-
-        # and the digit at position 2 is always one of "8", "9", "A" or "B".
-        # set the two most significant bits of the 9th byte to 10'B, so the high nibble will be one of "8", "9", "A", or "B".
-        bin = [guid[16]].pack('H*').unpack('B*')[0]
-        bin[0..1] = '10'
-        guid[16] = [bin].pack('B*').unpack('H*')[0][0]
-        guid
       end
 
       # convert IfcGloballyUniqueId into unformatted hex number

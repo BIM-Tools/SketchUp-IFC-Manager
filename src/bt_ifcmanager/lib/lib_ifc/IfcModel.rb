@@ -43,7 +43,7 @@ module BimTools
 
       attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications,
                     :classificationassociations, :product_types, :property_enumerations
-      attr_reader :su_model, :project, :ifc_objects, :export_summary, :options, :su_entities, :units,
+      attr_reader :su_model, :project, :ifc_objects, :project_data, :export_summary, :options, :su_entities, :units,
                   :default_location, :default_axis, :default_refdirection, :default_placement, :representation_manager
 
       # creates an IFC model based on given su model
@@ -72,6 +72,11 @@ module BimTools
           root_entities: []
         }
         @options = defaults.merge(options)
+
+        su_model.set_attribute('IfcManager', 'description', '')
+        @project_data = su_model.attribute_dictionaries['IfcManager']
+        project_uuid = @project_data.get_attribute('uuid', 'IfcProject', SecureRandom.uuid)
+        @project_data.set_attribute('uuid', 'IfcProject', project_uuid)
 
         @ifc = Settings.ifc_module
         @su_model = su_model
@@ -102,6 +107,7 @@ module BimTools
 
         # create new IfcProject
         @project = @ifc::IfcProject.new(self, su_model)
+        @project.globalid = IfcManager::IfcGloballyUniqueId.new(self, 'IfcProject')
 
         # set_units
         @units = @project.unitsincontext
@@ -207,6 +213,8 @@ module BimTools
       # @param entities [Sketchup::Entities]
       def create_ifc_objects(entities)
         faces = []
+        transformation = Geom::Transformation.new
+        instance_path = Sketchup::InstancePath.new([])
         entity_path = EntityPath.new(self)
         entity_path.add(@project)
         entitiy_count = entities.length
@@ -218,8 +226,7 @@ module BimTools
           unless @options[:hidden] == false && (ent.hidden? || !IfcManager.layer_visible?(ent.layer))
             case ent
             when Sketchup::Group, Sketchup::ComponentInstance
-              transformation = Geom::Transformation.new
-              ObjectCreator.new(self, ent, transformation, @project, entity_path)
+              ObjectCreator.new(self, ent, transformation, @project, instance_path, entity_path)
             when Sketchup::Face
               faces << ent
             end

@@ -43,7 +43,10 @@ module BimTools
       end
 
       def set_name(name)
-        @ifc_property_set.name = IfcManager::Types::IfcLabel.new(@ifc_model, name) if name
+        @ifc_property_set.name = IfcManager::Types::IfcLabel.new(@ifc_model, name)
+
+        # @todo before adding persistent GlobalId prevent duplicate IfcPropertySet definitions
+        # @ifc_property_set.globalid = IfcManager::IfcGloballyUniqueId.new(@ifc_model, "IfcPropertySet.#{name}")
       end
 
       def add_related_object(ifc_object)

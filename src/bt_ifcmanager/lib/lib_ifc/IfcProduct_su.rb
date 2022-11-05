@@ -50,10 +50,6 @@ module BimTools
         name = definition.name if name.length == 0
         @name = IfcManager::Types::IfcLabel.new(ifc_model, name)
 
-        # Set "tag" to component persistant_id like the other BIM Authoring Tools like Revit, Archicad and Tekla are doing
-        # (!) persistant_id in Sketchup is unique for the ComponentInstance placement, but not within the IFC model due to nested components
-        @tag = IfcManager::Types::IfcLabel.new(ifc_model, sketchup.persistent_id.to_s)
-
         # Set IfcProductType
         if ifc_model.options[:types]
           if @ifc_model.product_types.key?(definition)

@@ -32,21 +32,27 @@ module BimTools
       def initialize(ifc_model, su_material = nil)
         @ifc_model = ifc_model
         @ifc = Settings.ifc_module
-        material_name = if su_material
-                          su_material.display_name
-                        else
-                          'Default'
-                        end
-        @material_assoc = create_material_assoc(material_name)
+        @material_assoc = create_material_assoc(su_material)
         @surface_styles = create_surface_styles(su_material)
       end
 
       # Creates IfcRelAssociatesMaterial
       #
-      # @param material_name [string]
+      # @param su_material [Sketchup::Material]
       # @return [IfcRelAssociatesMaterial] Material association
-      def create_material_assoc(material_name)
+      def create_material_assoc(su_material)
+        material_name = if su_material
+                          su_material.display_name
+                        else
+                          'Default'
+                        end
+        persistent_id = if su_material
+                          su_material.persistent_id
+                        else
+                          'IfcMaterial.Default'
+                        end
         material_assoc = @ifc::IfcRelAssociatesMaterial.new(@ifc_model)
+        material_assoc.globalid = IfcManager::IfcGloballyUniqueId.new(@ifc_model, persistent_id)
         material_assoc.relatingmaterial = @ifc::IfcMaterial.new(@ifc_model)
         material_assoc.relatingmaterial.name = Types::IfcLabel.new(@ifc_model, material_name)
         material_assoc.relatedobjects = Types::Set.new
