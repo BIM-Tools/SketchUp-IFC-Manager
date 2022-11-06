@@ -676,6 +676,18 @@ module BimTools::IfcManager::Types
       super
       BimTools::IfcManager.add_export_message('IfcPositiveLengthMeasure must be a positive number!') if @value <= 0
     end
+
+    def step
+      if @value.zero?
+        return nil
+      else
+        if @geometry
+          to_step_string(convert)
+        else
+          to_step_string(@value)
+        end
+      end
+    end
   end
 
   # TYPE IfcPositivePlaneAngleMeasure = IfcPlaneAngleMeasure;

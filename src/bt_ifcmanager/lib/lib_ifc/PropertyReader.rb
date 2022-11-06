@@ -393,7 +393,7 @@ module BimTools
 
           # Sometimes the value is even nested a level deeper
           #   like: path = ["IFC 2x3", "IfcWindow", "OverallWidth", "IfcPositiveLengthMeasure", "IfcLengthMeasure"]
-          #   (!) This deepest level does not contain the ifc_type we need!
+          #   @todo: This deepest level does not contain the ifc_type we need!
           if !@value && value_dict.attribute_dictionaries
             subtype_dicts = value_dict.attribute_dictionaries
             names = subtype_dicts.map { |x| x.name }
