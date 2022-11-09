@@ -62,7 +62,6 @@ module BimTools
         rel.relatedobjects = Types::Set.new
         rel.relatingclassification = ifc_classification_reference
         @relatedobjects = rel.relatedobjects
-        ifc_classification_reference.ifc_rel_associates_classification = rel
         ifc_classification_reference
       end
     end
