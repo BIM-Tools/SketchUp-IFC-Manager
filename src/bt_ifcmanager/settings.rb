@@ -33,7 +33,8 @@
 #   fast_guid:           false, # create simplified guids
 #   dynamic_attributes:  false, # export dynamic component data
 #   open_file:           false, # open created file in given/default application
-#   mapped_items:        true
+#   mapped_items:        true,  # Export IFC mapped items
+#   model_axes:          true   # Export using model axes instead of Sketchup internal origin
 # load:
 #   classifications:     [],    # ["NL-SfB 2005, tabel 1", "DIN 276-1"]
 #   default_materials:   false  # {'beton'=>[142, 142, 142],'hout'=>[129, 90, 35],'staal'=>[198, 198, 198],'gips'=>[255, 255, 255],'zink'=>[198, 198, 198],'hsb'=>[204, 161, 0],'metselwerk'=>[102, 51, 0],'steen'=>[142, 142, 142],'zetwerk'=>[198, 198, 198],'tegel'=>[255, 255, 255],'aluminium'=>[198, 198, 198],'kunststof'=>[255, 255, 255],'rvs'=>[198, 198, 198],'pannen'=>[30, 30, 30],'bitumen'=>[30, 30, 30],'epdm'=>[30, 30, 30],'isolatie'=>[255, 255, 50],'kalkzandsteen'=>[255, 255, 255],'metalstud'=>[198, 198, 198],'gibo'=>[255, 255, 255],'glas'=>[204, 255, 255],'multiplex'=>[255, 216, 101],'cementdekvloer'=>[198, 198, 198]}
@@ -85,30 +86,84 @@ module BimTools
 
         # Load export options from settings
         if @options[:export]
-          @export_hidden = CheckboxOption.new('hidden', 'Export hidden objects', @options[:export][:hidden],
-  'Everything will be exported to IFC, including those that are hidden or on a disabled tag/layer.')
-          @export_classifications = CheckboxOption.new('classifications', 'Export classifications',
-                                                      @options[:export][:classifications], 'Export classifications attached to objects as IfcClassification')
-          @export_layers = CheckboxOption.new('layers', 'Export tags/layers as IFC layers',
-                                              @options[:export][:layers], 'Exports Sketchup tags/layers as IfcPresentationLayerAssignment')
-          @export_materials = CheckboxOption.new('materials', 'Export materials', @options[:export][:materials],
-  'Exports the Sketchup material name as IfcMaterial')
-          @export_colors = CheckboxOption.new('colors', 'Export colors', @options[:export][:colors],
-  'Exports the Sketchup material colors as colored IfcSurfaceStyles')
-          @export_geometry = CheckboxOption.new('geometry', 'Export geometry', @options[:export][:geometry],
-  'When unchecked NO geometry is exported, just the model structure and metadata like classifications and properties')
-          @export_fast_guid = CheckboxOption.new('fast_guid', "Improve export speed by using fake GUID's",
-                                                @options[:export][:fast_guid], 'This replaces the official UUID4 based GUID by a similar looking random string, not recomended but export might be a bit faster.')
-          @export_dynamic_attributes = CheckboxOption.new('dynamic_attributes', 'Export dynamic attributes',
-                                                          @options[:export][:dynamic_attributes], 'Export Dynamic Component attributes as Parametric PropertySets and Quantities as described here: https://github.com/BIM-Tools/SketchUp-IFC-Manager/wiki/Parametric-Property-Sets')
-          @export_types = CheckboxOption.new('types', 'Export IFC Type products', @options[:export][:types],
-  'Create IfcTypeProducts for Sketchup Components that are shared between all instance entities. This nicely matches the Sketchup Component structure and results in a somewhat smaller and cleaner IFC file.')
-          @export_type_properties = CheckboxOption.new('type_properties', 'Export IFC Type properties',
-                                                      @options[:export][:type_properties], 'Attach IFC properties and classifications to the IfcTypeProduct (when enabled) instead of the Entity itself. This results in a somewhat smaller and cleaner IFC file, but support varies between tools.')
-          @export_mapped_items = CheckboxOption.new('mapped_items', 'Export IFC mapped items',
-                                                    @options[:export][:mapped_items], 'The geometry for every (equally scaled) Component Definition is only exported once, this can make models much smaller')
-          @export_classification_suffix = CheckboxOption.new('classification_suffix',
-                                                            "Add 'Classification' suffix to all classifications", @options[:export][:classification_suffix], "Add ' Classification' suffix to all classification for Revit compatibility, this can help in grouping classifications in model checkers")
+          @export_hidden = CheckboxOption.new(
+            'hidden',
+            'Export hidden objects',
+            @options[:export][:hidden],
+            'Everything will be exported to IFC, including those that are hidden or on a disabled tag/layer.'
+          )
+          @export_classifications = CheckboxOption.new(
+            'classifications',
+            'Export classifications',
+            @options[:export][:classifications],
+            'Export classifications attached to objects as IfcClassification'
+          )
+          @export_layers = CheckboxOption.new(
+            'layers',
+            'Export tags/layers as IFC layers',
+            @options[:export][:layers],
+            'Exports Sketchup tags/layers as IfcPresentationLayerAssignment'
+          )
+          @export_materials = CheckboxOption.new(
+            'materials',
+            'Export materials',
+            @options[:export][:materials],
+            'Exports the Sketchup material name as IfcMaterial'
+          )
+          @export_colors = CheckboxOption.new(
+            'colors',
+            'Export colors',
+            @options[:export][:colors],
+            'Exports the Sketchup material colors as colored IfcSurfaceStyles'
+          )
+          @export_geometry = CheckboxOption.new(
+            'geometry',
+            'Export geometry',
+            @options[:export][:geometry],
+            'When unchecked NO geometry is exported, just the model structure and metadata like classifications and properties'
+          )
+          @export_fast_guid = CheckboxOption.new(
+            'fast_guid',
+            "Improve export speed by using fake GUID's",
+            @options[:export][:fast_guid],
+            'This replaces the official UUID4 based GUID by a similar looking random string, not recomended but export might be a bit faster.'
+          )
+          @export_dynamic_attributes = CheckboxOption.new(
+            'dynamic_attributes',
+            'Export dynamic attributes',
+            @options[:export][:dynamic_attributes],
+            'Export Dynamic Component attributes as Parametric PropertySets and Quantities as described here: https://github.com/BIM-Tools/SketchUp-IFC-Manager/wiki/Parametric-Property-Sets'
+          )
+          @export_types = CheckboxOption.new(
+            'types',
+            'Export IFC Type products',
+            @options[:export][:types],
+            'Create IfcTypeProducts for Sketchup Components that are shared between all instance entities. This nicely matches the Sketchup Component structure and results in a somewhat smaller and cleaner IFC file.'
+          )
+          @export_type_properties = CheckboxOption.new(
+            'type_properties',
+            'Export IFC Type properties',
+            @options[:export][:type_properties],
+            'Attach IFC properties and classifications to the IfcTypeProduct (when enabled) instead of the Entity itself. This results in a somewhat smaller and cleaner IFC file, but support varies between tools.'
+          )
+          @export_mapped_items = CheckboxOption.new(
+            'mapped_items',
+            'Export IFC mapped items',
+            @options[:export][:mapped_items],
+            'The geometry for every (equally scaled) Component Definition is only exported once, this can make models much smaller'
+          )
+          @export_classification_suffix = CheckboxOption.new(
+            'classification_suffix',
+            "Add 'Classification' suffix to all classifications",
+            @options[:export][:classification_suffix],
+            "Add ' Classification' suffix to all classification for Revit compatibility, this can help in grouping classifications in model checkers"
+          )
+          @export_model_axes = CheckboxOption.new(
+            'model_axes',
+            "Export using model axes transfomration",
+            @options[:export][:classification_suffix],
+            "Export using model axes instead of Sketchup internal origin"
+          )
         end
 
         # load classification schemes from settings
@@ -136,6 +191,7 @@ module BimTools
         @options[:export][:type_properties] = @export_type_properties.value
         @options[:export][:mapped_items] = @export_mapped_items.value
         @options[:export][:classification_suffix] = @export_classification_suffix.value
+        @options[:export][:model_axes] = @export_model_axes.value
         File.open(@settings_file, 'w') { |file| file.write(@options.to_yaml) }
         PropertiesWindow.close
         @dialog.close
@@ -321,6 +377,7 @@ module BimTools
           @export_type_properties.value = false
           @export_mapped_items.value = false
           @export_classification_suffix.value = false
+          @export_model_axes.value = false
 
           a_form_data = CGI.unescape(s_form_data).split('&')
           a_form_data.each do |s_setting|
@@ -354,6 +411,8 @@ module BimTools
               @export_mapped_items.value = true
             when 'classification_suffix'
               @export_classification_suffix.value = true
+            when 'model_axes'
+              @export_model_axes.value = true
             when 'ifc_classification'
               update_ifc_classifications << value
             when 'classification'
@@ -444,6 +503,7 @@ module BimTools
         html << @export_type_properties.html
         html << @export_mapped_items.html
         html << @export_classification_suffix.html
+        html << @export_model_axes.html
         html << "      </div>\n"
 
         # Default materials

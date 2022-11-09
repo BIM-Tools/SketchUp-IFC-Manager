@@ -69,7 +69,8 @@ module BimTools
           types: true,
           mapped_items: true, # export component definitions as mapped items
           export_entities: [],
-          root_entities: []
+          root_entities: [],
+          model_axes: false
         }
         @options = defaults.merge(options)
 
@@ -118,8 +119,7 @@ module BimTools
         @project.representationcontexts = Types::Set.new([@representationcontext])
 
         # Create default origin and axes for re-use throughout the model
-        transformation = Geom::Transformation.new
-        @default_placement = @ifc::IfcAxis2Placement3D.new(self, transformation)
+        @default_placement = @ifc::IfcAxis2Placement3D.new(self, Geom::Transformation.new)
         @default_location = @default_placement.location
         @default_axis = @default_placement.axis
         @default_refdirection = @default_placement.refdirection
@@ -127,12 +127,19 @@ module BimTools
         # create a hash with all Sketchup ComponentDefinitions and their IfcProductType counterparts
         @product_types = {}
 
+        # Set root transformation as base for all other transformations
+        if @options[:model_axes]
+          transformation = su_model.axes.transformation.inverse
+        else
+          transformation = Geom::Transformation.new
+        end
+
         # When no entities are given for export, pass all model entities to create ifc objects
         # if nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked
         if @options[:root_entities].empty?
-          create_ifc_objects(su_model.entities)
+          create_ifc_objects(su_model.entities, transformation)
         else
-          create_ifc_objects(@options[:root_entities])
+          create_ifc_objects(@options[:root_entities], transformation)
         end
       end
 
@@ -211,9 +218,8 @@ module BimTools
       # Recursively create IFC objects for all given SketchUp entities and add those to the model
       #
       # @param entities [Sketchup::Entities]
-      def create_ifc_objects(entities)
+      def create_ifc_objects(entities, transformation)
         faces = []
-        transformation = Geom::Transformation.new
         instance_path = Sketchup::InstancePath.new([])
         entity_path = EntityPath.new(self)
         entity_path.add(@project)
