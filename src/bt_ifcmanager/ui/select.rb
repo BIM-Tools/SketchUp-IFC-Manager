@@ -116,8 +116,7 @@ module BimTools
           else
             index = @options.index(@value)
           end
-          self.dialog.execute_script("$('##{@id}').val(#{index}).trigger('change');")
-
+          self.dialog.execute_script("$('##{@id}').val(#{index});\n$('##{@id}').trigger('change');")
         end
 
         def set_value()
