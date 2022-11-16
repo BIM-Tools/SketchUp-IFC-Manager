@@ -72,7 +72,7 @@ module BimTools
         # When the user clicks the first time, we switch to getting the
         # second point.  When they click a second time we copy properties
         if @state == 0
-          if bp.is_a?(Sketchup::ComponentInstance)
+          if bp.respond_to?(:definition)
             @model.selection.clear
             @model.selection.add bp
             if @source = bp
@@ -80,13 +80,13 @@ module BimTools
               Sketchup.set_status_text 'Select target object', SB_PROMPT
             end
           end
-        elsif bp.is_a?(Sketchup::ComponentInstance)
+        elsif bp.respond_to?(:definition)
           # copy properties on second and following clicks
           if target = bp
             clone_properties(@source, target)
           end
         end
-        if target.is_a?(Sketchup::ComponentInstance)
+        if target.respond_to?(:definition)
           @model.selection.clear
           @model.selection.add target
 
