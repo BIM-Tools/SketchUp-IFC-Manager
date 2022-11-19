@@ -46,12 +46,13 @@ module BimTools
     # Class that keeps track of all different shaperepresentations for
     #   a sketchup component definition
     class DefinitionManager
-      attr_reader :definition
+      attr_reader :definition, :name
 
       def initialize(ifc_model, definition)
         @ifc = Settings.ifc_module
         @ifc_model = ifc_model
         @definition = definition
+        @name = definition.name
         @representations = {}
       end
 

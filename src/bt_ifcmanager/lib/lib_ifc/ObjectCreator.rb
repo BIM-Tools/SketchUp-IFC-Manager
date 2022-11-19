@@ -111,6 +111,9 @@ module BimTools
           faces = create_nested_objects(ifc_entity, su_instance, su_material, su_layer)
           create_geometry(su_instance.definition, ifc_entity, placement_parent, su_material, su_layer, faces)
         else
+
+          # (!)(?) check against list of valid IFC entities? IfcGroup, IfcProduct
+
           ifc_entity = entity_type.new(@ifc_model, su_instance)
           ifc_entity.globalid = @guid if entity_type < @ifc::IfcRoot
 
@@ -311,41 +314,48 @@ module BimTools
                                                                                            su_layer)
               end
             else
-              entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
-              entity.name = Types::IfcLabel.new(@ifc_model, definition.name)
-              definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
-              entity.representation = definition_manager.create_representation(faces,
-                                                                               brep_transformation,
-                                                                               su_material,
-                                                                               su_layer)
-              entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
-
-              # IFC 4
-              entity.predefinedtype = :notdefined if entity.respond_to?(:predefinedtype=)
-
-              # IFC 2x3
-              entity.compositiontype = :element if entity.respond_to?(:compositiontype=)
-
-              # Add to spatial hierarchy
-              @entity_path.add(entity)
-              @entity_path.set_parent(entity)
-
-              # create materialassociation
-              unless @ifc_model.materials.include?(su_material)
-                @ifc_model.materials[su_material] = MaterialAndStyling.new(@ifc_model, su_material)
-              end
-
-              # add product to materialassociation
-              @ifc_model.materials[su_material].add_to_material(entity)
+              create_fallback_entity(definition_manager, faces, brep_transformation, su_material, su_layer)
             end
           else
-            definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
-            ifc_entity.representation = definition_manager.create_representation(faces,
-                                                                                 brep_transformation,
-                                                                                 su_material,
-                                                                                 su_layer)
+            if ifc_entity.respond_to?(:representation)
+              definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+              ifc_entity.representation = definition_manager.create_representation(faces,
+                                                                                   brep_transformation,
+                                                                                   su_material,
+                                                                                   su_layer)
+            else
+              create_fallback_entity(definition_manager, faces, brep_transformation, su_material, su_layer)
+            end
           end
         end
+      end
+      def create_fallback_entity(definition_manager, faces, brep_transformation, su_material, su_layer)
+        entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
+        entity.name = Types::IfcLabel.new(@ifc_model, definition_manager.name)
+        entity.representation = definition_manager.create_representation(faces,
+                                                                         brep_transformation,
+                                                                         su_material,
+                                                                         su_layer)
+        entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, Geom::Transformation.new)
+
+        # IFC 4
+        entity.predefinedtype = :notdefined if entity.respond_to?(:predefinedtype=)
+
+        # IFC 2x3
+        entity.compositiontype = :element if entity.respond_to?(:compositiontype=)
+
+        # Add to spatial hierarchy
+        @entity_path.add(entity)
+        @entity_path.set_parent(entity)
+
+        # create materialassociation
+        unless @ifc_model.materials.include?(su_material)
+          @ifc_model.materials[su_material] = MaterialAndStyling.new(@ifc_model, su_material)
+        end
+
+        # add product to materialassociation
+        @ifc_model.materials[su_material].add_to_material(entity)
+
       end
     end
   end
