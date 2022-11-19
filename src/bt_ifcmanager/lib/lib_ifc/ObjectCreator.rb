@@ -331,6 +331,14 @@ module BimTools
           end
         end
       end
+
+      # Create IfcBuildingElementProxy (instead of unsupported IFC entities)
+      #
+      # @param definition_manager [IfcManager::DefinitionManager]
+      # @param faces [Array<Sketchup::Face>]
+      # @param brep_transformation [Geom::Transformation]
+      # @param su_material [Sketchup::Material]
+      # @param su_layer [Sketchup::Layer]
       def create_fallback_entity(definition_manager, faces, brep_transformation, su_material, su_layer)
         entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
         entity.name = Types::IfcLabel.new(@ifc_model, definition_manager.name)
