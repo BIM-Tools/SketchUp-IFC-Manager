@@ -317,13 +317,15 @@ module BimTools
               create_fallback_entity(definition_manager, faces, brep_transformation, su_material, su_layer)
             end
           else
+            definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
             if ifc_entity.respond_to?(:representation)
-              definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
               ifc_entity.representation = definition_manager.create_representation(faces,
                                                                                    brep_transformation,
                                                                                    su_material,
                                                                                    su_layer)
             else
+
+              # @todo this creates empty objects for not supported entity types
               create_fallback_entity(definition_manager, faces, brep_transformation, su_material, su_layer)
             end
           end
