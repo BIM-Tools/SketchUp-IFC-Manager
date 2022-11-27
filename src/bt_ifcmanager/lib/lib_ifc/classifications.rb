@@ -51,12 +51,14 @@ module BimTools
       end
 
       def get_identification(classification_dictionary)
-        classification_dictionary.attribute_dictionaries.each do |dictionary|
-          if %w[identification itemreference class-codenotatie].include? dictionary.name.downcase
-            if value = dictionary['value']
-              return value
-            elsif value_dictionary = dictionary.attribute_dictionaries[dictionary.name]
-              return value_dictionary['value']
+        if classification_dictionary
+          classification_dictionary.attribute_dictionaries.each do |dictionary|
+            if %w[identification itemreference class-codenotatie].include? dictionary.name.downcase
+              if value = dictionary['value']
+                return value
+              elsif value_dictionary = dictionary.attribute_dictionaries[dictionary.name]
+                return value_dictionary['value']
+              end
             end
           end
         end
@@ -64,11 +66,13 @@ module BimTools
       end
 
       def get_location(classification_dictionary)
-        if dictionary = classification_dictionary.attribute_dictionary('Location')
-          if value = dictionary['value']
-            return value
-          elsif value_dictionary = dictionary.attribute_dictionaries[dictionary.name]
-            return value_dictionary['value']
+        if classification_dictionary
+          if dictionary = classification_dictionary.attribute_dictionary('Location')
+            if value = dictionary['value']
+              return value
+            elsif value_dictionary = dictionary.attribute_dictionaries[dictionary.name]
+              return value_dictionary['value']
+            end
           end
         end
         nil
