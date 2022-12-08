@@ -150,8 +150,8 @@ module BimTools
 
     # Add icons to command
     #
-    # @param command [UI::Command]
-    # @param name [UI::Command]
+    # @param [UI::Command] command
+    # @param [UI::Command] name
     def add_icons(command, name); end
   end
 end
