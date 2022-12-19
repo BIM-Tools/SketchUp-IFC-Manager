@@ -30,8 +30,8 @@ module BimTools
     # Reads the nested Sketchup AttributeDictionary structure for
     #  a Sketchup object classified as an IFC entity
     #
-    # @param ifc_entity [IfcEntity]
-    # @param attr_dict [Sketchup::AttributeDictionary]
+    # @param [IfcEntity] ifc_entity
+    # @param [Sketchup::AttributeDictionary] attr_dict
     class IfcDictionaryReader
       INSTANCE_SET_NAME = 'SU_InstanceSet'
       DEFINITION_SET_NAME = 'SU_DefinitionSet'
@@ -340,7 +340,7 @@ module BimTools
   # Collects the needed attributes for an IfcProperty from
   #  a nested Sketchup AttributeDictionary structure
   #
-  # @param attr_dict [Sketchup::AttributeDictionary]
+  # @param [Sketchup::AttributeDictionary] attr_dict
   #
   class Property
     attr_reader :name, :value, :ifc_type, :attribute_type, :options

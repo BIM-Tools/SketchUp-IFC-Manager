@@ -28,8 +28,8 @@ module BimTools
   module IfcTypeProduct_su
     attr_accessor :su_object
 
-    # @param ifc_model [BimTools::IfcManager::IfcModel]
-    # @param definition [Sketchup::ComponentDefinition]
+    # @param [BimTools::IfcManager::IfcModel] ifc_model
+    # @param [Sketchup::ComponentDefinition] definition
     def initialize(ifc_model, definition, instance_class = nil)
       super(ifc_model, definition)
       @ifc = IfcManager::Settings.ifc_module

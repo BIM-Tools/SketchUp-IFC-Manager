@@ -26,8 +26,8 @@ require_relative 'PropertyReader'
 
 module BimTools
   module IfcGroup_su
-    # @param ifc_model [IfcManager::IfcModel]
-    # @param sketchup [Sketchup::ComponentDefinition]
+    # @param [IfcManager::IfcModel] ifc_model
+    # @param [Sketchup::ComponentDefinition] sketchup
     def initialize(ifc_model, sketchup = nil)
       super
       @ifc = BimTools::IfcManager::Settings.ifc_module

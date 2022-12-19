@@ -51,9 +51,9 @@ module BimTools
 
       # Creates an IFC model based on given su model
       #
-      # @param su_model [Sketchup::Model]
-      # @param options [Hash] Optional options hash
-      # @param su_entities [Array<Sketchup::Entity>] Optional list of entities that have to be exported to IFC, nil exports all model entities.
+      # @param [Sketchup::Model] su_model
+      # @param [Hash] options optional options hash
+      # @param [Array<Sketchup::Entity>] su_entities optional list of entities that have to be exported to IFC, nil exports all model entities.
       def initialize(su_model, options = {})
         defaults = {
           ifc_entities: false, # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
@@ -217,7 +217,7 @@ module BimTools
 
       # Recursively create IFC objects for all given SketchUp entities and add those to the model
       #
-      # @param entities [Sketchup::Entities]
+      # @param [Sketchup::Entities] entities
       def create_ifc_objects(entities, transformation)
         faces = []
         instance_path = Sketchup::InstancePath.new([])

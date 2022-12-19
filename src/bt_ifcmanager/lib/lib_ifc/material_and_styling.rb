@@ -26,8 +26,8 @@ module BimTools
     # Class that manages the relationship between a Sketchup material and
     #  it's IFC counterparts (material and styling)
     #
-    # @param ifc_model [IfcModel]
-    # @param su_material [Sketchup::Material] Sketckup material for which IFC material and styles will be created
+    # @param [IfcModel] ifc_model
+    # @param [Sketchup::Material] su_material Sketckup material for which IFC material and styles will be created
     class MaterialAndStyling
       def initialize(ifc_model, su_material = nil)
         @ifc_model = ifc_model
@@ -38,7 +38,7 @@ module BimTools
 
       # Creates IfcRelAssociatesMaterial
       #
-      # @param su_material [Sketchup::Material]
+      # @param [Sketchup::Material] su_material
       # @return [IfcRelAssociatesMaterial] Material association
       def create_material_assoc(su_material)
         material_name = if su_material
@@ -61,7 +61,7 @@ module BimTools
 
       # Creates IfcRelAssociatesMaterial
       #
-      # @param su_material [Sketchup::Material]
+      # @param [Sketchup::Material] su_material
       # @return [Ifc_Set] Set of IFC surface styles
       def create_surface_styles(su_material)
         if su_material && @ifc_model.options[:colors]
@@ -108,14 +108,14 @@ module BimTools
 
       # Add the material to an IFC entity
       #
-      # @param ifc_entity [IfcProduct] IFC Entity
+      # @param[IfcProduct] ifc_entity IFC Entity
       def add_to_material(ifc_entity)
         @material_assoc.relatedobjects.add(ifc_entity)
       end
 
       # Add the stylings to a shaperepresentation
       #
-      # @param ifc_entity [IfcShapeRepresentation] IFC Entity
+      # @param [IfcShapeRepresentation] ifc_entity IFC Entity
       def add_to_styling(ifc_entity)
         if @surface_styles
           styled_item = @ifc::IfcStyledItem.new(@ifc_model, ifc_entity)

@@ -33,8 +33,8 @@ module BimTools
     @su_object = nil
     @parent = nil
 
-    # @param ifc_model [BimTools::IfcManager::IfcModel]
-    # @param sketchup [nil, #definition] an empty object (default object), Sketchup::ComponentInstance or Sketchup::Group
+    # @param [BimTools::IfcManager::IfcModel] ifc_model
+    # @param [nil, #definition] sketchup an empty object (default object), Sketchup::ComponentInstance or Sketchup::Group
     def initialize(ifc_model, sketchup)
       super
       @ifc = BimTools::IfcManager::Settings.ifc_module
