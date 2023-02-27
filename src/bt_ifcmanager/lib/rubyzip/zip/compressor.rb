@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   class Compressor #:nodoc:all
     def finish; end
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

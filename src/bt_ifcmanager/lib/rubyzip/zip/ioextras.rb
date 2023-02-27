@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   module IOExtras #:nodoc:
     CHUNK_SIZE = 131_072
 
@@ -27,7 +27,7 @@ module BimTools
       end
     end
   end
- end
+end
 end
 
 require_relative 'ioextras/abstract_input_stream'

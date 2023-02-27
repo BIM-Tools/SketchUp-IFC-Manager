@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   class DecryptedIo #:nodoc:all
     CHUNK_SIZE = 32_768
 
@@ -40,5 +40,5 @@ module BimTools
       @decrypter.decrypt(@io.read(CHUNK_SIZE))
     end
   end
- end
+end
 end

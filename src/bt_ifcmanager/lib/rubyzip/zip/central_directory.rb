@@ -2,10 +2,13 @@
 
 require 'forwardable'
 
+require_relative 'dirtyable'
+
 module BimTools
- module Zip
+module Zip
   class CentralDirectory
     extend Forwardable
+    include Dirtyable
 
     END_OF_CD_SIG          = 0x06054b50
     ZIP64_END_OF_CD_SIG    = 0x06064b50
@@ -24,8 +27,10 @@ module BimTools
                    :<<, :delete, :each, :entries, :find_entry, :glob,
                    :include?, :size
 
+    mark_dirty :<<, :comment=, :delete
+
     def initialize(entries = EntrySet.new, comment = '') #:nodoc:
-      super()
+      super(dirty_on_create: false)
       @entry_set = entries.kind_of?(EntrySet) ? entries : EntrySet.new(entries)
       @comment   = comment
     end
@@ -41,13 +46,9 @@ module BimTools
       eocd_offset = io.tell
       cdir_size = eocd_offset - cdir_offset
       if ::BimTools::Zip.write_zip64_support
-        need_zip64_eocd = cdir_offset > 0xFFFFFFFF || cdir_size > 0xFFFFFFFF \
-                          || @entry_set.size > 0xFFFF
-        need_zip64_eocd ||= @entry_set.any? { |entry| entry.extra['Zip64'] }
-        if need_zip64_eocd
-          write_64_e_o_c_d(io, cdir_offset, cdir_size)
-          write_64_eocd_locator(io, eocd_offset)
-        end
+         (cdir_offset > 0xFFFFFFFF || cdir_size > 0xFFFFFFFF || @entry_set.size > 0xFFFF)
+        write_64_e_o_c_d(io, cdir_offset, cdir_size)
+        write_64_eocd_locator(io, eocd_offset)
       end
       write_e_o_c_d(io, cdir_offset, cdir_size)
     end
@@ -181,7 +182,7 @@ module BimTools
         entry = Entry.read_c_dir_entry(io)
         next unless entry
 
-        offset = if entry.extra['Zip64']
+        offset = if entry.zip64?
                    entry.extra['Zip64'].relative_header_offset
                  else
                    entry.local_header_offset
@@ -251,7 +252,7 @@ module BimTools
       [io.tell, io.read]
     end
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

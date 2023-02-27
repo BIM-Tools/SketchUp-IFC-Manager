@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   # Olf Info-ZIP Extra for UNIX uid/gid and file timestampes
   class ExtraField::OldUnix < ExtraField::Generic
     HEADER_ID = 'UX'
@@ -46,5 +46,5 @@ module BimTools
       [@atime, @mtime].pack('VV')
     end
   end
- end
+end
 end

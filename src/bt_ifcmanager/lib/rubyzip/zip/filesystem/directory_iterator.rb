@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   module FileSystem
     class DirectoryIterator # :nodoc:all
       include Enumerable
@@ -46,5 +46,5 @@ module BimTools
       end
     end
   end
- end
+end
 end

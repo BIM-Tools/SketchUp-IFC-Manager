@@ -5,7 +5,7 @@ require 'forwardable'
 require_relative 'file_split'
 
 module BimTools
- module Zip
+module Zip
   # ZipFile is modeled after java.util.zip.ZipFile from the Java SDK.
   # The most important methods are those inherited from
   # ZipCentralDirectory for accessing information about the entries in
@@ -76,36 +76,9 @@ module BimTools
                  .merge(options)
       @name    = path_or_io.respond_to?(:path) ? path_or_io.path : path_or_io
       @create  = create ? true : false # allow any truthy value to mean true
-      @cdir = ::BimTools::Zip::CentralDirectory.new
 
-      if ::File.size?(@name.to_s)
-        # There is a file, which exists, that is associated with this zip.
-        @create = false
-        @file_permissions = ::File.stat(@name).mode
+      initialize_cdir(path_or_io, buffer: buffer)
 
-        if buffer
-          @cdir.read_from_stream(path_or_io)
-        else
-          ::File.open(@name, 'rb') do |f|
-            @cdir.read_from_stream(f)
-          end
-        end
-      elsif buffer && path_or_io.size > 0
-        # This zip is probably a non-empty StringIO.
-        @create = false
-        @cdir.read_from_stream(path_or_io)
-      elsif !@create && ::File.zero?(@name)
-        # A file exists, but it is empty, and we've said we're
-        # NOT creating a new zip.
-        raise Error, "File #{@name} has zero size. Did you mean to pass the create flag?"
-      elsif !@create
-        # If we get here, and we're not creating a new zip, then
-        # everything is wrong.
-        raise Error, "File #{@name} not found"
-      end
-
-      @stored_entries      = @cdir.entries.map(&:dup)
-      @stored_comment      = @cdir.comment
       @restore_ownership   = options[:restore_ownership]
       @restore_permissions = options[:restore_permissions]
       @restore_times       = options[:restore_times]
@@ -138,9 +111,6 @@ module BimTools
         end
 
         io = ::StringIO.new(io) if io.kind_of?(::String)
-
-        # https://github.com/rubyzip/rubyzip/issues/119
-        io.binmode if io.respond_to?(:binmode)
 
         zf = ::BimTools::Zip::File.new(io, create: create, buffer: true, **options)
         return zf unless block_given?
@@ -242,7 +212,6 @@ module BimTools
                     )
                   end
       new_entry.gather_fileinfo_from_srcpath(src_path)
-      new_entry.dirty = true
       @cdir << new_entry
     end
 
@@ -293,14 +262,13 @@ module BimTools
         ::BimTools::Zip::OutputStream.open(tmp_file) do |zos|
           @cdir.each do |e|
             e.write_to_zip_output_stream(zos)
-            e.dirty = false
             e.clean_up
           end
           zos.comment = comment
         end
         true
       end
-      initialize(name)
+      initialize_cdir(@name)
     end
 
     # Write buffer write changes to buffer and return
@@ -321,10 +289,13 @@ module BimTools
     # Returns true if any changes has been made to this archive since
     # the previous commit
     def commit_required?
+      return true if @create || @cdir.dirty?
+
       @cdir.each do |e|
-        return true if e.dirty
+        return true if e.dirty?
       end
-      comment != @stored_comment || entries != @stored_entries || @create
+
+      false
     end
 
     # Searches for entry with the specified name. Returns nil if
@@ -359,16 +330,45 @@ module BimTools
 
     private
 
+    def initialize_cdir(path_or_io, buffer: false)
+      @cdir = ::BimTools::Zip::CentralDirectory.new
+
+      if ::File.size?(@name.to_s)
+        # There is a file, which exists, that is associated with this zip.
+        @create = false
+        @file_permissions = ::File.stat(@name).mode
+
+        if buffer
+          # https://github.com/rubyzip/rubyzip/issues/119
+          path_or_io.binmode if path_or_io.respond_to?(:binmode)
+          @cdir.read_from_stream(path_or_io)
+        else
+          ::File.open(@name, 'rb') do |f|
+            @cdir.read_from_stream(f)
+          end
+        end
+      elsif buffer && path_or_io.size > 0
+        # This zip is probably a non-empty StringIO.
+        @create = false
+        @cdir.read_from_stream(path_or_io)
+      elsif !@create && ::File.zero?(@name)
+        # A file exists, but it is empty, and we've said we're
+        # NOT creating a new zip.
+        raise Error, "File #{@name} has zero size. Did you mean to pass the create flag?"
+      elsif !@create
+        # If we get here, and we're not creating a new zip, then
+        # everything is wrong.
+        raise Error, "File #{@name} not found"
+      end
+    end
+
     def check_entry_exists(entry_name, continue_on_exists_proc, proc_name)
-      continue_on_exists_proc ||= proc { BimTools::Zip.continue_on_exists_proc }
       return unless @cdir.include?(entry_name)
 
-      if continue_on_exists_proc.call
-        remove get_entry(entry_name)
-      else
-        raise ::BimTools::Zip::EntryExistsError,
-              proc_name + " failed. Entry #{entry_name} already exists"
-      end
+      continue_on_exists_proc ||= proc { Zip.continue_on_exists_proc }
+      raise ::BimTools::Zip::EntryExistsError.new proc_name, entry_name unless continue_on_exists_proc.call
+
+      remove get_entry(entry_name)
     end
 
     def check_file(path)
@@ -387,7 +387,7 @@ module BimTools
       end
     end
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

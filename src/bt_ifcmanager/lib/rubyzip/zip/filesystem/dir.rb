@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   module FileSystem
     class Dir # :nodoc:all
       def initialize(mapped_zip)
@@ -84,5 +84,5 @@ module BimTools
       end
     end
   end
- end
+end
 end

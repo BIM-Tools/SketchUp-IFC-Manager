@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   module FileSystem
     # All access to BimTools::Zip::File from FileSystem::File and FileSystem::Dir
     # goes through a ZipFileNameMapper, which has one responsibility: ensure
@@ -79,5 +79,5 @@ module BimTools
       end
     end
   end
- end
+end
 end

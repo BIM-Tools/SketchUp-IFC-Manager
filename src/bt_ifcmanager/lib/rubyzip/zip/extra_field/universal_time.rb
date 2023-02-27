@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   # Info-ZIP Additional timestamp field
   class ExtraField::UniversalTime < ExtraField::Generic
     HEADER_ID = 'UT'
@@ -77,5 +77,5 @@ module BimTools
       s
     end
   end
- end
+end
 end

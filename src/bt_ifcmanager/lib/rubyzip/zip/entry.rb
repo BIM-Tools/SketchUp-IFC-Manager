@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 
 require 'pathname'
+
+require_relative 'dirtyable'
+
 module BimTools
- module Zip
+module Zip
   class Entry
+    include Dirtyable
+
     STORED   = ::BimTools::Zip::COMPRESSION_METHOD_STORE
     DEFLATED = ::BimTools::Zip::COMPRESSION_METHOD_DEFLATE
 
@@ -17,12 +22,18 @@ module BimTools
 
     attr_accessor :comment, :compressed_size, :follow_symlinks, :name,
                   :restore_ownership, :restore_permissions, :restore_times,
-                  :size, :unix_gid, :unix_perms, :unix_uid, :zipfile
+                  :unix_gid, :unix_perms, :unix_uid
 
-    attr_accessor :crc, :dirty, :external_file_attributes, :fstype, :gp_flags,
+    attr_accessor :crc, :external_file_attributes, :fstype, :gp_flags,
                   :internal_file_attributes, :local_header_offset # :nodoc:
 
-    attr_reader :extra, :compression_level, :ftype, :filepath # :nodoc:
+    attr_reader :extra, :compression_level, :filepath # :nodoc:
+
+    attr_writer :size # :nodoc:
+
+    mark_dirty :comment=, :compressed_size=, :external_file_attributes=,
+               :fstype=, :gp_flags=, :name=, :size=,
+               :unix_gid=, :unix_perms=, :unix_uid=
 
     def set_default_vars_values
       @local_header_offset      = 0
@@ -50,47 +61,34 @@ module BimTools
       @unix_uid            = nil
       @unix_gid            = nil
       @unix_perms          = nil
-      # @posix_acl = nil
-      # @ntfs_acl = nil
-      @dirty               = false
     end
 
     def check_name(name)
-      error =
-        if name.start_with?('/')
-          "Illegal entry name '#{name}'. Names must not start with '/'"
-        elsif name.length > 65_535
-          'Illegal entry name. Names must have fewer than 65,536 characters'
-        else
-          ''
-        end
-      return if error.empty?
-
-      raise EntryNameError, error
+      raise EntryNameError, name if name.start_with?('/')
+      raise EntryNameError if name.length > 65_535
     end
 
     def initialize(
       zipfile = '', name = '',
-      comment: '', size: 0, compressed_size: 0, crc: 0,
+      comment: '', size: nil, compressed_size: 0, crc: 0,
       compression_method: DEFLATED,
       compression_level: ::BimTools::Zip.default_compression,
       time: ::BimTools::Zip::DOSTime.now, extra: ::BimTools::Zip::ExtraField.new
     )
+      super()
       @name = name
       check_name(@name)
 
       set_default_vars_values
       @fstype = ::BimTools::Zip::RUNNING_ON_WINDOWS ? ::BimTools::Zip::FSTYPE_FAT : ::BimTools::Zip::FSTYPE_UNIX
-      @ftype = name_is_directory? ? :directory : :file
 
       @zipfile            = zipfile
       @comment            = comment || ''
       @compression_method = compression_method || DEFLATED
       @compression_level  = compression_level || ::BimTools::Zip.default_compression
-
       @compressed_size    = compressed_size || 0
       @crc                = crc || 0
-      @size               = size || 0
+      @size               = size
       @time               = case time
                             when ::BimTools::Zip::DOSTime
                               time
@@ -113,52 +111,76 @@ module BimTools
       gp_flags & 8 == 8
     end
 
-    def extra=(field)
-      @extra = if field.nil?
-                 ExtraField.new
-               else
-                 field.kind_of?(ExtraField) ? field : ExtraField.new(field.to_s)
-               end
+    def size
+      @size || 0
     end
 
-    def time
-      if @extra['UniversalTime'] && !@extra['UniversalTime'].mtime.nil?
-        @extra['UniversalTime'].mtime
-      elsif @extra['NTFS'] && !@extra['NTFS'].mtime.nil?
-        @extra['NTFS'].mtime
-      else
-        # Standard time field in central directory has local time
-        # under archive creator. Then, we can't get timezone.
-        @time
-      end
+    def time(component: :mtime)
+      time =
+        if @extra['UniversalTime']
+          @extra['UniversalTime'].send(component)
+        elsif @extra['NTFS']
+          @extra['NTFS'].send(component)
+        end
+
+      # Standard time field in central directory has local time
+      # under archive creator. Then, we can't get timezone.
+      time || (@time if component == :mtime)
     end
 
     alias mtime time
 
-    def time=(value)
+    def atime
+      time(component: :atime)
+    end
+
+    def ctime
+      time(component: :ctime)
+    end
+
+    def time=(value, component: :mtime)
+      @dirty = true
       unless @extra.member?('UniversalTime') || @extra.member?('NTFS')
         @extra.create('UniversalTime')
       end
 
       value = DOSTime.from_time(value)
-      (@extra['UniversalTime'] || @extra['NTFS']).mtime = value
-      @time = value
+      comp = "#{component}=" unless component.to_s.end_with?('=')
+      (@extra['UniversalTime'] || @extra['NTFS']).send(comp, value)
+      @time = value if component == :mtime
+    end
+
+    alias mtime= time=
+
+    def atime=(value)
+      send(:time=, value, component: :atime)
+    end
+
+    def ctime=(value)
+      send(:time=, value, component: :ctime)
     end
 
     def compression_method
-      return STORED if @ftype == :directory || @compression_level == 0
+      return STORED if ftype == :directory || @compression_level == 0
 
       @compression_method
     end
 
     def compression_method=(method)
-      @compression_method = (@ftype == :directory ? STORED : method)
+      @dirty = true
+      @compression_method = (ftype == :directory ? STORED : method)
+    end
+
+    def zip64?
+      !@extra['Zip64'].nil?
     end
 
     def file_type_is?(type)
-      raise InternalError, "current filetype is unknown: #{inspect}" unless @ftype
+      ftype == type
+    end
 
-      @ftype == type
+    def ftype # :nodoc:
+      @ftype ||= name_is_directory? ? :directory : :file
     end
 
     # Dynamic checkers
@@ -240,7 +262,7 @@ module BimTools
 
       raise "unknown file type #{inspect}" unless directory? || file? || symlink?
 
-      __send__("create_#{@ftype}", dest_path, &block)
+      __send__("create_#{ftype}", dest_path, &block)
       self
     end
 
@@ -289,6 +311,7 @@ module BimTools
     end
 
     def read_local_entry(io) #:nodoc:all
+      @dirty = false # No changes at this point.
       @local_header_offset = io.tell
 
       static_sized_fields_buf = io.read(::BimTools::Zip::LOCAL_ENTRY_STATIC_HEADER_LENGTH) || ''
@@ -301,8 +324,7 @@ module BimTools
 
       unless @header_signature == LOCAL_ENTRY_SIGNATURE
         if @header_signature == SPLIT_FILE_SIGNATURE
-          raise SplitArchiveError,
-                'Rubyzip cannot extract from split archives at this time'
+          raise SplitArchiveError
         end
 
         raise Error, "Zip local header magic not found at location '#{local_header_offset}'"
@@ -315,6 +337,10 @@ module BimTools
         @name.force_encoding(::BimTools::Zip.force_entry_names_encoding)
       end
       @name.tr!('\\', '/') # Normalise filepath separators after encoding set.
+
+      # We need to do this here because `initialize` has so many side-effects.
+      # :-(
+      @ftype = name_is_directory? ? :directory : :file
 
       extra = io.read(@extra_length)
       if extra && extra.bytesize != @extra_length
@@ -336,13 +362,13 @@ module BimTools
        @time.to_binary_dos_date, # @last_mod_date
        @crc,
        zip64 && zip64.compressed_size ? 0xFFFFFFFF : @compressed_size,
-       zip64 && zip64.original_size ? 0xFFFFFFFF : @size,
+       zip64 && zip64.original_size ? 0xFFFFFFFF : (@size || 0),
        name_size,
        @extra ? @extra.local_size : 0].pack('VvvvvvVVVvv')
     end
 
     def write_local_entry(io, rewrite: false) #:nodoc:all
-      prep_zip64_extra(true)
+      prep_local_zip64_extra
       verify_local_header_size! if rewrite
       @local_header_offset = io.tell
 
@@ -434,6 +460,7 @@ module BimTools
     end
 
     def read_c_dir_entry(io) #:nodoc:all
+      @dirty = false # No changes at this point.
       static_sized_fields_buf = io.read(::BimTools::Zip::CDIR_ENTRY_STATIC_HEADER_LENGTH)
       check_c_dir_entry_static_header_length(static_sized_fields_buf)
       unpack_c_dir_entry(static_sized_fields_buf)
@@ -511,7 +538,7 @@ module BimTools
         @time.to_binary_dos_date, # @last_mod_date
         @crc,
         zip64 && zip64.compressed_size ? 0xFFFFFFFF : @compressed_size,
-        zip64 && zip64.original_size ? 0xFFFFFFFF : @size,
+        zip64 && zip64.original_size ? 0xFFFFFFFF : (@size || 0),
         name_size,
         @extra ? @extra.c_dir_size : 0,
         comment_size,
@@ -526,7 +553,8 @@ module BimTools
     end
 
     def write_c_dir_entry(io) #:nodoc:all
-      prep_zip64_extra(false)
+      prep_cdir_zip64_extra
+
       case @fstype
       when ::BimTools::Zip::FSTYPE_UNIX
         ft = case @ftype
@@ -569,11 +597,11 @@ module BimTools
     # Returns an IO like object for the given ZipEntry.
     # Warning: may behave weird with symlinks.
     def get_input_stream(&block)
-      if @ftype == :directory
+      if ftype == :directory
         yield ::BimTools::Zip::NullInputStream if block
         ::BimTools::Zip::NullInputStream
       elsif @filepath
-        case @ftype
+        case ftype
         when :file
           ::File.open(@filepath, 'rb', &block)
         when :symlink
@@ -582,7 +610,7 @@ module BimTools
           yield(stringio) if block
           stringio
         else
-          raise "unknown @file_type #{@ftype}"
+          raise "unknown @file_type #{ftype}"
         end
       else
         zis = ::BimTools::Zip::InputStream.new(@zipfile, offset: local_header_offset)
@@ -625,11 +653,12 @@ module BimTools
                end
 
       @filepath = src_path
+      @size = stat.size
       get_extra_attributes_from_path(@filepath)
     end
 
     def write_to_zip_output_stream(zip_output_stream) #:nodoc:all
-      if @ftype == :directory
+      if ftype == :directory
         zip_output_stream.put_next_entry(self)
       elsif @filepath
         zip_output_stream.put_next_entry(self)
@@ -656,7 +685,7 @@ module BimTools
     end
 
     def clean_up
-      # By default, do nothing
+      @dirty = false # Any changes are written at this point.
     end
 
     private
@@ -669,9 +698,9 @@ module BimTools
 
     def create_file(dest_path, _continue_on_exists_proc = proc { BimTools::Zip.continue_on_exists_proc })
       if ::File.exist?(dest_path) && !yield(self, dest_path)
-        raise ::BimTools::Zip::DestinationFileExistsError,
-              "Destination '#{dest_path}' already exists"
+        raise ::BimTools::Zip::DestinationExistsError, dest_path
       end
+
       ::File.open(dest_path, 'wb') do |os|
         get_input_stream do |is|
           bytes_written = 0
@@ -682,10 +711,10 @@ module BimTools
             bytes_written += buf.bytesize
             next unless bytes_written > size && !warned
 
-            message = "entry '#{name}' should be #{size}B, but is larger when inflated."
-            raise ::BimTools::Zip::EntrySizeError, message if ::BimTools::Zip.validate_entry_sizes
+            error = ::BimTools::Zip::EntrySizeError.new(self)
+            raise error if ::BimTools::Zip.validate_entry_sizes
 
-            warn "WARNING: #{message}"
+            warn "WARNING: #{error.message}"
             warned = true
           end
         end
@@ -698,14 +727,11 @@ module BimTools
       return if ::File.directory?(dest_path)
 
       if ::File.exist?(dest_path)
-        if block_given? && yield(self, dest_path)
-          ::FileUtils.rm_f dest_path
-        else
-          raise ::BimTools::Zip::DestinationFileExistsError,
-                "Cannot create directory '#{dest_path}'. " \
-                    'A file already exists with that name'
-        end
+        raise ::BimTools::Zip::DestinationExistsError, dest_path unless block_given? && yield(self, dest_path)
+
+        ::FileUtils.rm_f dest_path
       end
+
       ::FileUtils.mkdir_p(dest_path)
       set_extra_attributes_on_path(dest_path)
     end
@@ -720,7 +746,7 @@ module BimTools
     # apply missing data from the zip64 extra information field, if present
     # (required when file sizes exceed 2**32, but can be used for all files)
     def parse_zip64_extra(for_local_header) #:nodoc:all
-      return if @extra['Zip64'].nil?
+      return unless zip64?
 
       if for_local_header
         @size, @compressed_size = @extra['Zip64'].parse(@size, @compressed_size)
@@ -752,41 +778,40 @@ module BimTools
       end
     end
 
-    # create a zip64 extra information field if we need one
-    def prep_zip64_extra(for_local_header) #:nodoc:all
+    # rubocop:disable Style/GuardClause
+    def prep_local_zip64_extra
       return unless ::BimTools::Zip.write_zip64_support
+      return if (!zip64? && @size && @size < 0xFFFFFFFF) || !file?
 
-      need_zip64 = @size >= 0xFFFFFFFF || @compressed_size >= 0xFFFFFFFF
-      need_zip64 ||= @local_header_offset >= 0xFFFFFFFF unless for_local_header
-      if need_zip64
+      # Might not know size here, so need ZIP64 just in case.
+      # If we already have a ZIP64 extra (placeholder) then we must fill it in.
+      if zip64? || @size.nil? || @size >= 0xFFFFFFFF || @compressed_size >= 0xFFFFFFFF
         @version_needed_to_extract = VERSION_NEEDED_TO_EXTRACT_ZIP64
-        @extra.delete('Zip64Placeholder')
-        zip64 = @extra.create('Zip64')
-        if for_local_header
-          # local header always includes size and compressed size
-          zip64.original_size = @size
-          zip64.compressed_size = @compressed_size
-        else
-          # central directory entry entries include whichever fields are necessary
-          zip64.original_size = @size if @size >= 0xFFFFFFFF
-          zip64.compressed_size = @compressed_size if @compressed_size >= 0xFFFFFFFF
-          zip64.relative_header_offset = @local_header_offset if @local_header_offset >= 0xFFFFFFFF
-        end
-      else
-        @extra.delete('Zip64')
+        zip64 = @extra['Zip64'] || @extra.create('Zip64')
 
-        # if this is a local header entry, create a placeholder
-        # so we have room to write a zip64 extra field afterward
-        # (we won't know if it's needed until the file data is written)
-        if for_local_header
-          @extra.create('Zip64Placeholder')
-        else
-          @extra.delete('Zip64Placeholder')
-        end
+        # Local header always includes size and compressed size.
+        zip64.original_size = @size || 0
+        zip64.compressed_size = @compressed_size
       end
     end
+
+    def prep_cdir_zip64_extra
+      return unless ::BimTools::Zip.write_zip64_support
+
+      if (@size && @size >= 0xFFFFFFFF) || @compressed_size >= 0xFFFFFFFF ||
+         @local_header_offset >= 0xFFFFFFFF
+        @version_needed_to_extract = VERSION_NEEDED_TO_EXTRACT_ZIP64
+        zip64 = @extra['Zip64'] || @extra.create('Zip64')
+
+        # Central directory entry entries include whichever fields are necessary.
+        zip64.original_size = @size if @size && @size >= 0xFFFFFFFF
+        zip64.compressed_size = @compressed_size if @compressed_size >= 0xFFFFFFFF
+        zip64.relative_header_offset = @local_header_offset if @local_header_offset >= 0xFFFFFFFF
+      end
+    end
+    # rubocop:enable Style/GuardClause
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

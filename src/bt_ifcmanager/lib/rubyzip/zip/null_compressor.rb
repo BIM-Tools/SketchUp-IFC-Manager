@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   class NullCompressor < Compressor #:nodoc:all
     include Singleton
 
@@ -11,7 +11,7 @@ module BimTools
 
     attr_reader :size, :compressed_size
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   # InputStream is the basic class for reading zip entries in a
   # zip file. It is possible to create a InputStream object directly,
   # passing the zip file name to the constructor, but more often than not
@@ -71,12 +71,7 @@ module BimTools
     # Returns nil when there are no more entries.
     def get_next_entry
       unless @current_entry.nil?
-        if @current_entry.incomplete?
-          raise GPFBit3Error,
-                'It is not possible to get complete info from the local ' \
-                'header to extract this entry (GP flags bit 3 is set). ' \
-                'Please use `BimTools::Zip::File` instead of `BimTools::Zip::InputStream`.'
-        end
+        raise StreamingError, @current_entry if @current_entry.incomplete?
 
         @archive_io.seek(@current_entry.next_header_offset, IO::SEEK_SET)
       end
@@ -145,17 +140,14 @@ module BimTools
       @current_entry = ::BimTools::Zip::Entry.read_local_entry(@archive_io)
       return if @current_entry.nil?
 
-      if @current_entry.encrypted? && @decrypter.kind_of?(NullEncrypter)
+      if @current_entry.encrypted? && @decrypter.kind_of?(NullDecrypter)
         raise Error,
               'A password is required to decode this zip file'
       end
 
       if @current_entry.incomplete? && @current_entry.compressed_size == 0 \
         && !@complete_entry
-        raise GPFBit3Error,
-              'It is not possible to get complete info from the local ' \
-              'header to extract this entry (GP flags bit 3 is set). ' \
-              'Please use `BimTools::Zip::File` instead of `BimTools::Zip::InputStream`.'
+        raise StreamingError, @current_entry
       end
 
       @decrypted_io = get_decrypted_io
@@ -186,8 +178,7 @@ module BimTools
         @current_entry.compression_method
       )
       if decompressor_class.nil?
-        raise ::BimTools::Zip::CompressionMethodError,
-              "Unsupported compression method #{@current_entry.compression_method}"
+        raise ::BimTools::Zip::CompressionMethodError, @current_entry.compression_method
       end
 
       decompressor_class.new(@decrypted_io, decompressed_size)
@@ -201,7 +192,7 @@ module BimTools
       @decompressor.eof
     end
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   class Deflater < Compressor #:nodoc:all
     def initialize(output_stream, level = BimTools::Zip.default_compression, encrypter = NullEncrypter.new)
       super()
@@ -30,7 +30,7 @@ module BimTools
 
     attr_reader :size, :crc
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

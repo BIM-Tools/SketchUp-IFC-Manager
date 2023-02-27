@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   class Inflater < Decompressor #:nodoc:all
     def initialize(*args)
       super
@@ -41,8 +41,7 @@ module BimTools
         retry
       end
     rescue Zlib::Error => e
-      raise ::BimTools::Zip::DecompressionError,
-            "Zlib error ('#{e.message}') while inflating"
+      raise ::BimTools::Zip::DecompressionError, e
     end
 
     def input_finished?
@@ -51,7 +50,7 @@ module BimTools
   end
 
   ::BimTools::Zip::Decompressor.register(::BimTools::Zip::COMPRESSION_METHOD_DEFLATE, ::BimTools::Zip::Inflater)
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

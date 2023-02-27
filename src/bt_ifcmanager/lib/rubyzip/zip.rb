@@ -36,7 +36,7 @@ require_relative 'zip/streamable_directory'
 require_relative 'zip/errors'
 
 module BimTools
- module Zip
+module Zip
   extend self
   attr_accessor :unicode_names,
                 :on_exists_proc,
@@ -62,7 +62,7 @@ module BimTools
     @continue_on_exists_proc = false
     @sort_entries = false
     @default_compression = ::Zlib::DEFAULT_COMPRESSION
-    @write_zip64_support = false
+    @write_zip64_support = true
     @warn_invalid_date = true
     @case_insensitive_match = false
     @force_entry_names_encoding = nil
@@ -75,7 +75,7 @@ module BimTools
   end
 
   reset!
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

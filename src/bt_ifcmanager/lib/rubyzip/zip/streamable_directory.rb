@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   class StreamableDirectory < Entry
     def initialize(zipfile, entry, src_path = nil, permission = nil)
       super(zipfile, entry)
@@ -11,7 +11,7 @@ module BimTools
       @unix_perms = permission if permission
     end
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

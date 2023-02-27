@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   # A class to hold unknown extra fields so that they are preserved.
   class ExtraField::Unknown
     def initialize
@@ -31,5 +31,5 @@ module BimTools
       @local_bin == other.to_local_bin && @cdir_bin == other.to_c_dir_bin
     end
   end
- end
+end
 end

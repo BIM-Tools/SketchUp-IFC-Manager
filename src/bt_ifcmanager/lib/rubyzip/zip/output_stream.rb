@@ -3,7 +3,7 @@
 require 'forwardable'
 
 module BimTools
- module Zip
+module Zip
   # ZipOutputStream is the basic class for writing zip files. It is
   # possible to create a ZipOutputStream object directly, passing
   # the zip file name to the constructor, but more often than not
@@ -171,8 +171,7 @@ module BimTools
       when Entry::STORED
         ::BimTools::Zip::PassThruCompressor.new(@output_stream)
       else
-        raise ::BimTools::Zip::CompressionMethodError,
-              "Invalid compression method: '#{entry.compression_method}'"
+        raise ::BimTools::Zip::CompressionMethodError, entry.compression_method
       end
     end
 
@@ -199,7 +198,7 @@ module BimTools
       self
     end
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   class StreamableStream < DelegateClass(Entry) # :nodoc:all
     def initialize(entry)
       super(entry)
@@ -45,10 +45,11 @@ module BimTools
     end
 
     def clean_up
+      super
       @temp_file.unlink
     end
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

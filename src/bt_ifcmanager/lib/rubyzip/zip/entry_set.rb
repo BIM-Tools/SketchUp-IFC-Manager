@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   class EntrySet #:nodoc:all
     include Enumerable
 
@@ -84,7 +84,7 @@ module BimTools
       k
     end
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   module NullInputStream #:nodoc:all
     include ::BimTools::Zip::NullDecompressor
     include ::BimTools::Zip::IOExtras::AbstractInputStream
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

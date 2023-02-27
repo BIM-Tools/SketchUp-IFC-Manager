@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   class ExtraField::Generic
     def self.register_map
       return unless const_defined?(:HEADER_ID)
@@ -35,5 +35,5 @@ module BimTools
       self.class.const_get(:HEADER_ID) + [s.bytesize].pack('v') << s
     end
   end
- end
+end
 end

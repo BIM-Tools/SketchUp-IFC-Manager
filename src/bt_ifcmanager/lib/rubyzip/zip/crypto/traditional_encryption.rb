@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   module TraditionalEncryption
     def initialize(password)
       @password = password
@@ -95,7 +95,7 @@ module BimTools
       num
     end
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

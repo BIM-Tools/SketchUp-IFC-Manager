@@ -7,7 +7,7 @@ require_relative 'filesystem/dir'
 require_relative 'filesystem/file'
 
 module BimTools
- module Zip
+module Zip
   # The ZipFileSystem API provides an API for accessing entries in
   # a zip archive that is similar to ruby's builtin File and Dir
   # classes.
@@ -66,7 +66,7 @@ module BimTools
   class File
     include FileSystem
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

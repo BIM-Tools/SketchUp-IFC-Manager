@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   # Info-ZIP Extra for Zip64 size
   class ExtraField::Zip64 < ExtraField::Generic
     attr_accessor :compressed_size, :disk_start_number,
@@ -75,5 +75,5 @@ module BimTools
       packed
     end
   end
- end
+end
 end

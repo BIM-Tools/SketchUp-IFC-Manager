@@ -3,7 +3,7 @@
 require 'rubygems'
 
 module BimTools
- module Zip
+module Zip
   class DOSTime < Time #:nodoc:all
     # MS-DOS File Date and Time format as used in Interrupt 21H Function 57H:
 
@@ -30,7 +30,7 @@ module BimTools
     end
 
     def dos_equals(other)
-      warn 'BimTools::Zip::DOSTime#dos_equals is deprecated. Use `==` instead.'
+      warn 'Zip::DOSTime#dos_equals is deprecated. Use `==` instead.'
       self == other
     end
 
@@ -83,7 +83,7 @@ module BimTools
       include JRubyCMP
     end
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

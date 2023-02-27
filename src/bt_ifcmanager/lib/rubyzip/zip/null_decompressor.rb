@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   module NullDecompressor #:nodoc:all
     module_function
 
@@ -15,7 +15,7 @@ module BimTools
 
     alias eof? eof
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

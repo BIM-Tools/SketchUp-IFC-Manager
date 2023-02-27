@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   class ExtraField < Hash
     ID_MAP = {}
 
@@ -83,7 +83,7 @@ module BimTools
     alias length local_size
     alias size local_size
   end
- end
+end
 end
 
 require_relative 'extra_field/unknown'
@@ -92,7 +92,6 @@ require_relative 'extra_field/universal_time'
 require_relative 'extra_field/old_unix'
 require_relative 'extra_field/unix'
 require_relative 'extra_field/zip64'
-require_relative 'extra_field/zip64_placeholder'
 require_relative 'extra_field/ntfs'
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

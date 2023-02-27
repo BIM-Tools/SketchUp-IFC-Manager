@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   # PKWARE NTFS Extra Field (0x000a)
   # Only Tag 0x0001 is supported
   class ExtraField::NTFS < ExtraField::Generic
@@ -94,5 +94,5 @@ module BimTools
       ((time.to_f + SEC_TO_UNIX_EPOCH) * WINDOWS_TICK).to_i
     end
   end
- end
+end
 end

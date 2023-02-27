@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   module NullEncryption
     def header_bytesize
       0
@@ -39,7 +39,7 @@ module BimTools
 
     def reset!(_header); end
   end
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

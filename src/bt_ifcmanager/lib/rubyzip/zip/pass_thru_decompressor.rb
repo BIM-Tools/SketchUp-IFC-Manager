@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   class PassThruDecompressor < Decompressor #:nodoc:all
     def initialize(*args)
       super
@@ -27,7 +27,7 @@ module BimTools
   end
 
   ::BimTools::Zip::Decompressor.register(::BimTools::Zip::COMPRESSION_METHOD_STORE, ::BimTools::Zip::PassThruDecompressor)
- end
+end
 end
 
 # Copyright (C) 2002, 2003 Thomas Sondergaard

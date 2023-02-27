@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   module IOExtras
     # Implements many of the output convenience methods of IO.
     # relies on <<
@@ -43,5 +43,5 @@ module BimTools
       end
     end
   end
- end
+end
 end

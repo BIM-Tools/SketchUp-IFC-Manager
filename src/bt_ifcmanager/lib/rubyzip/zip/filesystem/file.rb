@@ -3,7 +3,7 @@
 require_relative 'file_stat'
 
 module BimTools
- module Zip
+module Zip
   module FileSystem
     # Instances of this class are normally accessed via the accessor
     # BimTools::Zip::File::file. An instance of File behaves like ruby's
@@ -125,7 +125,6 @@ module BimTools
           e.fstype = FSTYPE_UNIX # Force conversion filesystem type to unix.
           e.unix_perms = mode
           e.external_file_attributes = mode << 16
-          e.dirty = true
         end
         filenames.size
       end
@@ -169,21 +168,11 @@ module BimTools
       end
 
       def atime(filename)
-        e = find_entry(filename)
-        if e.extra.member? 'UniversalTime'
-          e.extra['UniversalTime'].atime
-        elsif e.extra.member? 'NTFS'
-          e.extra['NTFS'].atime
-        end
+        @mapped_zip.get_entry(filename).atime
       end
 
       def ctime(filename)
-        e = find_entry(filename)
-        if e.extra.member? 'UniversalTime'
-          e.extra['UniversalTime'].ctime
-        elsif e.extra.member? 'NTFS'
-          e.extra['NTFS'].ctime
-        end
+        @mapped_zip.get_entry(filename).ctime
       end
 
       def pipe?(_filename)
@@ -198,8 +187,8 @@ module BimTools
         false
       end
 
-      def symlink?(_filename)
-        false
+      def symlink?(filename)
+        @mapped_zip.get_entry(filename).symlink?
       end
 
       def socket?(_filename)
@@ -271,5 +260,5 @@ module BimTools
       end
     end
   end
- end
+end
 end

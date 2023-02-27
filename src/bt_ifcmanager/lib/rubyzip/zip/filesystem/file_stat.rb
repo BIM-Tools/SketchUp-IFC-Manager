@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   module FileSystem
     class File # :nodoc:all
       class Stat # :nodoc:all
@@ -108,5 +108,5 @@ module BimTools
       end
     end
   end
- end
+end
 end

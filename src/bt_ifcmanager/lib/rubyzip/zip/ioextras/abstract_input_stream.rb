@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   module IOExtras
     # Implements many of the convenience methods of IO
     # such as gets, getc, readline and readlines
@@ -125,5 +125,5 @@ module BimTools
       alias eof? eof
     end
   end
- end
+end
 end

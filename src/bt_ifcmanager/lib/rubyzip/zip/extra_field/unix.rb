@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   # Info-ZIP Extra for UNIX uid/gid
   class ExtraField::IUnix < ExtraField::Generic
     HEADER_ID = 'Ux'
@@ -39,5 +39,5 @@ module BimTools
       ''
     end
   end
- end
+end
 end

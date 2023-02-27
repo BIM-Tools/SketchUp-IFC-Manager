@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BimTools
- module Zip
+module Zip
   module FileSplit #:nodoc:
     MAX_SEGMENT_SIZE = 3_221_225_472
     MIN_SEGMENT_SIZE = 65_536
@@ -95,5 +95,5 @@ module BimTools
       szip_file_index
     end
   end
- end
+end
 end
