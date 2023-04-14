@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcStyledItem_su.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
@@ -18,8 +20,6 @@
 #  MA 02110-1301, USA.
 #
 #
-
-require_relative 'IfcNormalisedRatioMeasure'
 
 module BimTools
   module IfcStyledItem_su

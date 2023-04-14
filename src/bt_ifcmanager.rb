@@ -24,15 +24,15 @@
 # Create an entry in the Extension list that loads a script called
 # loader.rb.
 
-require 'sketchup.rb'
-require 'extensions.rb'
+require 'sketchup'
+require 'extensions'
 
 module BimTools
   PLUGIN_ROOT_PATH = File.dirname(__FILE__) unless defined? PLUGIN_ROOT_PATH
 
   module IfcManager
     # Version and release information.
-    VERSION = '4.1.3'
+    VERSION = '4.3.3'
 
     # load plugin only if SketchUp version is PRO
     # raised minimum version to 2017 due to switch to htmldialog
@@ -40,11 +40,11 @@ module BimTools
       PLUGIN_PATH       = File.join(PLUGIN_ROOT_PATH, 'bt_ifcmanager')
       PLUGIN_IMAGE_PATH = File.join(PLUGIN_PATH, 'images')
 
-      IFCMANAGER_EXTENSION = SketchupExtension.new('IFC Manager', File.join(PLUGIN_PATH, 'loader.rb'))
+      IFCMANAGER_EXTENSION = SketchupExtension.new('IFC Manager', File.join(PLUGIN_PATH, 'loader'))
       IFCMANAGER_EXTENSION.version = VERSION
       IFCMANAGER_EXTENSION.description = 'IFC data manager and exporter for SketchUp.'
       IFCMANAGER_EXTENSION.creator = 'BIM-Tools'
-      IFCMANAGER_EXTENSION.copyright = '2017-2022'
+      IFCMANAGER_EXTENSION.copyright = '2017-2023'
       Sketchup.register_extension(IFCMANAGER_EXTENSION, true)
     else
       UI.messagebox 'You need at least SketchUp 2017 to use this extension.'

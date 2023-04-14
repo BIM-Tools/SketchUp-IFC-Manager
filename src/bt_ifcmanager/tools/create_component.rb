@@ -19,14 +19,14 @@
 
 module BimTools
  module IfcManager
-  require File.join(PLUGIN_PATH, "update_ifc_fields.rb")
+  require File.join(PLUGIN_PATH, 'update_ifc_fields')
   module CreateComponent
     extend self
     attr_accessor :name
 
     @name = 'Create component'
     @description = 'Create component from selected entities'
-    
+
     def add_component_option( ifc_type, name, objecttype=nil )
       UI.add_context_menu_handler do |context_menu|
         selection = Sketchup.active_model.selection
@@ -36,41 +36,41 @@ module BimTools
           }
         end
       end
-    end # def add_component_option
-    
+    end
+
     # Add the following create new component options to the context menu
     add_component_option( 'IfcBuildingElementProxy', 'Building Element' )
     add_component_option( 'IfcBuildingStorey', 'Building Storey' )
     add_component_option( 'IfcBuilding', 'Building' )
     add_component_option( 'IfcSite', 'Site' )
-    
+
     # The activate method is called by SketchUp when the tool is first selected.
     # it is a good place to put most of your initialization
     def activate( ifc_type, name, objecttype=nil )
       model = Sketchup.active_model
       entities = model.active_entities
       selection = model.selection
-      
+
       model.start_operation('Create IFC Component', true)
-      
+
       # create temporary group
       group = entities.add_group( selection )
-      
+
       # convert group to component instance
       instance = group.to_component
-      
+
       # set IFC type
       instance.definition.add_classification(BimTools::IfcManager::Settings.ifc_version, ifc_type)
-      
+
       # Set name in definition, instance and ifc properties
       BimTools::IfcManager::set_ifc_entity_name(model, instance, name.downcase)
-      
+
       # set group as selected entity
       selection.clear
       selection.add( instance )
-      
+
       model.commit_operation
-      
+
       # open edit window
       if IfcManager::PropertiesWindow.window && IfcManager::PropertiesWindow.window.visible?
         IfcManager::PropertiesWindow.set_html
@@ -79,6 +79,6 @@ module BimTools
       end
       return instance
     end
-  end # module CreateComponent
- end # module IfcManager
-end # module BimTools
+  end
+ end
+end

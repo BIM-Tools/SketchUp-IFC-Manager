@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcLocalPlacement_su.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
@@ -21,8 +23,6 @@
 
 module BimTools
   module IfcLocalPlacement_su
-    
-
     attr_accessor :transformation, :ifc_total_transformation
 
     def initialize(ifc_model, su_total_transformation = nil, placementrelto = nil)

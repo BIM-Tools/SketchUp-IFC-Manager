@@ -1,0 +1,52 @@
+require: rubocop-sketchup
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  SafeAutoCorrect: true
+
+# If you want to use the same codding pattern as SketchUp's projects, enable
+# the next line. RuboCop will then use the coding pattern from the
+# rubocop-sketchup project. This coding pattern is a more relaxed version than
+# the default RuboCop pattern.
+# inherit_from: https://raw.githubusercontent.com/SketchUp/rubocop-sketchup/main/sketchup-style.yml
+
+AllCops:
+  # This prevents normal RuboCop cops to run. Disable this to get full static
+  # analysis of your Ruby code.
+  DisabledByDefault: false
+
+  SuggestExtensions:
+    rubocop-minitest: false # Only used to aid IDE code insight
+
+  DisplayCopNames: true
+  DisplayStyleGuide: true
+  ExtraDetails: true
+  Exclude:
+  - src/*/vendor/**/* # Exclude skippy vendor folder
+  SketchUp:
+    SourcePath: src
+    TargetSketchUpVersion: 2017
+    Exclude: # Exclude common folders.
+    - profiling/
+    - skippy/
+    - tests/
+  TargetRubyVersion: 2.0
+
+
+# If DisabledByDefault is set to true then we need to enable the SketchUp
+# related departments:
+
+SketchupDeprecations:
+  Enabled: true
+
+SketchupPerformance:
+  Enabled: true
+
+SketchupRequirements:
+  Enabled: true
+
+SketchupSuggestions:
+  Enabled: true
+
+SketchupBugs:
+  Enabled: true

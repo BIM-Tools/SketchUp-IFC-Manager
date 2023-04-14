@@ -21,16 +21,18 @@
 #
 #
 
-require_relative('IfcLabel')
-require_relative('IfcIdentifier')
-require_relative('entity_path')
-require_relative('ObjectCreator')
+require_relative 'ifc_types'
+require_relative 'ifc_product_definition_shape_builder'
+require_relative 'ifc_shape_representation_builder'
+require_relative 'entity_path'
+require_relative 'ObjectCreator'
 require_relative 'representation_manager'
-require_relative('step_writer')
+require_relative 'step_writer'
 
+require_relative 'classifications'
 module BimTools
   module IfcManager
-    require File.join(PLUGIN_PATH_LIB, 'layer_visibility.rb')
+    require File.join(PLUGIN_PATH_LIB, 'layer_visibility')
 
     class IfcModel
       # (?) possible additional methods:
@@ -41,7 +43,7 @@ module BimTools
 
       attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications,
                     :classificationassociations, :product_types, :property_enumerations
-      attr_reader :su_model, :project, :ifc_objects, :export_summary, :options, :su_entities, :units,
+      attr_reader :su_model, :project, :ifc_objects, :project_data, :export_summary, :options, :su_entities, :units,
                   :default_location, :default_axis, :default_refdirection, :default_placement, :representation_manager, :textures
 
       # creates an IFC model based on given su model
@@ -49,9 +51,9 @@ module BimTools
 
       # Creates an IFC model based on given su model
       #
-      # @param su_model [Sketchup::Model]
-      # @param options [Hash] Optional options hash
-      # @param su_entities [Array<Sketchup::Entity>] Optional list of entities that have to be exported to IFC, nil exports all model entities.
+      # @param [Sketchup::Model] su_model
+      # @param [Hash] options optional options hash
+      # @param [Array<Sketchup::Entity>] su_entities optional list of entities that have to be exported to IFC, nil exports all model entities.
       def initialize(su_model, options = {})
         defaults = {
           ifc_entities: false, # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
@@ -68,11 +70,17 @@ module BimTools
           mapped_items: true, # export component definitions as mapped items
           textures: false, # export component definitions as mapped items
           export_entities: [],
-          root_entities: []
+          root_entities: [],
+          model_axes: false
         }
         @options = defaults.merge(options)
 
-        @ifc = BimTools::IfcManager::Settings.ifc_module
+        su_model.set_attribute('IfcManager', 'description', '')
+        @project_data = su_model.attribute_dictionaries['IfcManager']
+        project_uuid = @project_data.get_attribute('uuid', 'IfcProject', SecureRandom.uuid)
+        @project_data.set_attribute('uuid', 'IfcProject', project_uuid)
+
+        @ifc = Settings.ifc_module
         @su_model = su_model
         @su_entities = @options[:export_entities]
         @ifc_id = 0
@@ -81,7 +89,7 @@ module BimTools
         # create collections for materials and layers
         @materials = {}
         @layers = {}
-        @classifications = {}
+        @classifications = IfcManager::Classifications.new(self)
 
         # if textures option is enabled set TextureWriter
         @textures = (Sketchup.create_texture_writer if @options[:textures])
@@ -91,7 +99,7 @@ module BimTools
 
         # create object that keeps track of all different shaperepresentations for
         #   the different sketchup component definitions
-        @representation_manager = BimTools::IfcManager::RepresentationManager.new(self)
+        @representation_manager = RepresentationManager.new(self)
 
         # # create empty hash that will contain all Mapped Representations (Component Definitions)
         # @mapped_representations = {}
@@ -104,6 +112,7 @@ module BimTools
 
         # create new IfcProject
         @project = @ifc::IfcProject.new(self, su_model)
+        @project.globalid = IfcManager::IfcGloballyUniqueId.new(self, 'IfcProject')
 
         # set_units
         @units = @project.unitsincontext
@@ -111,11 +120,10 @@ module BimTools
         # create IfcGeometricRepresentationContext for all IFC geometry objects
         @representationcontext = create_representationcontext
 
-        @project.representationcontexts = IfcManager::Ifc_Set.new([@representationcontext])
+        @project.representationcontexts = Types::Set.new([@representationcontext])
 
         # Create default origin and axes for re-use throughout the model
-        transformation = Geom::Transformation.new
-        @default_placement = @ifc::IfcAxis2Placement3D.new(self, transformation)
+        @default_placement = @ifc::IfcAxis2Placement3D.new(self, Geom::Transformation.new)
         @default_location = @default_placement.location
         @default_axis = @default_placement.axis
         @default_refdirection = @default_placement.refdirection
@@ -123,12 +131,19 @@ module BimTools
         # create a hash with all Sketchup ComponentDefinitions and their IfcProductType counterparts
         @product_types = {}
 
+        # Set root transformation as base for all other transformations
+        if @options[:model_axes]
+          transformation = su_model.axes.transformation.inverse
+        else
+          transformation = Geom::Transformation.new
+        end
+
         # When no entities are given for export, pass all model entities to create ifc objects
         # if nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked
         if @options[:root_entities].empty?
-          create_ifc_objects(su_model.entities)
+          create_ifc_objects(su_model.entities, transformation)
         else
-          create_ifc_objects(@options[:root_entities])
+          create_ifc_objects(@options[:root_entities], transformation)
         end
       end
 
@@ -146,7 +161,7 @@ module BimTools
       # (?) could be enhanced to also accept multiple ifc types like step / ifczip / ifcxml
       # (?) could be enhanced with export options hash
       def export(file_path)
-        IfcStepWriter.new(self, 'file_schema', 'file_description', file_path, @su_model)
+        IfcManager::IfcStepWriter.new(self, 'file_schema', 'file_description', file_path, @su_model)
       end
 
       # add object class name to export summary
@@ -164,20 +179,19 @@ module BimTools
         owner_history = @ifc::IfcOwnerHistory.new(self)
         owninguser = @ifc::IfcPersonAndOrganization.new(self)
         owninguser.theperson = @ifc::IfcPerson.new(self)
-        owninguser.theperson.familyname = BimTools::IfcManager::IfcLabel.new(@ifc_model, '')
+        owninguser.theperson.familyname = Types::IfcLabel.new(self, '')
         owninguser.theorganization = @ifc::IfcOrganization.new(self)
-        owninguser.theorganization.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, '')
+        owninguser.theorganization.name = Types::IfcLabel.new(self, '')
         # owninguser.theperson = @ifc::IfcPerson.new(self)
         # owninguser.theorganization = @ifc::IfcOrganization.new(self)
         owner_history.owninguser = owninguser
         owningapplication = @ifc::IfcApplication.new(self)
         applicationdeveloper = @ifc::IfcOrganization.new(self)
-        applicationdeveloper.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'BIM-Tools')
+        applicationdeveloper.name = Types::IfcLabel.new(self, 'BIM-Tools')
         owningapplication.applicationdeveloper = applicationdeveloper
-        owningapplication.version = BimTools::IfcManager::IfcLabel.new(@ifc_model, VERSION)
-        owningapplication.applicationfullname = BimTools::IfcManager::IfcLabel.new(@ifc_model,
-                                                                                   'IFC manager for sketchup')
-        owningapplication.applicationidentifier = BimTools::IfcManager::IfcIdentifier.new(@ifc_model, 'su_ifcmanager')
+        owningapplication.version = Types::IfcLabel.new(self, VERSION)
+        owningapplication.applicationfullname = Types::IfcLabel.new(self, 'IFC manager for sketchup')
+        owningapplication.applicationidentifier = Types::IfcIdentifier.new(self, 'su_ifcmanager')
         owner_history.owningapplication = owningapplication
         owner_history.changeaction = '.ADDED.'
         owner_history.lastmodifieddate = creation_date
@@ -190,26 +204,27 @@ module BimTools
       # Create new IfcGeometricRepresentationContext
       def create_representationcontext
         context = @ifc::IfcGeometricRepresentationContext.new(self)
-        context.contexttype = BimTools::IfcManager::IfcLabel.new(@ifc_model, 'Model')
+        context.contexttype = Types::IfcLabel.new(self, 'Model')
         context.coordinatespacedimension = '3'
         context.worldcoordinatesystem = @ifc::IfcAxis2Placement2D.new(self)
 
         # Older Sketchup versions don't have Point2d and Vector2d
-        if Geom::const_defined?(:Point2d)
+        if Geom.const_defined?(:Point2d)
           context.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self, Geom::Point2d.new(0, 0))
           context.truenorth = @ifc::IfcDirection.new(self, Geom::Vector2d.new(0, 1))
         else
-          context.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self, Geom::Point3d.new(0, 0,0))
-          context.truenorth = @ifc::IfcDirection.new(self, Geom::Vector3d.new(0, 1,0))
+          context.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self, Geom::Point3d.new(0, 0, 0))
+          context.truenorth = @ifc::IfcDirection.new(self, Geom::Vector3d.new(0, 1, 0))
         end
         context
       end
 
       # Recursively create IFC objects for all given SketchUp entities and add those to the model
       #
-      # @param entities [Sketchup::Entities]
-      def create_ifc_objects(entities)
+      # @param [Sketchup::Entities] entities
+      def create_ifc_objects(entities, transformation)
         faces = []
+        instance_path = Sketchup::InstancePath.new([])
         entity_path = EntityPath.new(self)
         entity_path.add(@project)
         entitiy_count = entities.length
@@ -218,11 +233,10 @@ module BimTools
           ent = entities[i]
 
           # skip hidden objects if skip-hidden option is set
-          unless @options[:hidden] == false && (ent.hidden? || !BimTools::IfcManager.layer_visible?(ent.layer))
+          unless @options[:hidden] == false && (ent.hidden? || !IfcManager.layer_visible?(ent.layer))
             case ent
             when Sketchup::Group, Sketchup::ComponentInstance
-              transformation = Geom::Transformation.new
-              ObjectCreator.new(self, ent, transformation, @project, entity_path)
+              ObjectCreator.new(self, ent, transformation, @project, instance_path, entity_path)
             when Sketchup::Face
               faces << ent
             end
@@ -237,14 +251,20 @@ module BimTools
                             else
                               'project geometry'
                             end
+          shape_representation = IfcShapeRepresentationBuilder.build(self) do |builder|
+            builder.set_contextofitems(@representationcontext)
+            builder.set_representationtype
+            builder.add_item(@ifc::IfcFacetedBrep.new(self, faces, Geom::Transformation.new))
+          end
+
           ifc_entity = @ifc::IfcBuildingElementProxy.new(self, nil)
-          ifc_entity.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, sub_entity_name)
-          ifc_entity.representation = @ifc::IfcProductDefinitionShape.new(self, nil)
-          brep = @ifc::IfcFacetedBrep.new(self, faces, Geom::Transformation.new)
-          ifc_entity.representation.representations.first.items.add(brep)
+          ifc_entity.name = Types::IfcLabel.new(self, sub_entity_name)
           ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(self, Geom::Transformation.new)
           ifc_entity.predefinedtype = :notdefined if ifc_entity.respond_to?(:predefinedtype=)
           ifc_entity.compositiontype = :element if ifc_entity.respond_to?(:compositiontype=)
+          ifc_entity.representation = IfcProductDefinitionShapeBuilder.build(self) do |builder|
+            builder.add_representation(shape_representation)
+          end
 
           # Add to spatial hierarchy
           entity_path.add(ifc_entity)

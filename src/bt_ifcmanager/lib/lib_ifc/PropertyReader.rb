@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  PropertyReader.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
@@ -19,36 +21,50 @@
 #
 #
 
-require_relative 'propertyset'
+require_relative 'ifc_types'
+require_relative 'ifc_property_builder'
+require_relative 'ifc_rel_defines_by_properties_builder'
 
 module BimTools
   module IfcManager
     # Reads the nested Sketchup AttributeDictionary structure for
     #  a Sketchup object classified as an IFC entity
     #
-    # @param ifc_entity [IfcEntity]
-    # @param attr_dict [Sketchup::AttributeDictionary]
+    # @param [IfcEntity] ifc_entity
+    # @param [Sketchup::AttributeDictionary] attr_dict
     class IfcDictionaryReader
-      include BimTools::IfcManager::PropertyDictionary
+      INSTANCE_SET_NAME = 'SU_InstanceSet'
+      DEFINITION_SET_NAME = 'SU_DefinitionSet'
+
+      UNUSED_DICTS = %w[
+        href
+        ref
+        proxy
+        edo
+        instanceAttributes
+      ].freeze
 
       def initialize(ifc_model, ifc_entity, entity_dict, instance_class = nil)
-        @ifc = BimTools::IfcManager::Settings.ifc_module
-        ifc_version = BimTools::IfcManager::Settings.ifc_version
+        @ifc = IfcManager::Settings.ifc_module
+        ifc_version = IfcManager::Settings.ifc_version
         @ifc_model = ifc_model
         @ifc_entity = ifc_entity
         @ifc_dict = entity_dict[ifc_version].attribute_dictionaries if entity_dict && entity_dict[ifc_version]
         @entity_dict = entity_dict
+        @propertyset_names = []
         if @ifc_dict
           # split attributes from properties
           # First get property names
           # names = attr_dict.map(&:name)
-          names = @ifc_dict.map { |x| x.name.to_sym }
+          names = @ifc_dict.map { |x| x.name }
           names -= UNUSED_DICTS # filter out unwanted dictionaries
-          @attributes = names & ifc_entity.attributes
+          ifc_entity_attributes = ifc_entity.attributes.map { |x| x.to_s }
+          @attributes = names & ifc_entity_attributes
 
           # Skip IfcProduct-only attributes for IfcTypeProduct
           all_attributes = if instance_class
-                             names & (ifc_entity.attributes + instance_class.attributes).uniq
+                             instance_class_attributes = instance_class.attributes.map { |x| x.to_s }
+                             names & (ifc_entity_attributes + instance_class_attributes).uniq
                            else
                              @attributes
                            end
@@ -62,131 +78,73 @@ module BimTools
         if @attributes
           i = 0
           while i < @attributes.length
-            name = @attributes[i].to_s
+            name = @attributes[i]
             value = set_attribute(@ifc_dict[name])
             i += 1
           end
         end
       end
 
-      # Collect all propertysets for this object
+      # Returns PropertySets and ElementQuantity's for this IFC entity
       #
       # @return [Array<Propertyset>]
       def get_propertysets
-        propertysets = []
-        if @propertyset_names
-          i = 0
-          while i < @propertyset_names.length
-            name = @propertyset_names[i].to_s
-            propertyset = if (name == 'BaseQuantities') || name.start_with?('Qto_') # export as elementquantities
-                            get_elementquantity(@ifc_dict[name])
-                          else
-                            get_propertyset(@ifc_dict[name])
-                          end
-            propertysets << propertyset if propertyset
-            i += 1
-          end
+        @propertyset_names.select { |name| @ifc_dict[name] }.map do |name|
+          get_propertyset(@ifc_dict[name])
         end
-        propertysets
       end
 
+      # add PropertySets and ElementQuantity's to this IFC entity through IfcRelDefinesByProperties
+      #
+      # @return [nil]
       def add_propertysets
-        if @propertyset_names
-          i = 0
-          while i < @propertyset_names.length
-            name = @propertyset_names[i].to_s
-            rel_defines = if (name == 'BaseQuantities') || name.start_with?('Qto_') # export as elementquantities
-                            add_elementquantity(@ifc_dict[name])
-                          else
-                            add_propertyset(@ifc_dict[name])
-                          end
-            rel_defines.relatedobjects.add(@ifc_entity) if rel_defines
-            i += 1
-          end
+        @propertyset_names.select { |name| @ifc_dict[name] }.map do |name|
+          add_propertyset(@ifc_dict[name])
         end
+        nil
       end
 
       def add_classifications
-        active_classifications = BimTools::IfcManager::Settings.classification_names
+        if IfcManager::Settings.export_classifications && schema_types = @entity_dict['AppliedSchemaTypes']
+          schema_types.each do |classification_name, classification_value|
+            # (?) exclude ALL IFC classifications?
+            unless Settings.ifc_version == classification_name
+              @ifc_model.classifications.add_classification_to_entity(@ifc_entity, classification_name,
+                                                                      classification_value, @entity_dict[classification_name])
+            end
+          end
+        end
+      end
 
-        # Collect all attached classifications except for IFC
-        @entity_dict.each do |attr_dict|
-          next unless active_classifications.keys.include? attr_dict.name
-
-          skc_reader = active_classifications[attr_dict.name]
-
-          # Create classifications if they don't exist
-          if @ifc_model.classifications.keys.include?(attr_dict.name)
-            ifc_classification = @ifc_model.classifications[attr_dict.name]
+      # Add the Sketchup properties SU_DefinitionSet
+      #   if defined in settings attributes
+      def add_sketchup_definition_properties(ifc_model, ifc_entity, sketchup, type_properties = false)
+        attributes = ifc_model.options[:attributes]
+        if attributes.include?(DEFINITION_SET_NAME) && (sketchup.attribute_dictionaries && (attr_dict = sketchup.attribute_dictionaries[DEFINITION_SET_NAME])) && propertyset = get_propertyset(attr_dict)
+          if type_properties
+            if ifc_entity.haspropertysets
+              ifc_entity.haspropertysets.add(propertyset)
+            else
+              ifc_entity.haspropertysets = IfcManager::Types::Set.new([propertyset])
+            end
           else
-            ifc_classification = @ifc::IfcClassification.new(@ifc_model)
-            @ifc_model.classifications[attr_dict.name] = ifc_classification
-            classification_properties = skc_reader.properties
-
-            creator = classification_properties[:creator]
-            if creator && !creator.empty?
-              ifc_classification.source = BimTools::IfcManager::IfcLabel.new(@ifc_model, creator)
-            end
-
-            edition = classification_properties[:revision]
-            if edition && !edition.empty?
-              ifc_classification.edition = BimTools::IfcManager::IfcLabel.new(@ifc_model, edition)
-            end
-
-            editiondate = classification_properties[:modified]
-            if editiondate && time = Time.parse(editiondate)
-
-              # Catch IFC4 changes
-              if @ifc.const_defined?(:IfcCalendarDate)
-                date = @ifc::IfcCalendarDate.new(@ifc_model)
-                date.daycomponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, time.day)
-                date.monthcomponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, time.month)
-                date.yearcomponent = BimTools::IfcManager::IfcInteger.new(@ifc_model, time.year)
-                ifc_classification.editiondate = date
-              else
-                ifc_classification.editiondate = BimTools::IfcManager::IfcDate.new(@ifc_model, time)
-              end
-            end
-            if @ifc_model.options[:classification_suffix]
-              ifc_classification.name = BimTools::IfcManager::IfcLabel.new(@ifc_model,
-                                                                           attr_dict.name << ' Classification')
-            else
-              ifc_classification.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, attr_dict.name)
+            IfcRelDefinesByPropertiesBuilder.build(@ifc_model) do |builder|
+              builder.set_relatingpropertydefinition(propertyset)
+              builder.add_related_object(ifc_entity)
             end
           end
+        end
+      end
 
-          attributes = []
-          attr_dict.attribute_dictionaries.each do |attribute|
-            attributes << attribute['value']
+      # Add the Sketchup properties SU_InstanceSet
+      #   if defined in settings attributes
+      def add_sketchup_instance_properties(ifc_model, ifc_entity, sketchup)
+        attributes = ifc_model.options[:attributes]
+        if attributes.include?(INSTANCE_SET_NAME) && (sketchup.attribute_dictionaries && (attr_dict = sketchup.attribute_dictionaries[INSTANCE_SET_NAME])) && propertyset = get_propertyset(attr_dict)
+          IfcRelDefinesByPropertiesBuilder.build(@ifc_model) do |builder|
+            builder.set_relatingpropertydefinition(propertyset)
+            builder.add_related_object(ifc_entity)
           end
-
-          # No way to map values with certainty, just pick the first 2
-          next unless attributes.length > 1
-
-          classification_ref = ifc_classification.ifc_classification_references[attributes[0]]
-          unless classification_ref
-            classification_ref = @ifc::IfcClassificationReference.new(@ifc_model)
-            classification_ref.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, attributes[1])
-            classification_ref.referencedsource = ifc_classification
-
-            # add classification_ref to the list of references in the classification
-            ifc_classification.ifc_classification_references[attributes[0]] = classification_ref
-
-            # Catch IFC4 atrribute name change
-            identification = BimTools::IfcManager::IfcIdentifier.new(@ifc_model, attributes[0])
-            if @ifc::IfcClassificationReference.method_defined?(:itemreference)
-              classification_ref.itemreference = identification
-            else
-              classification_ref.identification = identification
-            end
-
-            # create IfcRelAssociatesClassification
-            rel = @ifc::IfcRelAssociatesClassification.new(@ifc_model)
-            rel.relatedobjects = BimTools::IfcManager::Ifc_Set.new
-            rel.relatingclassification = classification_ref
-            classification_ref.ifc_rel_associates_classification = rel
-          end
-          classification_ref.ifc_rel_associates_classification.relatedobjects.add(@ifc_entity)
         end
       end
 
@@ -196,7 +154,7 @@ module BimTools
         name = attr_dict.name
 
         # don't overwrite already set values
-        return false unless @ifc_entity.send(name.downcase.to_s).nil?
+        return false unless @ifc_entity.send(name.downcase).nil?
 
         property = Property.new(attr_dict)
         value = property.value
@@ -211,13 +169,178 @@ module BimTools
         ifc_value ||= get_ifc_property_value(value, property.attribute_type)
         return @ifc_entity.send("#{name.downcase}=", ifc_value) if ifc_value
       end
+
+      # Creates PropertySet if there are any properties to export
+      #
+      # @return [IfcPropertySet, IfcElementQuantity, False]
+      def get_propertyset(attr_dict)
+        quantities = if (attr_dict.name == 'BaseQuantities') || attr_dict.name.start_with?('Qto_') # export as elementquantities
+                       true
+                     else
+                       false
+                     end
+
+        properties = []
+
+        if pset_dicts = attr_dict.attribute_dictionaries
+          names = pset_dicts.map { |x| x.name }
+          names -= UNUSED_DICTS # filter out unwanted dictionaries
+
+          # get the first dictionary (there should be only one left)
+          names.each do |pset_dict_name|
+            pset_dict = pset_dicts[pset_dict_name]
+            property = Property.new(pset_dict)
+            value = property.value
+            ifc_type = property.ifc_type
+
+            # Never set empty values
+            next if value.nil? || (value.is_a?(String) && value.empty?)
+
+            if quantities
+
+              if value
+                case get_quantity_type(property.name)
+                when :length
+                  ifc_value = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, long = false, geometry = false)
+                when :area
+                  ifc_value = IfcManager::Types::IfcAreaMeasure.new(@ifc_model, value)
+                when :volume
+                  ifc_value = IfcManager::Types::IfcVolumeMeasure.new(@ifc_model, value)
+                when :weight
+                  ifc_value = IfcManager::Types::IfcMassMeasure.new(@ifc_model, value)
+                end
+              end
+
+              next unless ifc_value
+
+              properties << IfcQuantityBuilder.build(@ifc_model) do |builder|
+                builder.set_value(ifc_value)
+                builder.set_name(property.name)
+              end
+            else
+
+              ifc_value = ifc_type.new(@ifc_model, value, true) if ifc_type
+
+              # Check if IFC type is set, otherwise use basic types
+              ifc_value ||= get_ifc_property_value(value, property.attribute_type, true)
+
+              next unless ifc_value
+
+              properties << IfcPropertyBuilder.build(@ifc_model, property.attribute_type) do |builder|
+                builder.set_name(property.name)
+                builder.set_value(ifc_value)
+                builder.set_enumeration_reference(property.options) # in case of enumeration
+              end
+            end
+          end
+
+        else # Any other AttributeDictionaries like 'SU_DefinitionSet' and 'SU_InstanceSet'
+          attr_dict.each do |key, value|
+            next unless value
+            next if value.is_a?(String) && value.empty?
+
+            properties << IfcPropertyBuilder.build(@ifc_model) do |builder|
+              builder.set_name(key)
+              builder.set_value(get_ifc_property_value(value, nil, true))
+            end
+          end
+        end
+
+        if properties.empty?
+          false
+        elsif quantities
+          IfcElementQuantityBuilder.build(@ifc_model) do |builder|
+            builder.set_name(attr_dict.name)
+            builder.set_quantities(properties)
+          end
+        else
+          IfcPropertySetBuilder.build(@ifc_model) do |builder|
+            builder.set_name(attr_dict.name)
+            builder.set_properties(properties)
+          end
+        end
+      end
+
+      def add_propertyset(attr_dict)
+        if propertyset = get_propertyset(attr_dict)
+          IfcRelDefinesByPropertiesBuilder.build(@ifc_model) do |builder|
+            builder.set_relatingpropertydefinition(propertyset)
+            builder.add_related_object(@ifc_entity)
+          end
+        end
+      end
+
+      def get_ifc_property_value(value, attribute_type, long = false)
+        case attribute_type
+        when 'string'
+          IfcManager::Types::IfcText.new(@ifc_model, value, long) # check string length?
+        when 'boolean'
+          IfcManager::Types::IfcBoolean.new(@ifc_model, value, long)
+        when 'double'
+          IfcManager::Types::IfcReal.new(@ifc_model, value, long)
+        when 'long'
+          IfcManager::Types::IfcInteger.new(@ifc_model, value, long)
+        when 'choice'
+          # Skip this attribute, this is not a value but a reference
+          false
+        when 'enumeration'
+          if long
+            IfcManager::Types::IfcLabel.new(@ifc_model, value, long)
+          else
+            value.to_sym
+          end
+        else
+          case value
+          when String
+            IfcManager::Types::IfcText.new(@ifc_model, value, long) # check string length?
+          when TrueClass
+            IfcManager::Types::IfcBoolean.new(@ifc_model, value, long)
+          when FalseClass
+            IfcManager::Types::IfcBoolean.new(@ifc_model, value, long)
+          when Float
+            IfcManager::Types::IfcReal.new(@ifc_model, value, long)
+          when Integer
+            IfcManager::Types::IfcInteger.new(@ifc_model, value, long)
+          when Length
+            IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, long, geometry = false)
+          else # Map all others to string
+            IfcManager::Types::IfcText.new(@ifc_model, value, long)
+          end
+        end
+      end
+
+      def get_quantity_type(name)
+        case name.upcase
+        when /AREA/
+          :area
+        when /VOLUME/
+          :volume
+        when /WEIGHT/
+          :weight
+        else # when /LENGTH/, /WIDTH/, /HEIGHT/, /DEPTH/, /PERIMETER/
+          :length
+        end
+      end
+
+      def self.get_quantity_type(name)
+        case name.upcase
+        when /AREA/
+          :area
+        when /VOLUME/
+          :volume
+        when /WEIGHT/
+          :weight
+        else # when /LENGTH/, /WIDTH/, /HEIGHT/, /DEPTH/, /PERIMETER/
+          :length
+        end
+      end
     end
   end
 
   # Collects the needed attributes for an IfcProperty from
   #  a nested Sketchup AttributeDictionary structure
   #
-  # @param attr_dict [Sketchup::AttributeDictionary]
+  # @param [Sketchup::AttributeDictionary] attr_dict
   #
   class Property
     attr_reader :name, :value, :ifc_type, :attribute_type, :options
@@ -228,7 +351,7 @@ module BimTools
       proxy
       edo
       instanceAttributes
-    ]
+    ].freeze
 
     def initialize(attr_dict)
       @name = attr_dict.name
@@ -264,21 +387,21 @@ module BimTools
           @options = value_dict['options']
 
           # Check for IFC type
-          if ifc_type_name[0].upcase == ifc_type_name[0] && BimTools::IfcManager.const_defined?(ifc_type_name)
-            @ifc_type = BimTools::IfcManager.const_get(ifc_type_name)
+          if ifc_type_name[0].upcase == ifc_type_name[0] && IfcManager.const_defined?(ifc_type_name)
+            @ifc_type = IfcManager.const_get(ifc_type_name)
           end
 
           # Sometimes the value is even nested a level deeper
           #   like: path = ["IFC 2x3", "IfcWindow", "OverallWidth", "IfcPositiveLengthMeasure", "IfcLengthMeasure"]
-          #   (!) This deepest level does not contain the ifc_type we need!
+          #   @todo: This deepest level does not contain the ifc_type we need!
           if !@value && value_dict.attribute_dictionaries
             subtype_dicts = value_dict.attribute_dictionaries
-            names = subtype_dicts.map { |x| x.name.to_sym }
+            names = subtype_dicts.map { |x| x.name }
             names -= UNUSED_DICTS # filter out unwanted dictionaries
 
             # there should be only one dictionary left
             if ifc_subtype_name = names.first
-              subtype_dict = subtype_dicts[ifc_subtype_name.to_s]
+              subtype_dict = subtype_dicts[ifc_subtype_name]
               @value = subtype_dict['value']
               @options = subtype_dict['options']
             end

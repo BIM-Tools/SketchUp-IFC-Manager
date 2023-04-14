@@ -21,8 +21,8 @@
 # input text name element
 
 module BimTools::IfcManager
-  require File.join(PLUGIN_PATH_UI, 'input_text.rb')
-  require File.join(PLUGIN_PATH, 'update_ifc_fields.rb')
+  require File.join(PLUGIN_PATH_UI, 'input_text')
+  require File.join(PLUGIN_PATH, 'update_ifc_fields')
   module PropertiesWindow
     class HtmlInputName < HtmlInputText
       def initialize(dialog)

@@ -21,7 +21,7 @@
 # input text element
 
 module BimTools::IfcManager
-  require File.join(PLUGIN_PATH_UI, 'form_element.rb')
+  require File.join(PLUGIN_PATH_UI, 'form_element')
   module PropertiesWindow      
     class HtmlInputText < FormElement
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  export.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
@@ -19,110 +21,108 @@
 #
 #
 
-require_relative File.join('lib', 'lib_ifc', 'IfcModel.rb')
+require_relative File.join('lib', 'lib_ifc', 'IfcModel')
 
 module BimTools
   module IfcManager
     require 'net/http'
     require 'uri'
-    require File.join(PLUGIN_PATH, 'update_ifc_fields.rb')
-    require File.join(PLUGIN_PATH_LIB, 'progressbar.rb')
+    require File.join(PLUGIN_PATH, 'update_ifc_fields')
+    require File.join(PLUGIN_PATH_LIB, 'progressbar')
 
-    def export( file_path )
+    def export(file_path)
       su_model = Sketchup.active_model
 
       # close previous export summary if still open
-      if @summary_dialog
-        @summary_dialog.close
-      end
+      @summary_dialog.close if @summary_dialog
 
       # reset export messages
-      BimTools::IfcManager::export_messages = Array.new
+      IfcManager.export_messages = []
 
       # create new progressbar
-      pb = ProgressBar.new(4,"Exporting to #{ifc_version = BimTools::IfcManager::Settings.ifc_version}...")
-      
+      pb = ProgressBar.new(4, "Exporting to #{ifc_version = Settings.ifc_version}...")
+
       # start timer
       timer = Time.now
 
       # get export options
       options = Settings.export
-      
+
       # update all IFC name fields with the component definition name
       # (?) is this necessary, or should this already be 100% correct at the time of export?
       su_model.start_operation('Update IFC data', true)
-      BimTools::IfcManager::update_ifc_fields( su_model )
+      IfcManager.update_ifc_fields(su_model)
       su_model.commit_operation
-      
+
       pb.update(1)
-      
+
       # create new IfcModel
-      ifc_model = IfcModel.new( su_model, options )
-      
+      ifc_model = IfcModel.new(su_model, options)
+
       pb.update(2)
-      
+
       # get total time
-      puts "finished creating #{ifc_version = BimTools::IfcManager::Settings.ifc_version} entities: #{(Time.now - timer).to_s}"
-      
+      puts "finished creating #{ifc_version = Settings.ifc_version} entities: #{Time.now - timer}"
+
       # export model to IFC step file
-      ifc_model.export( file_path )
-      
+      ifc_model.export(file_path)
+
       pb.update(3)
-      
+
       # get total time
       time = Time.now - timer
-      puts "finished export: #{time.to_s}"
-      
+      puts "finished export: #{time}"
+
       pb.update(4)
-      
-      show_summary( ifc_model.export_summary, file_path, time )
-      
+
+      show_summary(ifc_model.export_summary, file_path, time)
+
       # write log
       begin
-        
         # run in seperate thread to prevent waiting
         Thread.new do
-          uri = URI.parse("http://www.bim4sketchup.org/log.php")
+          uri = URI.parse('http://www.bim4sketchup.org/log.php')
           http = Net::HTTP.new(uri.host, uri.port)
           request = Net::HTTP::Post.new(uri.request_uri)
-          request.set_form_data({"version" => VERSION, "extension" => "Sketchup IFC Manager"})
+          request.set_form_data({ 'version' => VERSION, 'extension' => 'Sketchup IFC Manager' })
           http.request(request)
         end
-      rescue
-        puts "failed writing log."
+      rescue StandardError
+        puts 'failed writing log.'
       end
-    end # export
+    end
 
     def add_export_message(message)
-      BimTools::IfcManager::export_messages << message
+      IfcManager.export_messages << message
     end
 
-    def show_summary( hash, file_path, time )
+    def show_summary(hash, file_path, time)
       css = File.join(PLUGIN_PATH_CSS, 'sketchup.css')
-      html = "<html><head><link rel='stylesheet' type='text/css' href='#{css}'></head><body><textarea readonly>#{ifc_version = BimTools::IfcManager::Settings.ifc_version} Entities exported:\n\n"
-      hash.each_pair do | key, value |
-        html << "#{value.to_s} #{key.to_s}\n"
+      html = +"<html><head><link rel='stylesheet' type='text/css' href='#{css}'></head><body><textarea readonly>#{ifc_version = Settings.ifc_version} Entities exported:\n\n"
+      hash.each_pair do |key, value|
+        html << "#{value} #{key}\n"
       end
       html << "\n To file '#{file_path}'\n"
-      html << "\n Taking a total number of #{time.to_s} seconds\n"
-      unless BimTools::IfcManager::export_messages.empty?
-        messages = BimTools::IfcManager::export_messages.uniq.sort.join("\n- ")
+      html << "\n Taking a total number of #{time} seconds\n"
+      unless IfcManager.export_messages.empty?
+        messages = IfcManager.export_messages.uniq.sort.join("\n- ")
         html << "\nMessages:\n- #{messages}\n"
       end
-      html << "</textarea></body></html>"
+      html << '</textarea></body></html>'
       @summary_dialog = UI::HtmlDialog.new(
-      {
-        :dialog_title => "Export results",
-        :scrollable => false,
-        :resizable => true,
-        :width => 320,
-        :height => 520,
-        :left => 200,
-        :top => 200,
-        :style => UI::HtmlDialog::STYLE_UTILITY
-      })
-      @summary_dialog.set_html( html )
+        {
+          dialog_title: 'Export results',
+          scrollable: false,
+          resizable: true,
+          width: 320,
+          height: 520,
+          left: 200,
+          top: 200,
+          style: UI::HtmlDialog::STYLE_UTILITY
+        }
+      )
+      @summary_dialog.set_html(html)
       @summary_dialog.show
     end
-  end # module IfcManager
-end # module BimTools
+  end
+end

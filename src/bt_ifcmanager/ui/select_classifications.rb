@@ -22,7 +22,7 @@
 
 module BimTools::IfcManager
   if Settings.common_psets
-    require File.join(PLUGIN_PATH_LIB, "lib_ifc", 'add_common_psets.rb')
+    require File.join(PLUGIN_PATH_LIB, "lib_ifc", 'add_common_psets')
   end
   module PropertiesWindow      
     class HtmlSelectClassifications < HtmlSelect

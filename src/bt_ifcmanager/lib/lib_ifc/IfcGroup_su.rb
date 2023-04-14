@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcGroup_su.rb
 #
 #  Copyright 2021 Jan Brouwer <jan@brewsky.nl>
@@ -19,19 +21,19 @@
 #
 #
 
-require_relative 'set'
-require_relative 'propertyset'
+require_relative 'ifc_types'
+require_relative 'PropertyReader'
 
 module BimTools
   module IfcGroup_su
-    # @param ifc_model [IfcManager::IfcModel]
-    # @param sketchup [Sketchup::ComponentDefinition]
+    # @param [IfcManager::IfcModel] ifc_model
+    # @param [Sketchup::ComponentDefinition] sketchup
     def initialize(ifc_model, sketchup = nil)
       super
       @ifc = BimTools::IfcManager::Settings.ifc_module
       @rel = @ifc::IfcRelAssignsToGroup.new(ifc_model)
       @rel.relatinggroup = self
-      @rel.relatedobjects = IfcManager::Ifc_Set.new
+      @rel.relatedobjects = IfcManager::Types::Set.new
 
       # (!) Functionalty and code is similar to IfcProduct, should be merged
       if sketchup.is_a?(Sketchup::Group) || sketchup.is_a?(Sketchup::ComponentInstance)
@@ -41,13 +43,10 @@ module BimTools
         definition = sketchup.definition
 
         # (?) set name, here? is this a duplicate?
-        @name = BimTools::IfcManager::IfcLabel.new(ifc_model, definition.name)
-
-        # also set "tag" to component instance name?
-        # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
+        @name = IfcManager::Types::IfcLabel.new(ifc_model, definition.name)
 
         # get attributes from su object and add them to IfcProduct
-        dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(ifc_model, self, definition.attribute_dictionaries)
+        dict_reader = IfcManager::IfcDictionaryReader.new(ifc_model, self, definition.attribute_dictionaries)
         dict_reader.set_attributes
         dict_reader.add_propertysets
         dict_reader.add_classifications

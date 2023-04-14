@@ -23,11 +23,11 @@
 require 'json'
 
 module BimTools::IfcManager
-  module PropertiesWindow      
+  module PropertiesWindow
     class HtmlSelectMaterials < HtmlSelect
 
       def initialize(dialog, name)
-        super(dialog, name)          
+        super(dialog, name)
         @button = true
       end
 
@@ -40,7 +40,7 @@ module BimTools::IfcManager
         self.set_js_options(materials,options_template)
         super(extra)
       end
-      
+
       def set_value()
         selection = Set.new()
         su_selection = Sketchup.active_model.selection
@@ -59,7 +59,7 @@ module BimTools::IfcManager
         end
         set_value_from_list(selection.to_a)
       end
-      
+
       def html(selection)
         set_options()
         set_value()
@@ -100,12 +100,12 @@ module BimTools::IfcManager
         @dialog.add_action_callback("add_" << @id) { |action_context|
           input = UI.inputbox(["Name:"], [""], "Create material...")
           if input
-          
+
             # make sure the input is never empty to get a proper material name
             if input[0] == ""
               input[0] = "Material"
             end
-            
+
             model = Sketchup.active_model
             selection = model.selection
             new_material = model.materials.add(input[0].downcase)

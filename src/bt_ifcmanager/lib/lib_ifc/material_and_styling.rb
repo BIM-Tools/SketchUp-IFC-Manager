@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  material_and_styling.rb
 #
 #  Copyright 2022 Jan Brouwer <jan@brewsky.nl>
@@ -19,45 +21,53 @@
 #
 #
 
-require_relative 'IfcURIReference'
+require_relative 'ifc_types'
 
 module BimTools
   module IfcManager
     # Class that manages the relationship between a Sketchup material and
     #  it's IFC counterparts (material and styling)
     #
-    # @param ifc_model [BimTools::IfcManager::IfcModel]
-    # @param su_material [Sketchup::Material] Sketckup material for which IFC material and styles will be created
+    # @param [IfcModel] ifc_model
+    # @param [Sketchup::Material] su_material Sketckup material for which IFC material and styles will be created
     class MaterialAndStyling
       attr_reader :image_texture
 
       def initialize(ifc_model, su_material = nil)
         @ifc_model = ifc_model
-        @su_material = su_material
-        @ifc = BimTools::IfcManager::Settings.ifc_module
-        @material_name = if su_material
-                           su_material.display_name
-                         else
-                           'Default'
-                         end
+        @ifc = Settings.ifc_module
+        @material_assoc = create_material_assoc(su_material)
+        @surface_styles = create_surface_styles(su_material)
         @image_texture = create_image_texture
       end
 
       # Creates IfcRelAssociatesMaterial
       #
-      # @param material_name [string]
+      # @param [Sketchup::Material] su_material
       # @return [IfcRelAssociatesMaterial] Material association
-      def create_material_assoc
+      def create_material_assoc(su_material)
+        material_name = if su_material
+                          su_material.display_name
+                        else
+                          'Default'
+                        end
+        persistent_id = if su_material
+                          su_material.persistent_id
+                        else
+                          'IfcMaterial.Default'
+                        end
+
         material_assoc = @ifc::IfcRelAssociatesMaterial.new(@ifc_model)
+        material_assoc.globalid = IfcManager::IfcGloballyUniqueId.new(@ifc_model, persistent_id)
         material_assoc.relatingmaterial = @ifc::IfcMaterial.new(@ifc_model)
-        material_assoc.relatingmaterial.name = BimTools::IfcManager::IfcLabel.new(@ifc_model, @material_name)
-        material_assoc.relatedobjects = IfcManager::Ifc_Set.new
+        material_assoc.relatingmaterial.name = Types::IfcLabel.new(@ifc_model, material_name)
+        material_assoc.relatedobjects = Types::Set.new
         material_assoc
       end
 
       # Creates IfcRelAssociatesMaterial
       #
-      # @param su_material [Sketchup::Material]
+      # @param [Sketchup::Material] su_material
       # @return [Ifc_Set] Set of IFC surface styles
       def create_surface_styles
         if @su_material && @ifc_model.options[:colors]
@@ -66,16 +76,17 @@ module BimTools
           colourrgb = @ifc::IfcColourRgb.new(@ifc_model, @su_material)
 
           # Workaround for mandatory IfcPresentationStyleAssignment in IFC2x3
-          if BimTools::IfcManager::Settings.ifc_version == 'IFC 2x3'
-            styleassignment = @ifc::IfcPresentationStyleAssignment.new(@ifc_model, @su_material)
-            styleassignment.styles = IfcManager::Ifc_Set.new([surfacestyle])
-            surface_styles = IfcManager::Ifc_Set.new([styleassignment])
+          if Settings.ifc_version == 'IFC 2x3'
+            styleassignment = @ifc::IfcPresentationStyleAssignment.new(@ifc_model, su_material)
+            styleassignment.styles = Types::Set.new([surfacestyle])
+            surface_styles = Types::Set.new([styleassignment])
           else
-            surface_styles = IfcManager::Ifc_Set.new([surfacestyle])
+            surface_styles = Types::Set.new([surfacestyle])
           end
 
           surfacestyle.side = :both
-          surfacestyle.styles = IfcManager::Ifc_Set.new([surfacestylerendering])
+          surfacestyle.name = Types::IfcLabel.new(@ifc_model, su_material.name)
+          surfacestyle.styles = Types::Set.new([surfacestylerendering])
 
           surfacestylerendering.surfacecolour = colourrgb
           surfacestylerendering.reflectancemethod = :notdefined
@@ -83,23 +94,19 @@ module BimTools
           if @su_material
 
             # add transparency, converted from Sketchup's alpha value
-            surfacestylerendering.transparency = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(@ifc_model,
-                                                                                                     1 - @su_material.alpha)
+            surfacestylerendering.transparency = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1 - su_material.alpha)
 
             # add color values, converted from 0/255 to fraction
-            colourrgb.red = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(@ifc_model,
-                                                                                @su_material.color.red.to_f / 255)
-            colourrgb.green = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(@ifc_model,
-                                                                                  @su_material.color.green.to_f / 255)
-            colourrgb.blue = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(@ifc_model,
-                                                                                 @su_material.color.blue.to_f / 255)
+            colourrgb.red = Types::IfcNormalisedRatioMeasure.new(@ifc_model, su_material.color.red.to_f / 255)
+            colourrgb.green = Types::IfcNormalisedRatioMeasure.new(@ifc_model, su_material.color.green.to_f / 255)
+            colourrgb.blue = Types::IfcNormalisedRatioMeasure.new(@ifc_model, su_material.color.blue.to_f / 255)
           else
 
             # (?) use default values == white
-            surfacestylerendering.transparency = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(@ifc_model, 0.0)
-            colourrgb.red = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
-            colourrgb.green = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
-            colourrgb.blue = BimTools::IfcManager::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
+            surfacestylerendering.transparency = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 0.0)
+            colourrgb.red = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
+            colourrgb.green = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
+            colourrgb.blue = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
           end
           surface_styles
         end
@@ -114,17 +121,17 @@ module BimTools
           texturetransform.axis1 = @ifc_model.default_axis
           texturetransform.axis2 = @ifc_model.default_refdirection
           texturetransform.localorigin = @ifc_model.default_location
-          texturetransform.scale = IfcManager::IfcReal.new(@ifc_model, IfcManager::IfcLengthMeasure.new(@ifc_model,su_texture.width).convert)
-          texturetransform.scale2 = IfcManager::IfcReal.new(@ifc_model, IfcManager::IfcLengthMeasure.new(@ifc_model,su_texture.height).convert)
+          texturetransform.scale = Types::IfcReal.new(@ifc_model, Types::IfcLengthMeasure.new(@ifc_model,su_texture.width).convert)
+          texturetransform.scale2 = Types::IfcReal.new(@ifc_model, Types::IfcLengthMeasure.new(@ifc_model,su_texture.height).convert)
           image_texture.texturetransform = texturetransform
-          image_texture.urlreference = BimTools::IfcManager::IfcURIReference.new(@ifc_model, File.basename(su_texture.filename))
+          image_texture.urlreference = Types::IfcURIReference.new(@ifc_model, File.basename(su_texture.filename))
           image_texture
         end
       end
 
       # Add the material to an IFC entity
       #
-      # @param ifc_entity [IfcProduct] IFC Entity
+      # @param[IfcProduct] ifc_entity IFC Entity
       def add_to_material(ifc_entity)
         @material_assoc ||= create_material_assoc
         @material_assoc.relatedobjects.add(ifc_entity)
@@ -132,7 +139,7 @@ module BimTools
 
       # Add the stylings to a shaperepresentation
       #
-      # @param ifc_entity [IfcShapeRepresentation] IFC Entity
+      # @param [IfcShapeRepresentation] ifc_entity IFC Entity
       def add_to_styling(ifc_entity)
         @surface_styles ||= create_surface_styles
         if @surface_styles

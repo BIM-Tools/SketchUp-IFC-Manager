@@ -684,6 +684,9 @@ IfcDoor:
   :explicit:
   - :OverallHeight
   - :OverallWidth
+  - :PredefinedType
+  - :OperationType
+  - :UserDefinedOperationType
 IfcDoorLiningProperties:
   :explicit:
   - :LiningDepth
@@ -2326,6 +2329,9 @@ IfcWindow:
   :explicit:
   - :OverallHeight
   - :OverallWidth
+  - :PredefinedType
+  - :PartitioningType
+  - :UserDefinedPartitioningType
 IfcWindowLiningProperties:
   :explicit:
   - :LiningDepth

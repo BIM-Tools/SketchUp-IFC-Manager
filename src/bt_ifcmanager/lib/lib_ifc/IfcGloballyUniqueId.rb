@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcGloballyUniqueId.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
@@ -31,11 +33,14 @@ module BimTools
       # possible characters in GUID
       GUID64 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$'
 
-      def initialize(sketchup = nil, parent_hex_guid = nil)
-        # if sketchup object has a GUID, then use that, otherwise create new
-        if sketchup && defined?(sketchup.guid)
-          @hex_guid = unformat_guid(sketchup.guid)
-          @hex_guid = combined_guid(@hex_guid, parent_hex_guid) if parent_hex_guid
+      def initialize(ifc_model = nil, instance_path = nil)
+        if ifc_model && instance_path
+          uuid = ifc_model.project_data.get_attribute('uuid', instance_path)
+          unless uuid
+            uuid = SecureRandom.uuid
+            ifc_model.project_data.set_attribute('uuid', instance_path, uuid)
+          end
+          @hex_guid = unformat_guid(uuid)
         else
           @hex_guid = new_guid
         end
@@ -53,7 +58,7 @@ module BimTools
 
       # convert unformatted hex number into IfcGloballyUniqueId
       def to_s
-        ifc_guid = ''
+        ifc_guid = +''
 
         # https://www.cryptosys.net/pki/uuid-rfc4122.html
         # pack('H*'): converts the hex string to a binary number (high nibble first)
@@ -74,6 +79,16 @@ module BimTools
         ifc_guid.to_s
       end
 
+      # Get sketchup guid including persistent_id
+      # added persistent_id as workaround for duplicate guids in Sketchup
+      def get_sketchup_hex_guid(sketchup)
+        # if defined?(sketchup.persistent_id)
+        #   (unformat_guid(sketchup.guid).to_i(16) ^ sketchup.persistent_id).to_s(16).rjust(32, '0')
+        # else
+        unformat_guid(sketchup.guid)
+        # end
+      end
+
       # recognize guid type (IFC or UUID) and reformat to unformatted hex version without dashes
       def unformat_guid(guid)
         if guid.length == 22
@@ -83,25 +98,9 @@ module BimTools
         end
       end
 
-      # combine guid with parent guid
-      def combined_guid(sketchup_guid, parent_guid)
-        guid = (sketchup_guid.to_i(16) ^ parent_guid.to_i(16)).to_s(16).rjust(32, '0')
-
-        # The digit at position 1 above is always "4"
-        # set the four most significant bits of the 7th byte to 0100'B, so the high nibble is "4"
-        guid[12] = '4'
-
-        # and the digit at position 2 is always one of "8", "9", "A" or "B".
-        # set the two most significant bits of the 9th byte to 10'B, so the high nibble will be one of "8", "9", "A", or "B".
-        bin = [guid[16]].pack('H*').unpack('B*')[0]
-        bin[0..1] = '10'
-        guid[16] = [bin].pack('B*').unpack('H*')[0][0]
-        guid
-      end
-
       # convert IfcGloballyUniqueId into unformatted hex number
       def ifc_guid_to_hex(ifc_guid)
-        bin = ''
+        bin = +''
         length = 2
         ifc_guid.each_char do |char|
           n = GUID64.index(char.to_s)

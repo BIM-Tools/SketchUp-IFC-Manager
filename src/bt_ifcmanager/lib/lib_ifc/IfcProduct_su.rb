@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcProduct_su.rb
 #
 #  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
@@ -19,31 +21,20 @@
 #
 #
 
-# load types
-require_relative 'IfcBoolean'
-require_relative 'IfcDate'
-require_relative 'IfcLabel'
-require_relative 'IfcIdentifier'
-require_relative 'IfcReal'
-require_relative 'IfcInteger'
-require_relative 'IfcText'
-
+require_relative 'ifc_types'
 require_relative 'dynamic_attributes'
 require_relative 'PropertyReader'
-require_relative 'propertyset'
 require_relative 'material_and_styling'
 
 module BimTools
   module IfcProduct_su
     attr_accessor :su_object, :parent, :total_transformation, :type_product
 
-    extend BimTools::IfcManager::PropertyDictionary
-
     @su_object = nil
     @parent = nil
 
-    # @param ifc_model [BimTools::IfcManager::IfcModel]
-    # @param sketchup [nil, #definition] an empty object (default object), Sketchup::ComponentInstance or Sketchup::Group
+    # @param [BimTools::IfcManager::IfcModel] ifc_model
+    # @param [nil, #definition] sketchup an empty object (default object), Sketchup::ComponentInstance or Sketchup::Group
     def initialize(ifc_model, sketchup)
       super
       @ifc = BimTools::IfcManager::Settings.ifc_module
@@ -57,7 +48,7 @@ module BimTools
         # (?) set name, here? is this a duplicate?
         name = @su_object.name
         name = definition.name if name.length == 0
-        @name = BimTools::IfcManager::IfcLabel.new(ifc_model, name)
+        @name = IfcManager::Types::IfcLabel.new(ifc_model, name)
 
         # Set IfcProductType
         if ifc_model.options[:types]
@@ -75,9 +66,6 @@ module BimTools
           end
         end
         @type_properties = ifc_model.options[:type_properties] && @type_product
-
-        # (?) set "tag" to component instance name?
-        # tag definition: The tag (or label) identifier at the particular instance of a product, e.g. the serial number, or the position number. It is the identifier at the occurrence level.
 
         # get attributes from su object and add them to IfcProduct
         if dicts = definition.attribute_dictionaries
@@ -103,7 +91,7 @@ module BimTools
 
           # create materialassociation
           su_material = @su_object.material
-          unless ifc_model.materials[su_material]
+          unless ifc_model.materials.include?(su_material)
             ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
           end
 

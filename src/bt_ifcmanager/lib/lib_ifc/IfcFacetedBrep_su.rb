@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcFacetedBrep_su.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
@@ -19,7 +21,7 @@
 #
 #
 
-require_relative 'set'
+require_relative 'ifc_types'
 require_relative 'IfcParameterValue'
 
 module BimTools
@@ -37,7 +39,7 @@ module BimTools
       @flipped = !(@su_transformation.xaxis * @su_transformation.yaxis % @su_transformation.zaxis < 0)
 
       faces = su_faces.map { |face| add_face(face) }
-      ifcclosedshell.cfsfaces = IfcManager::Ifc_Set.new(faces) if faces.length != 0
+      ifcclosedshell.cfsfaces = IfcManager::Types::Set.new(faces) if faces.length != 0
     end
 
     def add_face(su_face)
@@ -78,8 +80,8 @@ module BimTools
       polyloop = @ifc::IfcPolyLoop.new(@ifc_model)
       bound.bound = polyloop
       bound.orientation = @flipped
-      polyloop.polygon = IfcManager::Ifc_List.new(points)
-      tex_map.vertices = IfcManager::Ifc_Set.new(loop.vertices.map { |vert| get_uv(vert, uv_helper) }) if tex_map
+      polyloop.polygon = IfcManager::Types::List.new(points)
+      tex_map.vertices = IfcManager::Types::Set.new(loop.vertices.map { |vert| get_uv(vert, uv_helper) }) if tex_map
       bound
     end
 
@@ -88,7 +90,7 @@ module BimTools
       u = IfcManager::IfcParameterValue.new(@ifc_model, uvq.x / uvq.z)
       v = IfcManager::IfcParameterValue.new(@ifc_model, uvq.y / uvq.z)
       texture_vert = @ifc::IfcTextureVertex.new(@ifc_model)
-      texture_vert.coordinates = IfcManager::Ifc_List.new([u, v])
+      texture_vert.coordinates = IfcManager::Types::List.new([u, v])
       texture_vert
     end
 

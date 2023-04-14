@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcPresentationLayerAssignment_su.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
@@ -19,8 +21,7 @@
 #
 #
 
-require_relative 'IfcLabel'
-require_relative 'set'
+require_relative 'ifc_types'
 
 module BimTools
   module IfcPresentationLayerAssignment_su
@@ -28,8 +29,8 @@ module BimTools
       raise TypeError, 'sketchup parameter must be of type Sketchup::Layer' unless sketchup.is_a?(Sketchup::Layer)
 
       super
-      @name = IfcManager::IfcLabel.new(ifc_model, sketchup.name)
-      @assigneditems = IfcManager::Ifc_Set.new
+      @name = IfcManager::Types::IfcLabel.new(ifc_model, sketchup.name)
+      @assigneditems = IfcManager::Types::Set.new
     end
   end
 end

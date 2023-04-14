@@ -22,9 +22,10 @@
 
 require 'json'
 
-module BimTools::IfcManager
-  require File.join(PLUGIN_PATH_UI, 'form_element.rb')
-    module PropertiesWindow      
+module BimTools
+  module IfcManager
+    require File.join(PLUGIN_PATH_UI, 'form_element')
+    module PropertiesWindow
       class HtmlSelect < FormElement
         attr_reader:options
 
@@ -115,8 +116,7 @@ module BimTools::IfcManager
           else
             index = @options.index(@value)
           end
-          self.dialog.execute_script("$('##{@id}').val(#{index}).trigger('change');")
-
+          self.dialog.execute_script("$('##{@id}').val(#{index});\n$('##{@id}').trigger('change');")
         end
 
         def set_value()
@@ -153,3 +153,4 @@ module BimTools::IfcManager
       end
     end
   end
+end

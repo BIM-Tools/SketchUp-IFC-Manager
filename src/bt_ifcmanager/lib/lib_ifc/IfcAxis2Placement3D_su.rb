@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  IfcAxis2Placement3D_su.rb
 #
 #  Copyright 2022 Jan Brouwer <jan@brewsky.nl>
@@ -18,8 +20,6 @@
 #  MA 02110-1301, USA.
 #
 #
-
-require_relative 'IfcReal'
 
 module BimTools
   module IfcAxis2Placement3D_su
