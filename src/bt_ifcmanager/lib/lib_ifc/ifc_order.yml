@@ -2087,6 +2087,7 @@ IfcSurfaceStyleRefraction:
 IfcSurfaceStyleShading:
   :explicit:
   - :SurfaceColour
+  - :Transparency
 IfcSurfaceStyleRendering:
   :explicit:
   - :Transparency

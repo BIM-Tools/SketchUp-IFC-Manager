@@ -646,6 +646,8 @@ module BimTools::IfcManager::Types
 
   # TYPE IfcParameterValue = REAL;
   # END_TYPE;
+  class IfcParameterValue < IfcReal
+  end
 
   # TYPE IfcPlanarForceMeasure = REAL;
   # END_TYPE;

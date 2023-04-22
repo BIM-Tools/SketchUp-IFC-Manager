@@ -36,16 +36,18 @@ module BimTools
       def initialize(ifc_model, su_material = nil)
         @ifc_model = ifc_model
         @ifc = Settings.ifc_module
-        @material_assoc = create_material_assoc(su_material)
-        @surface_styles = create_surface_styles(su_material)
-        @image_texture = create_image_texture
+        @su_material = su_material
+        @image_texture = create_image_texture(su_material)
+        @surface_styles_both = nil
+        @surface_styles_positive = nil
+        @surface_styles_negative = nil
       end
 
       # Creates IfcRelAssociatesMaterial
       #
       # @param [Sketchup::Material] su_material
       # @return [IfcRelAssociatesMaterial] Material association
-      def create_material_assoc(su_material)
+      def create_material_assoc(su_material=nil)
         material_name = if su_material
                           su_material.display_name
                         else
@@ -69,51 +71,70 @@ module BimTools
       #
       # @param [Sketchup::Material] su_material
       # @return [Ifc_Set] Set of IFC surface styles
-      def create_surface_styles
-        if @su_material && @ifc_model.options[:colors]
-          surfacestyle = @ifc::IfcSurfaceStyle.new(@ifc_model, @su_material)
-          surfacestylerendering = @ifc::IfcSurfaceStyleRendering.new(@ifc_model, @su_material)
-          colourrgb = @ifc::IfcColourRgb.new(@ifc_model, @su_material)
+      def create_surface_styles(su_material, side=:both)
+        if @ifc_model.options[:colors]
+          if su_material
+            name = su_material.name
+            alpha = su_material.alpha
+            color = su_material.color
+          else
+            name = 'Default'
+            alpha = 1.0
+
+            rendering_options = Sketchup.active_model.rendering_options
+            if side == :negative
+              color = rendering_options['FaceBackColor']
+            else
+              color = rendering_options['FaceFrontColor']
+            end
+          end
+
+          red_ratio = color.red.to_f / 255
+          green_ratio = color.green.to_f / 255
+          blue_ratio = color.blue.to_f / 255
+          alpha_ratio = 1 - alpha
+
+          colourrgb = @ifc::IfcColourRgb.new(@ifc_model)
+          colourrgb.red = Types::IfcNormalisedRatioMeasure.new(@ifc_model, red_ratio)
+          colourrgb.green = Types::IfcNormalisedRatioMeasure.new(@ifc_model, green_ratio)
+          colourrgb.blue = Types::IfcNormalisedRatioMeasure.new(@ifc_model, blue_ratio)
+
+          # IFC2x3 IfcSurfaceStyleRendering
+          # @todo IFC4 IfcSurfaceStyleShading (transparency change)
+          if @ifc::IfcSurfaceStyleShading.respond_to?(:transparency)
+            surface_style_rendering = @ifc::IfcSurfaceStyleShading.new(@ifc_model)
+          else
+            surface_style_rendering = @ifc::IfcSurfaceStyleRendering.new(@ifc_model)
+            surface_style_rendering.reflectancemethod = :notdefined
+          end
+          surface_style_rendering.surfacecolour = colourrgb
+          surface_style_rendering.transparency = Types::IfcNormalisedRatioMeasure.new(@ifc_model, alpha_ratio)
+
+          surface_style = @ifc::IfcSurfaceStyle.new(@ifc_model)
+          surface_style.side = side
+          surface_style.name = Types::IfcLabel.new(@ifc_model, name)
+          surface_style.styles = Types::Set.new([surface_style_rendering])
+
+          if @image_texture
+            texture_style = @ifc::IfcSurfaceStyleWithTextures.new(@ifc_model)
+            texture_style.textures = IfcManager::Types::List.new([@image_texture])
+            surface_style.styles.add(texture_style)
+          end
 
           # Workaround for mandatory IfcPresentationStyleAssignment in IFC2x3
           if Settings.ifc_version == 'IFC 2x3'
-            styleassignment = @ifc::IfcPresentationStyleAssignment.new(@ifc_model, su_material)
-            styleassignment.styles = Types::Set.new([surfacestyle])
-            surface_styles = Types::Set.new([styleassignment])
+            style_assignment = @ifc::IfcPresentationStyleAssignment.new(@ifc_model)
+            style_assignment.styles = Types::Set.new([surface_style])
           else
-            surface_styles = Types::Set.new([surfacestyle])
+            style_assignment = surface_style
           end
 
-          surfacestyle.side = :both
-          surfacestyle.name = Types::IfcLabel.new(@ifc_model, su_material.name)
-          surfacestyle.styles = Types::Set.new([surfacestylerendering])
-
-          surfacestylerendering.surfacecolour = colourrgb
-          surfacestylerendering.reflectancemethod = :notdefined
-
-          if @su_material
-
-            # add transparency, converted from Sketchup's alpha value
-            surfacestylerendering.transparency = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1 - su_material.alpha)
-
-            # add color values, converted from 0/255 to fraction
-            colourrgb.red = Types::IfcNormalisedRatioMeasure.new(@ifc_model, su_material.color.red.to_f / 255)
-            colourrgb.green = Types::IfcNormalisedRatioMeasure.new(@ifc_model, su_material.color.green.to_f / 255)
-            colourrgb.blue = Types::IfcNormalisedRatioMeasure.new(@ifc_model, su_material.color.blue.to_f / 255)
-          else
-
-            # (?) use default values == white
-            surfacestylerendering.transparency = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 0.0)
-            colourrgb.red = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
-            colourrgb.green = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
-            colourrgb.blue = Types::IfcNormalisedRatioMeasure.new(@ifc_model, 1.0)
-          end
-          surface_styles
+          style_assignment
         end
       end
 
-      def create_image_texture
-        if @ifc_model.textures && @su_material && su_texture = @su_material.texture
+      def create_image_texture(su_material)
+        if @ifc_model.textures && su_material && su_texture = su_material.texture
           image_texture = @ifc::IfcImageTexture.new(@ifc_model)
           image_texture.repeats = true
           image_texture.repeatt = true
@@ -133,18 +154,24 @@ module BimTools
       #
       # @param[IfcProduct] ifc_entity IFC Entity
       def add_to_material(ifc_entity)
-        @material_assoc ||= create_material_assoc
+        @material_assoc ||= create_material_assoc(@su_material)
         @material_assoc.relatedobjects.add(ifc_entity)
       end
 
       # Add the stylings to a shaperepresentation
       #
-      # @param [IfcShapeRepresentation] ifc_entity IFC Entity
-      def add_to_styling(ifc_entity)
-        @surface_styles ||= create_surface_styles
-        if @surface_styles
-          styled_item = @ifc::IfcStyledItem.new(@ifc_model, ifc_entity)
-          styled_item.styles = @surface_styles
+      # @param [IfcRepresentationItem] representation_item
+      def get_styling(side=nil)
+        case side
+        when :positive
+          @surface_styles_positive ||= create_surface_styles(@su_material, side)
+          return @surface_styles_positive
+        when :negative
+          @surface_styles_negative ||= create_surface_styles(@su_material, side)
+          return @surface_styles_negative
+        else # :both
+          @surface_styles_both ||= create_surface_styles(@su_material, :both)
+          return @surface_styles_both
         end
       end
     end

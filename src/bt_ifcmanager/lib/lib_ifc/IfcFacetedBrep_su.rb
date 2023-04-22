@@ -22,13 +22,12 @@
 #
 
 require_relative 'ifc_types'
-require_relative 'IfcParameterValue'
 
 module BimTools
   module IfcFacetedBrep_su
     def initialize(ifc_model, su_faces, su_transformation)
       super
-      @ifc = BimTools::IfcManager::Settings.ifc_module
+      @ifc = IfcManager::Settings.ifc_module
       ifcclosedshell = @ifc::IfcClosedShell.new(ifc_model, su_faces)
       @ifc_model = ifc_model
       @su_transformation = su_transformation
@@ -59,12 +58,12 @@ module BimTools
           texture_map = @ifc::IfcTextureMap.new(@ifc_model)
           uv_helper = su_face.get_UVHelper(true, true, @ifc_model.textures)
           @ifc_model.textures.load(su_face, true)
-          texture_map.maps = IfcManager::Ifc_List.new([image_texture])
+          texture_map.maps = IfcManager::Types::List.new([image_texture])
           texture_map.mappedto = ifc_face
         end
       end
-      bounds = su_face.loops.map { |loop| create_loop(loop, tex_map, uv_helper) }
-      ifc_face.bounds = IfcManager::Ifc_Set.new(bounds)
+      bounds = su_face.loops.map { |loop| create_loop(loop, texture_map, uv_helper) }
+      ifc_face.bounds = IfcManager::Types::Set.new(bounds)
       ifc_face
     end
 
@@ -87,8 +86,8 @@ module BimTools
 
     def get_uv(vertex, uv_helper)
       uvq = uv_helper.get_front_UVQ(vertex.position)
-      u = IfcManager::IfcParameterValue.new(@ifc_model, uvq.x / uvq.z)
-      v = IfcManager::IfcParameterValue.new(@ifc_model, uvq.y / uvq.z)
+      u = IfcManager::Types::IfcParameterValue.new(@ifc_model, uvq.x / uvq.z)
+      v = IfcManager::Types::IfcParameterValue.new(@ifc_model, uvq.y / uvq.z)
       texture_vert = @ifc::IfcTextureVertex.new(@ifc_model)
       texture_vert.coordinates = IfcManager::Types::List.new([u, v])
       texture_vert

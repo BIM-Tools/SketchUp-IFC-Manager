@@ -121,8 +121,9 @@ module BimTools
           @export_geometry = SelectOption.new(
             'geometry',
             'Export geometry',
-            @options[:export][:geometry], ['Brep','Tessellation',false],
-            'When false NO geometry is exported, just the model structure and metadata like classifications and properties'
+            @options[:export][:geometry],
+            ['Brep','Tessellation','None'],
+            'When \'None\' NO geometry is exported, just the model structure and metadata like classifications and properties'
           )
           @export_fast_guid = CheckboxOption.new(
             'fast_guid',
@@ -378,7 +379,7 @@ module BimTools
           @export_layers.value = false
           @export_materials.value = false
           @export_colors.value = false
-          @export_geometry.value = false
+          @export_geometry.value = 'Brep'
           @export_fast_guid.value = false
           @export_dynamic_attributes.value = false
           @export_types.value = false
@@ -407,7 +408,7 @@ module BimTools
             when 'colors'
               @export_colors.value = true
             when 'geometry'
-              @export_geometry.value = true
+              @export_geometry.value = value
             when 'fast_guid'
               @export_fast_guid.value = true
             when 'dynamic_attributes'
@@ -581,7 +582,7 @@ module BimTools
     class SelectOption
       attr_accessor :value
 
-      def initialize(name, title, initial_value, options)
+      def initialize(name, title, initial_value, options, help = '')
         @name = name
         @title = title
         @value = initial_value
@@ -589,40 +590,18 @@ module BimTools
       end
 
       def html
-        html_string = "<div class=\"col-md-12 row\">\n<select name=\"#{@name}\">\n"
+        html_strings = []
+        html_strings << "<div class=\"col-md-12 row\">\n<select name=\"#{@name}\" title=\"#{@help}\">\n"
         @options.each do |option|
           selected = if @value == option
                       ' selected'
                     else
                       ''
                     end
-          html_string << "  <option value=\"#{option}\"#{selected}>#{option}</option>\n"
+          html_strings << "  <option value=\"#{option}\"#{selected}>#{option}</option>\n"
         end
-        html_string << "</select>\n<label style=\"margin-left:.5em\"class=\"check-inline\">#{@name}</label>\n</div>\n"
-      end
-    end
-    
-    class SelectOption
-      attr_accessor :value
-
-      def initialize(name, title, initial_value, options)
-        @name = name
-        @title = title
-        @value = initial_value
-        @options = options
-      end
-
-      def html
-        html_string = "<div class=\"col-md-12 row\">\n<select name=\"#{@name}\">\n"
-        @options.each do |option|
-          selected = if @value == option
-                      ' selected'
-                    else
-                      ''
-                    end
-          html_string << "  <option value=\"#{option}\"#{selected}>#{option}</option>\n"
-        end
-        html_string << "</select>\n<label style=\"margin-left:.5em\"class=\"check-inline\">#{@name}</label>\n</div>\n"
+        html_strings << "</select>\n<label style=\"margin-left:.5em\"class=\"check-inline\">#{@name}</label>\n</div>\n"
+        html_strings.join()
       end
     end
   end

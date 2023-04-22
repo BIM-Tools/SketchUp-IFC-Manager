@@ -63,7 +63,7 @@ module BimTools
           layers: true, #  create IfcPresentationLayerAssignments
           materials: true, #  create IfcMaterials
           colors: true, #  create IfcStyledItems
-          geometry: true, #  create geometry for entities
+          geometry: 'Brep', #  create geometry for entities
           fast_guid: false, # create simplified guids
           dynamic_attributes: true, #  export dynamic component data
           types: true,
