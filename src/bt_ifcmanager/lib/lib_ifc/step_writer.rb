@@ -77,10 +77,34 @@ module BimTools
           BimTools::Zip::OutputStream.open(file_path) do |zos|
             zos.put_next_entry(file_name)
             zos.puts (step_objects.join(";\n") << ';').encode('iso-8859-1')
+            Dir.mktmpdir("Sketchup-IFC-Manager-textures-") do |dir|
+
+            # Write textures to temp location
+            if @ifc_model.textures
+              if @ifc_model.textures.write_all(dir, false)
+                puts("Texture files were successfully written.")
+              end
+            end
+
+            # add textures to zipfile
+            Dir.foreach(dir) do |filename|
+              next if filename == '.' or filename == '..'
+              file = File.join(dir, filename)
+              zos.put_next_entry File.basename(file)
+              zos << File.binread(file)
+            end
           end
+        end
         else
           File.open(file_path, 'w:ISO-8859-1') do |file|
             file.write(step_objects.join(";\n") << ';')
+          end
+        end
+
+        # Write textures to the ifc file location
+        if @ifc_model.textures
+          if @ifc_model.textures.write_all(File.dirname(file_path), false)
+            puts("Texture files were successfully written.")
           end
         end
       end

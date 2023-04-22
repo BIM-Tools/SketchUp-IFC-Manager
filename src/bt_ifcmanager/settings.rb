@@ -30,11 +30,13 @@
 #   layers:              true,  # create IfcPresentationLayerAssignments
 #   materials:           true,  # create IfcMaterials
 #   colors:              true,  # create IfcStyledItems
+#   geometry:            'Brep' # ['Brep','Tessellation',false]
 #   fast_guid:           false, # create simplified guids
 #   dynamic_attributes:  false, # export dynamic component data
 #   open_file:           false, # open created file in given/default application
 #   mapped_items:        true,  # Export IFC mapped items
 #   model_axes:          true   # Export using model axes instead of Sketchup internal origin
+#   textures:            false  # Add textures
 # load:
 #   classifications:     [],    # ["NL-SfB 2005, tabel 1", "DIN 276-1"]
 #   default_materials:   false  # {'beton'=>[142, 142, 142],'hout'=>[129, 90, 35],'staal'=>[198, 198, 198],'gips'=>[255, 255, 255],'zink'=>[198, 198, 198],'hsb'=>[204, 161, 0],'metselwerk'=>[102, 51, 0],'steen'=>[142, 142, 142],'zetwerk'=>[198, 198, 198],'tegel'=>[255, 255, 255],'aluminium'=>[198, 198, 198],'kunststof'=>[255, 255, 255],'rvs'=>[198, 198, 198],'pannen'=>[30, 30, 30],'bitumen'=>[30, 30, 30],'epdm'=>[30, 30, 30],'isolatie'=>[255, 255, 50],'kalkzandsteen'=>[255, 255, 255],'metalstud'=>[198, 198, 198],'gibo'=>[255, 255, 255],'glas'=>[204, 255, 255],'multiplex'=>[255, 216, 101],'cementdekvloer'=>[198, 198, 198]}
@@ -116,11 +118,12 @@ module BimTools
             @options[:export][:colors],
             'Exports the Sketchup material colors as colored IfcSurfaceStyles'
           )
-          @export_geometry = CheckboxOption.new(
+          @export_geometry = SelectOption.new(
             'geometry',
             'Export geometry',
             @options[:export][:geometry],
-            'When unchecked NO geometry is exported, just the model structure and metadata like classifications and properties'
+            ['Brep','Tessellation','None'],
+            'When \'None\' NO geometry is exported, just the model structure and metadata like classifications and properties'
           )
           @export_fast_guid = CheckboxOption.new(
             'fast_guid',
@@ -152,6 +155,11 @@ module BimTools
             @options[:export][:mapped_items],
             'The geometry for every (equally scaled) Component Definition is only exported once, this can make models much smaller'
           )
+          @export_textures = CheckboxOption.new(
+            'textures',
+            'Export textures',
+            @options[:export][:textures]
+          )
           @export_classification_suffix = CheckboxOption.new(
             'classification_suffix',
             "Add 'Classification' suffix to all classifications",
@@ -160,7 +168,7 @@ module BimTools
           )
           @export_model_axes = CheckboxOption.new(
             'model_axes',
-            "Export using model axes transfomration",
+            "Export using model axes transformation",
             @options[:export][:classification_suffix],
             "Export using model axes instead of Sketchup internal origin"
           )
@@ -190,6 +198,7 @@ module BimTools
         @options[:export][:types] = @export_types.value
         @options[:export][:type_properties] = @export_type_properties.value
         @options[:export][:mapped_items] = @export_mapped_items.value
+        @options[:export][:textures] = @export_textures.value
         @options[:export][:classification_suffix] = @export_classification_suffix.value
         @options[:export][:model_axes] = @export_model_axes.value
         File.open(@settings_file, 'w') { |file| file.write(@options.to_yaml) }
@@ -370,12 +379,13 @@ module BimTools
           @export_layers.value = false
           @export_materials.value = false
           @export_colors.value = false
-          @export_geometry.value = false
+          @export_geometry.value = 'Brep'
           @export_fast_guid.value = false
           @export_dynamic_attributes.value = false
           @export_types.value = false
           @export_type_properties.value = false
           @export_mapped_items.value = false
+          @export_textures.value = false
           @export_classification_suffix.value = false
           @export_model_axes.value = false
 
@@ -398,7 +408,7 @@ module BimTools
             when 'colors'
               @export_colors.value = true
             when 'geometry'
-              @export_geometry.value = true
+              @export_geometry.value = value
             when 'fast_guid'
               @export_fast_guid.value = true
             when 'dynamic_attributes'
@@ -409,7 +419,9 @@ module BimTools
               @export_type_properties.value = true
             when 'mapped_items'
               @export_mapped_items.value = true
-            when 'classification_suffix'
+            when 'textures'
+            @export_textures.value = true
+          when 'classification_suffix'
               @export_classification_suffix.value = true
             when 'model_axes'
               @export_model_axes.value = true
@@ -502,6 +514,7 @@ module BimTools
         html << @export_types.html
         html << @export_type_properties.html
         html << @export_mapped_items.html
+        html << @export_textures.html
         html << @export_classification_suffix.html
         html << @export_model_axes.html
         html << "      </div>\n"
@@ -563,6 +576,32 @@ module BimTools
             <label class=\"check-inline\"><input type=\"checkbox\" name=\"#{@name}\" value=\"#{@name}\"#{checked}> #{@title}</label>
           </div>\n"
         end
+      end
+    end
+    
+    class SelectOption
+      attr_accessor :value
+
+      def initialize(name, title, initial_value, options, help = '')
+        @name = name
+        @title = title
+        @value = initial_value
+        @options = options
+      end
+
+      def html
+        html_strings = []
+        html_strings << "<div class=\"col-md-12 row\">\n<select name=\"#{@name}\" title=\"#{@help}\">\n"
+        @options.each do |option|
+          selected = if @value == option
+                      ' selected'
+                    else
+                      ''
+                    end
+          html_strings << "  <option value=\"#{option}\"#{selected}>#{option}</option>\n"
+        end
+        html_strings << "</select>\n<label style=\"margin-left:.5em\"class=\"check-inline\">#{@name}</label>\n</div>\n"
+        html_strings.join()
       end
     end
   end

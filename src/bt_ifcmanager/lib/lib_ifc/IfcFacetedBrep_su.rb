@@ -27,7 +27,7 @@ module BimTools
   module IfcFacetedBrep_su
     def initialize(ifc_model, su_faces, su_transformation)
       super
-      @ifc = BimTools::IfcManager::Settings.ifc_module
+      @ifc = IfcManager::Settings.ifc_module
       ifcclosedshell = @ifc::IfcClosedShell.new(ifc_model, su_faces)
       @ifc_model = ifc_model
       @su_transformation = su_transformation
@@ -43,13 +43,31 @@ module BimTools
 
     def add_face(su_face)
       create_points(su_face)
-      face = @ifc::IfcFace.new(@ifc_model)
-      bounds = su_face.loops.map { |loop| create_loop(loop) }
-      face.bounds = IfcManager::Types::Set.new(bounds)
-      face
+      ifc_face = @ifc::IfcFace.new(@ifc_model)
+      texture_map = nil
+      su_material = su_face.material
+
+      if @ifc_model.textures && su_material && su_material.texture
+      
+        # check if material exists
+        unless @ifc_model.materials.key?(su_material)
+          @ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(@ifc_model, su_material)
+        end
+        image_texture = @ifc_model.materials[su_material].image_texture
+        if image_texture
+          texture_map = @ifc::IfcTextureMap.new(@ifc_model)
+          uv_helper = su_face.get_UVHelper(true, true, @ifc_model.textures)
+          @ifc_model.textures.load(su_face, true)
+          texture_map.maps = IfcManager::Types::List.new([image_texture])
+          texture_map.mappedto = ifc_face
+        end
+      end
+      bounds = su_face.loops.map { |loop| create_loop(loop, texture_map, uv_helper) }
+      ifc_face.bounds = IfcManager::Types::Set.new(bounds)
+      ifc_face
     end
 
-    def create_loop(loop)
+    def create_loop(loop, tex_map = nil, uv_helper = nil)
       # differenciate between inner and outer loops/bounds
       bound = if loop.outer?
                 @ifc::IfcFaceOuterBound.new(@ifc_model)
@@ -62,7 +80,17 @@ module BimTools
       bound.bound = polyloop
       bound.orientation = @flipped
       polyloop.polygon = IfcManager::Types::List.new(points)
+      tex_map.vertices = IfcManager::Types::Set.new(loop.vertices.map { |vert| get_uv(vert, uv_helper) }) if tex_map
       bound
+    end
+
+    def get_uv(vertex, uv_helper)
+      uvq = uv_helper.get_front_UVQ(vertex.position)
+      u = IfcManager::Types::IfcParameterValue.new(@ifc_model, uvq.x / uvq.z)
+      v = IfcManager::Types::IfcParameterValue.new(@ifc_model, uvq.y / uvq.z)
+      texture_vert = @ifc::IfcTextureVertex.new(@ifc_model)
+      texture_vert.coordinates = IfcManager::Types::List.new([u, v])
+      texture_vert
     end
 
     def create_points(su_face)
