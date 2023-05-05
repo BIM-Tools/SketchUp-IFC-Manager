@@ -47,7 +47,7 @@ module BimTools
       #
       # @param [Sketchup::Material] su_material
       # @return [IfcRelAssociatesMaterial] Material association
-      def create_material_assoc(su_material=nil)
+      def create_material_assoc(su_material = nil)
         material_name = if su_material
                           su_material.display_name
                         else
@@ -71,7 +71,7 @@ module BimTools
       #
       # @param [Sketchup::Material] su_material
       # @return [Ifc_Set] Set of IFC surface styles
-      def create_surface_styles(su_material, side=:both)
+      def create_surface_styles(su_material, side = :both)
         if @ifc_model.options[:colors]
           if su_material
             name = su_material.name
@@ -82,11 +82,11 @@ module BimTools
             alpha = 1.0
 
             rendering_options = Sketchup.active_model.rendering_options
-            if side == :negative
-              color = rendering_options['FaceBackColor']
-            else
-              color = rendering_options['FaceFrontColor']
-            end
+            color = if side == :negative
+                      rendering_options['FaceBackColor']
+                    else
+                      rendering_options['FaceFrontColor']
+                    end
           end
 
           red_ratio = color.red.to_f / 255
@@ -142,8 +142,11 @@ module BimTools
           texturetransform.axis1 = @ifc::IfcDirection.new(@ifc_model, Geom::Vector2d.new(0, 1))
           texturetransform.axis2 = @ifc::IfcDirection.new(@ifc_model, Geom::Vector2d.new(1, 0))
           texturetransform.localorigin = @ifc::IfcCartesianPoint.new(@ifc_model, Geom::Point2d.new(0, 0))
-          texturetransform.scale = Types::IfcReal.new(@ifc_model, Types::IfcLengthMeasure.new(@ifc_model,su_texture.width).convert)
-          texturetransform.scale2 = Types::IfcReal.new(@ifc_model, Types::IfcLengthMeasure.new(@ifc_model,su_texture.height).convert)
+          texturetransform.scale = Types::IfcReal.new(@ifc_model,
+                                                      Types::IfcLengthMeasure.new(@ifc_model, su_texture.width).convert)
+          texturetransform.scale2 = Types::IfcReal.new(@ifc_model,
+                                                       Types::IfcLengthMeasure.new(@ifc_model,
+                                                                                   su_texture.height).convert)
           image_texture.texturetransform = texturetransform
           image_texture.urlreference = Types::IfcURIReference.new(@ifc_model, File.basename(su_texture.filename))
           image_texture
@@ -161,17 +164,17 @@ module BimTools
       # Add the stylings to a shaperepresentation
       #
       # @param [IfcRepresentationItem] representation_item
-      def get_styling(side=nil)
+      def get_styling(side = nil)
         case side
         when :positive
           @surface_styles_positive ||= create_surface_styles(@su_material, side)
-          return @surface_styles_positive
+          @surface_styles_positive
         when :negative
           @surface_styles_negative ||= create_surface_styles(@su_material, side)
-          return @surface_styles_negative
+          @surface_styles_negative
         else # :both
           @surface_styles_both ||= create_surface_styles(@su_material, :both)
-          return @surface_styles_both
+          @surface_styles_both
         end
       end
     end

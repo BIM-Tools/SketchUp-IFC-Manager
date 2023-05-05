@@ -32,12 +32,12 @@ module BimTools
     class ObjectCreator
       # This creator class creates the correct IFC entity for the given sketchup object and it's children
       #
-      # @param ifc_model [IfcManager::IfcModel] The IFC model in which the new IFC entity must be added
-      # @param su_instance [Sketchup::ComponentInstance, Sketchup::Group] The sketchup component instance or group for which an IFC entity must be created
-      # @param su_total_transformation [Geom::Transformation] The combined transformation of all parent sketchup objects
-      # @param placement_parent [IFC ENTITY] The IFC entity that is the direct geometric parent in the sketchup model
-      # @param entity_path [Hash<BimTools::IfcManager::IFC2X3::IfcSpatialStructureElement>] Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
-      # @param su_material [Sketchup::Material] The parent sketchup objects material which will be used when the given one does not have a directly associated material
+      # @param [IfcManager::IfcModel] ifc_model The IFC model in which the new IFC entity must be added
+      # @param [Sketchup::ComponentInstance, Sketchup::Group] su_instance The sketchup component instance or group for which an IFC entity must be created
+      # @param [Geom::Transformation] su_total_transformation The combined transformation of all parent sketchup objects
+      # @param [IFC ENTITY] placement_parent The IFC entity that is the direct geometric parent in the sketchup model
+      # @param [Hash<BimTools::IfcManager::IFC2X3::IfcSpatialStructureElement>] entity_path Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
+      # @param [Sketchup::Material] su_material The parent sketchup objects material which will be used when the given one does not have a directly associated material
       def initialize(
         ifc_model,
         su_instance,
