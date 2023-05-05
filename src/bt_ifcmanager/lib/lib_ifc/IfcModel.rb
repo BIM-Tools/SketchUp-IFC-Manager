@@ -26,7 +26,7 @@ require_relative 'ifc_product_definition_shape_builder'
 require_relative 'ifc_shape_representation_builder'
 require_relative 'entity_path'
 require_relative 'ObjectCreator'
-require_relative 'representation_manager'
+require_relative 'definition_manager'
 require_relative 'step_writer'
 
 require_relative 'classifications'
@@ -132,11 +132,11 @@ module BimTools
         @product_types = {}
 
         # Set root transformation as base for all other transformations
-        if @options[:model_axes]
-          transformation = su_model.axes.transformation.inverse
-        else
-          transformation = Geom::Transformation.new
-        end
+        transformation = if @options[:model_axes]
+                           su_model.axes.transformation.inverse
+                         else
+                           Geom::Transformation.new
+                         end
 
         # When no entities are given for export, pass all model entities to create ifc objects
         # if nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked

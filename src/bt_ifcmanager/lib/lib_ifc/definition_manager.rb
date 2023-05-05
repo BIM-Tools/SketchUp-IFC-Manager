@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  representation_manager.rb
+#  definition_manager.rb
 #
 #  Copyright 2021 Jan Brouwer <jan@brewsky.nl>
 #
@@ -84,11 +84,8 @@ module BimTools
       # @param [Sketchup::Material] su_material
       # @param [Sketchup::Layer] su_layer
       def create_representation(faces, transformation, su_material, su_layer)
-
         # Check if geometry must be added
-        if @ifc_model.options[:geometry] == 'None'
-          return
-        end
+        return if @ifc_model.options[:geometry] == 'None'
 
         # Check if Mapped representation should be used
         if @ifc_model.options[:mapped_items]
@@ -113,7 +110,7 @@ module BimTools
             builder.set_representationtype
             builder.add_item(mesh)
           end
-        
+
           if @ifc_model.options[:colors]
             styled_item = @ifc::IfcStyledItem.new(@ifc_model, mesh)
             styles = get_surface_styles(@ifc_model, su_material)
@@ -138,25 +135,20 @@ module BimTools
         end
       end
 
-      def get_surface_styles(ifc_model, parent_material, front_material=nil, back_material=nil)
-        unless front_material
-          front_material = parent_material
-        end
-        unless back_material
-          back_material = front_material
-        end
-        if front_material == back_material
-          return Types::Set.new([get_styling(ifc_model, front_material, :both)])
-        end
-        return Types::Set.new([get_styling(ifc_model, front_material, :positive), get_styling(ifc_model, back_material, :negative)])
+      def get_surface_styles(ifc_model, parent_material, front_material = nil, back_material = nil)
+        front_material ||= parent_material
+        back_material ||= front_material
+        return Types::Set.new([get_styling(ifc_model, front_material, :both)]) if front_material == back_material
+
+        Types::Set.new([get_styling(ifc_model, front_material, :positive),
+                        get_styling(ifc_model, back_material, :negative)])
       end
-      
-      def get_styling(ifc_model, su_material, side=:both)
+
+      def get_styling(ifc_model, su_material, side = :both)
         unless ifc_model.materials[su_material]
           ifc_model.materials[su_material] = IfcManager::MaterialAndStyling.new(ifc_model, su_material)
         end
-        styling = ifc_model.materials[su_material].get_styling(side)
-        return styling
+        ifc_model.materials[su_material].get_styling(side)
       end
     end
 
@@ -168,75 +160,77 @@ module BimTools
         geometry_type = ifc_model.options[:geometry]
 
         # Fallback to Brep when Tessellation not available in current IFC schema
-        if geometry_type == 'Tessellation' && !@ifc.const_defined?(:IfcTriangulatedFaceSet)
-          geometry_type = 'Brep'
-        end
+        geometry_type = 'Brep' if geometry_type == 'Tessellation' && !@ifc.const_defined?(:IfcTriangulatedFaceSet)
 
         items = create_meshes(ifc_model, faces, transformation, su_material, geometry_type)
         @shaperepresentation = IfcShapeRepresentationBuilder.build(ifc_model) do |builder|
           builder.set_contextofitems(ifc_model.representationcontext)
           builder.set_representationtype(geometry_type)
           builder.set_items(items)
-        end  
+        end
         @representationmap = @ifc::IfcRepresentationMap.new(ifc_model)
         @representationmap.mappingorigin = ifc_model.default_placement
-        @representationmap.mappedrepresentation = @shaperepresentation        
+        @representationmap.mappedrepresentation = @shaperepresentation
       end
 
-      def create_meshes(ifc_model, faces, transformation, su_material=nil, geometry_type=nil)
+      def create_meshes(ifc_model, faces, transformation, su_material = nil, geometry_type = nil)
         # if su_material
-          faces_by_material = faces.group_by{|face|[face.material,face.back_material]}
-          if faces_by_material.length>0
-            return faces_by_material.map do |face_materials, face_group|
-              create_mesh(ifc_model, face_group, transformation, su_material, geometry_type, face_materials)
-            end
+        faces_by_material = faces.group_by { |face| [face.material, face.back_material] }
+        if faces_by_material.length > 0
+          return faces_by_material.map do |face_materials, face_group|
+            create_mesh(ifc_model, face_group, transformation, su_material, geometry_type, face_materials)
           end
+        end
         # end
-        return [create_mesh(ifc_model, faces, transformation, su_material, geometry_type)]
+        [create_mesh(ifc_model, faces, transformation, su_material, geometry_type)]
       end
-      
-      def create_mesh(ifc_model, faces, transformation, su_material=nil, geometry_type=nil, face_materials=nil)
+
+      def create_mesh(ifc_model, faces, transformation, su_material = nil, geometry_type = nil, face_materials = nil)
         mesh = nil
         front_material = face_materials[0] if face_materials
         back_material = face_materials[1] if face_materials
-        if geometry_type == 'Tessellation'
-          mesh = @ifc::IfcTriangulatedFaceSet.new(ifc_model, faces, transformation, su_material, front_material, back_material)
-        else # 'Brep'
-          mesh = @ifc::IfcFacetedBrep.new(ifc_model, faces, transformation)
-        end
-        
+        mesh = if geometry_type == 'Tessellation'
+                 @ifc::IfcTriangulatedFaceSet.new(ifc_model, faces, transformation, su_material, front_material,
+                                                  back_material)
+               else # 'Brep'
+                 @ifc::IfcFacetedBrep.new(ifc_model, faces, transformation)
+               end
+
         if ifc_model.options[:colors]
           styled_item = @ifc::IfcStyledItem.new(ifc_model, mesh)
           styled_item.styles = get_surface_styles(ifc_model, su_material, front_material, back_material)
         end
 
-        return mesh
+        mesh
       end
 
-      def get_surface_styles(ifc_model, parent_material=nil, front_material=nil, back_material=nil)
-        if !front_material && !back_material
-          return Types::Set.new([get_styling(ifc_model, parent_material, :both)])
-        end
+      def get_surface_styles(ifc_model, parent_material = nil, front_material = nil, back_material = nil)
+        return Types::Set.new([get_styling(ifc_model, parent_material, :both)]) if !front_material && !back_material
+
         if front_material && back_material
-          return Types::Set.new([get_styling(ifc_model, front_material, :positive), get_styling(ifc_model, back_material, :negative)])
+          return Types::Set.new([get_styling(ifc_model, front_material, :positive),
+                                 get_styling(ifc_model, back_material, :negative)])
         end
         if front_material && parent_material
-          return Types::Set.new([get_styling(ifc_model, front_material, :positive), get_styling(ifc_model, parent_material, :negative)])
+          return Types::Set.new([get_styling(ifc_model, front_material, :positive),
+                                 get_styling(ifc_model, parent_material, :negative)])
         end
         if back_material && parent_material
-          return Types::Set.new([get_styling(ifc_model, parent_material, :positive), get_styling(ifc_model, back_material, :negative)])
+          return Types::Set.new([get_styling(ifc_model, parent_material, :positive),
+                                 get_styling(ifc_model, back_material, :negative)])
         end
         if front_material && front_material == back_material
           return Types::Set.new([get_styling(ifc_model, front_material, :both)])
         end
-        return Types::Set.new([get_styling(ifc_model, parent_material, :both)])
+
+        Types::Set.new([get_styling(ifc_model, parent_material, :both)])
       end
-      
-      def get_styling(ifc_model, su_material, side=:both)
+
+      def get_styling(ifc_model, su_material, side = :both)
         unless ifc_model.materials[su_material]
           ifc_model.materials[su_material] = IfcManager::MaterialAndStyling.new(ifc_model, su_material)
         end
-        return ifc_model.materials[su_material].get_styling(side)
+        ifc_model.materials[su_material].get_styling(side)
       end
     end
   end
