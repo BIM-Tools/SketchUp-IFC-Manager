@@ -28,22 +28,6 @@ require_relative 'material_and_styling'
 module BimTools
   module IfcManager
     # Class that keeps track of all different shaperepresentations for
-    #   the different sketchup component definitions
-    class RepresentationManager
-      def initialize(ifc_model)
-        @ifc_model = ifc_model
-        @definition_managers = {}
-      end
-
-      def get_definition_manager(definition)
-        unless @definition_managers.key?(definition)
-          @definition_managers[definition] = DefinitionManager.new(@ifc_model, definition)
-        end
-        @definition_managers[definition]
-      end
-    end
-
-    # Class that keeps track of all different shaperepresentations for
     #   a sketchup component definition
     class DefinitionManager
       attr_reader :definition, :name
