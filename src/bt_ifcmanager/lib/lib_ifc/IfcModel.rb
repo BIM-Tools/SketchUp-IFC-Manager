@@ -44,7 +44,7 @@ module BimTools
       attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications,
                     :classificationassociations, :product_types, :property_enumerations
       attr_reader :su_model, :project, :ifc_objects, :project_data, :export_summary, :options, :su_entities, :units,
-                  :default_location, :default_axis, :default_refdirection, :default_placement, :representation_manager, :textures
+                  :default_location, :default_axis, :default_refdirection, :default_placement, :textures
 
       # creates an IFC model based on given su model
       # (?) could be enhanced to also accept other sketchup objects
@@ -99,7 +99,7 @@ module BimTools
 
         # create object that keeps track of all different shaperepresentations for
         #   the different sketchup component definitions
-        @representation_manager = RepresentationManager.new(self)
+        @definition_manager = collect_component_definitions(@su_model).to_h
 
         # # create empty hash that will contain all Mapped Representations (Component Definitions)
         # @mapped_representations = {}
@@ -270,6 +270,16 @@ module BimTools
           entity_path.add(ifc_entity)
           entity_path.set_parent(ifc_entity)
         end
+      end
+
+      def collect_component_definitions(su_model)
+        su_model.definitions.map do |definition|
+          [definition, DefinitionManager.new(self, definition)]
+        end
+      end
+
+      def get_definition_manager(definition)
+        @definition_manager[definition]
       end
     end
   end

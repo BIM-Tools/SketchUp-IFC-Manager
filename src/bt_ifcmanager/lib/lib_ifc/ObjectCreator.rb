@@ -228,7 +228,7 @@ module BimTools
                               end
             sub_entity = @ifc::IfcSpace.new(@ifc_model, nil)
             sub_entity.name = Types::IfcLabel.new(@ifc_model, sub_entity_name)
-            definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+            definition_manager = @ifc_model.get_definition_manager(definition)
             sub_entity.representation = definition_manager.create_representation(faces,
                                                                                  brep_transformation,
                                                                                  su_material,
@@ -253,7 +253,7 @@ module BimTools
                               end
             sub_entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
             sub_entity.name = Types::IfcLabel.new(@ifc_model, sub_entity_name)
-            definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+            definition_manager = @ifc_model.get_definition_manager(definition)
             sub_entity.representation = definition_manager.create_representation(faces,
                                                                                  brep_transformation,
                                                                                  su_material,
@@ -278,7 +278,7 @@ module BimTools
                               end
             sub_entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, nil)
             sub_entity.name = Types::IfcLabel.new(@ifc_model, sub_entity_name)
-            definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+            definition_manager = @ifc_model.get_definition_manager(definition)
             sub_entity.representation = definition_manager.create_representation(faces,
                                                                                  brep_transformation,
                                                                                  su_material,
@@ -296,7 +296,7 @@ module BimTools
           # When a Sketchup group/component is not classified as an IFC entity it should
           #   become part of the parent object geometry if the parent can have geometry
           when nil
-            definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+            definition_manager = @ifc_model.get_definition_manager(definition)
             if placement_parent.respond_to? :representation
               transformation = placement_parent.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
               if placement_parent_representation = placement_parent.representation
@@ -317,7 +317,7 @@ module BimTools
               create_fallback_entity(definition_manager, faces, brep_transformation, su_material, su_layer)
             end
           else
-            definition_manager = @ifc_model.representation_manager.get_definition_manager(definition)
+            definition_manager = @ifc_model.get_definition_manager(definition)
             if ifc_entity.respond_to?(:representation)
               ifc_entity.representation = definition_manager.create_representation(faces,
                                                                                    brep_transformation,
@@ -365,7 +365,6 @@ module BimTools
 
         # add product to materialassociation
         @ifc_model.materials[su_material].add_to_material(entity)
-
       end
     end
   end
