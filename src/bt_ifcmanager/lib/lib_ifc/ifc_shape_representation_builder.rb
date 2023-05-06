@@ -28,6 +28,9 @@ module BimTools
     class IfcShapeRepresentationBuilder
       attr_reader :ifc_shape_representation
 
+      # Builder method for building new IfcShapeRepresentation objects
+      #
+      # @param [IfcModel] ifc_model Model context for new IfcShapeRepresentation
       def self.build(ifc_model)
         builder = new(ifc_model)
         yield(builder)
@@ -41,31 +44,40 @@ module BimTools
 
         set_representationidentifier('Body')
         set_items
+        @ifc_shape_representation
       end
 
+      # Set IfcShapeRepresentation representation context
+      #
+      # @param [IfcGeometricRepresentationContext] representationcontext
       def set_contextofitems(representationcontext)
         @ifc_shape_representation.contextofitems = representationcontext
       end
 
+      # Set IfcShapeRepresentation representationidentifier
+      #
+      # @param [String] identifier 'Body'
       def set_representationidentifier(identifier = 'Body')
         @ifc_shape_representation.representationidentifier = Types::IfcLabel.new(@ifc_model, identifier)
       end
 
-      def set_representationtype(type = nil)
-        # Check if Mapped representation should be used
-        # (?) && (sketchup.count_instances > 1) # (?) Always use mapped items? also for objects that are used only once?
-        type ||= if @ifc_model.options[:mapped_items]
-                   'MappedRepresentation'
-                 else
-                   'Brep'
-                 end
+      # Set IfcShapeRepresentation representationtype
+      #
+      # @param [String] type 'Brep' or 'MappedRepresentation'
+      def set_representationtype(type = 'Brep')
         @ifc_shape_representation.representationtype = Types::IfcLabel.new(@ifc_model, type)
       end
 
-      def set_items(items = [])
+      # Set IfcShapeRepresentation items to the given list of meshes
+      #
+      # @param [Array] items
+      def set_items(items)
         @ifc_shape_representation.items = Types::Set.new(items)
       end
 
+      # Add mesh to IfcShapeRepresentation set of items
+      #
+      # @param item
       def add_item(item)
         @ifc_shape_representation.items.add(item)
       end
