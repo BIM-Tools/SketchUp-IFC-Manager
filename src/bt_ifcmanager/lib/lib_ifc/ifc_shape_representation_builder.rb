@@ -40,6 +40,7 @@ module BimTools
       def initialize(ifc_model)
         @ifc = Settings.ifc_module
         @ifc_model = ifc_model
+        # @definition_managers = Set.new
         @ifc_shape_representation = @ifc::IfcShapeRepresentation.new(ifc_model)
 
         set_representationidentifier('Body')
@@ -71,7 +72,7 @@ module BimTools
       # Set IfcShapeRepresentation items to the given list of meshes
       #
       # @param [Array] items
-      def set_items(items)
+      def set_items(items = [])
         @ifc_shape_representation.items = Types::Set.new(items)
       end
 
@@ -81,6 +82,22 @@ module BimTools
       def add_item(item)
         @ifc_shape_representation.items.add(item)
       end
+
+      # def add_definition_manager(definition_manager)
+      #   @definition_managers << definition_manager
+      # end
+
+      # # def add_extra_representation(definition_manager, transformation, su_material)
+      # #   puts 'yh'
+      # #   # unless @definition_managers.include? definition_manager
+      # #   puts 'br'
+      # #   @definition_managers << definition_manager
+      # #   brep = @ifc::IfcFacetedBrep.new(@ifc_model, definition_manager.faces, transformation)
+      # #   puts brep.step
+      # #   @shaperepresentation.items.add(brep)
+      # #   add_styling(brep, su_material)
+      # #   # end
+      # # end
     end
   end
 end
