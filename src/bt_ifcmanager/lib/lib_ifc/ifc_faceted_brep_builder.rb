@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  IfcFacetedBrep_su.rb
+#  ifc_faceted_brep_builder.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
 #
@@ -48,7 +48,7 @@ module BimTools
       su_material = su_face.material
 
       if @ifc_model.textures && su_material && su_material.texture
-      
+
         # check if material exists
         unless @ifc_model.materials.key?(su_material)
           @ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(@ifc_model, su_material)
