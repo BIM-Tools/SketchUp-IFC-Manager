@@ -74,7 +74,7 @@ module BimTools
       def create_surface_styles(su_material, side = :both)
         if @ifc_model.options[:colors]
           if su_material
-            name = su_material.name
+            name = su_material.display_name
             alpha = su_material.alpha
             color = su_material.color
           else

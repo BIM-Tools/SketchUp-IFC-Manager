@@ -74,6 +74,11 @@ module BimTools
       #
       # @return IfcShapeRepresentation
       def get_shape_representation(transformation, su_material, su_layer = nil)
+        geometry_type = @ifc_model.options[:geometry]
+
+        # Check if geometry must be added
+        return if geometry_type == 'None'
+
         definition_representation = get_definition_representation(transformation, su_material)
 
         # Check if Mapped representation should be used
@@ -81,8 +86,8 @@ module BimTools
           representation_type = 'MappedRepresentation'
           representation = definition_representation.get_mapped_representation
         else
-          representation_type = 'Brep'
-          representation = definition_representation.faceted_brep
+          representation_type = geometry_type
+          representation = definition_representation.representation
         end
 
         shape_representation = IfcShapeRepresentationBuilder.build(@ifc_model) do |builder|
@@ -93,9 +98,13 @@ module BimTools
 
         # set layer
         if su_layer && @ifc_model.options[:layers]
+
+          # check if IfcPresentationLayerAssignment exists
           unless @ifc_model.layers[su_layer.name]
             @ifc_model.layers[su_layer.name] = @ifc::IfcPresentationLayerAssignment.new(@ifc_model, su_layer)
           end
+
+          # add self to IfcPresentationLayerAssignment
           @ifc_model.layers[su_layer.name].assigneditems.add(shape_representation)
         end
 
