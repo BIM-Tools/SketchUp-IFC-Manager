@@ -33,10 +33,10 @@ module BimTools
     class DefinitionRepresentation
       attr_reader :shape_representation_builder, :meshes
 
-      def initialize(ifc_model, faces, su_material, transformation)
+      def initialize(ifc_model, geometry_type, faces, su_material, transformation)
         @ifc = Settings.ifc_module
         @ifc_model = ifc_model
-        @geometry_type = get_geometry_type(ifc_model)
+        @geometry_type = geometry_type
         @ifc_shape_representation_builder = nil
         @mapped_representation = nil
         @representation = nil
@@ -49,14 +49,6 @@ module BimTools
         @mapped_representation ||= IfcMappedItemBuilder.build(@ifc_model) do |builder|
           builder.set_mappingsource(get_mapping_source)
         end
-      end
-
-      def get_geometry_type(ifc_model)
-        geometry_type = ifc_model.options[:geometry]
-
-        # Fallback to Brep when Tessellation not available in current IFC schema
-        geometry_type = 'Brep' if geometry_type == 'Tessellation' && !@ifc.const_defined?(:IfcTriangulatedFaceSet)
-        geometry_type
       end
 
       def get_mapping_source

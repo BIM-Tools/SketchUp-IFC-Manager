@@ -36,6 +36,7 @@ module BimTools
       def initialize(ifc_model, definition)
         @ifc = Settings.ifc_module
         @ifc_model = ifc_model
+        @geometry_type = get_geometry_type(ifc_model)
         @definition = definition
         @name = definition.name
         @representations = {}
@@ -50,18 +51,27 @@ module BimTools
       # (?) Faces are extracted for every instance of a component, it should
       #   be possible to only do that once for a component definition
 
+      def get_geometry_type(ifc_model)
+        geometry_type = ifc_model.options[:geometry]
+
+        # Fallback to Brep when Tessellation not available in current IFC schema
+        geometry_type = 'Brep' if geometry_type == 'Tessellation' && !@ifc.const_defined?(:IfcTriangulatedFaceSet)
+        geometry_type
+      end
+
       #
       # @param [Sketchup::ComponentDefinition] definition
       # @param [Sketchup::Transformation] transformation
       # @param [Sketchup::Material] su_material
       # @return [IfcFacetedBrep]
       def get_definition_representation(transformation, su_material = nil)
-        return nil if @faces.length == 0
+        # Check if geometry must be added
+        return nil if @geometry_type == 'None' || @faces.length == 0
 
         representation_string = get_representation_string(transformation, su_material)
         unless @representations.key?(representation_string)
           @representations[representation_string] =
-            DefinitionRepresentation.new(@ifc_model, @faces, su_material, transformation)
+            DefinitionRepresentation.new(@ifc_model, @geometry_type, @faces, su_material, transformation)
         end
         @representations[representation_string]
       end
@@ -74,19 +84,16 @@ module BimTools
       #
       # @return IfcShapeRepresentation
       def get_shape_representation(transformation, su_material, su_layer = nil)
-        geometry_type = @ifc_model.options[:geometry]
-
-        # Check if geometry must be added
-        return if geometry_type == 'None'
-
         definition_representation = get_definition_representation(transformation, su_material)
+
+        return unless definition_representation
 
         # Check if Mapped representation should be used
         if @ifc_model.options[:mapped_items]
           representation_type = 'MappedRepresentation'
           representation = definition_representation.get_mapped_representation
         else
-          representation_type = geometry_type
+          representation_type = @geometry_type
           representation = definition_representation.representation
         end
 
