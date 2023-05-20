@@ -47,6 +47,13 @@ module BimTools
       end
 
       def create_header_section(_file_schema, _file_description)
+        # get correct MVD for IFC version
+        mvd = if Settings.ifc_version_compact == 'IFC2X3'
+                'CoordinationView_V2.0'
+              else
+                'ReferenceView_V1.2'
+              end
+
         # get timestamp
         time = Time.new
         timestamp = time.strftime('%Y-%m-%dT%H:%M:%S')
@@ -57,11 +64,15 @@ module BimTools
 
         step_objects = []
         step_objects << 'HEADER'
-        step_objects << "FILE_DESCRIPTION (('ViewDefinition [CoordinationView]'), '2;1')"
-        step_objects << "FILE_NAME ('', '#{timestamp}', (''), (''), 'IFC-manager for SketchUp (#{VERSION})', '#{originating_system}', '')"
-        step_objects << "FILE_SCHEMA (('#{BimTools::IfcManager::Settings.ifc_version_compact}'))"
+        step_objects << "FILE_DESCRIPTION(('ViewDefinition [#{mvd}]',\n#{export_options}\n),'2;1')"
+        step_objects << "FILE_NAME('','#{timestamp}',(''),(''),'IFC-manager for SketchUp (#{VERSION})','#{originating_system}','')"
+        step_objects << "FILE_SCHEMA(('#{Settings.ifc_version_compact}'))"
         step_objects << 'ENDSEC'
         step_objects
+      end
+
+      def export_options
+        @ifc_model.options.map { |k, v| "'Option [#{k}: #{v}]'" }.join(",\n")
       end
 
       def create_data_section(_sketchup_objects)
@@ -77,24 +88,22 @@ module BimTools
           BimTools::Zip::OutputStream.open(file_path) do |zos|
             zos.put_next_entry(file_name)
             zos.puts (step_objects.join(";\n") << ';').encode('iso-8859-1')
-            Dir.mktmpdir("Sketchup-IFC-Manager-textures-") do |dir|
+            Dir.mktmpdir('Sketchup-IFC-Manager-textures-') do |dir|
+              # Write textures to temp location
+              if @ifc_model.textures && @ifc_model.textures.write_all(dir, false)
+                puts('Texture files were successfully written.')
+              end
 
-            # Write textures to temp location
-            if @ifc_model.textures
-              if @ifc_model.textures.write_all(dir, false)
-                puts("Texture files were successfully written.")
+              # add textures to zipfile
+              Dir.foreach(dir) do |filename|
+                next if ['.', '..'].include?(filename)
+
+                file = File.join(dir, filename)
+                zos.put_next_entry File.basename(file)
+                zos << File.binread(file)
               end
             end
-
-            # add textures to zipfile
-            Dir.foreach(dir) do |filename|
-              next if filename == '.' or filename == '..'
-              file = File.join(dir, filename)
-              zos.put_next_entry File.basename(file)
-              zos << File.binread(file)
-            end
           end
-        end
         else
           File.open(file_path, 'w:ISO-8859-1') do |file|
             file.write(step_objects.join(";\n") << ';')
@@ -102,10 +111,8 @@ module BimTools
         end
 
         # Write textures to the ifc file location
-        if @ifc_model.textures
-          if @ifc_model.textures.write_all(File.dirname(file_path), false)
-            puts("Texture files were successfully written.")
-          end
+        if @ifc_model.textures && @ifc_model.textures.write_all(File.dirname(file_path), false)
+          puts('Texture files were successfully written.')
         end
       end
     end
