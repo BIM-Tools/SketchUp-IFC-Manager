@@ -134,7 +134,8 @@ module BimTools
       end
 
       def create_image_texture(su_material)
-        if @ifc_model.textures && su_material && su_texture = su_material.texture
+        # IFC 4 only
+        if @ifc_model.textures && su_material && (@ifc::IfcTextureMap.method_defined? :maps) && su_texture = su_material.texture
           image_texture = @ifc::IfcImageTexture.new(@ifc_model)
           image_texture.repeats = true
           image_texture.repeatt = true
@@ -143,12 +144,14 @@ module BimTools
           texturetransform.axis2 = @ifc::IfcDirection.new(@ifc_model, Geom::Vector2d.new(1, 0))
           texturetransform.localorigin = @ifc::IfcCartesianPoint.new(@ifc_model, Geom::Point2d.new(0, 0))
           texturetransform.scale = Types::IfcReal.new(@ifc_model,
-                                                      Types::IfcLengthMeasure.new(@ifc_model, su_texture.width).convert)
+                                                      Types::IfcLengthMeasure.new(@ifc_model,
+                                                                                  su_texture.width).convert)
           texturetransform.scale2 = Types::IfcReal.new(@ifc_model,
                                                        Types::IfcLengthMeasure.new(@ifc_model,
                                                                                    su_texture.height).convert)
           image_texture.texturetransform = texturetransform
-          image_texture.urlreference = Types::IfcURIReference.new(@ifc_model, File.basename(su_texture.filename))
+          image_texture.urlreference = Types::IfcURIReference.new(@ifc_model,
+                                                                  File.basename(su_texture.filename))
           image_texture
         end
       end
