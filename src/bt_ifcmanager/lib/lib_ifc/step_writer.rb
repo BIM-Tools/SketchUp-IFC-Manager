@@ -105,14 +105,22 @@ module BimTools
             end
           end
         else
-          File.open(file_path, 'w:ISO-8859-1') do |file|
-            file.write(step_objects.join(";\n") << ';')
-          end
-        end
+          begin
+            File.open(file_path, 'w:ISO-8859-1') do |file|
+              file.write(step_objects.join(";\n") << ';')
+            end
 
-        # Write textures to the ifc file location
-        if @ifc_model.textures && @ifc_model.textures.write_all(File.dirname(file_path), false)
-          puts('Texture files were successfully written.')
+            # Write textures to the ifc file location
+            if @ifc_model.textures && @ifc_model.textures.write_all(File.dirname(file_path), false)
+              puts('Texture files were successfully written.')
+            end
+          rescue SystemCallError => e
+            puts e.message
+            UI.messagebox("IFC Manager is unable to save the file: #{e.message}", MB_OK)
+          rescue StandardError => e
+            puts e.message
+            UI.messagebox("IFC Manager is unable to save the file: #{e.message}", MB_OK)
+          end
         end
       end
     end
