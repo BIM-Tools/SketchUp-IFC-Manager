@@ -77,8 +77,6 @@ module BimTools
 
         su_model.set_attribute('IfcManager', 'description', '')
         @project_data = su_model.attribute_dictionaries['IfcManager']
-        project_uuid = @project_data.get_attribute('uuid', 'IfcProject', SecureRandom.uuid)
-        @project_data.set_attribute('uuid', 'IfcProject', project_uuid)
 
         @ifc = Settings.ifc_module
         @su_model = su_model
