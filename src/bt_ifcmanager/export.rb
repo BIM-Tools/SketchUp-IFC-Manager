@@ -65,7 +65,7 @@ module BimTools
       puts "finished creating #{ifc_version = Settings.ifc_version} entities: #{Time.now - timer}"
 
       # export model to IFC step file
-      ifc_model.export(file_path)
+      status_message = ifc_model.export(file_path)
 
       pb.update(3)
 
@@ -75,7 +75,7 @@ module BimTools
 
       pb.update(4)
 
-      show_summary(ifc_model.export_summary, file_path, time)
+      show_summary(ifc_model.export_summary, file_path, time, status_message)
 
       # write log
       begin
@@ -96,17 +96,23 @@ module BimTools
       IfcManager.export_messages << message
     end
 
-    def show_summary(hash, file_path, time)
+    def show_summary(hash, file_path, time, status_message = '')
       css = File.join(PLUGIN_PATH_CSS, 'sketchup.css')
-      html = +"<html><head><link rel='stylesheet' type='text/css' href='#{css}'></head><body><textarea readonly>#{ifc_version = Settings.ifc_version} Entities exported:\n\n"
-      hash.each_pair do |key, value|
-        html << "#{value} #{key}\n"
-      end
-      html << "\n To file '#{file_path}'\n"
-      html << "\n Taking a total number of #{time} seconds\n"
-      unless IfcManager.export_messages.empty?
-        messages = IfcManager.export_messages.uniq.sort.join("\n- ")
-        html << "\nMessages:\n- #{messages}\n"
+      html = +"<html><head><link rel='stylesheet' type='text/css' href='#{css}'></head><body><textarea readonly>"
+      if status_message.length == 0
+        html << "#{ifc_version = Settings.ifc_version} Entities exported:\n\n"
+        hash.each_pair do |key, value|
+          html << "#{value} #{key}\n"
+        end
+        html << "\n To file '#{file_path}'\n"
+        html << "\n Taking a total number of #{time} seconds\n"
+        unless IfcManager.export_messages.empty?
+          messages = IfcManager.export_messages.uniq.sort.join("\n- ")
+          html << "\nMessages:\n- #{messages}\n"
+        end
+      else
+        html << "Export failed!\n\n"
+        html << "#{status_message}\n\n"
       end
       html << '</textarea></body></html>'
       @summary_dialog = UI::HtmlDialog.new(
