@@ -104,6 +104,10 @@ module BimTools
       def get_surface_styles(ifc_model, parent_material = nil, front_material = nil, back_material = nil)
         return Types::Set.new([get_styling(ifc_model, parent_material, :both)]) if !front_material && !back_material
 
+        if front_material && front_material == back_material
+          return Types::Set.new([get_styling(ifc_model, front_material, :both)])
+        end
+
         if front_material && back_material
           return Types::Set.new([get_styling(ifc_model, front_material, :positive),
                                  get_styling(ifc_model, back_material, :negative)])
@@ -115,9 +119,6 @@ module BimTools
         if back_material && parent_material
           return Types::Set.new([get_styling(ifc_model, parent_material, :positive),
                                  get_styling(ifc_model, back_material, :negative)])
-        end
-        if front_material && front_material == back_material
-          return Types::Set.new([get_styling(ifc_model, front_material, :both)])
         end
 
         Types::Set.new([get_styling(ifc_model, parent_material, :both)])

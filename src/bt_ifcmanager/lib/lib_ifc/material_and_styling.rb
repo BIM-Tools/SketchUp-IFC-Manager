@@ -22,6 +22,7 @@
 #
 
 require_relative 'ifc_types'
+require_relative 'ifc_surface_style_rendering_builder'
 
 module BimTools
   module IfcManager
@@ -38,6 +39,7 @@ module BimTools
         @ifc = Settings.ifc_module
         @su_material = su_material
         @image_texture = create_image_texture(su_material)
+        @surface_style_rendering = create_surface_style_rendering(su_material)
         @surface_styles_both = nil
         @surface_styles_positive = nil
         @surface_styles_negative = nil
@@ -72,64 +74,57 @@ module BimTools
       # @param [Sketchup::Material] su_material
       # @return [Ifc_Set] Set of IFC surface styles
       def create_surface_styles(su_material, side = :both)
-        if @ifc_model.options[:colors]
-          if su_material
-            name = su_material.display_name
-            alpha = su_material.alpha
-            color = su_material.color
-          else
-            name = 'Default'
-            alpha = 1.0
+        if su_material
+          name = su_material.display_name
+          surface_style_rendering = @surface_style_rendering
+        else
+          name = 'Default'
+          surface_style_rendering = create_default_surface_style_rendering(side)
+        end
 
-            rendering_options = Sketchup.active_model.rendering_options
-            color = if side == :negative
-                      rendering_options['FaceBackColor']
-                    else
-                      rendering_options['FaceFrontColor']
-                    end
+        surface_style = @ifc::IfcSurfaceStyle.new(@ifc_model)
+        surface_style.side = side
+        surface_style.name = Types::IfcLabel.new(@ifc_model, name)
+        surface_style.styles = Types::Set.new([surface_style_rendering])
+
+        if @image_texture
+          texture_style = @ifc::IfcSurfaceStyleWithTextures.new(@ifc_model)
+          texture_style.textures = IfcManager::Types::List.new([@image_texture])
+          surface_style.styles.add(texture_style)
+        end
+
+        # Workaround for mandatory IfcPresentationStyleAssignment in IFC2x3
+        if Settings.ifc_version == 'IFC 2x3'
+          style_assignment = @ifc::IfcPresentationStyleAssignment.new(@ifc_model)
+          style_assignment.styles = Types::Set.new([surface_style])
+        else
+          style_assignment = surface_style
+        end
+
+        style_assignment
+      end
+
+      def create_surface_style_rendering(su_material)
+        if su_material
+          surface_style_rendering = IfcSurfaceStyleRenderingBuilder.build(@ifc_model) do |builder|
+            builder.set_surface_colour(su_material.color)
+            builder.set_transparency(su_material.alpha)
           end
+        end
+      end
 
-          red_ratio = color.red.to_f / 255
-          green_ratio = color.green.to_f / 255
-          blue_ratio = color.blue.to_f / 255
-          alpha_ratio = 1 - alpha
+      def create_default_surface_style_rendering(side = :both)
+        alpha = 1.0
+        rendering_options = @ifc_model.su_model.rendering_options
+        color = if side == :negative
+                  rendering_options['FaceBackColor']
+                else
+                  rendering_options['FaceFrontColor']
+                end
 
-          colourrgb = @ifc::IfcColourRgb.new(@ifc_model)
-          colourrgb.red = Types::IfcNormalisedRatioMeasure.new(@ifc_model, red_ratio)
-          colourrgb.green = Types::IfcNormalisedRatioMeasure.new(@ifc_model, green_ratio)
-          colourrgb.blue = Types::IfcNormalisedRatioMeasure.new(@ifc_model, blue_ratio)
-
-          # IFC2x3 IfcSurfaceStyleRendering
-          # @todo IFC4 IfcSurfaceStyleShading (transparency change)
-          if @ifc::IfcSurfaceStyleShading.respond_to?(:transparency)
-            surface_style_rendering = @ifc::IfcSurfaceStyleShading.new(@ifc_model)
-          else
-            surface_style_rendering = @ifc::IfcSurfaceStyleRendering.new(@ifc_model)
-            surface_style_rendering.reflectancemethod = :notdefined
-          end
-          surface_style_rendering.surfacecolour = colourrgb
-          surface_style_rendering.transparency = Types::IfcNormalisedRatioMeasure.new(@ifc_model, alpha_ratio)
-
-          surface_style = @ifc::IfcSurfaceStyle.new(@ifc_model)
-          surface_style.side = side
-          surface_style.name = Types::IfcLabel.new(@ifc_model, name)
-          surface_style.styles = Types::Set.new([surface_style_rendering])
-
-          if @image_texture
-            texture_style = @ifc::IfcSurfaceStyleWithTextures.new(@ifc_model)
-            texture_style.textures = IfcManager::Types::List.new([@image_texture])
-            surface_style.styles.add(texture_style)
-          end
-
-          # Workaround for mandatory IfcPresentationStyleAssignment in IFC2x3
-          if Settings.ifc_version == 'IFC 2x3'
-            style_assignment = @ifc::IfcPresentationStyleAssignment.new(@ifc_model)
-            style_assignment.styles = Types::Set.new([surface_style])
-          else
-            style_assignment = surface_style
-          end
-
-          style_assignment
+        surface_style_rendering = IfcSurfaceStyleRenderingBuilder.build(@ifc_model) do |builder|
+          builder.set_surface_colour(color)
+          builder.set_transparency(alpha)
         end
       end
 
@@ -168,16 +163,18 @@ module BimTools
       #
       # @param [IfcRepresentationItem] representation_item
       def get_styling(side = nil)
-        case side
-        when :positive
-          @surface_styles_positive ||= create_surface_styles(@su_material, side)
-          @surface_styles_positive
-        when :negative
-          @surface_styles_negative ||= create_surface_styles(@su_material, side)
-          @surface_styles_negative
-        else # :both
-          @surface_styles_both ||= create_surface_styles(@su_material, :both)
-          @surface_styles_both
+        if @ifc_model.options[:colors]
+          case side
+          when :positive
+            @surface_styles_positive ||= create_surface_styles(@su_material, side)
+            @surface_styles_positive
+          when :negative
+            @surface_styles_negative ||= create_surface_styles(@su_material, side)
+            @surface_styles_negative
+          else # :both
+            @surface_styles_both ||= create_surface_styles(@su_material, :both)
+            @surface_styles_both
+          end
         end
       end
     end
