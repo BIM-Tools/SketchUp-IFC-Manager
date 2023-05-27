@@ -36,7 +36,7 @@ module BimTools
         end
       end
 
-      class Set < Set
+      class Set < ::Set
         include Step
 
         def add(entity)
