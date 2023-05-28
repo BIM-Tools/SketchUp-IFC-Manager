@@ -255,39 +255,46 @@ module BimTools
           #   become part of the parent object geometry if the parent can have geometry
           when nil
             definition_manager = @ifc_model.get_definition_manager(definition)
-            if placement_parent.su_object
-              parent_definition_manager = @ifc_model.get_definition_manager(placement_parent.su_object.definition)
-              if placement_parent.respond_to? :representation
+            # if placement_parent.su_object
+            #   parent_definition_manager = @ifc_model.get_definition_manager(placement_parent.su_object.definition)
+              if placement_parent.respond_to?(:representation) # && placement_parent.representation
                 transformation = placement_parent.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
-                # add_representation(placement_parent,
-                #                    parent_definition_manager,
-                #                    transformation,
-                #                    su_material,
-                #                    su_layer)
+                # add_representation(placement_parent, definition_manager, transformation, su_material, su_layer)
 
-                definition_representation = definition_manager.get_definition_representation(transformation,
-                                                                                             su_material)
-                brep = definition_representation.faceted_brep
-                if brep
-                  # placement_parent.representation.representations[0].items.mappingsource.mappedrepresentation.items.add(brep)
-                  puts 'placement_parent'
-                  # puts parent_definition_manager
-                  # reps = parent_definition_manager.representations
-                  # reps[reps.keys.first]
-                  parent_definition_manager.representations.values.first.add_faceted_brep(brep)
-                  puts parent_definition_manager.representations.values.first.faceted_breps.length
-                  # parent_definition_manager.representations.first.first.add_faceted_brep(brep) # HACK!!!
+                definition_representation = definition_manager.get_definition_representation(transformation, su_material)
+                
+                mappedrepresentation = placement_parent.representation.representations[0].items.mappingsource.mappedrepresentation
+                mappedrepresentation.items += definition_representation.meshes
 
-                  # puts placement_parent
-                end
-                # definition_representation.add_faceted_brep(faces, su_material, transformation)
+                # # add_representation(placement_parent,
+                # #                    parent_definition_manager,
+                # #                    transformation,
+                # #                    su_material,
+                # #                    su_layer)
+
+                # definition_representation = definition_manager.get_definition_representation(transformation,
+                #                                                                              su_material)
+                # brep = definition_representation.faceted_brep
+                # if brep
+                #   # placement_parent.representation.representations[0].items.mappingsource.mappedrepresentation.items.add(brep)
+                #   puts 'placement_parent'
+                #   # puts parent_definition_manager
+                #   # reps = parent_definition_manager.representations
+                #   # reps[reps.keys.first]
+                #   parent_definition_manager.representations.values.first.add_faceted_brep(brep)
+                #   puts parent_definition_manager.representations.values.first.faceted_breps.length
+                #   # parent_definition_manager.representations.first.first.add_faceted_brep(brep) # HACK!!!
+
+                #   # puts placement_parent
+                # end
+                # # definition_representation.add_faceted_brep(faces, su_material, transformation)
 
               else
                 create_fallback_entity(definition_manager, brep_transformation, su_material, su_layer)
               end
-            else
-              create_fallback_entity(definition_manager, brep_transformation, su_material, su_layer)
-            end
+            # else
+            #   create_fallback_entity(definition_manager, brep_transformation, su_material, su_layer)
+            # end
           else
             if ifc_entity.respond_to?(:representation)
               add_representation(ifc_entity,
@@ -335,12 +342,14 @@ module BimTools
         ##############################################
         # ifc_entity.representation wordt steeds overschreven!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        puts 'add_representation'
-        puts ifc_entity
-        ifc_entity.representation = IfcProductDefinitionShapeBuilder.build(@ifc_model) do |builder|
-          builder.add_representation(definition_manager.get_shape_representation(transformation, su_material, su_layer))
+        shape_representation = definition_manager.get_shape_representation(transformation, su_material, su_layer)
+        if ifc_entity.representation
+          ifc_entity.representation.representations.add(shape_representation)
+        else
+          ifc_entity.representation = IfcProductDefinitionShapeBuilder.build(@ifc_model) do |builder|
+            builder.add_representation(shape_representation)
+          end
         end
-        # end
       end
 
       # Create IfcBuildingElementProxy (instead of unsupported IFC entities)

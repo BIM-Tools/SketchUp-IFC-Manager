@@ -165,8 +165,12 @@ module BimTools
       #   # add_styling(@faceted_brep, su_material)
       # end
 
-      def add_faceted_brep(brep)
-        @faceted_breps.add(brep)
+      # def add_faceted_brep(brep)
+      #   @faceted_breps.add(brep)
+      # end
+
+      def add_meshes(meshes)
+        @meshes += meshes
       end
     end
   end

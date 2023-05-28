@@ -12,7 +12,7 @@ module BimTools::IfcManager
         merge_faces(entities[i].definition.entities)
       elsif entities[i].is_a? Sketchup::Edge
         edge = entities[i]
-        if edge.hidden?
+        if edge.hidden? || edge.soft?
           faces = edge.faces
           if faces.length == 2 && faces[0].normal.samedirection?(faces[1].normal)
 
