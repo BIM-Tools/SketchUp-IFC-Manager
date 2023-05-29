@@ -65,7 +65,7 @@ module BimTools
                                      'ReferenceView_V1.2'
                                    end
                              export_options = @ifc_model.options.map { |k, v| "'Option [#{k}: #{v}]'" }.join(",\n")
-                             "('ViewDefinition [#{mvd}]',\n#{export_options}\n)"
+                             "(\n#{export_options},\n'ViewDefinition [#{mvd}]'\n)"
                            else
                              @file_description
                            end
