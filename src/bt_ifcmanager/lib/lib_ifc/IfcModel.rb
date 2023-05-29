@@ -23,6 +23,7 @@
 
 require_relative 'ifc_types'
 require_relative 'ifc_product_definition_shape_builder'
+require_relative 'ifc_project_builder'
 require_relative 'ifc_shape_representation_builder'
 require_relative 'entity_path'
 require_relative 'ObjectCreator'
@@ -108,17 +109,19 @@ module BimTools
         # create IfcOwnerHistory for all IFC objects
         @owner_history = create_ownerhistory
 
-        # create new IfcProject
-        @project = @ifc::IfcProject.new(self, su_model)
-        @project.globalid = IfcManager::IfcGloballyUniqueId.new(self, 'IfcProject')
-
-        # set_units
-        @units = @project.unitsincontext
-
         # create IfcGeometricRepresentationContext for all IFC geometry objects
         @representationcontext = create_representationcontext
 
-        @project.representationcontexts = Types::Set.new([@representationcontext])
+        # create new IfcProject
+        @project = IfcProjectBuilder.build(self) do |builder|
+          builder.set_global_id
+          builder.set_name(@su_model.name) unless @su_model.name.empty?
+          builder.set_description(@su_model.description) unless @su_model.description.empty?
+          builder.set_representationcontexts([@representationcontext])
+        end
+
+        # set_units
+        @units = @project.unitsincontext
 
         # Create default origin and axes for re-use throughout the model
         @default_placement = @ifc::IfcAxis2Placement3D.new(self, Geom::Transformation.new)

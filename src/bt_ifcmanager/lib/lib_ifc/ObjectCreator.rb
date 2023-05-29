@@ -102,18 +102,12 @@ module BimTools
           create_nested_objects(placement_parent, su_instance, su_material, su_layer)
         elsif entity_type == @ifc::IfcProject
 
-          # @todo: set all correct parameters for IfcProject!!!
-          @ifc_model.project.su_object = su_instance
-          ifc_entity = @ifc_model.project
-          ifc_entity.globalid = @guid
-
-          # get properties from Sketchup object and add them to ifc object
-          unless su_definition.name.empty?
-            ifc_entity.name = IfcManager::Types::IfcLabel.new(@ifc_model,
-                                                              su_definition.name)
-          end
-          unless su_definition.description.empty?
-            ifc_entity.description = IfcManager::Types::IfcLabel.new(@ifc_model, su_definition.description)
+          # Enrich the base IfcProject with properties of the modelled IfcProject
+          ifc_entity = IfcProjectBuilder.build(@ifc_model, @ifc_model.project) do |builder|
+            builder.set_global_id(@guid)
+            builder.set_name(su_definition.name) unless su_definition.name.empty?
+            builder.set_description(su_definition.description) unless su_definition.description.empty?
+            builder.set_attributes_from_su_instance(su_instance)
           end
           construct_entity(ifc_entity, placement_parent)
           create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
