@@ -108,9 +108,12 @@ module BimTools
           ifc_entity.globalid = @guid
 
           # get properties from Sketchup object and add them to ifc object
-          @name = IfcManager::Types::IfcLabel.new(@ifc_model, su_definition.name) unless su_definition.name.empty?
+          unless su_definition.name.empty?
+            ifc_entity.name = IfcManager::Types::IfcLabel.new(@ifc_model,
+                                                              su_definition.name)
+          end
           unless su_definition.description.empty?
-            @description = IfcManager::Types::IfcLabel.new(@ifc_model, su_definition.description)
+            ifc_entity.description = IfcManager::Types::IfcLabel.new(@ifc_model, su_definition.description)
           end
           construct_entity(ifc_entity, placement_parent)
           create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
