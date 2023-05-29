@@ -89,26 +89,31 @@ module BimTools
 
       # Create IFC entity based on the IFC classification in sketchup
       def create_ifc_entity(ent_type_name, su_instance, placement_parent = nil, su_material = nil, su_layer = nil)
+        su_definition = su_instance.definition
+
         # Replace IfcWallStandardCase by IfcWall, due to geometry issues and deprecation in IFC 4
         ent_type_name = 'IfcWall' if ent_type_name == 'IfcWallStandardCase'
 
         entity_type = Settings.ifc_module.const_get(ent_type_name) if ent_type_name
-
-        case entity_type
-        when nil
+        if entity_type.nil?
 
           # If sketchup object is not an IFC entity it must become part of the parent object geometry
-          create_geometry(su_instance.definition, nil, placement_parent, su_material, su_layer)
+          create_geometry(su_definition, nil, placement_parent, su_material, su_layer)
           create_nested_objects(placement_parent, su_instance, su_material, su_layer)
-        when @ifc::IfcProject
+        elsif entity_type == @ifc::IfcProject
 
           # @todo: set all correct parameters for IfcProject!!!
           @ifc_model.project.su_object = su_instance
           ifc_entity = @ifc_model.project
-          ifc_entity.globalid = @guid if entity_type < @ifc::IfcRoot
-          @entity_path.add(ifc_entity)
+          ifc_entity.globalid = @guid
+
+          # get properties from Sketchup object and add them to ifc object
+          @name = IfcManager::Types::IfcLabel.new(@ifc_model, su_definition.name) unless su_definition.name.empty?
+          unless su_definition.description.empty?
+            @description = IfcManager::Types::IfcLabel.new(@ifc_model, su_definition.description)
+          end
           construct_entity(ifc_entity, placement_parent)
-          create_geometry(su_instance.definition, ifc_entity, placement_parent, su_material, su_layer)
+          create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
           create_nested_objects(ifc_entity, su_instance, su_material, su_layer)
         else
 
@@ -124,7 +129,7 @@ module BimTools
 
           @entity_path.add(ifc_entity)
           construct_entity(ifc_entity, placement_parent)
-          create_geometry(su_instance.definition, ifc_entity, placement_parent, su_material, su_layer)
+          create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
           create_nested_objects(ifc_entity, su_instance, su_material, su_layer)
         end
       end
@@ -257,41 +262,42 @@ module BimTools
             definition_manager = @ifc_model.get_definition_manager(definition)
             # if placement_parent.su_object
             #   parent_definition_manager = @ifc_model.get_definition_manager(placement_parent.su_object.definition)
-              if placement_parent.respond_to?(:representation) # && placement_parent.representation
-                transformation = placement_parent.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
-                # add_representation(placement_parent, definition_manager, transformation, su_material, su_layer)
+            if placement_parent.respond_to?(:representation) # && placement_parent.representation
+              transformation = placement_parent.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
+              # add_representation(placement_parent, definition_manager, transformation, su_material, su_layer)
 
-                definition_representation = definition_manager.get_definition_representation(transformation, su_material)
-                
-                mappedrepresentation = placement_parent.representation.representations[0].items.mappingsource.mappedrepresentation
-                mappedrepresentation.items += definition_representation.meshes
+              definition_representation = definition_manager.get_definition_representation(transformation,
+                                                                                           su_material)
 
-                # # add_representation(placement_parent,
-                # #                    parent_definition_manager,
-                # #                    transformation,
-                # #                    su_material,
-                # #                    su_layer)
+              mappedrepresentation = placement_parent.representation.representations[0].items.mappingsource.mappedrepresentation
+              mappedrepresentation.items += definition_representation.meshes
 
-                # definition_representation = definition_manager.get_definition_representation(transformation,
-                #                                                                              su_material)
-                # brep = definition_representation.faceted_brep
-                # if brep
-                #   # placement_parent.representation.representations[0].items.mappingsource.mappedrepresentation.items.add(brep)
-                #   puts 'placement_parent'
-                #   # puts parent_definition_manager
-                #   # reps = parent_definition_manager.representations
-                #   # reps[reps.keys.first]
-                #   parent_definition_manager.representations.values.first.add_faceted_brep(brep)
-                #   puts parent_definition_manager.representations.values.first.faceted_breps.length
-                #   # parent_definition_manager.representations.first.first.add_faceted_brep(brep) # HACK!!!
+              # # add_representation(placement_parent,
+              # #                    parent_definition_manager,
+              # #                    transformation,
+              # #                    su_material,
+              # #                    su_layer)
 
-                #   # puts placement_parent
-                # end
-                # # definition_representation.add_faceted_brep(faces, su_material, transformation)
+              # definition_representation = definition_manager.get_definition_representation(transformation,
+              #                                                                              su_material)
+              # brep = definition_representation.faceted_brep
+              # if brep
+              #   # placement_parent.representation.representations[0].items.mappingsource.mappedrepresentation.items.add(brep)
+              #   puts 'placement_parent'
+              #   # puts parent_definition_manager
+              #   # reps = parent_definition_manager.representations
+              #   # reps[reps.keys.first]
+              #   parent_definition_manager.representations.values.first.add_faceted_brep(brep)
+              #   puts parent_definition_manager.representations.values.first.faceted_breps.length
+              #   # parent_definition_manager.representations.first.first.add_faceted_brep(brep) # HACK!!!
 
-              else
-                create_fallback_entity(definition_manager, brep_transformation, su_material, su_layer)
-              end
+              #   # puts placement_parent
+              # end
+              # # definition_representation.add_faceted_brep(faces, su_material, transformation)
+
+            else
+              create_fallback_entity(definition_manager, brep_transformation, su_material, su_layer)
+            end
             # else
             #   create_fallback_entity(definition_manager, brep_transformation, su_material, su_layer)
             # end
