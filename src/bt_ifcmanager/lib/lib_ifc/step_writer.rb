@@ -27,7 +27,6 @@ module BimTools
   module IfcManager
     require File.join(PLUGIN_ZIP_PATH, 'zip') unless defined? BimTools::Zip
     class IfcStepWriter
-      attr_reader :su_model
       attr_accessor :ifc_objects, :owner_history, :representationcontexts, :materials, :layers, :classifications, :classificationassociations # , :site, :building, :buildingstorey
 
       def initialize(ifc_model, file_schema = nil, file_description = nil)
@@ -36,21 +35,21 @@ module BimTools
         @file_description = file_description
       end
 
-      def get_step_objects
+      def get_step_objects(file_path)
         time = Time.new
         step_objects = []
         step_objects << 'ISO-10303-21'
-        step_objects.concat(create_header_section(time))
+        step_objects.concat(create_header_section(file_path, time))
         step_objects.concat(create_data_section)
         step_objects << 'END-ISO-10303-21'
         step_objects
       end
 
-      def create_header_section(time)
+      def create_header_section(file_path, time)
         step_objects = []
         step_objects << 'HEADER'
         step_objects << get_file_description
-        step_objects << get_file_name(time)
+        step_objects << get_file_name(file_path, time)
         step_objects << get_file_schema
         step_objects << 'ENDSEC'
         step_objects
@@ -72,11 +71,11 @@ module BimTools
         "FILE_DESCRIPTION(#{file_description},'2;1')"
       end
 
-      def get_file_name(time)
+      def get_file_name(file_path, time)
         timestamp = time.strftime('%Y-%m-%dT%H:%M:%S')
         version_number = Sketchup.version_number / 100_000_000.floor
         originating_system = "SketchUp 20#{version_number} (#{Sketchup.version})"
-        "FILE_NAME('','#{timestamp}',(''),(''),'IFC-manager for SketchUp (#{VERSION})','#{originating_system}','')"
+        "FILE_NAME('#{File.basename(file_path)}','#{timestamp}',(''),(''),'IFC-manager for SketchUp (#{VERSION})','#{originating_system}','')"
       end
 
       def get_file_schema
@@ -96,7 +95,7 @@ module BimTools
       end
 
       def write(file_path)
-        step_objects = get_step_objects
+        step_objects = get_step_objects(file_path)
         if File.extname(file_path).downcase == '.ifczip'
           file_name = File.basename(file_path, File.extname(file_path)) << '.ifc'
           BimTools::Zip::OutputStream.open(file_path) do |zos|
