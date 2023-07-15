@@ -249,7 +249,6 @@ module BimTools
                                                 su_material,
                                                 su_layer,
                                                 sub_entity_name)
-            ifc_entity.add(sub_entity)
 
           # An IfcGroup or IfcProject has no geometry so all Sketchup geometry is embedded in a IfcBuildingElementProxy
           #   IfcGroup is also the supertype of IfcSystem
