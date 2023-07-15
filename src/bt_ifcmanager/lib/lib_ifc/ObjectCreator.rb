@@ -24,6 +24,7 @@
 require_relative 'ifc_types'
 require_relative 'IfcGloballyUniqueId'
 require_relative 'entity_path'
+require_relative 'ifc_project_builder'
 
 module BimTools
   module IfcManager
@@ -91,10 +92,23 @@ module BimTools
       def create_ifc_entity(ent_type_name, su_instance, placement_parent = nil, su_material = nil, su_layer = nil)
         su_definition = su_instance.definition
 
+        # Strip any accidental direct Type assignments
+        # @todo should be part of ifc_product_builder
+        if ent_type_name && ent_type_name.end_with?('Type')
+          case ent_type_name
+          # Catch missing IfcAirTerminal in Ifc2x3
+          when 'IfcAirTerminalType'
+            ent_type_name = 'IfcFlowTerminal'
+          else
+            ent_base_type_name = ent_type_name.delete_suffix('Type')
+            ent_type_name = ent_base_type_name if @ifc.const_defined? ent_base_type_name
+          end
+        end
+
         # Replace IfcWallStandardCase by IfcWall, due to geometry issues and deprecation in IFC 4
         ent_type_name = 'IfcWall' if ent_type_name == 'IfcWallStandardCase'
 
-        entity_type = Settings.ifc_module.const_get(ent_type_name) if ent_type_name
+        entity_type = @ifc.const_get(ent_type_name) if ent_type_name
         if entity_type.nil?
 
           # If sketchup object is not an IFC entity it must become part of the parent object geometry
@@ -103,11 +117,11 @@ module BimTools
         elsif entity_type == @ifc::IfcProject
 
           # Enrich the base IfcProject with properties of the modelled IfcProject
-          ifc_entity = IfcProjectBuilder.build(@ifc_model, @ifc_model.project) do |builder|
-            builder.set_global_id(@guid)
-            builder.set_name(su_definition.name) unless su_definition.name.empty?
-            builder.set_description(su_definition.description) unless su_definition.description.empty?
-            builder.set_attributes_from_su_instance(su_instance)
+          ifc_entity = IfcProjectBuilder.modify(@ifc_model, @ifc_model.project) do |modifier|
+            modifier.set_global_id(@guid)
+            modifier.set_name(su_definition.name) unless su_definition.name.empty?
+            modifier.set_description(su_definition.description) unless su_definition.description.empty?
+            modifier.set_attributes_from_su_instance(su_instance)
           end
           construct_entity(ifc_entity, placement_parent)
           create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
@@ -259,7 +273,7 @@ module BimTools
             definition_manager = @ifc_model.get_definition_manager(definition)
             # if placement_parent.su_object
             #   parent_definition_manager = @ifc_model.get_definition_manager(placement_parent.su_object.definition)
-            if placement_parent.respond_to?(:representation) # && placement_parent.representation
+            if placement_parent.respond_to?(:representation) && placement_parent.representation
               transformation = placement_parent.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
               # add_representation(placement_parent, definition_manager, transformation, su_material, su_layer)
 
@@ -269,11 +283,11 @@ module BimTools
               mappedrepresentation = placement_parent.representation.representations[0].items.mappingsource.mappedrepresentation
               mappedrepresentation.items += definition_representation.meshes
 
-              # # add_representation(placement_parent,
-              # #                    parent_definition_manager,
-              # #                    transformation,
-              # #                    su_material,
-              # #                    su_layer)
+              add_representation(placement_parent,
+                                 parent_definition_manager,
+                                 transformation,
+                                 su_material,
+                                 su_layer)
 
               # definition_representation = definition_manager.get_definition_representation(transformation,
               #                                                                              su_material)
@@ -367,7 +381,7 @@ module BimTools
                                  su_layer,
                                  entity_name = nil,
                                  ent_type_name = 'IfcBuildingElementProxy')
-        entity_type = Settings.ifc_module.const_get(ent_type_name)
+        entity_type = @ifc.const_get(ent_type_name)
         ifc_entity = entity_type.new(@ifc_model, nil)
         entity_name ||= definition_manager.name
         ifc_entity.name = Types::IfcLabel.new(@ifc_model, entity_name)
