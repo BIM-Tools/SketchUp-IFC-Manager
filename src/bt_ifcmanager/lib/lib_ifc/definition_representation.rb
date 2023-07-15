@@ -102,26 +102,31 @@ module BimTools
       end
 
       def get_surface_styles(ifc_model, parent_material = nil, front_material = nil, back_material = nil)
-        return Types::Set.new([get_styling(ifc_model, parent_material, :both)]) if !front_material && !back_material
+        if Settings.ifc_version_compact == 'IFC2X3'
+          return Types::Set.new([get_styling(ifc_model, front_material, :both)]) if front_material
+          return Types::Set.new([get_styling(ifc_model, parent_material, :both)])
+        else
+          return Types::Set.new([get_styling(ifc_model, parent_material, :both)]) if !front_material && !back_material
 
-        if front_material && front_material == back_material
-          return Types::Set.new([get_styling(ifc_model, front_material, :both)])
-        end
+          if front_material && front_material == back_material
+            return Types::Set.new([get_styling(ifc_model, front_material, :both)])
+          end
 
-        if front_material && back_material
-          return Types::Set.new([get_styling(ifc_model, front_material, :positive),
-                                 get_styling(ifc_model, back_material, :negative)])
-        end
-        if front_material && parent_material
-          return Types::Set.new([get_styling(ifc_model, front_material, :positive),
-                                 get_styling(ifc_model, parent_material, :negative)])
-        end
-        if back_material && parent_material
-          return Types::Set.new([get_styling(ifc_model, parent_material, :positive),
-                                 get_styling(ifc_model, back_material, :negative)])
-        end
+          if front_material && back_material
+            return Types::Set.new([get_styling(ifc_model, front_material, :positive),
+                                  get_styling(ifc_model, back_material, :negative)])
+          end
+          if front_material && parent_material
+            return Types::Set.new([get_styling(ifc_model, front_material, :positive),
+                                  get_styling(ifc_model, parent_material, :negative)])
+          end
+          if back_material && parent_material
+            return Types::Set.new([get_styling(ifc_model, parent_material, :positive),
+                                  get_styling(ifc_model, back_material, :negative)])
+          end
 
-        Types::Set.new([get_styling(ifc_model, parent_material, :both)])
+          Types::Set.new([get_styling(ifc_model, parent_material, :both)])
+        end
       end
 
       def get_styling(ifc_model, su_material, side = :both)
