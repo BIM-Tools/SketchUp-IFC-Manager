@@ -50,9 +50,7 @@ module BimTools
 
       # update all IFC name fields with the component definition name
       # (?) is this necessary, or should this already be 100% correct at the time of export?
-      su_model.start_operation('Update IFC data', true)
       IfcManager.update_ifc_fields(su_model)
-      su_model.commit_operation
 
       pb.update(1)
 

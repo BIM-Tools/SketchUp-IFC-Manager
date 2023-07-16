@@ -102,8 +102,8 @@ module BimTools
 
     # IFC export button
     btn_ifc_export = UI::Command.new('Export model to IFC') do
-      # get model current path
-      model_path = Sketchup.active_model.path
+      model = Sketchup.active_model
+      model_path = model.path
 
       # get model file name
       filename = if File.basename(model_path) == ''
@@ -124,7 +124,9 @@ module BimTools
         # make sure file_path ends in "ifc"
         export_path << '.ifc' unless ['.ifc', '.ifczip'].include? File.extname(export_path).downcase
 
+        model.start_operation('IFC Manager export', true)
         export(export_path)
+        model.commit_operation
       end
     end
     btn_ifc_export.small_icon = File.join(PLUGIN_PATH_IMAGE, "IfcExport#{ICON_SMALL}#{ICON_TYPE}")
