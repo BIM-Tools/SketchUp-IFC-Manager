@@ -105,11 +105,11 @@ module BimTools
       end
 
       def create_surface_style_rendering(su_material)
-        if su_material
-          surface_style_rendering = IfcSurfaceStyleRenderingBuilder.build(@ifc_model) do |builder|
-            builder.set_surface_colour(su_material.color)
-            builder.set_transparency(su_material.alpha)
-          end
+        return unless su_material
+
+        IfcSurfaceStyleRenderingBuilder.build(@ifc_model) do |builder|
+          builder.set_surface_colour(su_material.color)
+          builder.set_transparency(su_material.alpha)
         end
       end
 
@@ -122,7 +122,7 @@ module BimTools
                   rendering_options['FaceFrontColor']
                 end
 
-        surface_style_rendering = IfcSurfaceStyleRenderingBuilder.build(@ifc_model) do |builder|
+        IfcSurfaceStyleRenderingBuilder.build(@ifc_model) do |builder|
           builder.set_surface_colour(color)
           builder.set_transparency(alpha)
         end
@@ -130,25 +130,27 @@ module BimTools
 
       def create_image_texture(su_material)
         # IFC 4 only
-        if @ifc_model.textures && su_material && (@ifc::IfcTextureMap.method_defined? :maps) && su_texture = su_material.texture
-          image_texture = @ifc::IfcImageTexture.new(@ifc_model)
-          image_texture.repeats = true
-          image_texture.repeatt = true
-          texturetransform = @ifc::IfcCartesianTransformationOperator2DnonUniform.new(@ifc_model)
-          texturetransform.axis1 = @ifc::IfcDirection.new(@ifc_model, Geom::Vector2d.new(0, 1))
-          texturetransform.axis2 = @ifc::IfcDirection.new(@ifc_model, Geom::Vector2d.new(1, 0))
-          texturetransform.localorigin = @ifc::IfcCartesianPoint.new(@ifc_model, Geom::Point2d.new(0, 0))
-          texturetransform.scale = Types::IfcReal.new(@ifc_model,
-                                                      Types::IfcLengthMeasure.new(@ifc_model,
-                                                                                  su_texture.width).convert)
-          texturetransform.scale2 = Types::IfcReal.new(@ifc_model,
-                                                       Types::IfcLengthMeasure.new(@ifc_model,
-                                                                                   su_texture.height).convert)
-          image_texture.texturetransform = texturetransform
-          image_texture.urlreference = Types::IfcURIReference.new(@ifc_model,
-                                                                  File.basename(su_texture.filename))
-          image_texture
+        unless @ifc_model.textures && su_material && (@ifc::IfcTextureMap.method_defined? :maps) && su_texture = su_material.texture
+          return
         end
+
+        image_texture = @ifc::IfcImageTexture.new(@ifc_model)
+        image_texture.repeats = true
+        image_texture.repeatt = true
+        texturetransform = @ifc::IfcCartesianTransformationOperator2DnonUniform.new(@ifc_model)
+        texturetransform.axis1 = @ifc::IfcDirection.new(@ifc_model, Geom::Vector2d.new(0, 1))
+        texturetransform.axis2 = @ifc::IfcDirection.new(@ifc_model, Geom::Vector2d.new(1, 0))
+        texturetransform.localorigin = @ifc::IfcCartesianPoint.new(@ifc_model, Geom::Point2d.new(0, 0))
+        texturetransform.scale = Types::IfcReal.new(@ifc_model,
+                                                    Types::IfcLengthMeasure.new(@ifc_model,
+                                                                                su_texture.width).convert)
+        texturetransform.scale2 = Types::IfcReal.new(@ifc_model,
+                                                     Types::IfcLengthMeasure.new(@ifc_model,
+                                                                                 su_texture.height).convert)
+        image_texture.texturetransform = texturetransform
+        image_texture.urlreference = Types::IfcURIReference.new(@ifc_model,
+                                                                File.basename(su_texture.filename))
+        image_texture
       end
 
       # Add the material to an IFC entity
@@ -163,18 +165,15 @@ module BimTools
       #
       # @param [IfcRepresentationItem] representation_item
       def get_styling(side = nil)
-        if @ifc_model.options[:colors]
-          case side
-          when :positive
-            @surface_styles_positive ||= create_surface_styles(@su_material, side)
-            @surface_styles_positive
-          when :negative
-            @surface_styles_negative ||= create_surface_styles(@su_material, side)
-            @surface_styles_negative
-          else # :both
-            @surface_styles_both ||= create_surface_styles(@su_material, :both)
-            @surface_styles_both
-          end
+        return unless @ifc_model.options[:colors]
+
+        case side
+        when :positive
+          @surface_styles_positive ||= create_surface_styles(@su_material, side)
+        when :negative
+          @surface_styles_negative ||= create_surface_styles(@su_material, side)
+        else # :both
+          @surface_styles_both ||= create_surface_styles(@su_material, :both)
         end
       end
     end

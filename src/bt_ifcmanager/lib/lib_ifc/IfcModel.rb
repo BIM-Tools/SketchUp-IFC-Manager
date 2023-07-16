@@ -247,31 +247,18 @@ module BimTools
         end
 
         # create a single IfcBuildingelementProxy from all 'loose' faces in the model
-        unless faces.empty?
-          sub_entity_name = if @project.name
-                              "#{@project.name.value} geometry"
-                            else
-                              'project geometry'
-                            end
-          shape_representation = IfcShapeRepresentationBuilder.build(self) do |builder|
-            builder.set_contextofitems(@representationcontext)
-            builder.set_representationtype
-            builder.add_item(@ifc::IfcFacetedBrep.new(self, faces, Geom::Transformation.new))
-          end
+        return if faces.empty?
 
-          ifc_entity = @ifc::IfcBuildingElementProxy.new(self, nil)
-          ifc_entity.name = Types::IfcLabel.new(self, sub_entity_name)
-          ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(self, Geom::Transformation.new)
-          ifc_entity.predefinedtype = :notdefined if ifc_entity.respond_to?(:predefinedtype=)
-          ifc_entity.compositiontype = :element if ifc_entity.respond_to?(:compositiontype=)
-          ifc_entity.representation = IfcProductDefinitionShapeBuilder.build(self) do |builder|
-            builder.add_representation(shape_representation)
-          end
-
-          # Add to spatial hierarchy
-          entity_path.add(ifc_entity)
-          entity_path.set_parent(ifc_entity)
-        end
+        d = DefinitionManager.new(self, @su_model)
+        brep_transformation = Geom::Transformation.new
+        create_fallback_entity(
+          entity_path,
+          d,
+          brep_transformation,
+          nil,
+          nil,
+          'model_geometry'
+        )
       end
 
       def collect_component_definitions(su_model)
@@ -282,6 +269,61 @@ module BimTools
 
       def get_definition_manager(definition)
         @definition_manager[definition]
+      end
+
+      def get_styling(su_material, side = :both)
+        materials[su_material] = IfcManager::MaterialAndStyling.new(self, su_material) unless materials[su_material]
+        materials[su_material].get_styling(side)
+      end
+
+      # Create IfcBuildingElementProxy (instead of unsupported IFC entities)
+      #
+      # @param definition_manager [IfcManager::DefinitionManager]
+      # @param brep_transformation [Geom::Transformation]
+      # @param su_material [Sketchup::Material]
+      # @param su_layer [Sketchup::Layer]
+      def create_fallback_entity(
+        entity_path,
+        definition_manager,
+        transformation,
+        su_material = nil,
+        su_layer = nil,
+        entity_name = nil,
+        ent_type_name = 'IfcBuildingElementProxy'
+      )
+        entity_type = @ifc.const_get(ent_type_name)
+        ifc_entity = entity_type.new(self, nil)
+        entity_name ||= definition_manager.name
+        ifc_entity.name = Types::IfcLabel.new(self, entity_name)
+        shape_representation = definition_manager.get_shape_representation(transformation, su_material, su_layer)
+        if ifc_entity.representation
+          ifc_entity.representation.representations.add(shape_representation)
+        else
+          ifc_entity.representation = IfcProductDefinitionShapeBuilder.build(self) do |builder|
+            builder.add_representation(shape_representation)
+          end
+        end
+        ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(
+          self, Geom::Transformation.new
+        )
+
+        # IFC 4
+        ifc_entity.predefinedtype = :notdefined if ifc_entity.respond_to?(:predefinedtype=)
+
+        # IFC 2x3
+        ifc_entity.compositiontype = :element if ifc_entity.respond_to?(:compositiontype=)
+
+        # Add to spatial hierarchy
+        entity_path.add(ifc_entity)
+        entity_path.set_parent(ifc_entity)
+
+        # create materialassociation
+        materials[su_material] = MaterialAndStyling.new(self, su_material) unless materials.include?(su_material)
+
+        # add product to materialassociation
+        materials[su_material].add_to_material(ifc_entity)
+
+        ifc_entity
       end
     end
   end
