@@ -63,6 +63,8 @@ module BimTools
               normals_front[index] = face_mesh.normal_at(mesh_point_id)
             end
           end
+
+          # @todo Catch the back material with a setting switch
           if back_material
             if back_material.texture
               uv_coordinates_back[index] = get_uv(face_mesh.uv_at(mesh_point_id, false))
@@ -139,13 +141,6 @@ module BimTools
         v = IfcManager::Types::IfcParameterValue.new(@ifc_model, uvq.y / uvq.z)
       end
       IfcManager::Types::List.new([u, v])
-    end
-    
-    def get_styling(ifc_model, su_material, side=:both)
-      unless ifc_model.materials[su_material]
-        ifc_model.materials[su_material] = IfcManager::MaterialAndStyling.new(ifc_model, su_material)
-      end
-      return ifc_model.materials[su_material].get_styling(side)
     end
   end
 end

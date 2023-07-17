@@ -96,9 +96,14 @@ module BimTools
         # @todo should be part of ifc_product_builder
         if ent_type_name && ent_type_name.end_with?('Type')
           case ent_type_name
+
           # Catch missing IfcAirTerminal in Ifc2x3
           when 'IfcAirTerminalType'
-            ent_type_name = 'IfcFlowTerminal'
+            ent_type_name = if Settings.ifc_version_compact == 'IFC2X3'
+                              'IfcFlowTerminal'
+                            else
+                              'IfcAirTerminal'
+                            end
           else
             ent_base_type_name = ent_type_name.delete_suffix('Type')
             ent_type_name = ent_base_type_name if @ifc.const_defined? ent_base_type_name
