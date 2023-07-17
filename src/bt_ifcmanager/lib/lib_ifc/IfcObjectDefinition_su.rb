@@ -52,6 +52,7 @@ module BimTools
     def add_related_object(object)
       unless @decomposes
         @decomposes = @ifc::IfcRelAggregates.new(@ifc_model)
+        @decomposes.name = IfcManager::Types::IfcLabel.new(@ifc_model, "#{name.value} container") if name
         @decomposes.relatingobject = self
         @decomposes.relatedobjects = IfcManager::Types::Set.new
       end

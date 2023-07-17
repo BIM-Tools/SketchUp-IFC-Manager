@@ -1,6 +1,4 @@
-# frozen_string_literal: true
-
-#  step_types.rb
+#  IfcURIReference.rb
 #
 #  Copyright 2022 Jan Brouwer <jan@brewsky.nl>
 #
@@ -20,47 +18,25 @@
 #  MA 02110-1301, USA.
 #
 #
+require 'uri'
 
-module BimTools
-  module IfcManager
-    module Types
-      class List < Array
-        include Step
+require_relative 'Ifc_Type'
 
-        def add(entity)
-          self << entity
-        end
-
-        def step
-          "(#{map { |item| property_to_step(item) }.join(',')})"
-        end
+module BimTools::IfcManager
+  class IfcURIReference < Ifc_Type
+    def initialize(ifc_model, value, long = false)
+      super
+      begin
+        @value = URI(value).to_s
+      rescue StandardError, TypeError => e
+        puts "Value cannot be converted to a String: #{e}"
       end
+    end
 
-      class Set < ::Set
-        include Step
-
-        def add(entity)
-          self << entity
-        end
-
-        def step
-          "(#{map { |item| property_to_step(item) }.join(',')})"
-        end
-      end
-
-      class Enumeration
-        attr_reader :value
-
-        def initialize(value)
-          @value = value.to_s
-        end
-
-        def step
-          val = ".#{@value.upcase}."
-          val = add_long(val) if @long
-          val
-        end
-      end
+    def step
+      val = "'#{@value}'"
+      val = add_long(val) if @long
+      val
     end
   end
 end

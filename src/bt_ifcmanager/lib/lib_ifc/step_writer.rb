@@ -27,60 +27,117 @@ module BimTools
   module IfcManager
     require File.join(PLUGIN_ZIP_PATH, 'zip') unless defined? BimTools::Zip
     class IfcStepWriter
-      attr_reader :su_model
       attr_accessor :ifc_objects, :owner_history, :representationcontexts, :materials, :layers, :classifications, :classificationassociations # , :site, :building, :buildingstorey
 
-      def initialize(ifc_model, file_schema, file_description, file_path, sketchup_objects = nil)
+      def initialize(ifc_model, file_schema = nil, file_description = nil)
         @ifc_model = ifc_model
-
-        step_objects = get_step_objects(file_schema, file_description, sketchup_objects)
-        write(file_path, step_objects)
+        @file_schema = file_schema
+        @file_description = file_description
       end
 
-      def get_step_objects(file_schema, file_description, sketchup_objects)
+      def get_step_objects(file_path)
+        time = Time.new
         step_objects = []
         step_objects << 'ISO-10303-21'
-        step_objects.concat(create_header_section(file_schema, file_description))
-        step_objects.concat(create_data_section(sketchup_objects))
+        step_objects.concat(create_header_section(file_path, time))
+        step_objects.concat(create_data_section)
         step_objects << 'END-ISO-10303-21'
         step_objects
       end
 
-      def create_header_section(_file_schema, _file_description)
-        # get timestamp
-        time = Time.new
-        timestamp = time.strftime('%Y-%m-%dT%H:%M:%S')
-
-        # get originating_system
-        version_number = Sketchup.version_number / 100_000_000.floor
-        originating_system = "SketchUp 20#{version_number} (#{Sketchup.version})"
-
+      def create_header_section(file_path, time)
         step_objects = []
         step_objects << 'HEADER'
-        step_objects << "FILE_DESCRIPTION (('ViewDefinition [CoordinationView]'), '2;1')"
-        step_objects << "FILE_NAME ('', '#{timestamp}', (''), (''), 'IFC-manager for SketchUp (#{VERSION})', '#{originating_system}', '')"
-        step_objects << "FILE_SCHEMA (('#{BimTools::IfcManager::Settings.ifc_version_compact}'))"
+        step_objects << get_file_description
+        step_objects << get_file_name(file_path, time)
+        step_objects << get_file_schema
         step_objects << 'ENDSEC'
         step_objects
       end
 
-      def create_data_section(_sketchup_objects)
+      def get_file_description
+        file_description = if @file_description.nil?
+                             # get correct MVD for IFC version
+                             mvd = if Settings.ifc_version_compact == 'IFC2X3'
+                                     'CoordinationView_V2.0'
+                                   else
+                                     'ReferenceView_V1.2'
+                                   end
+                             export_options = @ifc_model.options.map { |k, v| "'Option [#{k}: #{v}]'" }.join(",\n")
+                             "(\n'ViewDefinition [#{mvd}]',\n#{export_options}\n)"
+                           else
+                             @file_description
+                           end
+        "FILE_DESCRIPTION(#{file_description},'2;1')"
+      end
+
+      def get_file_name(file_path, time)
+        timestamp = time.strftime('%Y-%m-%dT%H:%M:%S')
+        version_number = Sketchup.version_number / 100_000_000.floor
+        originating_system = "SketchUp 20#{version_number} (#{Sketchup.version})"
+        "FILE_NAME('#{File.basename(file_path)}','#{timestamp}',(''),(''),'IFC-manager for SketchUp (#{VERSION})','#{originating_system}','')"
+      end
+
+      def get_file_schema
+        file_schema = if @file_schema.nil?
+                        "('#{Settings.ifc_version_compact}')"
+                      else
+                        @file_schema
+                      end
+        "FILE_SCHEMA(#{file_schema})"
+      end
+
+      def create_data_section
         step_objects = @ifc_model.ifc_objects.map(&:step)
         step_objects.unshift('DATA')
         step_objects << 'ENDSEC'
         step_objects
       end
 
-      def write(file_path, step_objects)
+      def write(file_path)
+        step_objects = get_step_objects(file_path)
         if File.extname(file_path).downcase == '.ifczip'
           file_name = File.basename(file_path, File.extname(file_path)) << '.ifc'
           BimTools::Zip::OutputStream.open(file_path) do |zos|
             zos.put_next_entry(file_name)
             zos.puts (step_objects.join(";\n") << ';').encode('iso-8859-1')
+            Dir.mktmpdir('Sketchup-IFC-Manager-textures-') do |dir|
+              # Write textures to temp location
+              if @ifc_model.textures && @ifc_model.textures.write_all(dir, false)
+                puts('Texture files were successfully written.')
+              end
+
+              # add textures to zipfile
+              Dir.foreach(dir) do |filename|
+                next if ['.', '..'].include?(filename)
+
+                file = File.join(dir, filename)
+                zos.put_next_entry File.basename(file)
+                zos << File.binread(file)
+              end
+            end
           end
         else
-          File.open(file_path, 'w:ISO-8859-1') do |file|
-            file.write(step_objects.join(";\n") << ';')
+          begin
+            File.open(file_path, 'w:ISO-8859-1') do |file|
+              file.write(step_objects.join(";\n") << ';')
+            end
+
+            # Write textures to the ifc file location
+            if @ifc_model.textures && @ifc_model.textures.write_all(File.dirname(file_path), false)
+              puts('Texture files were successfully written.')
+            end
+            ''
+          rescue SystemCallError => e
+            message = "IFC Manager is unable to save the file: #{e.message}"
+            puts message
+            UI.messagebox(message, MB_OK)
+            message
+          rescue StandardError => e
+            message = "IFC Manager is unable to save the file: #{e.message}"
+            puts message
+            UI.messagebox(message, MB_OK)
+            message
           end
         end
       end

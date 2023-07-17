@@ -199,7 +199,9 @@ IfcSurfaceTexture:
   - :RepeatS
   - :RepeatT
   - :TextureType
+  - :Mode
   - :TextureTransform
+  - :Parameter
 IfcBlobTexture:
   :explicit:
   - :RasterFormat
@@ -306,6 +308,9 @@ IfcCalendarDate:
 IfcCartesianPoint:
   :explicit:
   - :Coordinates
+IfcCartesianPointList3D:
+  :explicit:
+  - :CoordList
 IfcCartesianTransformationOperator:
   :explicit:
   - :Axis1
@@ -979,6 +984,13 @@ IfcHygroscopicMaterialProperties:
 IfcImageTexture:
   :explicit:
   - :UrlReference
+IfcIndexedTextureMap:
+  :explicit:
+  - :MappedTo
+  - :TexCoords
+IfcIndexedTriangleTextureMap:
+  :explicit:
+  - :TexCoordIndex
 IfcInventory:
   :explicit:
   - :InventoryType
@@ -2075,6 +2087,7 @@ IfcSurfaceStyleRefraction:
 IfcSurfaceStyleShading:
   :explicit:
   - :SurfaceColour
+  - :Transparency
 IfcSurfaceStyleRendering:
   :explicit:
   - :Transparency
@@ -2142,6 +2155,10 @@ IfcTendon:
   - :AnchorageSlip
   - :MinCurvatureRadius
 IfcTessellatedFaceSet:
+  :explicit:
+  - :Coordinates
+  - :Normals
+  - :Closed
   :inverse:
   - :HasColours
   - :HasTextures
@@ -2186,6 +2203,9 @@ IfcTextStyleWithBoxCharacteristics:
   - :BoxSlantAngle
   - :BoxRotateAngle
   - :CharacterSpacing
+IfcTextureCoordinate:
+  :explicit:
+  - :Maps
 IfcTextureCoordinateGenerator:
   :explicit:
   - :Mode
@@ -2193,6 +2213,9 @@ IfcTextureCoordinateGenerator:
 IfcTextureMap:
   :explicit:
   - :TextureMaps
+  - :Maps
+  - :Vertices
+  - :MappedTo
 IfcTextureVertex:
   :explicit:
   - :Coordinates
@@ -2231,6 +2254,10 @@ IfcTrapeziumProfileDef:
   - :TopXDim
   - :YDim
   - :TopXOffset
+IfcTriangulatedFaceSet:
+  :explicit:
+  - :CoordIndex
+  - :NormalIndex
 IfcTrimmedCurve:
   :explicit:
   - :BasisCurve

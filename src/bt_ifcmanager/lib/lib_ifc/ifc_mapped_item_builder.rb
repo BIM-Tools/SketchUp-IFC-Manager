@@ -29,6 +29,7 @@ module BimTools
       def self.build(ifc_model)
         builder = new(ifc_model)
         yield(builder)
+        builder.validate
         builder.ifc_mapped_item
       end
 
@@ -38,11 +39,20 @@ module BimTools
         @ifc_mapped_item = @ifc::IfcMappedItem.new(ifc_model)
       end
 
+      def validate
+        # Set default mappingtarget when not set
+        set_mappingtarget unless @ifc_mapped_item.mappingtarget
+      end
+
       def set_mappingsource(source)
         @ifc_mapped_item.mappingsource = source
       end
 
-      def set_mappingtarget(target)
+      def set_mappingtarget(target = nil)
+        unless target
+          target = @ifc::IfcCartesianTransformationOperator3D.new(@ifc_model)
+          target.localorigin = @ifc_model.default_location
+        end
         @ifc_mapped_item.mappingtarget = target
       end
 

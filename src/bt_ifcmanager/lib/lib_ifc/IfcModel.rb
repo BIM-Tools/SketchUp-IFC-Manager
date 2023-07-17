@@ -23,10 +23,11 @@
 
 require_relative 'ifc_types'
 require_relative 'ifc_product_definition_shape_builder'
+require_relative 'ifc_project_builder'
 require_relative 'ifc_shape_representation_builder'
 require_relative 'entity_path'
 require_relative 'ObjectCreator'
-require_relative 'representation_manager'
+require_relative 'definition_manager'
 require_relative 'step_writer'
 
 require_relative 'classifications'
@@ -44,7 +45,7 @@ module BimTools
       attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications,
                     :classificationassociations, :product_types, :property_enumerations
       attr_reader :su_model, :project, :ifc_objects, :project_data, :export_summary, :options, :su_entities, :units,
-                  :default_location, :default_axis, :default_refdirection, :default_placement, :representation_manager
+                  :default_location, :default_axis, :default_refdirection, :default_placement, :textures
 
       # creates an IFC model based on given su model
       # (?) could be enhanced to also accept other sketchup objects
@@ -63,11 +64,12 @@ module BimTools
           layers: true, #  create IfcPresentationLayerAssignments
           materials: true, #  create IfcMaterials
           colors: true, #  create IfcStyledItems
-          geometry: true, #  create geometry for entities
+          geometry: 'Brep', #  create geometry for entities
           fast_guid: false, # create simplified guids
           dynamic_attributes: true, #  export dynamic component data
           types: true,
           mapped_items: true, # export component definitions as mapped items
+          textures: false, # export component definitions as mapped items
           export_entities: [],
           root_entities: [],
           model_axes: false
@@ -76,8 +78,6 @@ module BimTools
 
         su_model.set_attribute('IfcManager', 'description', '')
         @project_data = su_model.attribute_dictionaries['IfcManager']
-        project_uuid = @project_data.get_attribute('uuid', 'IfcProject', SecureRandom.uuid)
-        @project_data.set_attribute('uuid', 'IfcProject', project_uuid)
 
         @ifc = Settings.ifc_module
         @su_model = su_model
@@ -90,12 +90,15 @@ module BimTools
         @layers = {}
         @classifications = IfcManager::Classifications.new(self)
 
+        # if textures option is enabled set TextureWriter
+        @textures = (Sketchup.create_texture_writer if @options[:textures])
+
         # create empty array that will contain all IFC objects
         @ifc_objects = []
 
         # create object that keeps track of all different shaperepresentations for
         #   the different sketchup component definitions
-        @representation_manager = RepresentationManager.new(self)
+        @definition_manager = collect_component_definitions(@su_model).to_h
 
         # # create empty hash that will contain all Mapped Representations (Component Definitions)
         # @mapped_representations = {}
@@ -106,17 +109,19 @@ module BimTools
         # create IfcOwnerHistory for all IFC objects
         @owner_history = create_ownerhistory
 
-        # create new IfcProject
-        @project = @ifc::IfcProject.new(self, su_model)
-        @project.globalid = IfcManager::IfcGloballyUniqueId.new(self, 'IfcProject')
-
-        # set_units
-        @units = @project.unitsincontext
-
         # create IfcGeometricRepresentationContext for all IFC geometry objects
         @representationcontext = create_representationcontext
 
-        @project.representationcontexts = Types::Set.new([@representationcontext])
+        # create new IfcProject
+        @project = IfcProjectBuilder.build(self) do |builder|
+          builder.set_global_id
+          builder.set_name(@su_model.name) unless @su_model.name.empty?
+          builder.set_description(@su_model.description) unless @su_model.description.empty?
+          builder.set_representationcontexts([@representationcontext])
+        end
+
+        # set_units
+        @units = @project.unitsincontext
 
         # Create default origin and axes for re-use throughout the model
         @default_placement = @ifc::IfcAxis2Placement3D.new(self, Geom::Transformation.new)
@@ -128,11 +133,11 @@ module BimTools
         @product_types = {}
 
         # Set root transformation as base for all other transformations
-        if @options[:model_axes]
-          transformation = su_model.axes.transformation.inverse
-        else
-          transformation = Geom::Transformation.new
-        end
+        transformation = if @options[:model_axes]
+                           su_model.axes.transformation.inverse
+                         else
+                           Geom::Transformation.new
+                         end
 
         # When no entities are given for export, pass all model entities to create ifc objects
         # if nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked
@@ -157,7 +162,8 @@ module BimTools
       # (?) could be enhanced to also accept multiple ifc types like step / ifczip / ifcxml
       # (?) could be enhanced with export options hash
       def export(file_path)
-        IfcManager::IfcStepWriter.new(self, 'file_schema', 'file_description', file_path, @su_model)
+        step_writer = IfcStepWriter.new(self)
+        step_writer.write(file_path)
       end
 
       # add object class name to export summary
@@ -241,31 +247,83 @@ module BimTools
         end
 
         # create a single IfcBuildingelementProxy from all 'loose' faces in the model
-        unless faces.empty?
-          sub_entity_name = if @project.name
-                              "#{@project.name.value} geometry"
-                            else
-                              'project geometry'
-                            end
-          shape_representation = IfcShapeRepresentationBuilder.build(self) do |builder|
-            builder.set_contextofitems(@representationcontext)
-            builder.set_representationtype
-            builder.add_item(@ifc::IfcFacetedBrep.new(self, faces, Geom::Transformation.new))
-          end
+        return if faces.empty?
 
-          ifc_entity = @ifc::IfcBuildingElementProxy.new(self, nil)
-          ifc_entity.name = Types::IfcLabel.new(self, sub_entity_name)
-          ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(self, Geom::Transformation.new)
-          ifc_entity.predefinedtype = :notdefined if ifc_entity.respond_to?(:predefinedtype=)
-          ifc_entity.compositiontype = :element if ifc_entity.respond_to?(:compositiontype=)
+        d = DefinitionManager.new(self, @su_model)
+        brep_transformation = Geom::Transformation.new
+        create_fallback_entity(
+          entity_path,
+          d,
+          brep_transformation,
+          nil,
+          nil,
+          'model_geometry'
+        )
+      end
+
+      def collect_component_definitions(su_model)
+        su_model.definitions.map do |definition|
+          [definition, DefinitionManager.new(self, definition)]
+        end
+      end
+
+      def get_definition_manager(definition)
+        @definition_manager[definition]
+      end
+
+      def get_styling(su_material, side = :both)
+        materials[su_material] = IfcManager::MaterialAndStyling.new(self, su_material) unless materials[su_material]
+        materials[su_material].get_styling(side)
+      end
+
+      # Create IfcBuildingElementProxy (instead of unsupported IFC entities)
+      #
+      # @param definition_manager [IfcManager::DefinitionManager]
+      # @param brep_transformation [Geom::Transformation]
+      # @param su_material [Sketchup::Material]
+      # @param su_layer [Sketchup::Layer]
+      def create_fallback_entity(
+        entity_path,
+        definition_manager,
+        transformation,
+        su_material = nil,
+        su_layer = nil,
+        entity_name = nil,
+        ent_type_name = 'IfcBuildingElementProxy'
+      )
+        entity_type = @ifc.const_get(ent_type_name)
+        ifc_entity = entity_type.new(self, nil)
+        entity_name ||= definition_manager.name
+        ifc_entity.name = Types::IfcLabel.new(self, entity_name)
+        shape_representation = definition_manager.get_shape_representation(transformation, su_material, su_layer)
+        if ifc_entity.representation
+          ifc_entity.representation.representations.add(shape_representation)
+        else
           ifc_entity.representation = IfcProductDefinitionShapeBuilder.build(self) do |builder|
             builder.add_representation(shape_representation)
           end
-
-          # Add to spatial hierarchy
-          entity_path.add(ifc_entity)
-          entity_path.set_parent(ifc_entity)
         end
+        ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(
+          self, Geom::Transformation.new
+        )
+
+        # IFC 4
+        ifc_entity.predefinedtype = :notdefined if ifc_entity.respond_to?(:predefinedtype=)
+
+        # IFC 2x3
+        ifc_entity.compositiontype = :element if ifc_entity.respond_to?(:compositiontype=)
+
+        # Add to spatial hierarchy
+        entity_path.add(ifc_entity)
+        entity_path.set_parent(ifc_entity)
+
+        # create materialassociation
+        materials[su_material] = MaterialAndStyling.new(self, su_material) unless materials.include?(su_material)
+
+        # add product to materialassociation
+        materials[su_material].add_to_material(ifc_entity)
+
+        ifc_entity
       end
     end
   end

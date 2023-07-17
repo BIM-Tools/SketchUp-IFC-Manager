@@ -1,8 +1,6 @@
-# frozen_string_literal: true
-
-#  step_types.rb
+#  IfcIndexedTriangleTextureMap_su.rb
 #
-#  Copyright 2022 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,43 +20,25 @@
 #
 
 module BimTools
-  module IfcManager
-    module Types
-      class List < Array
-        include Step
+  module IfcIndexedTriangleTextureMap_su
+    def initialize(ifc_model)
+      super
+      @ifc = BimTools::IfcManager::Settings.ifc_module
+      instance_variable_set(:@attr, ([:MappedTo] + attributes))
 
-        def add(entity)
-          self << entity
+
+      # Workaround for bug in IFC XSD's forward from IFC4, missing "mappedto" attribute
+      unless attributes.include? :MappedTo
+        @mappedto = nil
+        define_singleton_method(:attributes) do
+          attributes = self.class.attributes
+          return attributes.insert(1, :MappedTo)
         end
-
-        def step
-          "(#{map { |item| property_to_step(item) }.join(',')})"
+        define_singleton_method(:mappedto) do
+          return @mappedto
         end
-      end
-
-      class Set < ::Set
-        include Step
-
-        def add(entity)
-          self << entity
-        end
-
-        def step
-          "(#{map { |item| property_to_step(item) }.join(',')})"
-        end
-      end
-
-      class Enumeration
-        attr_reader :value
-
-        def initialize(value)
-          @value = value.to_s
-        end
-
-        def step
-          val = ".#{@value.upcase}."
-          val = add_long(val) if @long
-          val
+        define_singleton_method(:mappedto=) do |mappedto|
+          return @mappedto = mappedto
         end
       end
     end
