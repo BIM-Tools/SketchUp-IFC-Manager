@@ -37,6 +37,7 @@
 #   mapped_items:        true,  # Export IFC mapped items
 #   model_axes:          true   # Export using model axes instead of Sketchup internal origin
 #   textures:            false  # Add textures
+#   double_sided_faces:  false  # Add double sided faces
 # load:
 #   classifications:     [],    # ["NL-SfB 2005, tabel 1", "DIN 276-1"]
 #   default_materials:   false  # {'beton'=>[142, 142, 142],'hout'=>[129, 90, 35],'staal'=>[198, 198, 198],'gips'=>[255, 255, 255],'zink'=>[198, 198, 198],'hsb'=>[204, 161, 0],'metselwerk'=>[102, 51, 0],'steen'=>[142, 142, 142],'zetwerk'=>[198, 198, 198],'tegel'=>[255, 255, 255],'aluminium'=>[198, 198, 198],'kunststof'=>[255, 255, 255],'rvs'=>[198, 198, 198],'pannen'=>[30, 30, 30],'bitumen'=>[30, 30, 30],'epdm'=>[30, 30, 30],'isolatie'=>[255, 255, 50],'kalkzandsteen'=>[255, 255, 255],'metalstud'=>[198, 198, 198],'gibo'=>[255, 255, 255],'glas'=>[204, 255, 255],'multiplex'=>[255, 216, 101],'cementdekvloer'=>[198, 198, 198]}
@@ -160,6 +161,11 @@ module BimTools
             'Export textures',
             @options[:export][:textures]
           )
+          @export_double_sided_faces = CheckboxOption.new(
+            'double_sided_faces',
+            'Export double sided faces',
+            @options[:export][:double_sided_faces]
+          )
           @export_classification_suffix = CheckboxOption.new(
             'classification_suffix',
             "Add 'Classification' suffix to all classifications",
@@ -199,6 +205,7 @@ module BimTools
         @options[:export][:type_properties] = @export_type_properties.value
         @options[:export][:mapped_items] = @export_mapped_items.value
         @options[:export][:textures] = @export_textures.value
+        @options[:export][:double_sided_faces] = @export_double_sided_faces.value
         @options[:export][:classification_suffix] = @export_classification_suffix.value
         @options[:export][:model_axes] = @export_model_axes.value
         File.open(@settings_file, 'w') { |file| file.write(@options.to_yaml) }
@@ -386,6 +393,7 @@ module BimTools
           @export_type_properties.value = false
           @export_mapped_items.value = false
           @export_textures.value = false
+          @export_double_sided_faces.value = false
           @export_classification_suffix.value = false
           @export_model_axes.value = false
 
@@ -420,8 +428,10 @@ module BimTools
             when 'mapped_items'
               @export_mapped_items.value = true
             when 'textures'
-            @export_textures.value = true
-          when 'classification_suffix'
+              @export_textures.value = true
+            when 'double_sided_faces'
+              @export_double_sided_faces.value = true
+            when 'classification_suffix'
               @export_classification_suffix.value = true
             when 'model_axes'
               @export_model_axes.value = true
@@ -515,6 +525,7 @@ module BimTools
         html << @export_type_properties.html
         html << @export_mapped_items.html
         html << @export_textures.html
+        html << @export_double_sided_faces.html
         html << @export_classification_suffix.html
         html << @export_model_axes.html
         html << "      </div>\n"
@@ -578,7 +589,7 @@ module BimTools
         end
       end
     end
-    
+
     class SelectOption
       attr_accessor :value
 

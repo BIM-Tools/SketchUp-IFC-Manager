@@ -41,6 +41,7 @@ module BimTools
         @mapped_representation = nil
         @representation = nil
         @meshes = create_meshes(ifc_model, faces, transformation, su_material)
+        @double_sided_faces = @ifc_model.options[:double_sided_faces]
       end
 
       def get_mapped_representation
@@ -85,7 +86,8 @@ module BimTools
                    transformation,
                    su_material,
                    front_material,
-                   back_material
+                   back_material,
+                   @double_sided_faces
                  )
                else
                  IfcFacetedBrepBuilder.build(ifc_model) do |builder|

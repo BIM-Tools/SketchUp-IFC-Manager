@@ -18,6 +18,7 @@
   :classification_suffix: true
   :model_axes: true
   :textures: true
+  :double_sided_faces: true
 :load:
   :classifications:
     NL-SfB tabel 1.skc: true
