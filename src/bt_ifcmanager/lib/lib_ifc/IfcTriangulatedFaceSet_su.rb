@@ -24,6 +24,8 @@ require_relative 'material_and_styling'
 
 module BimTools
   module IfcTriangulatedFaceSet_su
+    ORIGIN = Geom::Point3d.new
+
     def initialize(
       ifc_model,
       faces, transformation,
@@ -40,7 +42,7 @@ module BimTools
           ifc_model.textures.load(face, true)
           ifc_model.textures.load(face, false) if double_sided_faces
         end
-        [face.mesh(7), face.normal]
+        [face.mesh(7), get_face_transformation(face).inverse]
       end
 
       points = []
@@ -57,37 +59,51 @@ module BimTools
       @coordindex = IfcManager::Types::List.new # polygons as indexes
       while face_mesh_id < meshes.length
         face_mesh = meshes[face_mesh_id][0]
-        face_normal = meshes[face_mesh_id][1]
+        front_texture = if front_material && front_material.texture
+                          true
+                        else
+                          false
+                        end
+        back_texture = if back_material && back_material.texture
+                         true
+                       else
+                         false
+                       end
+        parent_texture = if parent_material && parent_material.texture
+                           true
+                         else
+                           false
+                         end
+
+        if !(front_texture || back_texture) && parent_texture
+          face_transformation = meshes[face_mesh_id][1]
+          texture = parent_material.texture
+          texture_transformation = get_texture_transformation(texture)
+          uv_transformation = texture_transformation * face_transformation
+        end
+
         face_mesh.transform! transformation
         mesh_point_id = 1
         while mesh_point_id <= face_mesh.count_points
           index = mesh_point_id + point_total - 1
           points[index] = face_mesh.point_at(mesh_point_id)
           if front_material
-            if front_material.texture
+            if front_texture
               uv_coordinates_front[index] = get_uv(face_mesh.uv_at(mesh_point_id, true))
               normals_front[index] = face_mesh.normal_at(mesh_point_id)
             end
-          elsif parent_material && parent_material.texture
-            texture = parent_material.texture
-            texture_width_factor = (1 / texture.width)
-            texture_height_factor = (1 / texture.height)
-            uv_coordinates_front[index] =
-              get_uv_global(points[index], face_normal, texture_width_factor, texture_height_factor)
+          elsif parent_texture
+            uv_coordinates_front[index] = get_uv_global(points[index], uv_transformation)
             normals_front[index] = face_mesh.normal_at(mesh_point_id)
           end
           if double_sided_faces
             if back_material
-              if back_material.texture
+              if back_texture
                 uv_coordinates_back[index] = get_uv(face_mesh.uv_at(mesh_point_id, false))
                 normals_back[index] = face_mesh.normal_at(mesh_point_id)
               end
-            elsif parent_material && parent_material.texture
-              texture = parent_material.texture
-              texture_width_factor = (1 / texture.width)
-              texture_height_factor = (1 / texture.height)
-              uv_coordinates_back[index] =
-                get_uv_global(points[index], face_normal, texture_width_factor, texture_height_factor)
+            elsif parent_texture
+              uv_coordinates_back[index] = get_uv_global(points[index], uv_transformation)
               normals_back[index] = face_mesh.normal_at(mesh_point_id)
             end
           end
@@ -150,12 +166,11 @@ module BimTools
       )
     end
 
-    def get_uv_global(vertex, normal, texture_width_factor = 1, texture_height_factor = 1)
-      u = 0.5 + (vertex.to_a.dot(normal) * 0.5) * texture_width_factor
-      v = 0.5 - (vertex.y * normal.y + vertex.z * normal.z) * 0.5 * texture_height_factor
+    def get_uv_global(vertex, uv_transformation)
+      uv_point = vertex.transform(uv_transformation)
       IfcManager::Types::List.new(
-        [IfcManager::Types::IfcParameterValue.new(@ifc_model, u),
-         IfcManager::Types::IfcParameterValue.new(@ifc_model, v)]
+        [IfcManager::Types::IfcParameterValue.new(@ifc_model, uv_point.x),
+         IfcManager::Types::IfcParameterValue.new(@ifc_model, uv_point.y)]
       )
     end
 
@@ -164,6 +179,19 @@ module BimTools
         ifc_model.materials[su_material] = IfcManager::MaterialAndStyling.new(ifc_model, su_material)
       end
       ifc_model.materials[su_material].get_styling(side)
+    end
+
+    def get_texture_transformation(texture)
+      Geom::Transformation.scaling(1 / texture.width, 1 / texture.height, 0)
+    end
+
+    def get_face_transformation(face)
+      plane_point = face.vertices[0].position
+      normal = face.normal
+      axes = normal.axes
+      plane = [plane_point, normal]
+      projected_origin = ORIGIN.project_to_plane(plane)
+      Geom::Transformation.axes(projected_origin, axes[0], axes[1], axes[2])
     end
   end
 end
