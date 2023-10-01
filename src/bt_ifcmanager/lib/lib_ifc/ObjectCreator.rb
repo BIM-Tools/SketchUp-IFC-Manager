@@ -117,10 +117,11 @@ module BimTools
         if entity_type.nil?
 
           # If sketchup object is not an IFC entity it must become part of the parent object geometry
-          create_geometry(su_definition, nil, placement_parent, su_material, su_layer)
-          create_nested_objects(placement_parent, su_instance, su_material, su_layer)
+          ifc_entity = nil
+          placement_target = placement_parent
         elsif entity_type == @ifc::IfcProject
 
+          # @todo: set all correct parameters for IfcProject!!!
           # Enrich the base IfcProject with properties of the modelled IfcProject
           ifc_entity = IfcProjectBuilder.modify(@ifc_model, @ifc_model.project) do |modifier|
             modifier.set_global_id(@guid)
@@ -128,9 +129,9 @@ module BimTools
             modifier.set_description(su_definition.description) unless su_definition.description.empty?
             modifier.set_attributes_from_su_instance(su_instance)
           end
+
+          placement_target = ifc_entity
           construct_entity(ifc_entity, placement_parent)
-          create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
-          create_nested_objects(ifc_entity, su_instance, su_material, su_layer)
         else
 
           # (!)(?) check against list of valid IFC entities? IfcGroup, IfcProduct
@@ -144,10 +145,12 @@ module BimTools
           ifc_entity.tag = Types::IfcLabel.new(@ifc_model, @persistent_id_path) if defined?(ifc_entity.tag)
 
           @entity_path.add(ifc_entity)
+
+          placement_target = ifc_entity
           construct_entity(ifc_entity, placement_parent)
-          create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
-          create_nested_objects(ifc_entity, su_instance, su_material, su_layer)
         end
+        create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
+        create_nested_objects(placement_target, su_instance, su_material, su_layer)
       end
 
       # Constructs the IFC entity
