@@ -21,6 +21,8 @@
 #
 #
 
+require_relative 'ifc_types'
+
 # create new ISO-10303-21/STEP object (the STEP object should do the formatting of the entire file, including header)
 
 module BimTools
@@ -75,7 +77,7 @@ module BimTools
         timestamp = time.strftime('%Y-%m-%dT%H:%M:%S')
         version_number = Sketchup.version_number / 100_000_000.floor
         originating_system = "SketchUp 20#{version_number} (#{Sketchup.version})"
-        "FILE_NAME('#{File.basename(file_path)}','#{timestamp}',(''),(''),'IFC-manager for SketchUp (#{VERSION})','#{originating_system}','')"
+        "FILE_NAME('#{IfcManager::Types.replace_char(File.basename(file_path))}','#{timestamp}',(''),(''),'IFC-manager for SketchUp (#{VERSION})','#{originating_system}','')"
       end
 
       def get_file_schema
