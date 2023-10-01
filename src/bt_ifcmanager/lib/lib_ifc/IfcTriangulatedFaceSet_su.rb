@@ -28,7 +28,8 @@ module BimTools
 
     def initialize(
       ifc_model,
-      faces, transformation,
+      faces,
+      transformation,
       parent_material,
       front_material = nil,
       back_material = nil,
@@ -64,7 +65,7 @@ module BimTools
                         else
                           false
                         end
-        back_texture = if back_material && back_material.texture
+        back_texture = if double_sided_faces && back_material && back_material.texture
                          true
                        else
                          false
@@ -79,7 +80,8 @@ module BimTools
           face_transformation = meshes[face_mesh_id][1]
           texture = parent_material.texture
           texture_transformation = get_texture_transformation(texture)
-          uv_transformation = texture_transformation * face_transformation
+          # uv_transformation = transformation * face_transformation
+          uv_transformation = transformation.inverse * face_transformation * texture_transformation
         end
 
         face_mesh.transform! transformation
@@ -124,35 +126,37 @@ module BimTools
         end)
       end)
 
-      if ifc_model.textures
-        if front_material
-          create_texture_map(ifc_model, front_material, uv_coordinates_front) if front_material.texture
-        elsif parent_material && parent_material.texture
-          create_texture_map(ifc_model, parent_material, uv_coordinates_front)
-        end
-        if back_material
-          create_texture_map(ifc_model, back_material, uv_coordinates_back) if back_material.texture
-        elsif parent_material && parent_material.texture
-          create_texture_map(ifc_model, parent_material, uv_coordinates_back)
-        end
+      return unless ifc_model.textures
+
+      if front_material
+        create_texture_map(ifc_model, front_material, uv_coordinates_front) if front_material.texture
+      elsif parent_material && parent_material.texture
+        create_texture_map(ifc_model, parent_material, uv_coordinates_front)
+      end
+      return unless double_sided_faces
+
+      if back_material
+        create_texture_map(ifc_model, back_material, uv_coordinates_back) if back_material.texture
+      elsif parent_material && parent_material.texture
+        create_texture_map(ifc_model, parent_material, uv_coordinates_back)
       end
     end
 
     def create_texture_map(ifc_model, su_material, uv_coordinates)
-      if su_material
-        unless ifc_model.materials[su_material]
-          ifc_model.materials[su_material] = IfcManager::MaterialAndStyling.new(ifc_model, su_material)
-        end
-        image_texture = ifc_model.materials[su_material].image_texture
-        if image_texture
-          tex_vert_list = @ifc::IfcTextureVertexList.new(ifc_model)
-          tex_vert_list.texcoordslist = IfcManager::Types::Set.new(uv_coordinates)
-          texture_map = @ifc::IfcIndexedTriangleTextureMap.new(ifc_model)
-          texture_map.mappedto = self
-          texture_map.maps = IfcManager::Types::List.new([image_texture])
-          texture_map.texcoords = tex_vert_list
-        end
+      return unless su_material
+
+      unless ifc_model.materials[su_material]
+        ifc_model.materials[su_material] = IfcManager::MaterialAndStyling.new(ifc_model, su_material)
       end
+      image_texture = ifc_model.materials[su_material].image_texture
+      return unless image_texture
+
+      tex_vert_list = @ifc::IfcTextureVertexList.new(ifc_model)
+      tex_vert_list.texcoordslist = IfcManager::Types::Set.new(uv_coordinates)
+      texture_map = @ifc::IfcIndexedTriangleTextureMap.new(ifc_model)
+      texture_map.mappedto = self
+      texture_map.maps = IfcManager::Types::List.new([image_texture])
+      texture_map.texcoords = tex_vert_list
     end
 
     def get_ifc_polygon(point_total, polygon)
@@ -174,15 +178,8 @@ module BimTools
       )
     end
 
-    def get_styling(ifc_model, su_material, side = :both)
-      unless ifc_model.materials[su_material]
-        ifc_model.materials[su_material] = IfcManager::MaterialAndStyling.new(ifc_model, su_material)
-      end
-      ifc_model.materials[su_material].get_styling(side)
-    end
-
     def get_texture_transformation(texture)
-      Geom::Transformation.scaling(1 / texture.width, 1 / texture.height, 0)
+      Geom::Transformation.scaling(1 / texture.width, 1 / texture.height, 1 / texture.height)
     end
 
     def get_face_transformation(face)

@@ -40,8 +40,8 @@ module BimTools
         @ifc_shape_representation_builder = nil
         @mapped_representation = nil
         @representation = nil
-        @meshes = create_meshes(ifc_model, faces, transformation, su_material)
         @double_sided_faces = @ifc_model.options[:double_sided_faces]
+        @meshes = create_meshes(ifc_model, faces, transformation, su_material)
       end
 
       def get_mapped_representation
@@ -106,7 +106,7 @@ module BimTools
       end
 
       def get_surface_styles(ifc_model, parent_material = nil, front_material = nil, back_material = nil)
-        if Settings.ifc_version_compact == 'IFC2X3'
+        if Settings.ifc_version_compact == 'IFC2X3' || @double_sided_faces == false
           return Types::Set.new([ifc_model.get_styling(front_material, :both)]) if front_material
 
           Types::Set.new([ifc_model.get_styling(parent_material, :both)])
