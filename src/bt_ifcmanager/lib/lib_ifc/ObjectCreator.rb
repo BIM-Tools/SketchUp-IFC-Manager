@@ -295,12 +295,12 @@ module BimTools
 
             definition_representation = definition_manager.get_definition_representation(transformation,
                                                                                          su_material)
-
-            mappedrepresentation = placement_parent.representation.representations[0].items.mappingsource.mappedrepresentation
+            # @todo: improve this
+            mappedrepresentation = placement_parent.representation.representations.first.items.first.mappingsource.mappedrepresentation
             mappedrepresentation.items += definition_representation.meshes
 
             add_representation(placement_parent,
-                               parent_definition_manager,
+                               definition_manager,
                                transformation,
                                su_material,
                                su_layer)
