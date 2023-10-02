@@ -120,7 +120,7 @@ module BimTools
             add_default_spatialelement(@ifc::IfcBuildingStorey)
             insert_after(ifc_entity, @ifc::IfcBuildingStorey)
           end
-        when @ifc::IfcElementAssembly, @ifc::IfcCurtainWall
+        when @ifc::IfcElementAssembly, @ifc::IfcCurtainWall, @ifc::IfcRoof
 
           # add to end but check for basic spatial hierarchy
           if (entity_path_types & [@ifc::IfcSpace, @ifc::IfcBuildingStorey, @ifc::IfcSite]).empty?
