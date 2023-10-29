@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  ObjectCreator.rb
+#  entity_builder.rb
 #
 #  Copyright 2018 Jan Brouwer <jan@brewsky.nl>
 #
@@ -23,21 +23,21 @@
 
 require_relative 'ifc_types'
 require_relative 'IfcGloballyUniqueId'
-require_relative 'entity_path'
+require_relative 'spatial_structure'
 require_relative 'ifc_project_builder'
 
 module BimTools
   module IfcManager
     require File.join(PLUGIN_PATH_LIB, 'layer_visibility')
 
-    class ObjectCreator
+    class EntityBuilder
       # This creator class creates the correct IFC entity for the given sketchup object and it's children
       #
       # @param [IfcManager::IfcModel] ifc_model The IFC model in which the new IFC entity must be added
       # @param [Sketchup::ComponentInstance, Sketchup::Group] su_instance The sketchup component instance or group for which an IFC entity must be created
       # @param [Geom::Transformation] su_total_transformation The combined transformation of all parent sketchup objects
       # @param [IFC ENTITY] placement_parent The IFC entity that is the direct geometric parent in the sketchup model
-      # @param [Hash<fcSpatialStructureElement>] entity_path Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
+      # @param [Hash<fcSpatialStructureElement>] spatial_structure Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
       # @param [Sketchup::Material] su_material The parent sketchup objects material which will be used when the given one does not have a directly associated material
       def initialize(
         ifc_model,
@@ -45,7 +45,7 @@ module BimTools
         su_total_transformation,
         placement_parent = nil,
         instance_path = nil,
-        entity_path = nil,
+        spatial_structure = nil,
         su_material = nil,
         su_layer = nil
       )
@@ -54,7 +54,7 @@ module BimTools
         instances = instance_path.to_a + [su_instance]
         @instance_path = Sketchup::InstancePath.new(instances)
         @persistent_id_path = persistent_id_path(@instance_path)
-        @entity_path = EntityPath.new(@ifc_model, entity_path)
+        @spatial_structure = SpatialStructureHierarchy.new(@ifc_model, spatial_structure)
         @guid = IfcManager::IfcGloballyUniqueId.new(@ifc_model, @persistent_id_path)
         ent_type_name = su_instance.definition.get_attribute(
           'AppliedSchemaTypes',
@@ -118,7 +118,6 @@ module BimTools
 
           # If sketchup object is not an IFC entity it must become part of the parent object geometry
           ifc_entity = nil
-          placement_target = placement_parent
         elsif entity_type == @ifc::IfcProject
 
           # @todo: set all correct parameters for IfcProject!!!
@@ -129,8 +128,6 @@ module BimTools
             modifier.set_description(su_definition.description) unless su_definition.description.empty?
             modifier.set_attributes_from_su_instance(su_instance)
           end
-
-          placement_target = ifc_entity
           construct_entity(ifc_entity, placement_parent)
         else
 
@@ -144,13 +141,11 @@ module BimTools
           # therefore the full persistent_id_path hierarchy is used
           ifc_entity.tag = Types::IfcLabel.new(@ifc_model, @persistent_id_path) if defined?(ifc_entity.tag)
 
-          @entity_path.add(ifc_entity)
-
-          placement_target = ifc_entity
+          @spatial_structure.add(ifc_entity)
           construct_entity(ifc_entity, placement_parent)
         end
         create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
-        create_nested_objects(placement_target, su_instance, su_material, su_layer)
+        create_nested_objects(ifc_entity, su_instance, su_material, su_layer)
       end
 
       # Constructs the IFC entity
@@ -170,7 +165,7 @@ module BimTools
         # set objectplacement based on transformation
         return unless ifc_entity.is_a?(@ifc::IfcProduct)
 
-        @entity_path.set_parent(ifc_entity)
+        @spatial_structure.set_parent(ifc_entity)
         if ifc_entity.parent.is_a?(@ifc::IfcProduct)
           ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, @su_total_transformation,
                                                                    ifc_entity.parent.objectplacement)
@@ -189,23 +184,23 @@ module BimTools
 
       # find nested objects (geometry and entities)
       #
-      # @param ifc_entity
+      # @param placement_parent
       # @param su_instance
       # @param su_material
       # @return [Array<Sketchup::Face>] direct sketchup geometry
-      def create_nested_objects(ifc_entity, su_instance, su_material, su_layer)
+      def create_nested_objects(placement_parent, su_instance, su_material, su_layer)
         # (!)(?) Do we need to update su_material?
         # su_material = su_instance.material if su_instance.material
 
         component_instances = su_instance.definition.entities.select { |entity| entity.respond_to?(:definition) }
         component_instances.map do |component_instance|
-          ObjectCreator.new(
+          EntityBuilder.new(
             @ifc_model,
             component_instance,
             @su_total_transformation,
-            ifc_entity,
+            placement_parent,
             @instance_path,
-            @entity_path,
+            @spatial_structure,
             su_material,
             su_layer
           )
@@ -218,10 +213,10 @@ module BimTools
         # calculate the local transformation
         # if the SU object if not an IfcProduct (cannot have a representation ), then BREP needs to be transformed with SU object transformation
         brep_transformation = if ifc_entity.is_a?(@ifc::IfcProduct)
-                                ifc_entity.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
-                              else
-                                @su_total_transformation
-                              end
+          ifc_entity.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
+        else
+          @su_total_transformation
+        end
 
         # create geometry from faces
         # (!) skips any geometry placed inside objects NOT of the type IfcProduct
@@ -237,7 +232,7 @@ module BimTools
                               'space geometry'
                             end
           sub_entity = @ifc_model.create_fallback_entity(
-            @entity_path,
+            @spatial_structure,
             definition_manager,
             brep_transformation,
             su_material,
@@ -259,7 +254,7 @@ module BimTools
                               'project geometry'
                             end
           @ifc_model.create_fallback_entity(
-            @entity_path,
+            @spatial_structure,
             definition_manager,
             brep_transformation,
             su_material,
@@ -277,7 +272,7 @@ module BimTools
                               'group geometry'
                             end
           sub_entity = @ifc_model.create_fallback_entity(
-            @entity_path,
+            @spatial_structure,
             definition_manager,
             brep_transformation,
             su_material,
@@ -306,7 +301,7 @@ module BimTools
                                su_layer)
           else
             @ifc_model.create_fallback_entity(
-              @entity_path,
+              @spatial_structure,
               definition_manager,
               brep_transformation,
               su_material,
@@ -324,7 +319,7 @@ module BimTools
 
             # @todo this creates empty objects for not supported entity types, catch at initialization
             @ifc_model.create_fallback_entity(
-              @entity_path,
+              @spatial_structure,
               definition_manager,
               brep_transformation,
               su_material,

@@ -25,8 +25,8 @@ require_relative 'ifc_types'
 require_relative 'ifc_product_definition_shape_builder'
 require_relative 'ifc_project_builder'
 require_relative 'ifc_shape_representation_builder'
-require_relative 'entity_path'
-require_relative 'ObjectCreator'
+require_relative 'spatial_structure'
+require_relative 'entity_builder'
 require_relative 'definition_manager'
 require_relative 'step_writer'
 
@@ -227,8 +227,8 @@ module BimTools
       def create_ifc_objects(entities, transformation)
         faces = []
         instance_path = Sketchup::InstancePath.new([])
-        entity_path = EntityPath.new(self)
-        entity_path.add(@project)
+        spatial_structure = SpatialStructureHierarchy.new(self)
+        spatial_structure.add(@project)
         entitiy_count = entities.length
         i = 0
         while i < entitiy_count
@@ -238,7 +238,7 @@ module BimTools
           unless @options[:hidden] == false && (ent.hidden? || !IfcManager.layer_visible?(ent.layer))
             case ent
             when Sketchup::Group, Sketchup::ComponentInstance
-              ObjectCreator.new(self, ent, transformation, @project, instance_path, entity_path)
+              EntityBuilder.new(self, ent, transformation, @project, instance_path, spatial_structure)
             when Sketchup::Face
               faces << ent
             end
@@ -252,7 +252,7 @@ module BimTools
         d = DefinitionManager.new(self, @su_model)
         brep_transformation = Geom::Transformation.new
         create_fallback_entity(
-          entity_path,
+          spatial_structure,
           d,
           brep_transformation,
           nil,
@@ -283,7 +283,7 @@ module BimTools
       # @param su_material [Sketchup::Material]
       # @param su_layer [Sketchup::Layer]
       def create_fallback_entity(
-        entity_path,
+        spatial_structure,
         definition_manager,
         transformation,
         su_material = nil,
@@ -314,8 +314,8 @@ module BimTools
         ifc_entity.compositiontype = :element if ifc_entity.respond_to?(:compositiontype=)
 
         # Add to spatial hierarchy
-        entity_path.add(ifc_entity)
-        entity_path.set_parent(ifc_entity)
+        spatial_structure.add(ifc_entity)
+        spatial_structure.set_parent(ifc_entity)
 
         # create materialassociation
         materials[su_material] = MaterialAndStyling.new(self, su_material) unless materials.include?(su_material)

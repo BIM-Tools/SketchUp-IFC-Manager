@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  entity_path.rb
+#  spatial_structure.rb
 #
 #  Copyright 2021 Jan Brouwer <jan@brewsky.nl>
 #
@@ -23,14 +23,14 @@
 
 module BimTools
   module IfcManager
-    # The EntityPath class represents the entity path to a given entity within the IFC project spatial hierarchy.
+    # The SpatialStructureHierarchy class represents the entity path to a given entity within the IFC project spatial hierarchy.
     #
-    class EntityPath
-      # This creator class creates the EntityPath object for a specific IFC entity
+    class SpatialStructureHierarchy
+      # This creator class creates the SpatialStructureHierarchy object for a specific IFC entity
       #
       # @param ifc_entity [IFC2X3::IfcProduct] IFC Entity
       # @param spatial_hierarchy [Hash<IFC2X3::IfcSpatialStructureElement>] Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
-      def initialize(ifc_model, entity_path = nil)
+      def initialize(ifc_model, spatial_structure = nil)
         @ifc = Settings.ifc_module
         @spatial_order = [
           @ifc::IfcProject,
@@ -40,11 +40,11 @@ module BimTools
           @ifc::IfcSpace
         ].freeze
         @ifc_model = ifc_model
-        @entity_path = if entity_path
-                         entity_path.to_a.clone
-                       else
-                         []
-                       end
+        @spatial_structure = if spatial_structure
+                               spatial_structure.to_a.clone
+                             else
+                               []
+                             end
       end
 
       # Insert given entity into entity path after given type
@@ -52,39 +52,39 @@ module BimTools
       # @param ifc_entity [BimTools::IFC2X3::IfcProduct]
       # @param ifc_type [BimTools::IFC2X3::IfcProduct] class
       def insert_after(ifc_entity, ifc_type)
-        index = path_types.rindex(ifc_type)
+        index = get_spatial_structure_types.rindex(ifc_type)
         index += 1
-        @entity_path.insert(index, ifc_entity)
+        @spatial_structure.insert(index, ifc_entity)
       end
 
       def add(ifc_entity)
-        entity_path_types = path_types
+        spatial_structure_types = get_spatial_structure_types
         case ifc_entity
         when @ifc::IfcProject
           # (!) Check!!!
-          @entity_path[0] = ifc_entity
+          @spatial_structure[0] = ifc_entity
         when @ifc::IfcSite
-          if entity_path_types.include? @ifc::IfcSite
+          if spatial_structure_types.include? @ifc::IfcSite
             # Add as partial @ifc::IfcSite
             # @todo fix option to use partial sites
-            # parent_site = @entity_path[path_types().rindex(@ifc::IfcSite)]
+            # parent_site = @spatial_structure[get_spatial_structure_types().rindex(@ifc::IfcSite)]
             # path = ["IFC 2x3", "@ifc::IfcSite", "CompositionType", "IfcElementCompositionEnum"]
             # if parent_site.su_object.definition.get_classification_value(path) == "complex" && ifc_entity.su_object.definition.get_classification_value(path) == "partial"
             #   insert_after(ifc_entity,@ifc::IfcSite)
             # else
-            #   @entity_path[path_types().rindex(@ifc::IfcSite)] = ifc_entity
+            #   @spatial_structure[get_spatial_structure_types().rindex(@ifc::IfcSite)] = ifc_entity
             # end
 
-            @entity_path[path_types.rindex(@ifc::IfcSite)] = ifc_entity
-          elsif entity_path_types.include? @ifc::IfcProject
+            @spatial_structure[get_spatial_structure_types.rindex(@ifc::IfcSite)] = ifc_entity
+          elsif spatial_structure_types.include? @ifc::IfcProject
             insert_after(ifc_entity, @ifc::IfcProject)
           end
         when @ifc::IfcBuilding
-          if entity_path_types.include? @ifc::IfcBuilding
+          if spatial_structure_types.include? @ifc::IfcBuilding
             # Add as partial IfcBuilding
             # insert_after(ifc_entity,@ifc::IfcBuilding)
-            @entity_path[path_types.rindex(@ifc::IfcBuilding)] = ifc_entity
-          elsif entity_path_types.include? @ifc::IfcSite
+            @spatial_structure[get_spatial_structure_types.rindex(@ifc::IfcBuilding)] = ifc_entity
+          elsif spatial_structure_types.include? @ifc::IfcSite
             insert_after(ifc_entity, @ifc::IfcSite)
           else
             # Create default Site and add there
@@ -92,11 +92,11 @@ module BimTools
             insert_after(ifc_entity, @ifc::IfcSite)
           end
         when @ifc::IfcBuildingStorey
-          if entity_path_types.include? @ifc::IfcBuildingStorey
+          if spatial_structure_types.include? @ifc::IfcBuildingStorey
             # Add as partial IfcBuildingStorey
             # insert_after(ifc_entity,@ifc::IfcBuildingStorey)
-            @entity_path[path_types.rindex(@ifc::IfcBuildingStorey)] = ifc_entity
-          elsif entity_path_types.include? @ifc::IfcBuilding
+            @spatial_structure[get_spatial_structure_types.rindex(@ifc::IfcBuildingStorey)] = ifc_entity
+          elsif spatial_structure_types.include? @ifc::IfcBuilding
             insert_after(ifc_entity, @ifc::IfcBuilding)
           else
             # Create default IfcBuilding and add there, and check for site
@@ -104,17 +104,17 @@ module BimTools
             insert_after(ifc_entity, @ifc::IfcBuilding)
           end
         when @ifc::IfcSpace
-          if entity_path_types.include? @ifc::IfcSpace
+          if spatial_structure_types.include? @ifc::IfcSpace
             # Add as partial IfcBuildingStorey
             # insert_after(ifc_entity,@ifc::IfcSpace)
-            @entity_path[path_types.rindex(@ifc::IfcSpace)] = ifc_entity
-          elsif entity_path_types.include? @ifc::IfcBuildingStorey
+            @spatial_structure[get_spatial_structure_types.rindex(@ifc::IfcSpace)] = ifc_entity
+          elsif spatial_structure_types.include? @ifc::IfcBuildingStorey
             insert_after(ifc_entity, @ifc::IfcBuildingStorey)
-            # @entity_path[path_types.rindex(@ifc::IfcBuildingStorey)] = ifc_entity
-          elsif entity_path_types.include? @ifc::IfcSite
+            # @spatial_structure[get_spatial_structure_types.rindex(@ifc::IfcBuildingStorey)] = ifc_entity
+          elsif spatial_structure_types.include? @ifc::IfcSite
             # Add as outside space
             # insert_after(ifc_entity,@ifc::IfcSite)
-            @entity_path[path_types.rindex(@ifc::IfcSite)] = ifc_entity
+            @spatial_structure[get_spatial_structure_types.rindex(@ifc::IfcSite)] = ifc_entity
           else
             # Create default IfcBuildingStorey and add there, and check for IfcBuilding and site
             add_default_spatialelement(@ifc::IfcBuildingStorey)
@@ -123,14 +123,14 @@ module BimTools
         when @ifc::IfcElementAssembly, @ifc::IfcCurtainWall, @ifc::IfcRoof
 
           # add to end but check for basic spatial hierarchy
-          if (entity_path_types & [@ifc::IfcSpace, @ifc::IfcBuildingStorey, @ifc::IfcSite]).empty?
+          if (spatial_structure_types & [@ifc::IfcSpace, @ifc::IfcBuildingStorey, @ifc::IfcSite]).empty?
             add_default_spatialelement(@ifc::IfcBuildingStorey)
           end
-          @entity_path << ifc_entity
+          @spatial_structure << ifc_entity
         else # IfcProduct, IfcGroup
 
           # don't add but check for basic spatial hierarchy
-          if (entity_path_types & [@ifc::IfcSpace, @ifc::IfcBuildingStorey, @ifc::IfcSite]).empty?
+          if (spatial_structure_types & [@ifc::IfcSpace, @ifc::IfcBuildingStorey, @ifc::IfcSite]).empty?
             add_default_spatialelement(@ifc::IfcBuildingStorey)
           end
         end
@@ -141,10 +141,10 @@ module BimTools
         # find parent type, if entity not present find the next one
         index = @spatial_order.rindex(entity_class) - 1
         parent_class = @spatial_order[index]
-        add_default_spatialelement(parent_class) unless path_types.include?(parent_class)
+        add_default_spatialelement(parent_class) unless get_spatial_structure_types.include?(parent_class)
 
-        parent_index = path_types.rindex(parent_class)
-        parent = @entity_path[parent_index]
+        parent_index = get_spatial_structure_types.rindex(parent_class)
+        parent = @spatial_structure[parent_index]
 
         # check if default_related_object is already set
         unless parent.default_related_object
@@ -165,24 +165,24 @@ module BimTools
       end
 
       def to_a
-        @entity_path
+        @spatial_structure
       end
 
-      def path_types
-        @entity_path.map(&:class)
+      def get_spatial_structure_types
+        @spatial_structure.map(&:class)
       end
 
       # Add entity to the model structure
       def set_parent(ifc_entity)
-        index = @entity_path.index(ifc_entity)
+        index = @spatial_structure.index(ifc_entity)
         parent = if index
                    if index > 1
-                     @entity_path[index - 1]
+                     @spatial_structure[index - 1]
                    else
-                     @entity_path[0]
+                     @spatial_structure[0]
                    end
                  else
-                   @entity_path[-1]
+                   @spatial_structure[-1]
                  end
         ifc_entity.parent = parent
         case ifc_entity

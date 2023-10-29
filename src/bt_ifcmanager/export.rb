@@ -21,7 +21,7 @@
 #
 #
 
-require_relative File.join('lib', 'lib_ifc', 'IfcModel')
+require_relative File.join('lib', 'lib_ifc', 'ifc_model')
 
 module BimTools
   module IfcManager
