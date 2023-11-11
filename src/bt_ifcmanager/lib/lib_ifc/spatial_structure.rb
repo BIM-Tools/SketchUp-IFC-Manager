@@ -152,7 +152,7 @@ module BimTools
           default_parent.name = Types::IfcLabel.new(@ifc_model,
                                                     +'default ' << entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(' ').downcase)
 
-          # Add ObjectPlacement
+          # Add new ObjectPlacement without transformation
           default_parent.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model)
           default_parent.objectplacement.relativeplacement = @ifc_model.default_placement
           default_parent.objectplacement.placementrelto = parent.objectplacement if parent.respond_to?(:objectplacement)

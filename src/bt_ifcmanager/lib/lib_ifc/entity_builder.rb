@@ -51,8 +51,7 @@ module BimTools
       )
         @ifc = Settings.ifc_module
         @ifc_model = ifc_model
-        instances = instance_path.to_a + [su_instance]
-        @instance_path = Sketchup::InstancePath.new(instances)
+        @instance_path = Sketchup::InstancePath.new(instance_path.to_a + [su_instance])
         @persistent_id_path = persistent_id_path(@instance_path)
         @spatial_structure = SpatialStructureHierarchy.new(@ifc_model, spatial_structure)
         @guid = IfcManager::IfcGloballyUniqueId.new(@ifc_model, @persistent_id_path)
@@ -88,7 +87,15 @@ module BimTools
         instance_path.to_a.map { |p| p.persistent_id.to_s }.join('.')
       end
 
-      # Create IFC entity based on the IFC classification in sketchup
+      # Creates an IFC entity from a SketchUp instance based on the IFC classification in sketchup
+      # and adds it to the IFC model.
+      #
+      # @param ent_type_name [String] The name of the IFC entity type to create.
+      # @param su_instance [Sketchup::ComponentInstance] The SketchUp instance to create the IFC entity from.
+      # @param placement_parent [IfcObjectPlacement] The parent object placement for the IFC entity.
+      # @param su_material [Sketchup::Material] The SketchUp material to apply to the IFC entity.
+      # @param su_layer [Sketchup::Layer] The SketchUp layer to apply to the IFC entity.
+      # @return [IfcEntity] The created IFC entity.
       def create_ifc_entity(ent_type_name, su_instance, placement_parent = nil, su_material = nil, su_layer = nil)
         su_definition = su_instance.definition
 
@@ -118,6 +125,8 @@ module BimTools
 
           # If sketchup object is not an IFC entity it must become part of the parent object geometry
           ifc_entity = nil
+
+        # Only a single IfcProject entity is allowed in an IFC model
         elsif entity_type == @ifc::IfcProject
 
           # @todo: set all correct parameters for IfcProject!!!
@@ -128,7 +137,7 @@ module BimTools
             modifier.set_description(su_definition.description) unless su_definition.description.empty?
             modifier.set_attributes_from_su_instance(su_instance)
           end
-          construct_entity(ifc_entity, placement_parent)
+          assign_entity_attributes(ifc_entity, placement_parent)
         else
 
           # (!)(?) check against list of valid IFC entities? IfcGroup, IfcProduct
@@ -142,16 +151,19 @@ module BimTools
           ifc_entity.tag = Types::IfcLabel.new(@ifc_model, @persistent_id_path) if defined?(ifc_entity.tag)
 
           @spatial_structure.add(ifc_entity)
-          construct_entity(ifc_entity, placement_parent)
+          assign_entity_attributes(ifc_entity, placement_parent)
         end
         create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
         create_nested_objects(ifc_entity, su_instance, su_material, su_layer)
       end
 
-      # Constructs the IFC entity
+      # Assigns attributes to an IFC entity and adds it to a parent group if applicable.
       #
-      # @param ifc_entity
-      def construct_entity(ifc_entity, placement_parent)
+      # @param ifc_entity [Object] The IFC entity to assign attributes to.
+      # @param placement_parent [Object] The parent group to add the entity to, if applicable.
+      #
+      # @return [void]
+      def assign_entity_attributes(ifc_entity, placement_parent)
         # if parent is a IfcGroup, add entity to group
         if placement_parent.is_a?(@ifc::IfcGroup) && ifc_entity.is_a?(@ifc::IfcObjectDefinition)
           if placement_parent.is_a?(@ifc::IfcZone)
@@ -161,24 +173,24 @@ module BimTools
           end
         end
 
-        # create objectplacement for ifc_entity
-        # set objectplacement based on transformation
         return unless ifc_entity.is_a?(@ifc::IfcProduct)
 
         @spatial_structure.set_parent(ifc_entity)
-        if ifc_entity.parent.is_a?(@ifc::IfcProduct)
-          ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, @su_total_transformation,
-                                                                   ifc_entity.parent.objectplacement)
-        else
-          ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model, @su_total_transformation)
-        end
+
+        placement_rel_to = placement_parent.objectplacement if placement_parent.respond_to?(:objectplacement)
+        @objectplacement = @ifc::IfcLocalPlacement.new(
+          @ifc_model,
+          @su_total_transformation,
+          placement_rel_to
+        )
+        ifc_entity.objectplacement = @objectplacement
 
         # set elevation for buildingstorey
         # (?) is this the best place to define building storey elevation?
         #   could be better set from within IfcBuildingStorey?
         return unless ifc_entity.is_a?(@ifc::IfcBuildingStorey)
 
-        elevation = ifc_entity.objectplacement.ifc_total_transformation.origin.z
+        elevation = @objectplacement.ifc_total_transformation.origin.z
         ifc_entity.elevation = Types::IfcLengthMeasure.new(@ifc_model, elevation)
       end
 
@@ -210,14 +222,6 @@ module BimTools
       def create_geometry(definition, ifc_entity, placement_parent = nil, su_material, su_layer)
         definition_manager = @ifc_model.get_definition_manager(definition)
 
-        # calculate the local transformation
-        # if the SU object if not an IfcProduct (cannot have a representation ), then BREP needs to be transformed with SU object transformation
-        brep_transformation = if ifc_entity.is_a?(@ifc::IfcProduct)
-          ifc_entity.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
-        else
-          @su_total_transformation
-        end
-
         # create geometry from faces
         # (!) skips any geometry placed inside objects NOT of the type IfcProduct
         return if definition_manager.faces.empty?
@@ -234,7 +238,8 @@ module BimTools
           sub_entity = @ifc_model.create_fallback_entity(
             @spatial_structure,
             definition_manager,
-            brep_transformation,
+            @su_total_transformation,
+            placement_parent,
             su_material,
             su_layer,
             sub_entity_name,
@@ -256,7 +261,8 @@ module BimTools
           @ifc_model.create_fallback_entity(
             @spatial_structure,
             definition_manager,
-            brep_transformation,
+            @su_total_transformation,
+            placement_parent,
             su_material,
             su_layer,
             sub_entity_name
@@ -274,7 +280,8 @@ module BimTools
           sub_entity = @ifc_model.create_fallback_entity(
             @spatial_structure,
             definition_manager,
-            brep_transformation,
+            @su_total_transformation,
+            placement_parent,
             su_material,
             su_layer,
             sub_entity_name
@@ -285,34 +292,52 @@ module BimTools
         #   become part of the parent object geometry if the parent can have geometry
         when nil
           definition_manager = @ifc_model.get_definition_manager(definition)
-          if placement_parent.respond_to?(:representation) && placement_parent.representation
-            transformation = placement_parent.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
+          if placement_parent.respond_to?(:representation)
+            parent_representation = placement_parent.representation
 
-            definition_representation = definition_manager.get_definition_representation(transformation,
-                                                                                         su_material)
-            # @todo: improve this
-            mappedrepresentation = placement_parent.representation.representations.first.items.first.mappingsource.mappedrepresentation
-            mappedrepresentation.items += definition_representation.meshes
+            if parent_representation
+              transformation = placement_parent.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
 
-            add_representation(placement_parent,
-                               definition_manager,
-                               transformation,
-                               su_material,
-                               su_layer)
+              definition_representation = definition_manager.get_definition_representation(
+                transformation,
+                su_material
+              )
+
+              # @todo: improve this
+              mappedrepresentation = parent_representation.representations.first.items.first.mappingsource.mappedrepresentation
+              mappedrepresentation.items += definition_representation.meshes
+
+            else
+              transformation = placement_parent.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
+              add_representation(placement_parent,
+                                 definition_manager,
+                                 transformation,
+                                 su_material,
+                                 su_layer)
+            end
           else
+            # go up the placement hierarchy until a parent with a representation is found
             @ifc_model.create_fallback_entity(
               @spatial_structure,
               definition_manager,
-              brep_transformation,
+              @su_total_transformation,
+              placement_parent,
               su_material,
               su_layer
             )
           end
         else
           if ifc_entity.respond_to?(:representation)
+            # calculate the local transformation
+            # if the SU object if not an IfcProduct (cannot have a representation ), then BREP needs to be transformed with SU object transformation
+            mesh_transformation = if ifc_entity.is_a?(@ifc::IfcProduct)
+                                    @objectplacement.ifc_total_transformation.inverse * @su_total_transformation
+                                  else
+                                    @su_total_transformation
+                                  end
             add_representation(ifc_entity,
                                definition_manager,
-                               brep_transformation,
+                               mesh_transformation,
                                su_material,
                                su_layer)
           else
@@ -321,7 +346,8 @@ module BimTools
             @ifc_model.create_fallback_entity(
               @spatial_structure,
               definition_manager,
-              brep_transformation,
+              @su_total_transformation,
+              placement_parent,
               su_material,
               su_layer
             )
