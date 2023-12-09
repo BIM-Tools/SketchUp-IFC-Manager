@@ -292,6 +292,7 @@ module BimTools
         entity_name = nil,
         ent_type_name = 'IfcBuildingElementProxy'
       )
+
         entity_type = @ifc.const_get(ent_type_name)
         ifc_entity = entity_type.new(self, nil)
         entity_name ||= definition_manager.name
@@ -299,7 +300,7 @@ module BimTools
 
         if placement_parent.is_a?(@ifc::IfcProduct)
           ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(self, total_transformation,
-            placement_parent.objectplacement)
+                                                                   placement_parent.objectplacement)
         else
           ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(self, total_transformation)
         end
@@ -307,10 +308,8 @@ module BimTools
 
         if placement_parent && placement_parent.respond_to?(:objectplacement) && placement_parent.objectplacement
           no_scale *= placement_parent.objectplacement.ifc_total_transformation.inverse
-        else
-          if ifc_entity.parent
-            no_scale *= ifc_entity.parent.objectplacement.ifc_total_transformation.inverse
-          end
+        elsif ifc_entity.parent
+          no_scale *= ifc_entity.parent.objectplacement.ifc_total_transformation.inverse
         end
 
         add_representation(
@@ -337,10 +336,8 @@ module BimTools
 
         ifc_entity.objectplacement.placementrelto = if placement_parent && placement_parent.respond_to?(:objectplacement) && placement_parent.objectplacement
                                                       placement_parent.objectplacement
-                                                    else
-                                                      if ifc_entity.parent
-                                                        ifc_entity.parent.objectplacement
-                                                      end
+                                                    elsif ifc_entity.parent
+                                                      ifc_entity.parent.objectplacement
                                                     end
 
         # create materialassociation

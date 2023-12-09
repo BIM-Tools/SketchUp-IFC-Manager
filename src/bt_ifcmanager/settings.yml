@@ -16,7 +16,7 @@
   :type_properties: false
   :mapped_items: true
   :classification_suffix: true
-  :model_axes: true
+  :model_axes: false
   :textures: false
   :double_sided_faces: false
 :load:
