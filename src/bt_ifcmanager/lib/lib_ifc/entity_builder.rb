@@ -154,7 +154,12 @@ module BimTools
           assign_entity_attributes(ifc_entity, placement_parent)
         end
         create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
-        create_nested_objects(ifc_entity, su_instance, su_material, su_layer)
+
+        # We allways need a placement parent, so when the current entity is nil, we use the parent
+        if ifc_entity
+          placement_parent = ifc_entity
+        end
+        create_nested_objects(placement_parent, su_instance, su_material, su_layer)
       end
 
       # Assigns attributes to an IFC entity and adds it to a parent group if applicable.
@@ -317,6 +322,8 @@ module BimTools
             end
           else
             # go up the placement hierarchy until a parent with a representation is found
+            puts placement_parent.name
+            puts definition_manager.name
             @ifc_model.create_fallback_entity(
               @spatial_structure,
               definition_manager,
