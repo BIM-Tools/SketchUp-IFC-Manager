@@ -121,7 +121,14 @@ module BimTools
         ent_type_name = 'IfcWall' if ent_type_name == 'IfcWallStandardCase'
 
         entity_type = @ifc.const_get(ent_type_name) if ent_type_name
-        if entity_type.nil?
+
+        # Don't add unclassified components as direct geometry to spatial elements
+        if entity_type.nil? && placement_parent.is_a?(@ifc::IfcSpatialStructureElement)
+          ifc_entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, su_instance)
+          ifc_entity.globalid = @guid
+          ifc_entity.tag = Types::IfcLabel.new(@ifc_model, @persistent_id_path)
+          assign_entity_attributes(ifc_entity, placement_parent)
+        elsif entity_type.nil?
 
           # If sketchup object is not an IFC entity it must become part of the parent object geometry
           ifc_entity = nil
@@ -155,10 +162,8 @@ module BimTools
         end
         create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
 
-        # We allways need a placement parent, so when the current entity is nil, we use the parent
-        if ifc_entity
-          placement_parent = ifc_entity
-        end
+        # We always need a placement parent, so when the current entity is nil, we use the parent
+        placement_parent = ifc_entity if ifc_entity
         create_nested_objects(placement_parent, su_instance, su_material, su_layer)
       end
 
@@ -297,7 +302,7 @@ module BimTools
         #   become part of the parent object geometry if the parent can have geometry
         when nil
           definition_manager = @ifc_model.get_definition_manager(definition)
-          if placement_parent.respond_to?(:representation)
+          if placement_parent.respond_to?(:representation) && !placement_parent.is_a?(@ifc::IfcSpatialStructureElement)
             parent_representation = placement_parent.representation
 
             if parent_representation
@@ -314,16 +319,16 @@ module BimTools
 
             else
               transformation = placement_parent.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
-              add_representation(placement_parent,
-                                 definition_manager,
-                                 transformation,
-                                 su_material,
-                                 su_layer)
+              add_representation(
+                placement_parent,
+                definition_manager,
+                transformation,
+                su_material,
+                su_layer
+              )
             end
           else
             # go up the placement hierarchy until a parent with a representation is found
-            puts placement_parent.name
-            puts definition_manager.name
             @ifc_model.create_fallback_entity(
               @spatial_structure,
               definition_manager,
@@ -342,11 +347,13 @@ module BimTools
                                   else
                                     @su_total_transformation
                                   end
-            add_representation(ifc_entity,
-                               definition_manager,
-                               mesh_transformation,
-                               su_material,
-                               su_layer)
+            add_representation(
+              ifc_entity,
+              definition_manager,
+              mesh_transformation,
+              su_material,
+              su_layer
+            )
           else
 
             # @todo this creates empty objects for not supported entity types, catch at initialization
