@@ -305,9 +305,10 @@ module BimTools
           if placement_parent.respond_to?(:representation) && !placement_parent.is_a?(@ifc::IfcSpatialStructureElement)
             parent_representation = placement_parent.representation
 
-            if parent_representation
-              transformation = placement_parent.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
+            # (?) Can this be improved by using the scaling component from IfcLocalPlacement_su?
+            transformation = placement_parent.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
 
+            if parent_representation
               definition_representation = definition_manager.get_definition_representation(
                 transformation,
                 su_material
@@ -318,7 +319,6 @@ module BimTools
               mappedrepresentation.items += definition_representation.meshes
 
             else
-              transformation = placement_parent.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
               add_representation(
                 placement_parent,
                 definition_manager,

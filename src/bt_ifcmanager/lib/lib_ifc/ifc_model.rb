@@ -297,20 +297,21 @@ module BimTools
         ifc_entity = entity_type.new(self, nil)
         entity_name ||= definition_manager.name
         ifc_entity.name = Types::IfcLabel.new(self, entity_name)
+        spatial_structure.add(ifc_entity)
 
-        if placement_parent.is_a?(@ifc::IfcProduct)
-          ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(self, total_transformation,
-                                                                   placement_parent.objectplacement)
-        else
-          ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(self, total_transformation)
-        end
-        no_scale, scaling = TransformationHelper.strip_scaling(total_transformation)
+        # (?) Do we need this? Shouldn't placement_parent always be of type IfcSpatialStructureElement at this point?
+        # The only case is that placement_parent is of type IfcProject, can't we prevent that from happening?
+        # Can it actually be nil?
+        placement_parent = spatial_structure.get_placement_parent(placement_parent)
 
-        if placement_parent && placement_parent.respond_to?(:objectplacement) && placement_parent.objectplacement
-          no_scale *= placement_parent.objectplacement.ifc_total_transformation.inverse
-        elsif ifc_entity.parent
-          no_scale *= ifc_entity.parent.objectplacement.ifc_total_transformation.inverse
-        end
+        transformation = total_transformation * placement_parent.objectplacement.ifc_total_transformation.inverse
+        rotation_and_translation, scaling = TransformationHelper.decompose_transformation(transformation)
+
+        ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(
+          self,
+          rotation_and_translation,
+          placement_parent.objectplacement
+        )
 
         add_representation(
           ifc_entity,
@@ -318,10 +319,6 @@ module BimTools
           scaling,
           su_material,
           su_layer
-        )
-
-        ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(
-          self, no_scale
         )
 
         # IFC 4
@@ -333,12 +330,6 @@ module BimTools
         # Add to spatial hierarchy
         spatial_structure.add(ifc_entity)
         spatial_structure.set_parent(ifc_entity)
-
-        ifc_entity.objectplacement.placementrelto = if placement_parent && placement_parent.respond_to?(:objectplacement) && placement_parent.objectplacement
-                                                      placement_parent.objectplacement
-                                                    elsif ifc_entity.parent
-                                                      ifc_entity.parent.objectplacement
-                                                    end
 
         # create materialassociation
         materials[su_material] = MaterialAndStyling.new(self, su_material) unless materials.include?(su_material)

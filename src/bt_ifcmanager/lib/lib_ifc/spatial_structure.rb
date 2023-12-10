@@ -197,6 +197,19 @@ module BimTools
           end
         end
       end
+
+      # Returns the placement parent of an element.
+      #
+      # If the given placement_parent is an instance of IfcSpatialStructureElement, it is returned as is.
+      # Otherwise, it searches for the first object of type IfcSite in the @spatial_structure collection and returns it.
+      #
+      # @param placement_parent [Object] The placement parent to check.
+      # @return [Object] The placement parent of the element.
+      def get_placement_parent(placement_parent)
+        return placement_parent if placement_parent.is_a? @ifc::IfcSpatialStructureElement
+
+        @spatial_structure.find { |entity| entity.is_a? @ifc::IfcSite }
+      end
     end
   end
 end

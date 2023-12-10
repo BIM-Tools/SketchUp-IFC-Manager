@@ -29,7 +29,7 @@ module BimTools
 
     @@DEFAULT_TRANSFORMATION = Geom::Transformation.new().to_a.freeze
 
-    def initialize(ifc_model, su_total_transformation = nil, placementrelto = nil)
+    def initialize(ifc_model, su_total_transformation = Geom::Transformation.new, placementrelto = nil)
       super
       @ifc = BimTools::IfcManager::Settings.ifc_module
 
@@ -44,9 +44,10 @@ module BimTools
         @ifc_total_transformation = su_total_transformation
       else
 
-        no_scale, scaling = TransformationHelper.strip_scaling(su_total_transformation)
+        # (?) What happens with the scaling component?
+        rotation_and_translation, scaling = TransformationHelper.decompose_transformation(su_total_transformation)
 
-        @ifc_total_transformation = no_scale
+        @ifc_total_transformation = rotation_and_translation
 
 
         @transformation = if !@placementrelto.nil? && @placementrelto.ifc_total_transformation
