@@ -21,35 +21,34 @@
 #
 #
 
+require_relative '../transformation_helper'
+
 module BimTools
   module IfcLocalPlacement_su
     attr_accessor :transformation, :ifc_total_transformation
 
-    def initialize(ifc_model, su_total_transformation = nil, placementrelto = nil)
+    @@DEFAULT_TRANSFORMATION = Geom::Transformation.new().to_a.freeze
+
+    def initialize(ifc_model, su_total_transformation = Geom::Transformation.new, placementrelto = nil)
       super
       @ifc = BimTools::IfcManager::Settings.ifc_module
 
       # set parent placement
       @placementrelto = placementrelto # if placementrelto.is_a?(IfcLocalPlacement)
 
-      if su_total_transformation.is_a?(Geom::Transformation)
+      return unless su_total_transformation.is_a?(Geom::Transformation)
 
-        # fix y-axis direction if flipped
-        t = su_total_transformation
-        axis_fix = if t.xaxis.cross(t.yaxis).samedirection?(t.zaxis)
-                     Geom::Transformation.axes([0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1])
-                   else
-                     Geom::Transformation.axes([0, 0, 0], [1, 0, 0], [0, -1, 0], [0, 0, 1])
-                   end
+      # Re-use default placement if no transformation is applied
+      if su_total_transformation && su_total_transformation.to_a == @@DEFAULT_TRANSFORMATION
+        @relativeplacement = ifc_model.default_placement
+        @ifc_total_transformation = su_total_transformation
+      else
 
-        # strip out scaling
-        t = su_total_transformation.to_a
-        x = t[0..2].normalize # is the xaxis
-        y = t[4..6].normalize # is the yaxis
-        z = t[8..10].normalize # is the zaxis
-        no_scale = Geom::Transformation.axes(su_total_transformation.origin, x, y, z)
+        # (?) What happens with the scaling component?
+        rotation_and_translation, scaling = TransformationHelper.decompose_transformation(su_total_transformation)
 
-        @ifc_total_transformation = no_scale * axis_fix
+        @ifc_total_transformation = rotation_and_translation
+
 
         @transformation = if !@placementrelto.nil? && @placementrelto.ifc_total_transformation
                             @placementrelto.ifc_total_transformation.inverse * @ifc_total_transformation

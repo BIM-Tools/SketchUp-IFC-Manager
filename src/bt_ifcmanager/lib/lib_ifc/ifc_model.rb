@@ -29,6 +29,7 @@ require_relative 'spatial_structure'
 require_relative 'entity_builder'
 require_relative 'definition_manager'
 require_relative 'step_writer'
+require_relative '../transformation_helper'
 
 require_relative 'classifications'
 module BimTools
@@ -249,12 +250,11 @@ module BimTools
         # create a single IfcBuildingelementProxy from all 'loose' faces in the model
         return if faces.empty?
 
-        d = DefinitionManager.new(self, @su_model)
-        brep_transformation = Geom::Transformation.new
         create_fallback_entity(
           spatial_structure,
-          d,
-          brep_transformation,
+          DefinitionManager.new(self, @su_model),
+          Geom::Transformation.new,
+          nil, # placement_parent???
           nil,
           nil,
           'model_geometry'
@@ -279,32 +279,46 @@ module BimTools
       # Create IfcBuildingElementProxy (instead of unsupported IFC entities)
       #
       # @param definition_manager [IfcManager::DefinitionManager]
-      # @param brep_transformation [Geom::Transformation]
+      # @param mesh_transformation [Geom::Transformation]
       # @param su_material [Sketchup::Material]
       # @param su_layer [Sketchup::Layer]
       def create_fallback_entity(
         spatial_structure,
         definition_manager,
-        transformation,
+        total_transformation = nil,
+        placement_parent = nil,
         su_material = nil,
         su_layer = nil,
         entity_name = nil,
         ent_type_name = 'IfcBuildingElementProxy'
       )
+
         entity_type = @ifc.const_get(ent_type_name)
         ifc_entity = entity_type.new(self, nil)
         entity_name ||= definition_manager.name
         ifc_entity.name = Types::IfcLabel.new(self, entity_name)
-        shape_representation = definition_manager.get_shape_representation(transformation, su_material, su_layer)
-        if ifc_entity.representation
-          ifc_entity.representation.representations.add(shape_representation)
-        else
-          ifc_entity.representation = IfcProductDefinitionShapeBuilder.build(self) do |builder|
-            builder.add_representation(shape_representation)
-          end
-        end
+        spatial_structure.add(ifc_entity)
+
+        # (?) Do we need this? Shouldn't placement_parent always be of type IfcSpatialStructureElement at this point?
+        # The only case is that placement_parent is of type IfcProject, can't we prevent that from happening?
+        # Can it actually be nil?
+        placement_parent = spatial_structure.get_placement_parent(placement_parent)
+
+        transformation = total_transformation * placement_parent.objectplacement.ifc_total_transformation.inverse
+        rotation_and_translation, scaling = TransformationHelper.decompose_transformation(transformation)
+
         ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(
-          self, Geom::Transformation.new
+          self,
+          rotation_and_translation,
+          placement_parent.objectplacement
+        )
+
+        add_representation(
+          ifc_entity,
+          definition_manager,
+          scaling,
+          su_material,
+          su_layer
         )
 
         # IFC 4
@@ -324,6 +338,24 @@ module BimTools
         materials[su_material].add_to_material(ifc_entity)
 
         ifc_entity
+      end
+
+      # Add representation to the IfcProduct, transform geometry with given transformation
+      #
+      # @param [IfcProduct] ifc_entity
+      # @param [DefinitionManager] definition_manager
+      # @param [Sketchup::Transformation] transformation
+      # @param [Sketchup::Material] su_material
+      # @param [Sketchup::Layer] su_layer
+      def add_representation(ifc_entity, definition_manager, transformation, su_material, su_layer)
+        shape_representation = definition_manager.get_shape_representation(transformation, su_material, su_layer)
+        if ifc_entity.representation
+          ifc_entity.representation.representations.add(shape_representation)
+        else
+          ifc_entity.representation = IfcProductDefinitionShapeBuilder.build(self) do |builder|
+            builder.add_representation(shape_representation)
+          end
+        end
       end
     end
   end

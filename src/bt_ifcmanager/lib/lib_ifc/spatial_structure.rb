@@ -152,7 +152,7 @@ module BimTools
           default_parent.name = Types::IfcLabel.new(@ifc_model,
                                                     +'default ' << entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(' ').downcase)
 
-          # Add ObjectPlacement
+          # Add new ObjectPlacement without transformation
           default_parent.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model)
           default_parent.objectplacement.relativeplacement = @ifc_model.default_placement
           default_parent.objectplacement.placementrelto = parent.objectplacement if parent.respond_to?(:objectplacement)
@@ -196,6 +196,19 @@ module BimTools
             ifc_entity.parent.add_related_object(ifc_entity)
           end
         end
+      end
+
+      # Returns the placement parent of an element.
+      #
+      # If the given placement_parent is an instance of IfcSpatialStructureElement, it is returned as is.
+      # Otherwise, it searches for the first object of type IfcSite in the @spatial_structure collection and returns it.
+      #
+      # @param placement_parent [Object] The placement parent to check.
+      # @return [Object] The placement parent of the element.
+      def get_placement_parent(placement_parent)
+        return placement_parent if placement_parent.is_a? @ifc::IfcSpatialStructureElement
+
+        @spatial_structure.find { |entity| entity.is_a? @ifc::IfcSite }
       end
     end
   end
