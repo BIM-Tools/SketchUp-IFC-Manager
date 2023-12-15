@@ -221,10 +221,15 @@ module BimTools
       # Load skc and generate IFC classes
       # (?) First check if already loaded?
       def load_ifc_skc(ifc_classification)
-        reader = SKC.new(ifc_classification)
-        @filters[ifc_classification] = reader
-        ifc_version = reader.name
-        IfcXmlParser.new(ifc_version, reader.xsd_schema)
+        begin
+          reader = SKC.new(ifc_classification)
+          @filters[ifc_classification] = reader
+          ifc_version = reader.name
+          IfcXmlParser.new(ifc_version, reader.xsd_schema)
+        rescue StandardError => e
+          puts e.message
+          UI::Notification.new(IFCMANAGER_EXTENSION, e.message).show
+        end
       end
 
       def set_ifc_classification(ifc_classification_name)
@@ -275,10 +280,15 @@ module BimTools
         if @options[:load][:classifications].is_a? Hash
           @options[:load][:classifications].each_pair do |classification_file, load|
             if load == true
-              classification = SKC.new(classification_file)
-              @filters[classification_file] = classification
-              @classifications[classification.name] = classification
-              @active_classifications[classification_file] = load
+              begin
+                classification = SKC.new(classification_file)
+                @filters[classification_file] = classification
+                @classifications[classification.name] = classification
+                @active_classifications[classification_file] = load
+              rescue StandardError => e
+                puts e.message
+                UI::Notification.new(IFCMANAGER_EXTENSION, e.message).show
+              end
             elsif load == false
               @active_classifications[classification_file] = load
             end

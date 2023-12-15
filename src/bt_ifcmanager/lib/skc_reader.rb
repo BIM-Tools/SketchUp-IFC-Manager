@@ -46,25 +46,28 @@ module BimTools
                    end
         if filepath
           @skc_filepath = filepath
-          set_properties
+          set_skc_document_properties
         else
           message = "Unable to find SKC-file:\r\n'#{filename}'"
-          puts message
-          UI::Notification.new(IFCMANAGER_EXTENSION, message).show
+          raise StandardError, message
         end
       end
 
-      def set_properties
-        if @skc_filepath
-          BimTools::Zip::File.open(@skc_filepath) do |zip_file|
-            if entry = zip_file.find_entry('documentProperties.xml')
-              raise 'File too large when extracted' if entry.size > MAX_SIZE
-
+      def set_skc_document_properties
+        return unless @skc_filepath
+        BimTools::Zip::File.open(@skc_filepath) do |zip_file|
+          if entry = zip_file.find_entry('documentProperties.xml')
+            raise "Unable to load classification, SKC-file too large when extracted: #{@skc_filepath}" if entry.size > MAX_SIZE
+            begin
               document_properties = REXML::Document.new(entry.get_input_stream.read)
               document_properties.elements.each('documentProperties') do |element|
                 @properties = element.elements.map { |e| [e.name.split(':').last.to_sym, e.text] }.to_h
                 @name = @properties[:title] if @properties.include? :title
               end
+            rescue REXML::ParseException => e
+              message = "Unable to load classification, invalid SKC-file: #{@skc_filepath}"
+              puts message + ", #{e.message}"
+              raise StandardError, message
             end
           end
         end
@@ -73,16 +76,16 @@ module BimTools
       # Get classification name
       # (!) Better to read once and store in variable
       def classification_name
-        if @skc_filepath
-          BimTools::Zip::File.open(@skc_filepath) do |zip_file|
-            if entry = zip_file.find_entry('documentProperties.xml')
-              raise 'File too large when extracted' if entry.size > MAX_SIZE
+        return unless @skc_filepath
 
-              document_properties = REXML::Document.new(entry.get_input_stream.read)
-              document_properties.elements.each('documentProperties') do |element|
-                element.elements.each('dp:title') do |element|
-                  return element.text
-                end
+        BimTools::Zip::File.open(@skc_filepath) do |zip_file|
+          if entry = zip_file.find_entry('documentProperties.xml')
+            raise 'File too large when extracted' if entry.size > MAX_SIZE
+
+            document_properties = REXML::Document.new(entry.get_input_stream.read)
+            document_properties.elements.each('documentProperties') do |element|
+              element.elements.each('dp:title') do |element|
+                return element.text
               end
             end
           end
@@ -90,79 +93,76 @@ module BimTools
       end
 
       def xsd_schema
-        if @skc_filepath
-          BimTools::Zip::File.open(@skc_filepath) do |zip_file|
-            xsd_file = nil
+        return unless @skc_filepath
 
-            # Find XSD file name
-            if entry = zip_file.find_entry('document.xml')
-              raise 'File too large when extracted' if entry.size > MAX_SIZE
+        BimTools::Zip::File.open(@skc_filepath) do |zip_file|
+          xsd_file = nil
 
-              document = REXML::Document.new(entry.get_input_stream.read)
-              document.elements.each('classificationDocument') do |element|
-                element.elements.each('cls:Classification') do |element|
-                  if xsd_file = element.attributes['xsdFile']
-                    break
-                  end
+          # Find XSD file name
+          if entry = zip_file.find_entry('document.xml')
+            raise 'File too large when extracted' if entry.size > MAX_SIZE
+
+            document = REXML::Document.new(entry.get_input_stream.read)
+            document.elements.each('classificationDocument') do |element|
+              element.elements.each('cls:Classification') do |element|
+                if xsd_file = element.attributes['xsdFile']
+                  break
                 end
-                break
               end
-            end
-
-            # Read XSD file
-            if entry = zip_file.find_entry(xsd_file)
-              raise 'File too large when extracted' if entry.size > MAX_SIZE
-
-              return entry.get_input_stream.read
-            else
-              raise 'Unable to read classification'
+              break
             end
           end
+
+          # Read XSD file
+          raise 'Unable to read classification' unless entry = zip_file.find_entry(xsd_file)
+          raise 'File too large when extracted' if entry.size > MAX_SIZE
+
+          return entry.get_input_stream.read
         end
       end
 
       def xsd_filter
-        if @skc_filepath
-          BimTools::Zip::File.open(@skc_filepath) do |zip_file|
-            xsd_file = nil
+        return unless @skc_filepath
 
-            # Find XSD file name
-            if entry = zip_file.find_entry('document.xml')
-              raise 'File too large when extracted' if entry.size > MAX_SIZE
+        BimTools::Zip::File.open(@skc_filepath) do |zip_file|
+          xsd_file = nil
 
-              document = REXML::Document.new(entry.get_input_stream.read)
-              document.elements.each('classificationDocument') do |element|
-                element.elements.each('cls:Classification') do |element|
-                  if xsd_file = element.attributes['xsdFile']
-                    break
-                  end
-                end
-                break
-              end
-            end
+          # Find XSD file name
+          if entry = zip_file.find_entry('document.xml')
+            raise 'File too large when extracted' if entry.size > MAX_SIZE
 
-            # Read XSD filter file
-            if entry = zip_file.find_entry(xsd_file << '.filter')
-              raise 'File too large when extracted' if entry.size > MAX_SIZE
-
-              skip = false
-              filter = []
-              entry.get_input_stream.read.each_line do |line|
-                case line
-                when "{\n"
-                  skip = true
-                when "}\n"
-                  skip = false
-                when "\n"
-                else
-                  filter << line.strip if !skip && !line.start_with?('//')
+            document = REXML::Document.new(entry.get_input_stream.read)
+            document.elements.each('classificationDocument') do |element|
+              element.elements.each('cls:Classification') do |element|
+                if xsd_file = element.attributes['xsdFile']
+                  break
                 end
               end
-              return filter
-            else
-              puts 'Unable to find classification filter'
-              return false
+              break
             end
+          end
+
+          # Read XSD filter file
+          if entry = zip_file.find_entry(xsd_file << '.filter')
+            raise 'File too large when extracted' if entry.size > MAX_SIZE
+
+            skip = false
+            filter = []
+            entry.get_input_stream.read.each_line do |line|
+              case line
+              when "{\n"
+                skip = true
+              when "}\n"
+                skip = false
+              when "\n"
+              else
+                filter << line.strip if !skip && !line.start_with?('//')
+              end
+            end
+            return filter
+          else
+            puts 'Unable to find classification filter'
+            return false
           end
         end
       end
