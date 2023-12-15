@@ -33,6 +33,10 @@ module BimTools
     class SKC
       attr_reader :filepath, :name, :properties
 
+      # Initializes a new SKC object.
+      #
+      # @param filename [String] The name of the SKC file.
+      # @raise [StandardError] If the SKC file cannot be found.
       def initialize(filename)
         @name = ''
         @properties = {}
@@ -53,6 +57,7 @@ module BimTools
         end
       end
 
+      # Sets the SKC document properties by reading the SKC file.
       def set_skc_document_properties
         return unless @skc_filepath
 
@@ -77,8 +82,10 @@ module BimTools
         end
       end
 
-      # Get classification name
+      # Gets the classification name from the SKC file.
       # (!) Better to read once and store in variable
+      #
+      # @return [String, nil] The classification name, or nil if the SKC file is not available.
       def classification_name
         return unless @skc_filepath
 
@@ -96,6 +103,9 @@ module BimTools
         end
       end
 
+      # Gets the XSD schema from the SKC file.
+      #
+      # @return [String, nil] The XSD schema, or nil if the SKC file is not available.
       def xsd_schema
         return unless @skc_filepath
 
@@ -125,6 +135,9 @@ module BimTools
         end
       end
 
+      # Gets the filter options from the SKC file.
+      #
+      # @return [Array<String>] The filter options as an array of strings.
       def get_skc_options
         options = []
         return options unless @skc_filepath
@@ -183,112 +196,5 @@ module BimTools
         return options
       end
     end
-
-    # model = Sketchup.active_model
-    # cs = model.classifications
-    # cs.each do |c|
-    #   if c.name.include? 'IFC'
-    #     ifc_version = c.name
-    #   end
-    #   break
-    # end
-
-    #     files = Sketchup.find_support_files('skc', 'Classifications')
-
-    #     ifc_version = ''
-    #     schema_file = nil
-    #     xsd_file = nil
-
-    #     # Find schema file
-    #     files.each do |skc_file|
-    #       if File.basename(skc_file) == ifc_skc
-    #         BimTools::Zip::File.open(skc_file) do |zip_file|
-
-    #           # Find classification name
-    #           if entry = zip_file.find_entry("documentProperties.xml")
-    #             raise 'File too large when extracted' if entry.size > MAX_SIZE
-    #             document_properties = REXML::Document.new(entry.get_input_stream.read)
-    #             document_properties.elements.each("documentProperties") do |element|
-    #               element.elements.each("dp:title") do |element|
-    #                 ifc_version = element.text
-    #                 schema_file = skc_file
-    #                 break
-    #               end
-    #               break
-    #             end
-    #           end
-
-    #           # Find XSD file name
-    #           if entry = zip_file.find_entry("document.xml")
-    #             raise 'File too large when extracted' if entry.size > MAX_SIZE
-    #             document = REXML::Document.new(entry.get_input_stream.read)
-    #             document.elements.each("classificationDocument") do |element|
-    #               element.elements.each("cls:Classification") do |element|
-    #                 if xsd_file = element.attributes["xsdFile"]
-    #                   break
-    #                 end
-    #               end
-    #               break
-    #             end
-    #           end
-
-    #           # Read XSD file
-    #           if entry = zip_file.find_entry(xsd_file)
-    #             raise 'File too large when extracted' if entry.size > MAX_SIZE
-    #             parser = IfcXmlParser.new(ifc_version)
-    #             parser.from_string(entry.get_input_stream.read)
-    #           else
-    #             raise 'Unable to read classification'
-    #           end
-    #         end
-
-    #         # BimTools::Zip::InputStream.open(skc_file) do |io|
-    #         #   while (entry = io.get_next_entry)
-    #         #     case entry.name
-    #         #     when "documentProperties.xml"
-    #         #       document_properties = REXML::Document.new(io.read)
-    #         #       document_properties.elements.each("documentProperties") do |element|
-    #         #         element.elements.each("dp:title") do |element|
-    #         #           classification_name = element.text
-    #         #           # if classification_name == ifc_version
-    #         #           puts "classification_name"
-    #         #           puts classification_name
-    #         #           ifc_version = classification_name
-    #         #           schema_file = skc_file
-    #         #           # end
-    #         #           break
-    #         #         end
-    #         #         break
-    #         #       end
-    #         #     when "document.xml"
-    #         #       document = REXML::Document.new(io.read)
-    #         #       document.elements.each("classificationDocument") do |element|
-    #         #         element.elements.each("cls:Classification") do |element|
-    #         #           if xsd_file = element.attributes["xsdFile"]
-    #         #             break
-    #         #           end
-    #         #         end
-    #         #         break
-    #         #       end
-    #         #     end
-    #         #   end
-    #         #   if xsd_file
-    #         #     puts "xsd_file"
-    #         #     puts xsd_file
-    #         #     # BimTools::Zip::InputStream.open(schema_file) do |io|
-    #         #       while (entry = io.get_next_entry)
-    #         #         puts entry.name
-    #         #         if entry.name == xsd_file
-    #         #           puts io.read
-    #         #           break
-    #         #         end
-    #         #       end
-    #         #     # end
-    #         #   else
-    #         #     puts "schema or xsd file not found"
-    #         #   end
-    #         # end
-    #       end
-    #     end
   end
 end
