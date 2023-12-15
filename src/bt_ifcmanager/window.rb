@@ -88,7 +88,7 @@ module BimTools
             ui_classification.set_js_options(options, options_template)
             @form_elements << ui_classification
           else
-            options = classification.xsd_filter
+            options = classification.get_skc_options
             ui_classification.set_js_options(options, options_template)
             @form_elements << ui_classification
           end
