@@ -26,11 +26,11 @@ require_relative 'ifc_surface_style_rendering_builder'
 
 module BimTools
   module IfcManager
-    # Class that manages the relationship between a Sketchup material and
-    #  it's IFC counterparts (material and styling)
+    # This class manages the relationship between a SketchUp material and its corresponding IFC material and styles.
+    # It provides a bridge between the SketchUp material and the IFC schema, allowing for the conversion of SketchUp materials into IFC materials and styles.
     #
-    # @param [IfcModel] ifc_model
-    # @param [Sketchup::Material] su_material Sketckup material for which IFC material and styles will be created
+    # @param [IfcModel] ifc_model The IFC model that the SketchUp material will be converted into.
+    # @param [Sketchup::Material] su_material The SketchUp material that will be converted into an IFC material and styles.
     class MaterialAndStyling
       attr_reader :image_texture
 
@@ -45,10 +45,11 @@ module BimTools
         @surface_styles_negative = nil
       end
 
-      # Creates IfcRelAssociatesMaterial
+      # This method creates an IfcRelAssociatesMaterial object, which represents a relationship between a material definition and the elements or element types that this material applies to in the IFC schema.
       #
-      # @param [Sketchup::Material] su_material
-      # @return [IfcRelAssociatesMaterial] Material association
+      # @param [Sketchup::Material, nil] su_material The SketchUp material to be associated. If no material is provided, a default material is created.
+      #
+      # @return [IfcRelAssociatesMaterial] The created IfcRelAssociatesMaterial object, which associates the provided material (or a default material) with certain elements or element types.
       def create_material_assoc(su_material = nil)
         material_name = if su_material
                           su_material.display_name
@@ -69,17 +70,20 @@ module BimTools
         material_assoc
       end
 
-      # Creates IfcRelAssociatesMaterial
+      # This method is responsible for creating IFC surface styles.
+      # An IFC surface style provides a mechanism for attaching visual style properties to geometric representations.
       #
-      # @param [Sketchup::Material] su_material
-      # @return [Ifc_Set] Set of IFC surface styles
+      # @param [Sketchup::Material] su_material The SketchUp material to be converted into an IFC surface style.
+      # @param [Symbol] side The side of the surface that the style applies to. Can be :both, :positive, or :negative.
+      #
+      # @return [Ifc_Set] A set of IFC surface styles. This includes the main surface style and, if an image texture is present, a texture style.
       def create_surface_styles(su_material, side = :both)
         if su_material
           name = su_material.display_name
           surface_style_rendering = @surface_style_rendering
         else
           name = 'Default'
-          surface_style_rendering = create_default_surface_style_rendering(side)
+          surface_style_rendering = get_default_surface_style_rendering(side)
         end
 
         surface_style = @ifc::IfcSurfaceStyle.new(@ifc_model)
@@ -104,6 +108,11 @@ module BimTools
         style_assignment
       end
 
+      # Creates an IFC surface style rendering object based on the given SketchUp material.
+      # The IFC surface style rendering object represents the visual appearance of a surface in the IFC model.
+      #
+      # @param su_material [Sketchup::Material] The SketchUp material used to create the IFC surface style rendering.
+      # @return [void]
       def create_surface_style_rendering(su_material)
         return unless su_material
 
@@ -113,8 +122,15 @@ module BimTools
         end
       end
 
-      def create_default_surface_style_rendering(side = :both)
-        alpha = 1.0
+      # Returns the default surface style rendering for the given side.
+      # If the side is :negative, it returns the rendering for the back face color.
+      # If the side is :positive or :both, it returns the rendering for the front face color.
+      #
+      # @param side [Symbol] The side for which to get the rendering.
+      # @return [IfcSurfaceStyleRendering] The default surface style rendering.
+      def get_default_surface_style_rendering(side = :both)
+        return @@default_rendering if defined?(@@default_rendering)
+
         rendering_options = @ifc_model.su_model.rendering_options
         color = if side == :negative
                   rendering_options['FaceBackColor']
@@ -122,17 +138,26 @@ module BimTools
                   rendering_options['FaceFrontColor']
                 end
 
-        IfcSurfaceStyleRenderingBuilder.build(@ifc_model) do |builder|
+        @@default_rendering = IfcSurfaceStyleRenderingBuilder.build(@ifc_model) do |builder|
           builder.set_surface_colour(color)
-          builder.set_transparency(alpha)
+          builder.set_transparency(1.0)
         end
+
+        @@default_rendering
       end
 
+      # Creates an image texture for the given SketchUp material.
+      #
+      # @param su_material [Sketchup::Material] The SketchUp material.
+      # @return [IfcEngine::IfcImageTexture, nil] The created IfcImageTexture object, or nil if the texture cannot be created.
       def create_image_texture(su_material)
-        # IFC 4 only
-        unless @ifc_model.textures && su_material && (@ifc::IfcTextureMap.method_defined? :maps) && su_texture = su_material.texture
-          return
-        end
+        # export textures for IFC 4 and up only, check if IfcTextureMap is available
+        return unless @ifc_model.textures
+        return unless @ifc::IfcTextureMap.method_defined?(:maps)
+        return unless su_material
+
+        su_texture = su_material.texture
+        return unless su_texture
 
         image_texture = @ifc::IfcImageTexture.new(@ifc_model)
         image_texture.repeats = true
