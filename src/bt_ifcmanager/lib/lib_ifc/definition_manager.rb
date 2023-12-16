@@ -121,10 +121,6 @@ module BimTools
       def get_representation_string(transformation, su_material = nil)
         "#{transformation.to_a}#{su_material}"
       end
-
-      def add_meshes(meshes, transformation, su_material)
-        definition_representation = get_definition_representation(transformation, su_material)
-      end
     end
   end
 end

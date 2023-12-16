@@ -133,10 +133,6 @@ module BimTools
           Types::Set.new([ifc_model.get_styling(parent_material, :both)])
         end
       end
-
-      def add_meshes(meshes)
-        @meshes += meshes
-      end
     end
   end
 end
