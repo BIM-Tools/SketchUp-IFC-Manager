@@ -135,12 +135,12 @@ module BimTools
             message = "IFC Manager is unable to save the file: #{e.message}"
             puts message
             UI.messagebox(message, MB_OK)
-            message
+            raise StandardError, message
           rescue StandardError => e
             message = "IFC Manager is unable to save the file: #{e.message}"
             puts message
             UI.messagebox(message, MB_OK)
-            message
+            raise StandardError, message
           end
         end
       end
