@@ -104,17 +104,22 @@ module BimTools
           BimTools::Zip::OutputStream.open(file_path) do |zos|
             zos.put_next_entry(file_name)
             zos.puts (step_objects.join(";\n") << ';').encode('iso-8859-1')
-            Dir.mktmpdir('Sketchup-IFC-Manager-textures-') do |dir|
+            Dir.mktmpdir('Sketchup-IFC-Manager-textures-') do |directory|
               # Write textures to temp location
-              if @ifc_model.textures && @ifc_model.textures.write_all(dir, false)
-                puts('Texture files were successfully written.')
+              texture_file_names = []
+
+              @ifc_model.materials.each_key do |material|
+                next unless material && material.texture
+
+                texture_file_name = File.basename(material.texture.filename)
+                texture_file = File.join(directory, texture_file_name)
+                material.texture.write(texture_file)
+                texture_file_names << texture_file_name
               end
 
               # add textures to zipfile
-              Dir.foreach(dir) do |filename|
-                next if ['.', '..'].include?(filename)
-
-                file = File.join(dir, filename)
+              texture_file_names.each do |texture_file_name|
+                file = File.join(directory, texture_file_name)
                 zos.put_next_entry File.basename(file)
                 zos << File.binread(file)
               end
@@ -125,12 +130,7 @@ module BimTools
             File.open(file_path, 'w:ISO-8859-1') do |file|
               file.write(step_objects.join(";\n") << ';')
             end
-
-            # Write textures to the ifc file location
-            if @ifc_model.textures && @ifc_model.textures.write_all(File.dirname(file_path), false)
-              puts('Texture files were successfully written.')
-            end
-            ''
+            write_textures(@ifc_model, File.dirname(file_path))
           rescue SystemCallError => e
             message = "IFC Manager is unable to save the file: #{e.message}"
             puts message
@@ -143,6 +143,30 @@ module BimTools
             raise StandardError, message
           end
         end
+      end
+
+      # Writes the textures associated with the materials in the given IFC model to the specified directory.
+      #
+      # Parameters:
+      # - ifc_model: The IFC model containing the materials and textures.
+      # - directory: The directory where the textures will be written.
+      #
+      # Returns:
+      # An array of filenames representing the written textures.
+      def write_textures(ifc_model, directory)
+        return [] unless ifc_model.textures
+
+        # We cannot use TextureWriter.write_all because it only loads textures from objects, not materials directly.
+        file_names = []
+        ifc_model.materials.each_key do |material|
+          next unless material && material.texture
+
+          texture_file_name = File.basename(material.texture.filename)
+          texture_file = File.join(directory, texture_file_name)
+          material.texture.write(texture_file)
+          file_names << texture_file_name
+        end
+        file_names
       end
     end
   end

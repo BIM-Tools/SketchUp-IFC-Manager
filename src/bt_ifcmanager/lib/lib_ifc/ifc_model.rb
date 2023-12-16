@@ -91,8 +91,12 @@ module BimTools
         @layers = {}
         @classifications = IfcManager::Classifications.new(self)
 
-        # if textures option is enabled set TextureWriter
-        @textures = (Sketchup.create_texture_writer if @options[:textures])
+        # Enable texture export if textures option is enabled and the active IFC version is capable of exporting textures
+        # We cannot use TextureWriter for writing textures because it only loads textures from objects, not materials directly.
+        # but we do need it to get UV coordinates for textures.
+        if @options[:textures] && @ifc.const_defined?(:IfcTextureMap) && @ifc::IfcTextureMap.method_defined?(:maps)
+          @textures = Sketchup.create_texture_writer
+        end
 
         # create empty array that will contain all IFC objects
         @ifc_objects = []

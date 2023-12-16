@@ -37,15 +37,6 @@ module BimTools
     )
       super
       @ifc = IfcManager::Settings.ifc_module
-
-      meshes = faces.map do |face|
-        if ifc_model.textures
-          ifc_model.textures.load(face, true)
-          ifc_model.textures.load(face, false) if double_sided_faces
-        end
-        [face.mesh(7), get_face_transformation(face).inverse]
-      end
-
       points = []
       uv_coordinates_front = []
       uv_coordinates_back = []
@@ -54,6 +45,18 @@ module BimTools
       polygons = []
       point_total = 0
       face_mesh_id = 0
+      add_parent_texture = false
+
+      meshes = faces.map do |face|
+        if face.material.nil? && !add_parent_texture
+          add_parent_texture = true
+        end
+        [face.mesh(7), get_face_transformation(face).inverse]
+      end
+
+      if add_parent_texture && !ifc_model.materials.key?(parent_material)
+        ifc_model.materials[parent_material] = MaterialAndStyling.new(ifc_model, parent_material)
+      end
 
       # @todo closed should be true for manifold geometry
       @closed = false

@@ -129,7 +129,7 @@ module BimTools
       # @param side [Symbol] The side for which to get the rendering.
       # @return [IfcSurfaceStyleRendering] The default surface style rendering.
       def get_default_surface_style_rendering(side = :both)
-        return @@default_rendering if defined?(@@default_rendering)
+        return @default_rendering if defined?(@default_rendering)
 
         rendering_options = @ifc_model.su_model.rendering_options
         color = if side == :negative
@@ -138,12 +138,12 @@ module BimTools
                   rendering_options['FaceFrontColor']
                 end
 
-        @@default_rendering = IfcSurfaceStyleRenderingBuilder.build(@ifc_model) do |builder|
+        @default_rendering = IfcSurfaceStyleRenderingBuilder.build(@ifc_model) do |builder|
           builder.set_surface_colour(color)
           builder.set_transparency(1.0)
         end
 
-        @@default_rendering
+        @default_rendering
       end
 
       # Creates an image texture for the given SketchUp material.
@@ -151,9 +151,7 @@ module BimTools
       # @param su_material [Sketchup::Material] The SketchUp material.
       # @return [IfcEngine::IfcImageTexture, nil] The created IfcImageTexture object, or nil if the texture cannot be created.
       def create_image_texture(su_material)
-        # export textures for IFC 4 and up only, check if IfcTextureMap is available
         return unless @ifc_model.textures
-        return unless @ifc::IfcTextureMap.method_defined?(:maps)
         return unless su_material
 
         su_texture = su_material.texture

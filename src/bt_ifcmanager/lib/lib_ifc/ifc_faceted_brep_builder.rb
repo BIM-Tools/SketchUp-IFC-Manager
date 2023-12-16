@@ -104,7 +104,6 @@ module BimTools
             if image_texture
               texture_map = @ifc::IfcTextureMap.new(@ifc_model)
               uv_helper = su_face.get_UVHelper(true, true, @ifc_model.textures)
-              @ifc_model.textures.load(su_face, true)
               texture_map.maps = IfcManager::Types::List.new([image_texture])
               texture_map.mappedto = ifc_face
             end
