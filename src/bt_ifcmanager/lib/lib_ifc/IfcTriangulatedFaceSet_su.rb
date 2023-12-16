@@ -55,7 +55,7 @@ module BimTools
       end
 
       if add_parent_texture && !ifc_model.materials.key?(parent_material)
-        ifc_model.materials[parent_material] = MaterialAndStyling.new(ifc_model, parent_material)
+        ifc_model.materials[parent_material] = IfcManager::MaterialAndStyling.new(ifc_model, parent_material)
       end
 
       # @todo closed should be true for manifold geometry

@@ -80,7 +80,7 @@ module BimTools
 
       def set_styling(su_material)
         if @ifc_model.options[:colors] && !@ifc_model.materials[su_material]
-          @ifc_model.materials[su_material] = MaterialAndStyling.new(@ifc_model, su_material)
+          @ifc_model.materials[su_material] = IfcManager::MaterialAndStyling.new(@ifc_model, su_material)
         end
         # @ifc_model.materials[su_material].add_to_styling(@ifc_faceted_brep)
       end
@@ -95,7 +95,7 @@ module BimTools
 
           # check if material exists
           unless @ifc_model.materials.key?(su_material)
-            @ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(@ifc_model, su_material)
+            @ifc_model.materials[su_material] = IfcManager::MaterialAndStyling.new(@ifc_model, su_material)
           end
 
           # IFC 4
