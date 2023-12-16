@@ -99,6 +99,7 @@ module BimTools
       def write(file_path)
         step_objects = get_step_objects(file_path)
         if File.extname(file_path).downcase == '.ifczip'
+          BimTools::Zip.write_zip64_support = false
           file_name = File.basename(file_path, File.extname(file_path)) << '.ifc'
           BimTools::Zip::OutputStream.open(file_path) do |zos|
             zos.put_next_entry(file_name)
