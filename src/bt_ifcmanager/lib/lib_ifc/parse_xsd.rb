@@ -212,7 +212,6 @@ module BimTools
         IfcSite
         IfcSpatialStructureElement
         IfcStyledItem
-        IfcTriangulatedFaceSet
         IfcTypeProduct
         IfcUnitAssignment
       ]

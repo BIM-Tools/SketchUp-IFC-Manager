@@ -55,6 +55,8 @@ module BimTools
         @ifc_faceted_brep.outer.cfsfaces = IfcManager::Types::Set.new(faces)
       end
 
+      # (!) This method must be called before adding faces
+      # @todo make this more robust
       def set_transformation(transformation)
         @su_transformation = transformation
 
