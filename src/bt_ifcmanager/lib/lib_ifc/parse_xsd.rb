@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #  parse_xsd.rb
 #
 #  Copyright 2021 Jan Brouwer <jan@brewsky.nl>
@@ -29,6 +31,8 @@ require_relative File.join('.', 'step')
 
 module BimTools
   module IfcManager
+    # The IfcManager module provides functionality for parsing and working with IFC files.
+
     # xsd_path = Pathname.new("#{PLUGIN_ROOT_PATH}/bt_ifcmanager/lib/lib_ifc/IFC2X3.xsd")
     # xsd_path = Pathname.new("#{PLUGIN_ROOT_PATH}/bt_ifcmanager/lib/lib_ifc/IFC4.xsd")
     # xsd_path = Pathname.new("#{PLUGIN_ROOT_PATH}/bt_ifcmanager/lib/lib_ifc/ifcXML4.xsd")
@@ -38,6 +42,14 @@ module BimTools
       ifc_order_file = File.join(File.dirname(__FILE__), 'ifc_order.yml')
       IFC_ORDER = YAML.load_file(ifc_order_file)
 
+      # Initializes a new instance of the ParseXSD class.
+      #
+      # Parameters:
+      # - ifc_version: The IFC version to be used.
+      # - xsd_string: Optional. The XSD string to be parsed.
+      #
+      # Returns:
+      # - A new instance of the ParseXSD class.
       def initialize(ifc_version, xsd_string = nil)
         @ifc_version = ifc_version
         ifc_version_compact = ifc_version.delete(' ').upcase
@@ -54,16 +66,37 @@ module BimTools
         Settings.ifc_module = @ifc_module
       end
 
+      # Parses an XSD file and returns the parsed document.
+      #
+      # Parameters:
+      # - xsd_path: The path to the XSD file.
+      #
+      # Returns:
+      # The parsed document.
       def from_file(xsd_path)
         document = REXML::Document.new(File.new(xsd_path))
         parse(document)
       end
 
+      # Parses an XSD string and returns the parsed document.
+      #
+      # Parameters:
+      # - xsd_string: The XSD string to parse.
+      #
+      # Returns:
+      # The parsed document.
       def from_string(xsd_string)
         document = REXML::Document.new(xsd_string)
         parse(document)
       end
 
+      # Parses the given IFC XSD document.
+      #
+      # Parameters:
+      # - document: The document to parse.
+      #
+      # Returns:
+      # - None.
       def parse(document)
         timer = Time.now
         root = document.root
@@ -77,6 +110,13 @@ module BimTools
         puts "finished loading: #{time}"
       end
 
+      # Gets the base class of the given IFC object.
+      #
+      # Parameters:
+      # - ifc_object: The IFC object.
+      #
+      # Returns:
+      # - The base class of the IFC object.
       def get_base(ifc_object)
         if ifc_object
           ifc_object.elements.each('xs:complexContent/xs:extension') do |extension|
@@ -89,6 +129,14 @@ module BimTools
         nil
       end
 
+      # Gets the subtype of the given IFC object.
+      #
+      # Parameters:
+      # - ifc_object: The IFC object.
+      # - ifc_objects: The collection of IFC objects.
+      #
+      # Returns:
+      # - The subtype of the IFC object.
       def get_subtype(ifc_object, ifc_objects)
         base = get_base(ifc_object)
         if base
@@ -109,6 +157,14 @@ module BimTools
         end
       end
 
+      # Sorts the attributes of the given IFC class based on the IFC_ORDER yaml file.
+      #
+      # Parameters:
+      # - ifc_name: The name of the IFC class.
+      # - ifc_attributes: The attributes of the IFC class.
+      #
+      # Returns:
+      # - The sorted attributes of the IFC class.
       def sort_attributes(ifc_name, ifc_attributes)
         if IFC_ORDER.key?(ifc_name)
           order = IFC_ORDER[ifc_name]
@@ -118,7 +174,14 @@ module BimTools
         ifc_attributes
       end
 
-      # Get attributes
+      # Gets the attributes of the given IFC object.
+      #
+      # Parameters:
+      # - ifc_object: The IFC object.
+      # - ifc_name: The name of the IFC class.
+      #
+      # Returns:
+      # - The attributes of the IFC object.
       def get_attributes(ifc_object, ifc_name)
         ifc_attributes = []
         if ifc_object
@@ -131,19 +194,39 @@ module BimTools
             end
           end
         end
-
-        # file = File.join(File.dirname(__FILE__), 'ifc_order.yml')
-        # d = YAML::load_file(file)
-        # unless ifc_attributes.empty?
-        #   d[ifc_name] = {:explicit => ifc_attributes}
-        # end
-        # File.open(file, 'w') {|f| f.write d.to_yaml } #Store
-
         sort_attributes(ifc_name, ifc_attributes)
       end
 
-      # Find mixin module
+      # IFC classes that need an additional module mixed in
+      MIXIN_MODULES = %w[
+        IfcAxis2Placement3D
+        IfcCartesianPoint
+        IfcDirection
+        IfcGroup
+        IfcIndexedTriangleTextureMap
+        IfcLocalPlacement
+        IfcObjectDefinition
+        IfcPresentationLayerAssignment
+        IfcProduct
+        IfcRoot
+        IfcSite
+        IfcSpatialStructureElement
+        IfcStyledItem
+        IfcTriangulatedFaceSet
+        IfcTypeProduct
+        IfcUnitAssignment
+      ]
+
+      # Gets the mixin module for the given IFC class.
+      #
+      # Parameters:
+      # - ifc_name: The name of the IFC class.
+      #
+      # Returns:
+      # - The mixin module for the IFC class.
       def get_mixin(ifc_name)
+        return unless MIXIN_MODULES.include?(ifc_name)
+
         mixin_file = Pathname.new("#{PLUGIN_ROOT_PATH}/bt_ifcmanager/lib/lib_ifc/#{ifc_name}_su.rb")
         if mixin_file.exist?
           require_relative(mixin_file)
@@ -152,23 +235,38 @@ module BimTools
         nil
       end
 
-      # Create IfcEntity base class
+      # Creates the IfcEntity base class.
+      #
+      # Parameters:
+      # - None.
+      #
+      # Returns:
+      # - None.
       def create_ifcentity
-        unless @ifc_module.const_defined?(:IfcEntity)
-          ifc_class = Class.new do
-            include Step
-            def initialize(ifc_model, _sketchup = nil, *_args)
-              @ifc_model = ifc_model
-            end
+        return if @ifc_module.const_defined?(:IfcEntity)
 
-            def self.attributes
-              []
-            end
+        ifc_class = Class.new do
+          include Step
+          def initialize(ifc_model, _sketchup = nil, *_args)
+            @ifc_model = ifc_model
           end
-          @ifc_module.const_set(:IfcEntity, ifc_class)
+
+          def self.attributes
+            []
+          end
         end
+        @ifc_module.const_set(:IfcEntity, ifc_class)
       end
 
+      # Creates the IFC class for the given IFC name.
+      #
+      # Parameters:
+      # - ifc_name: The name of the IFC class.
+      # - ifc_object: The IFC object.
+      # - ifc_objects: The collection of IFC objects.
+      #
+      # Returns:
+      # - The created IFC class.
       def create_ifc_class(ifc_name, ifc_object, ifc_objects)
         unless @ifc_module.const_defined?(ifc_name)
           mixin = get_mixin(ifc_name)
@@ -198,6 +296,13 @@ module BimTools
         @ifc_module.const_get(ifc_name)
       end
 
+      # Gets the IFC objects from the given elements.
+      #
+      # Parameters:
+      # - elements: The elements to extract IFC objects from.
+      #
+      # Returns:
+      # - The collection of IFC objects.
       def get_ifc_objects(elements)
         h = {}
         elements.each('xs:complexType') do |element|
