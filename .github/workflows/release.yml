@@ -59,12 +59,12 @@ jobs:
         if: env.IS_VALID == 'true'
         id: generate_notes
         run: |
-          PREVIOUS_TAG=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
-          RELEASE_NOTES=$(git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD)
+          echo "PREVIOUS_TAG=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)" >> $GITHUB_ENV
+          RELEASE_NOTES=$(git log --pretty=format:"- %s" ${{ env.PREVIOUS_TAG }}..HEAD)
           if [[ -z "$RELEASE_NOTES" ]]; then
             RELEASE_NOTES="No changes since the last release."
           else
-            RELEASE_NOTES="## What's Changed\n\nRelease version ${{ env.VERSION }}:\n$RELEASE_NOTES\n\n**Full Changelog**: https://github.com/BIM-Tools/SketchUp-IFC-Manager/compare/$PREVIOUS_TAG...${{ env.VERSION }}"
+            RELEASE_NOTES="## What's Changed"$'\n\n'"Release version ${{ env.VERSION }}:"$'\n'"$RELEASE_NOTES"$'\n\n'"**Full Changelog**: https://github.com/BIM-Tools/SketchUp-IFC-Manager/compare/${{ env.PREVIOUS_TAG }}...${{ env.VERSION }}"
           fi
           echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
           echo "$RELEASE_NOTES" >> $GITHUB_ENV
