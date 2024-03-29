@@ -66,7 +66,9 @@ jobs:
           else
             RELEASE_NOTES="Release version $VERSION:\n$RELEASE_NOTES"
           fi
-          echo "RELEASE_NOTES=$RELEASE_NOTES" >> $GITHUB_ENV
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          echo "$RELEASE_NOTES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Create Release
         if: env.IS_VALID == 'true'
