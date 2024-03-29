@@ -53,7 +53,7 @@ jobs:
       - name: Create RBZ file
         if: env.IS_VALID == 'true'
         run: |
-          zip -r "./bt_ifcmanager-$VERSION.rbz" src/
+          cd src && zip -r "../bt_ifcmanager-${{ env.VERSION }}.rbz" .
 
       - name: Generate release notes
         if: env.IS_VALID == 'true'
@@ -64,7 +64,7 @@ jobs:
           if [[ -z "$RELEASE_NOTES" ]]; then
             RELEASE_NOTES="No changes since the last release."
           else
-            RELEASE_NOTES="Release version $VERSION:\n$RELEASE_NOTES"
+            RELEASE_NOTES="## What's Changed\n\nRelease version ${{ env.VERSION }}:\n$RELEASE_NOTES\n\n**Full Changelog**: https://github.com/BIM-Tools/SketchUp-IFC-Manager/compare/$PREVIOUS_TAG...${{ env.VERSION }}"
           fi
           echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
           echo "$RELEASE_NOTES" >> $GITHUB_ENV
@@ -89,8 +89,9 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_URL: ${{ env.UPLOAD_URL }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ env.UPLOAD_URL }}
           asset_path: ./bt_ifcmanager-${{ env.VERSION }}.rbz
           asset_name: bt_ifcmanager-${{ env.VERSION }}.rbz
           asset_content_type: application/zip
