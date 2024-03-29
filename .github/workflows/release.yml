@@ -37,7 +37,11 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit -m "Update version to $VERSION" -a
+          if ! git diff --quiet; then
+            git commit -am "Commit message"
+          else
+            echo "No changes to commit"
+          fi
 
       - name: Push changes
         if: env.IS_VALID == 'true'
