@@ -9,74 +9,85 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        persist-credentials: false
-        fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
 
-    - name: Extract version
-      id: extract_version
-      run: echo "::set-output name=version::$(echo ${GITHUB_REF#refs/tags/})"
+      - name: Check commit message and extract version
+        id: extract_version
+        run: |
+          COMMIT_MESSAGE=$(git log --format=%B -n 1)
+          VERSION=$(echo $COMMIT_MESSAGE | grep -oP 'Release version \K(\d+\.\d+\.\d+)')
+          if [[ -z "$VERSION" ]]; then
+            echo "No version number found in commit message. Cancelling job."
+            echo "::cancel_all::"
+          else
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+          fi
 
-    - name: Check version format
-      id: check_version
-      run: echo "::set-output name=is_valid::$(if [[ "${{ steps.extract_version.outputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo 'true'; else echo 'false'; fi)"
+      - name: Check version format
+        id: check_version
+        run: |
+          IS_VALID=$(if [[ "${{ steps.extract_version.outputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo 'true'; else echo 'false'; fi)
+          echo "IS_VALID=$IS_VALID" >> $GITHUB_ENV
 
-    - name: Update version in bt_ifcmanager.rb
-      if: steps.check_version.outputs.is_valid == 'true'
-      run: |
-        VERSION=${{ steps.extract_version.outputs.version }}
-        sed -i "s/VERSION = '.*'/VERSION = '$VERSION'/" src/bt_ifcmanager.rb
+      - name: Update version in bt_ifcmanager.rb
+        if: steps.check_version.outputs.is_valid == 'true'
+        run: |
+          sed -i "s/VERSION = '.*'/VERSION = '${{ steps.extract_version.outputs.version }}'/" src/bt_ifcmanager.rb
 
-    - name: Commit changes
-      if: steps.check_version.outputs.is_valid == 'true'
-      run: |
-        VERSION=${{ steps.extract_version.outputs.version }}
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git commit -m "Update version to $VERSION" -a
+      - name: Commit changes
+        if: steps.check_version.outputs.is_valid == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Update version to ${{ steps.extract_version.outputs.version }}" -a
 
-    - name: Push changes
-      if: steps.check_version.outputs.is_valid == 'true'
-      run: git push
+      - name: Push changes
+        if: steps.check_version.outputs.is_valid == 'true'
+        uses: ad-m/github-push-action@v0.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Create RBZ file
-      if: steps.check_version.outputs.is_valid == 'true'
-      run: |
-        VERSION=${{ steps.extract_version.outputs.version }}
-        RBZ_FILE=bt_ifcmanager-$VERSION.rbz
-        zip -r $RBZ_FILE src/
+      - name: Create RBZ file
+        if: steps.check_version.outputs.is_valid == 'true'
+        run: |
+          zip -r bt_ifcmanager-${{ steps.extract_version.outputs.version }}.rbz src/
 
-    - name: Generate release notes
-      id: generate_notes
-      run: |
-        VERSION=${{ steps.extract_version.outputs.version }}
-        PREVIOUS_TAG=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
-        RELEASE_NOTES=$(git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD)
-        echo "::set-output name=notes::$RELEASE_NOTES"
+      - name: Generate release notes
+        id: generate_notes
+        run: |
+          VERSION=${{ steps.extract_version.outputs.version }}
+          PREVIOUS_TAG=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
+          RELEASE_NOTES=$(git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD)
+          if [[ -z "$RELEASE_NOTES" ]]; then
+            RELEASE_NOTES="No changes since the last release."
+          fi
+          echo "RELEASE_NOTES=$RELEASE_NOTES" >> $GITHUB_ENV
 
-    - name: Create Release
-      if: steps.check_version.outputs.is_valid == 'true'
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: v${{ steps.extract_version.outputs.version }}
-        release_name: Sketchup-IFC-Manager ${{ steps.extract_version.outputs.version }}
-        body: ${{ steps.generate_notes.outputs.notes }}
-        draft: true
-        prerelease: false
+      - name: Create Release
+        if: steps.check_version.outputs.is_valid == 'true'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.extract_version.outputs.version }}
+          release_name: Sketchup-IFC-Manager ${{ steps.extract_version.outputs.version }}
+          body: ${{ env.RELEASE_NOTES }}
+          draft: true
+          prerelease: false
 
-    - name: Upload Release Asset
-      if: steps.check_version.outputs.is_valid == 'true'
-      id: upload-release-asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./bt_ifcmanager-${{ steps.extract_version.outputs.version }}.rbz
-        asset_name: bt_ifcmanager-${{ steps.extract_version.outputs.version }}.rbz
-        asset_content_type: application/zip
+      - name: Upload Release Asset
+        if: steps.check_version.outputs.is_valid == 'true'
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./bt_ifcmanager-${{ steps.extract_version.outputs.version }}.rbz
+          asset_name: bt_ifcmanager-${{ steps.extract_version.outputs.version }}.rbz
+          asset_content_type: application/zip
