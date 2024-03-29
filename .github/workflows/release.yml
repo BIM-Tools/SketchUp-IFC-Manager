@@ -42,7 +42,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit -m "Update version to $VERSION" -a
+          git commit -m "Update version to $VERSION" -a || true
 
       - name: Push changes
         if: env.IS_VALID == 'true'
