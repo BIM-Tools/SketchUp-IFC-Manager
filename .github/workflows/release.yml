@@ -22,7 +22,6 @@ jobs:
           VERSION=$(echo $COMMIT_MESSAGE | grep -oP 'Release version \K(\d+\.\d+\.\d+)')
           if [[ -z "$VERSION" ]]; then
             echo "No version number found in commit message."
-            echo "IS_VALID=false" >> $GITHUB_ENV
           else
             echo "VERSION=$VERSION" >> $GITHUB_ENV
             echo "IS_VALID=true" >> $GITHUB_ENV
