@@ -30,14 +30,14 @@ jobs:
       - name: Update version in bt_ifcmanager.rb
         if: env.IS_VALID == 'true'
         run: |
-          sed -i "s/VERSION = '.*'/VERSION = '${{ env.VERSION }}'/" src/bt_ifcmanager.rb
+          sed -i "s/VERSION = '.*'/VERSION = '$VERSION'/" src/bt_ifcmanager.rb
 
       - name: Commit changes
         if: env.IS_VALID == 'true'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit -m "Update version to ${{ env.VERSION }}" -a
+          git commit -m "Update version to $VERSION" -a
 
       - name: Push changes
         if: env.IS_VALID == 'true'
@@ -48,13 +48,13 @@ jobs:
       - name: Create RBZ file
         if: env.IS_VALID == 'true'
         run: |
-          zip -r bt_ifcmanager-${{ env.VERSION }}.rbz src/
+          zip -r bt_ifcmanager-$VERSION.rbz src/
 
       - name: Generate release notes
         if: env.IS_VALID == 'true'
         id: generate_notes
         run: |
-          VERSION=${{ env.VERSION }}
+          VERSION=$VERSION
           PREVIOUS_TAG=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
           RELEASE_NOTES=$(git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD)
           if [[ -z "$RELEASE_NOTES" ]]; then
@@ -69,8 +69,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ env.VERSION }}
-          release_name: Sketchup-IFC-Manager ${{ env.VERSION }}
+          tag_name: v$VERSION
+          release_name: Sketchup-IFC-Manager $VERSION
           body: ${{ env.RELEASE_NOTES }}
           draft: true
           prerelease: false
@@ -83,6 +83,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bt_ifcmanager-${{ env.VERSION }}.rbz
-          asset_name: bt_ifcmanager-${{ env.VERSION }}.rbz
+          asset_path: ./bt_ifcmanager-$VERSION.rbz
+          asset_name: bt_ifcmanager-$VERSION.rbz
           asset_content_type: application/zip
