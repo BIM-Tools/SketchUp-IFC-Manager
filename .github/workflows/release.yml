@@ -27,6 +27,11 @@ jobs:
             echo "IS_VALID=true" >> $GITHUB_ENV
           fi
 
+      - name: Debug
+        run: |
+          echo "Commit message: $COMMIT_MESSAGE"
+          echo "Version: $VERSION"
+
       - name: Update version in bt_ifcmanager.rb
         if: env.is_valid == 'true'
         run: |
