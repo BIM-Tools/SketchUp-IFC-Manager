@@ -34,9 +34,13 @@ require_relative '../transformation_helper'
 require_relative 'classifications'
 module BimTools
   module IfcManager
-    require File.join(PLUGIN_PATH_LIB, 'layer_visibility')
+    require File.join(PLUGIN_PATH_LIB, 'visibility_utils')
 
+    # The IfcModel class represents an IFC model created from a SketchUp model.
+    # It includes methods for converting SketchUp entities to IFC entities and writing them to a STEP file.
     class IfcModel
+      include VisibilityUtils
+
       # (?) possible additional methods:
       # - get_ifc_objects(hash ifc->su)
       # - get_su_objects(hash su->ifc)
@@ -48,14 +52,12 @@ module BimTools
       attr_reader :su_model, :project, :ifc_objects, :project_data, :export_summary, :options, :su_entities, :units,
                   :default_location, :default_axis, :default_refdirection, :default_placement, :textures
 
-      # creates an IFC model based on given su model
+      # Initializes a new IfcModel instance.
       # (?) could be enhanced to also accept other sketchup objects
-
-      # Creates an IFC model based on given su model
       #
-      # @param [Sketchup::Model] su_model
-      # @param [Hash] options optional options hash
-      # @param [Array<Sketchup::Entity>] su_entities optional list of entities that have to be exported to IFC, nil exports all model entities.
+      # @param [Sketchup::Model] su_model The SketchUp model to base the IFC model on.
+      # @param [Hash] options An optional hash of options for the IFC model.
+      # @param [Array<Sketchup::Entity>] su_entities An optional list of SketchUp entities to export to the IFC model. If nil, all entities in the model are exported.
       def initialize(su_model, options = {})
         defaults = {
           ifc_entities: false, # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
@@ -234,24 +236,20 @@ module BimTools
         instance_path = Sketchup::InstancePath.new([])
         spatial_structure = SpatialStructureHierarchy.new(self)
         spatial_structure.add(@project)
-        entitiy_count = entities.length
-        i = 0
-        while i < entitiy_count
-          ent = entities[i]
 
-          # skip hidden objects if skip-hidden option is set
-          unless @options[:hidden] == false && (ent.hidden? || !IfcManager.layer_visible?(ent.layer))
-            case ent
-            when Sketchup::Group, Sketchup::ComponentInstance
-              EntityBuilder.new(self, ent, transformation, @project, instance_path, spatial_structure)
-            when Sketchup::Face
-              faces << ent
-            end
+        entities.each do |entity|
+          # Skip hidden objects if skip-hidden option is set
+          next unless instance_visible?(entity, @options)
+
+          case entity
+          when Sketchup::Group, Sketchup::ComponentInstance
+            EntityBuilder.new(self, entity, transformation, @project, instance_path, spatial_structure)
+          when Sketchup::Face
+            faces << entity
           end
-          i += 1
         end
 
-        # create a single IfcBuildingelementProxy from all 'loose' faces in the model
+        # Create a single IfcBuildingelementProxy from all unassociated faces in the model
         return if faces.empty?
 
         create_fallback_entity(

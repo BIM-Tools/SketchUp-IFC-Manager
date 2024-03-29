@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  layer_visibility.rb
+#  visibility_utils.rb
 #
 #  Copyright 2020 Jan Brouwer <jan@brewsky.nl>
 #
@@ -21,22 +21,28 @@
 
 module BimTools
   module IfcManager
-    # Helper method that figures out if a layer REALLY is visible
-    #   due to the new folder structure in SketchUp 2021
-    #
-    # @param [Sketchup::Layer] or [Sketchup::LayerFolder] layer
-    # @return [true] if layer is visible
-    def layer_visible?(layer)
-      if layer.visible?
-        if Sketchup.version_number < 2_100_000_000
+    module VisibilityUtils
+      # Helper method that figures out if a layer REALLY is visible
+      # due to the new folder structure in SketchUp 2021
+      #
+      # @param [Sketchup::Layer] or [Sketchup::LayerFolder] layer
+      # @return [true] if layer is visible
+      def layer_visible?(layer)
+        return false unless layer.visible?
+
+        if Sketchup.version_number < 2_100_000_000 || !layer.folder
           true
-        elsif layer.folder
-          layer_visible?(layer.folder)
         else
-          true
+          layer_visible?(layer.folder)
         end
-      else
-        false
+      end
+
+      # Determines if a SketchUp instance is visible based on the given options.
+      #
+      # @param su_instance [Sketchup::Entity] The SketchUp instance to check visibility for.
+      # @return [Boolean] Returns true if the instance is visible, false otherwise.
+      def instance_visible?(su_instance, options)
+        options[:hidden] == true || !su_instance.hidden? && layer_visible?(su_instance.layer)
       end
     end
   end

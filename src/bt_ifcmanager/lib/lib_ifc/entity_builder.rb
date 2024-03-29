@@ -28,10 +28,14 @@ require_relative 'ifc_project_builder'
 
 module BimTools
   module IfcManager
-    require File.join(PLUGIN_PATH_LIB, 'layer_visibility')
+    require File.join(PLUGIN_PATH_LIB, 'visibility_utils')
 
+    # The EntityBuilder class is responsible for creating the correct IFC entity
+    # for a given SketchUp object and its children.
     class EntityBuilder
-      # This creator class creates the correct IFC entity for the given sketchup object and it's children
+      include VisibilityUtils
+
+      # Initializes a new instance of the EntityBuilder class.
       #
       # @param [IfcManager::IfcModel] ifc_model The IFC model in which the new IFC entity must be added
       # @param [Sketchup::ComponentInstance, Sketchup::Group] su_instance The sketchup component instance or group for which an IFC entity must be created
@@ -214,19 +218,41 @@ module BimTools
         # (!)(?) Do we need to update su_material?
         # su_material = su_instance.material if su_instance.material
 
-        component_instances = su_instance.definition.entities.select { |entity| entity.respond_to?(:definition) }
-        component_instances.map do |component_instance|
-          EntityBuilder.new(
-            @ifc_model,
-            component_instance,
-            @su_total_transformation,
-            placement_parent,
-            @instance_path,
-            @spatial_structure,
-            su_material,
-            su_layer
-          )
+        su_child_instances(su_instance).map do |su_child_instance|
+          create_entity_builder(placement_parent, su_child_instance, su_material, su_layer)
         end
+      end
+
+      # Retrieves the child instances of a given SketchUp instance that have a definition.
+      #
+      # @param su_instance [Sketchup::ComponentInstance, Sketchup::Group] The SketchUp component instance or group whose child instances are to be retrieved.
+      #
+      # @return [Array<Sketchup::ComponentInstance, Sketchup::Group>] Returns an array of child instances that have a definition.
+      def su_child_instances(su_instance)
+        su_instance.definition.entities.select { |entity| entity.respond_to?(:definition) }
+      end
+
+      # Creates a new EntityBuilder instance for a given SketchUp instance if it is visible.
+      #
+      # @param placement_parent [IfcEntity, nil] The IFC entity that is the direct geometric parent in the SketchUp model.
+      # @param su_instance [Sketchup::ComponentInstance, Sketchup::Group] The SketchUp component instance or group for which an IFC entity must be created.
+      # @param su_material [Sketchup::Material, nil] The parent SketchUp object's material which will be used when the given one does not have a directly associated material.
+      # @param su_layer [Sketchup::Layer, nil] The SketchUp layer associated with the entity.
+      #
+      # @return [EntityBuilder, nil] Returns a new EntityBuilder instance if the SketchUp instance is visible, otherwise returns nil.
+      def create_entity_builder(placement_parent, su_instance, su_material, su_layer)
+        return unless instance_visible?(su_instance, @ifc_model.options)
+
+        EntityBuilder.new(
+          @ifc_model,
+          su_instance,
+          @su_total_transformation,
+          placement_parent,
+          @instance_path,
+          @spatial_structure,
+          su_material,
+          su_layer
+        )
       end
 
       def create_geometry(definition, ifc_entity, placement_parent = nil, su_material, su_layer)
