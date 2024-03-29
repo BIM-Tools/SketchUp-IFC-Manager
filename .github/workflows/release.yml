@@ -77,8 +77,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v$VERSION
-          release_name: Sketchup-IFC-Manager $VERSION
+          tag_name: v${{ env.VERSION }}
+          release_name: Sketchup-IFC-Manager ${{ env.VERSION }}
           body: ${{ env.RELEASE_NOTES }}
           draft: true
           prerelease: false
