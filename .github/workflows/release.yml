@@ -27,6 +27,11 @@ jobs:
             echo "IS_VALID=true" >> $GITHUB_ENV
           fi
 
+      - name: Debug
+        run: |
+          echo "IS_VALID: $IS_VALID"
+          echo "Version: $VERSION"
+
       - name: Update version in bt_ifcmanager.rb
         if: env.IS_VALID == 'true'
         run: |
@@ -37,11 +42,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          if ! git diff --quiet; then
-            git commit -am "Commit message"
-          else
-            echo "No changes to commit"
-          fi
+          git commit -m "Update version to $VERSION" -a
 
       - name: Push changes
         if: env.IS_VALID == 'true'
@@ -58,11 +59,12 @@ jobs:
         if: env.IS_VALID == 'true'
         id: generate_notes
         run: |
-          VERSION=$VERSION
           PREVIOUS_TAG=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
           RELEASE_NOTES=$(git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD)
           if [[ -z "$RELEASE_NOTES" ]]; then
             RELEASE_NOTES="No changes since the last release."
+          else
+            RELEASE_NOTES="Release version $VERSION:\n$RELEASE_NOTES"
           fi
           echo "RELEASE_NOTES=$RELEASE_NOTES" >> $GITHUB_ENV
 
