@@ -59,7 +59,7 @@ jobs:
         if: env.IS_VALID == 'true'
         id: generate_notes
         run: |
-          PREVIOUS_TAG=$(git describe --abbrev=0 --tags --max-count=1)
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0)
           RELEASE_NOTES=$(git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD)
           if [[ -z "$RELEASE_NOTES" ]]; then
             RELEASE_NOTES="No changes since the last release."
