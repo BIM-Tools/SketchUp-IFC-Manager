@@ -89,9 +89,8 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UPLOAD_URL: ${{ env.UPLOAD_URL }}
         with:
-          upload_url: ${{ env.UPLOAD_URL }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./bt_ifcmanager-${{ env.VERSION }}.rbz
           asset_name: bt_ifcmanager-${{ env.VERSION }}.rbz
           asset_content_type: application/zip
