@@ -22,6 +22,7 @@
 #
 
 require_relative 'ifc_types'
+require_relative 'ifc_owner_history_builder'
 require_relative 'ifc_product_definition_shape_builder'
 require_relative 'ifc_project_builder'
 require_relative 'ifc_shape_representation_builder'
@@ -79,6 +80,8 @@ module BimTools
         }
         @options = defaults.merge(options)
 
+        creation_date = Time.now
+
         su_model.set_attribute('IfcManager', 'description', '')
         @project_data = su_model.attribute_dictionaries['IfcManager']
 
@@ -114,7 +117,13 @@ module BimTools
         @property_enumerations = {}
 
         # create IfcOwnerHistory for all IFC objects
-        @owner_history = create_ownerhistory
+        @owner_history = BimTools::IfcManager::IfcOwnerHistoryBuilder.build(self) do |builder|
+          builder.owning_user_from_model(su_model)
+          builder.owning_application(VERSION, 'IFC manager for sketchup', 'su_ifcmanager')
+          builder.change_action = '.ADDED.'
+          builder.last_modified_date = creation_date
+          builder.creation_date = creation_date
+        end
 
         # create IfcGeometricRepresentationContext for all IFC geometry objects
         @representationcontext = create_representationcontext
@@ -180,34 +189,6 @@ module BimTools
         else
           @export_summary[class_name] = 1
         end
-      end
-
-      # Create new IfcOwnerHistory
-      def create_ownerhistory
-        creation_date = Time.now.to_i.to_s
-        owner_history = @ifc::IfcOwnerHistory.new(self)
-        owninguser = @ifc::IfcPersonAndOrganization.new(self)
-        owninguser.theperson = @ifc::IfcPerson.new(self)
-        owninguser.theperson.familyname = Types::IfcLabel.new(self, '')
-        owninguser.theorganization = @ifc::IfcOrganization.new(self)
-        owninguser.theorganization.name = Types::IfcLabel.new(self, '')
-        # owninguser.theperson = @ifc::IfcPerson.new(self)
-        # owninguser.theorganization = @ifc::IfcOrganization.new(self)
-        owner_history.owninguser = owninguser
-        owningapplication = @ifc::IfcApplication.new(self)
-        applicationdeveloper = @ifc::IfcOrganization.new(self)
-        applicationdeveloper.name = Types::IfcLabel.new(self, 'BIM-Tools')
-        owningapplication.applicationdeveloper = applicationdeveloper
-        owningapplication.version = Types::IfcLabel.new(self, VERSION)
-        owningapplication.applicationfullname = Types::IfcLabel.new(self, 'IFC manager for sketchup')
-        owningapplication.applicationidentifier = Types::IfcIdentifier.new(self, 'su_ifcmanager')
-        owner_history.owningapplication = owningapplication
-        owner_history.changeaction = '.ADDED.'
-        owner_history.lastmodifieddate = creation_date
-        owner_history.creationdate = creation_date
-        owner_history.lastmodifyinguser = owninguser
-        owner_history.lastmodifyingapplication = owningapplication
-        owner_history
       end
 
       # Create new IfcGeometricRepresentationContext
