@@ -23,24 +23,25 @@
 #  project/site/building/storeys
 #  location
 # export:
-#   ifc_entities:        false, # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
-#   hidden:              false, # include hidden sketchup objects
-#   attributes:          [],    # include specific attribute dictionaries given in array as IfcPropertySets, like ['SU_DefinitionSet', 'SU_InstanceSet'], false means all
-#   classifications:     true,  # add all SketchUp classifications
-#   layers:              true,  # create IfcPresentationLayerAssignments
-#   materials:           true,  # create IfcMaterials
-#   colors:              true,  # create IfcStyledItems
-#   geometry:            'Brep' # ['Brep','Tessellation',false]
-#   fast_guid:           false, # create simplified guids
-#   dynamic_attributes:  false, # export dynamic component data
-#   open_file:           false, # open created file in given/default application
-#   mapped_items:        true,  # Export IFC mapped items
-#   model_axes:          true   # Export using model axes instead of Sketchup internal origin
-#   textures:            false  # Add textures
-#   double_sided_faces:  false  # Add double sided faces
+#   ifc_entities:          false, # include IFC entity types given in array, like ["IfcWindow", "IfcDoor"], false means all
+#   hidden:                false, # include hidden sketchup objects
+#   attributes:            [],    # include specific attribute dictionaries given in array as IfcPropertySets, like ['SU_DefinitionSet', 'SU_InstanceSet'], false means all
+#   classifications:       true,  # add all SketchUp classifications
+#   layers:                true,  # create IfcPresentationLayerAssignments
+#   materials:             true,  # create IfcMaterials
+#   colors:                true,  # create IfcStyledItems
+#   geometry:              'Brep' # ['Brep','Tessellation',false]
+#   fast_guid:             false, # create simplified guids
+#   dynamic_attributes:    false, # export dynamic component data
+#   open_file:             false, # open created file in given/default application
+#   mapped_items:          true,  # Export IFC mapped items
+#   classification_suffix: true # Add ' Classification' suffix to all classification for Revit compatibility
+#   model_axes:            true   # Export using model axes instead of Sketchup internal origin
+#   textures:              false  # Add textures
+#   double_sided_faces:    false  # Add double sided faces
 # load:
-#   classifications:     [],    # ["NL-SfB 2005, tabel 1", "DIN 276-1"]
-#   default_materials:   false  # {'beton'=>[142, 142, 142],'hout'=>[129, 90, 35],'staal'=>[198, 198, 198],'gips'=>[255, 255, 255],'zink'=>[198, 198, 198],'hsb'=>[204, 161, 0],'metselwerk'=>[102, 51, 0],'steen'=>[142, 142, 142],'zetwerk'=>[198, 198, 198],'tegel'=>[255, 255, 255],'aluminium'=>[198, 198, 198],'kunststof'=>[255, 255, 255],'rvs'=>[198, 198, 198],'pannen'=>[30, 30, 30],'bitumen'=>[30, 30, 30],'epdm'=>[30, 30, 30],'isolatie'=>[255, 255, 50],'kalkzandsteen'=>[255, 255, 255],'metalstud'=>[198, 198, 198],'gibo'=>[255, 255, 255],'glas'=>[204, 255, 255],'multiplex'=>[255, 216, 101],'cementdekvloer'=>[198, 198, 198]}
+#   classifications:       [],    # ["NL-SfB 2005, tabel 1", "DIN 276-1"]
+#   default_materials:     false  # {'beton'=>[142, 142, 142],'hout'=>[129, 90, 35],'staal'=>[198, 198, 198],'gips'=>[255, 255, 255],'zink'=>[198, 198, 198],'hsb'=>[204, 161, 0],'metselwerk'=>[102, 51, 0],'steen'=>[142, 142, 142],'zetwerk'=>[198, 198, 198],'tegel'=>[255, 255, 255],'aluminium'=>[198, 198, 198],'kunststof'=>[255, 255, 255],'rvs'=>[198, 198, 198],'pannen'=>[30, 30, 30],'bitumen'=>[30, 30, 30],'epdm'=>[30, 30, 30],'isolatie'=>[255, 255, 50],'kalkzandsteen'=>[255, 255, 255],'metalstud'=>[198, 198, 198],'gibo'=>[255, 255, 255],'glas'=>[204, 255, 255],'multiplex'=>[255, 216, 101],'cementdekvloer'=>[198, 198, 198]}
 
 require 'yaml'
 require 'cgi'
@@ -58,6 +59,7 @@ module BimTools
 
       attr_reader :ifc_classification,
                   :ifc_classifications,
+                  :ifc_version_names,
                   :active_classifications,
                   :common_psets,
                   :export_classifications
@@ -66,6 +68,7 @@ module BimTools
       @common_psets = true
       @settings_file = File.join(PLUGIN_PATH, 'settings.yml')
       @ifc_classifications = {}
+      @ifc_version_names = []
 
       # classifications shown in properties window
       @active_classifications = {}
@@ -175,7 +178,7 @@ module BimTools
           @export_model_axes = CheckboxOption.new(
             'model_axes',
             "Export using model axes transformation",
-            @options[:export][:classification_suffix],
+            @options[:export][:model_axes],
             "Export using model axes instead of Sketchup internal origin"
           )
         end
@@ -232,6 +235,19 @@ module BimTools
         end
       end
 
+      # This method retrieves the name of a SketchUp Classification.
+      #
+      # @param skc_file_name [String] The SKC file name.
+      # @return [String, nil] The name of the classification file, or nil if an error occurs.
+      def get_skc_name(skc_file_name)
+        begin
+          reader = SKC.new(skc_file_name)
+          return reader.name
+        rescue StandardError
+          return nil
+        end
+      end
+
       def set_ifc_classification(ifc_classification_name)
         @ifc_classification = ifc_classification_name
         @ifc_classifications[ifc_classification_name] = true
@@ -249,13 +265,13 @@ module BimTools
 
       def read_ifc_classifications
         @ifc_classifications = {}
+        @ifc_version_names = []
         if @options[:load][:ifc_classifications].is_a? Hash
           @options[:load][:ifc_classifications].each_pair do |ifc_classification_name, load|
-            if load == true
+            @ifc_classifications[ifc_classification_name] = load
+            @ifc_version_names << get_skc_name(ifc_classification_name)
+            if load
               @ifc_classification = ifc_classification_name
-              @ifc_classifications[ifc_classification_name] = load
-            elsif load == false
-              @ifc_classifications[ifc_classification_name] = load
             end
           end
         end
