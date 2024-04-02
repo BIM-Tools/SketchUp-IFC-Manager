@@ -57,6 +57,10 @@ module BimTools
         @spatial_structure.insert(index, ifc_entity)
       end
 
+      # Adds an IfcProduct entity to the correct place in the spatial structure.
+      #
+      # @param ifc_entity [Object] The IFC entity to be added.
+      # @return [void]
       def add(ifc_entity)
         spatial_structure_types = get_spatial_structure_types
         case ifc_entity
@@ -64,62 +68,13 @@ module BimTools
           # (!) Check!!!
           @spatial_structure[0] = ifc_entity
         when @ifc::IfcSite
-          if spatial_structure_types.include? @ifc::IfcSite
-            # Add as partial @ifc::IfcSite
-            # @todo fix option to use partial sites
-            # parent_site = @spatial_structure[get_spatial_structure_types().rindex(@ifc::IfcSite)]
-            # path = ["IFC 2x3", "@ifc::IfcSite", "CompositionType", "IfcElementCompositionEnum"]
-            # if parent_site.su_object.definition.get_classification_value(path) == "complex" && ifc_entity.su_object.definition.get_classification_value(path) == "partial"
-            #   insert_after(ifc_entity,@ifc::IfcSite)
-            # else
-            #   @spatial_structure[get_spatial_structure_types().rindex(@ifc::IfcSite)] = ifc_entity
-            # end
-
-            @spatial_structure[get_spatial_structure_types.rindex(@ifc::IfcSite)] = ifc_entity
-          elsif spatial_structure_types.include? @ifc::IfcProject
-            insert_after(ifc_entity, @ifc::IfcProject)
-          end
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc::IfcSite, @ifc::IfcProject)
         when @ifc::IfcBuilding
-          if spatial_structure_types.include? @ifc::IfcBuilding
-            # Add as partial IfcBuilding
-            # insert_after(ifc_entity,@ifc::IfcBuilding)
-            @spatial_structure[get_spatial_structure_types.rindex(@ifc::IfcBuilding)] = ifc_entity
-          elsif spatial_structure_types.include? @ifc::IfcSite
-            insert_after(ifc_entity, @ifc::IfcSite)
-          else
-            # Create default Site and add there
-            add_default_spatialelement(@ifc::IfcSite)
-            insert_after(ifc_entity, @ifc::IfcSite)
-          end
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc::IfcBuilding, @ifc::IfcSite)
         when @ifc::IfcBuildingStorey
-          if spatial_structure_types.include? @ifc::IfcBuildingStorey
-            # Add as partial IfcBuildingStorey
-            # insert_after(ifc_entity,@ifc::IfcBuildingStorey)
-            @spatial_structure[get_spatial_structure_types.rindex(@ifc::IfcBuildingStorey)] = ifc_entity
-          elsif spatial_structure_types.include? @ifc::IfcBuilding
-            insert_after(ifc_entity, @ifc::IfcBuilding)
-          else
-            # Create default IfcBuilding and add there, and check for site
-            add_default_spatialelement(@ifc::IfcBuilding)
-            insert_after(ifc_entity, @ifc::IfcBuilding)
-          end
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc::IfcBuildingStorey, @ifc::IfcBuilding)
         when @ifc::IfcSpace
-          if spatial_structure_types.include? @ifc::IfcSpace
-            # Add as partial IfcBuildingStorey
-            # insert_after(ifc_entity,@ifc::IfcSpace)
-            @spatial_structure[get_spatial_structure_types.rindex(@ifc::IfcSpace)] = ifc_entity
-          elsif spatial_structure_types.include? @ifc::IfcBuildingStorey
-            insert_after(ifc_entity, @ifc::IfcBuildingStorey)
-            # @spatial_structure[get_spatial_structure_types.rindex(@ifc::IfcBuildingStorey)] = ifc_entity
-          elsif spatial_structure_types.include? @ifc::IfcSite
-            # Add as outside space
-            # insert_after(ifc_entity,@ifc::IfcSite)
-            @spatial_structure[get_spatial_structure_types.rindex(@ifc::IfcSite)] = ifc_entity
-          else
-            # Create default IfcBuildingStorey and add there, and check for IfcBuilding and site
-            add_default_spatialelement(@ifc::IfcBuildingStorey)
-            insert_after(ifc_entity, @ifc::IfcBuildingStorey)
-          end
+          add_space(ifc_entity, spatial_structure_types)
         when @ifc::IfcElementAssembly, @ifc::IfcCurtainWall, @ifc::IfcRoof
 
           # add to end but check for basic spatial hierarchy
@@ -136,14 +91,41 @@ module BimTools
         end
       end
 
-      # Create new default instance of given class and add to entity path
+      # Adds a spatial element to the project's spatial structure.
+      #
+      # Parameters:
+      # - ifc_entity: The IfcSpatialElement instance to be added to the spatial structure.
+      # - spatial_structure_types: An array of spatial structure types.
+      # - structure_type: The structure type of the spatial element to be added.
+      # - parent_structure_type: The structure type of the parent spatial element.
+      #
+      # Returns: None.
+      def add_spatialelement(ifc_entity, spatial_structure_types, structure_type, parent_structure_type)
+        complex_parent_index = spatial_structure_types.rindex(structure_type)
+        if complex_parent_index
+          add_complex_spatialelement(ifc_entity, structure_type, complex_parent_index)
+        elsif spatial_structure_types.include?(parent_structure_type)
+          insert_after(ifc_entity, parent_structure_type)
+        else
+          add_default_spatialelement(parent_structure_type)
+          insert_after(ifc_entity, parent_structure_type)
+        end
+      end
+
+      # Adds a default spatial element to the spatial structure hierarchy
+      # for given class and add to entity path.
+      #
+      # @param entity_class [Class] The class of the entity for which to add a default spatial element.
+      # @return [void]
       def add_default_spatialelement(entity_class)
+        spatial_structure_types = get_spatial_structure_types
         # find parent type, if entity not present find the next one
         index = @spatial_order.rindex(entity_class) - 1
         parent_class = @spatial_order[index]
-        add_default_spatialelement(parent_class) unless get_spatial_structure_types.include?(parent_class)
+        add_default_spatialelement(parent_class) unless spatial_structure_types.include?(parent_class)
+        spatial_structure_types = get_spatial_structure_types
 
-        parent_index = get_spatial_structure_types.rindex(parent_class)
+        parent_index = spatial_structure_types.rindex(parent_class)
         parent = @spatial_structure[parent_index]
 
         # check if default_related_object is already set
@@ -162,6 +144,18 @@ module BimTools
         end
         add(parent.default_related_object)
         set_parent(parent.default_related_object)
+      end
+
+      # Adds a complex spatial element to the spatial structure.
+      #
+      # @param ifc_entity [Object] The IFC entity to be added.
+      # @param structure_type [Symbol] The structure type of the spatial element.
+      # @param complex_parent_index [Integer] The index of the complex parent in the spatial structure.
+      # @return [void]
+      def add_complex_spatialelement(ifc_entity, structure_type, complex_parent_index)
+        @spatial_structure[complex_parent_index].compositiontype = :complex
+        ifc_entity.compositiontype = :partial
+        insert_after(ifc_entity, structure_type)
       end
 
       def to_a
