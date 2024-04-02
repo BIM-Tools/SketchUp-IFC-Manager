@@ -34,7 +34,6 @@ module BimTools
       super(ifc_model, definition)
       @ifc = IfcManager::Settings.ifc_module
       @definition = definition
-      ifc_version = IfcManager::Settings.ifc_version
       @type_properties = ifc_model.options[:type_properties]
 
       @rel_defines_by_type = @ifc::IfcRelDefinesByType.new(@ifc_model)

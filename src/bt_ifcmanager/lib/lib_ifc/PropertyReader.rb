@@ -44,43 +44,47 @@ module BimTools
         instanceAttributes
       ].freeze
 
+      # Define a mapping for attributes that need to be renamed
+      ATTRIBUTE_MAPPING = {
+        'ObjectType' => 'ElementType'
+      }.freeze
+
       def initialize(ifc_model, ifc_entity, entity_dict, instance_class = nil)
         @ifc = IfcManager::Settings.ifc_module
         ifc_version = IfcManager::Settings.ifc_version
         @ifc_model = ifc_model
         @ifc_entity = ifc_entity
+        @instance_class = instance_class
         @ifc_dict = entity_dict[ifc_version].attribute_dictionaries if entity_dict && entity_dict[ifc_version]
         @entity_dict = entity_dict
         @propertyset_names = []
         return unless @ifc_dict
 
         # split attributes from properties
-        # First get property names
-        # names = attr_dict.map(&:name)
-        names = @ifc_dict.map { |x| x.name }
+        names = @ifc_dict.map(&:name)
         names -= UNUSED_DICTS # filter out unwanted dictionaries
         ifc_entity_attributes = ifc_entity.attributes.map { |x| x.to_s }
         @attributes = names & ifc_entity_attributes
 
         # Skip IfcProduct-only attributes for IfcTypeProduct
-        all_attributes = if instance_class
+        @all_attributes = if instance_class
                            instance_class_attributes = instance_class.attributes.map { |x| x.to_s }
                            names & (ifc_entity_attributes + instance_class_attributes).uniq
                          else
                            @attributes
                          end
 
-        @propertyset_names = names - all_attributes
+        @propertyset_names = names - @all_attributes
       end
 
-      # Set the IFC entity attributes
+      # Set the IFC entity attributes using all combined attribute possibilitites from IfcProduct and IfcTypeProduct
       def set_attributes
-        return unless @attributes
+        return unless @all_attributes
 
         i = 0
-        while i < @attributes.length
-          name = @attributes[i]
-          value = set_attribute(@ifc_dict[name])
+        while i < @all_attributes.length
+          name = @all_attributes[i]
+          set_attribute(@ifc_dict[name])
           i += 1
         end
       end
@@ -154,23 +158,33 @@ module BimTools
       private
 
       def set_attribute(attr_dict)
-        name = attr_dict.name
+        name = determine_name(attr_dict)
+        return false unless valid_attribute?(name)
 
-        # don't overwrite already set values
-        return false unless @ifc_entity.send(name.downcase).nil?
-
-        property = Property.new(attr_dict)
+        property = create_property(attr_dict, name)
         value = property.value
-        ifc_type = property.ifc_type
-
-        # Never set empty values
         return false if value.nil? || (value.is_a?(String) && value.empty?)
 
-        ifc_value = ifc_type.new(@ifc_model, value) if ifc_type
-
-        # Check if IFC type is set, otherwise use basic types
-        ifc_value ||= get_ifc_property_value(value, property.attribute_type)
+        ifc_value = determine_ifc_value(property, value)
         @ifc_entity.send("#{name.downcase}=", ifc_value) if ifc_value
+      end
+
+      def determine_name(attr_dict)
+        name = attr_dict.name
+        @instance_class ? (ATTRIBUTE_MAPPING[name] || name) : name
+      end
+
+      def valid_attribute?(name)
+        @ifc_entity.respond_to?(name.downcase) && @ifc_entity.send(name.downcase).nil?
+      end
+
+      def create_property(attr_dict, name)
+        @instance_class ? Property.new(attr_dict, name) : Property.new(attr_dict)
+      end
+
+      def determine_ifc_value(property, value)
+        ifc_type = property.ifc_type
+        ifc_type ? ifc_type.new(@ifc_model, value) : get_ifc_property_value(value, property.attribute_type)
       end
 
       # Creates PropertySet if there are any properties to export
@@ -356,8 +370,8 @@ module BimTools
       instanceAttributes
     ].freeze
 
-    def initialize(attr_dict)
-      @name = attr_dict.name
+    def initialize(attr_dict, name = nil)
+      @name = name || attr_dict.name
 
       # When value is set the data is stored on this level
       @value = attr_dict['value']
