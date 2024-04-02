@@ -93,13 +93,11 @@ module BimTools
 
       # Adds a spatial element to the project's spatial structure.
       #
-      # Parameters:
-      # - ifc_entity: The IfcSpatialElement instance to be added to the spatial structure.
-      # - spatial_structure_types: An array of spatial structure types.
-      # - structure_type: The structure type of the spatial element to be added.
-      # - parent_structure_type: The structure type of the parent spatial element.
-      #
-      # Returns: None.
+      # @param ifc_entity [Object] The IfcSpatialElement instance to be added to the spatial structure.
+      # @param spatial_structure_types [Array] An array of spatial structure types.
+      # @param structure_type [Object] The structure type of the spatial element.
+      # @param parent_structure_type [Object] The structure type of the parent spatial element.
+      # @return [void]
       def add_spatialelement(ifc_entity, spatial_structure_types, structure_type, parent_structure_type)
         complex_parent_index = spatial_structure_types.rindex(structure_type)
         if complex_parent_index
