@@ -72,8 +72,7 @@ module BimTools
           fast_guid: false, # create simplified guids
           dynamic_attributes: true, #  export dynamic component data
           types: true,
-          mapped_items: true, # export component definitions as mapped items
-          textures: false, # export component definitions as mapped items
+          textures: false,
           export_entities: [],
           root_entities: [],
           model_axes: false
@@ -109,9 +108,6 @@ module BimTools
         # create object that keeps track of all different shaperepresentations for
         #   the different sketchup component definitions
         @definition_manager = collect_component_definitions(@su_model).to_h
-
-        # # create empty hash that will contain all Mapped Representations (Component Definitions)
-        # @mapped_representations = {}
 
         # Re use property enumerations when possible
         @property_enumerations = {}

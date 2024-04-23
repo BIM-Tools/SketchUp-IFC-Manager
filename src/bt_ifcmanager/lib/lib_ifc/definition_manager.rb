@@ -21,7 +21,6 @@
 #
 #
 
-require_relative 'ifc_mapped_item_builder'
 require_relative 'ifc_product_definition_shape_builder'
 require_relative 'definition_representation'
 require_relative 'material_and_styling'
@@ -106,11 +105,7 @@ module BimTools
 
         geometry_type = @geometry_type if extrusion.nil?
 
-        if @ifc_model.options[:mapped_items]
-          ['MappedRepresentation', [definition_representation.get_mapped_representation(extrusion)]]
-        else
-          [geometry_type, definition_representation.representations(extrusion)]
-        end
+        [geometry_type, definition_representation.representations(extrusion)]
       end
 
       def build_shape_representation(representation_type, representations)

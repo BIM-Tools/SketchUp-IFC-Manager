@@ -23,7 +23,6 @@
 
 require_relative 'ifc_extruded_area_solid_builder'
 require_relative 'ifc_faceted_brep_builder'
-require_relative 'ifc_mapped_item_builder'
 require_relative 'ifc_product_definition_shape_builder'
 require_relative 'ifc_triangulated_face_set_builder'
 require_relative 'material_and_styling'
@@ -40,7 +39,6 @@ module BimTools
         @ifc_model = ifc_model
         @geometry_type = geometry_type
         @ifc_shape_representation_builder = nil
-        @mapped_representation = nil
         @representation = nil
         @double_sided_faces = @ifc_model.options[:double_sided_faces]
         @su_material = su_material
@@ -53,25 +51,6 @@ module BimTools
 
         bottom_face, direction = extrusion
         [create_extrusion(bottom_face, direction, @su_material, @transformation)]
-      end
-
-      def get_mapped_representation(_extrusion = nil)
-        @mapped_representation ||= IfcMappedItemBuilder.build(@ifc_model) do |builder|
-          builder.set_mappingsource(get_mapping_source)
-        end
-      end
-
-      def get_mapping_source
-        shaperepresentation = IfcShapeRepresentationBuilder.build(@ifc_model) do |builder|
-          builder.set_contextofitems(@ifc_model.representationcontext)
-          builder.set_representationtype(@geometry_type)
-          builder.set_items(@meshes)
-        end
-
-        representationmap = @ifc::IfcRepresentationMap.new(@ifc_model)
-        representationmap.mappingorigin = @ifc_model.default_placement
-        representationmap.mappedrepresentation = shaperepresentation
-        representationmap
       end
 
       # Set the definition-representations OWN representation using it's faces

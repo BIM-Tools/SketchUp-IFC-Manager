@@ -34,7 +34,6 @@
 #   fast_guid:             false, # create simplified guids
 #   dynamic_attributes:    false, # export dynamic component data
 #   open_file:             false, # open created file in given/default application
-#   mapped_items:          true,  # Export IFC mapped items
 #   classification_suffix: true # Add ' Classification' suffix to all classification for Revit compatibility
 #   model_axes:            true   # Export using model axes instead of Sketchup internal origin
 #   textures:              false  # Add textures
@@ -153,12 +152,6 @@ module BimTools
             @options[:export][:type_properties],
             'Attach IFC properties and classifications to the IfcTypeProduct (when enabled) instead of the Entity itself. This results in a somewhat smaller and cleaner IFC file, but support varies between tools.'
           )
-          @export_mapped_items = CheckboxOption.new(
-            'mapped_items',
-            'Export IFC mapped items',
-            @options[:export][:mapped_items],
-            'The geometry for every (equally scaled) Component Definition is only exported once, this can make models much smaller'
-          )
           @export_textures = CheckboxOption.new(
             'textures',
             'Export textures',
@@ -206,7 +199,6 @@ module BimTools
         @options[:export][:dynamic_attributes] = @export_dynamic_attributes.value
         @options[:export][:types] = @export_types.value
         @options[:export][:type_properties] = @export_type_properties.value
-        @options[:export][:mapped_items] = @export_mapped_items.value
         @options[:export][:textures] = @export_textures.value
         @options[:export][:double_sided_faces] = @export_double_sided_faces.value
         @options[:export][:classification_suffix] = @export_classification_suffix.value
@@ -417,7 +409,6 @@ module BimTools
           @export_dynamic_attributes.value = false
           @export_types.value = false
           @export_type_properties.value = false
-          @export_mapped_items.value = false
           @export_textures.value = false
           @export_double_sided_faces.value = false
           @export_classification_suffix.value = false
@@ -451,8 +442,6 @@ module BimTools
               @export_types.value = true
             when 'type_properties'
               @export_type_properties.value = true
-            when 'mapped_items'
-              @export_mapped_items.value = true
             when 'textures'
               @export_textures.value = true
             when 'double_sided_faces'
@@ -549,7 +538,6 @@ module BimTools
         html << @export_dynamic_attributes.html
         html << @export_types.html
         html << @export_type_properties.html
-        html << @export_mapped_items.html
         html << @export_textures.html
         html << @export_double_sided_faces.html
         html << @export_classification_suffix.html

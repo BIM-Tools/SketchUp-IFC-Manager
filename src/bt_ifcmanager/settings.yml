@@ -14,7 +14,6 @@
   :dynamic_attributes: true
   :types: true
   :type_properties: false
-  :mapped_items: true
   :classification_suffix: true
   :model_axes: false
   :textures: false

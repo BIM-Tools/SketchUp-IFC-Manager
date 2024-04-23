@@ -69,7 +69,7 @@ module BimTools
 
       # Set IfcShapeRepresentation representationtype
       #
-      # @param [String] type 'Brep' or 'MappedRepresentation'
+      # @param [String] type 'Brep', 'Tessellation' or 'SweptSolid'
       def set_representationtype(type = 'Brep')
         @ifc_shape_representation.representationtype = Types::IfcLabel.new(@ifc_model, type)
       end

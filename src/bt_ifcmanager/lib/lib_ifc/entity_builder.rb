@@ -361,7 +361,6 @@ module BimTools
 
         # An IfcGroup or IfcProject has no geometry so all Sketchup geometry is embedded in a IfcBuildingElementProxy
         #   IfcGroup is also the supertype of IfcSystem
-        #   (?) mapped items?
         when @ifc::IfcGroup
           sub_entity_name = if ifc_entity.name
                               "#{ifc_entity.name.value} geometry"
@@ -459,15 +458,7 @@ module BimTools
               transformation,
               su_material
             )
-
-            # @todo: improve this
-            if @ifc_model.options[:mapped_items]
-              mappedrepresentation = parent_representation.representations.first.items.first.mappingsource.mappedrepresentation
-              mappedrepresentation.items += definition_representation.meshes
-            else
-              parent_representation.representations.first.items += definition_representation.meshes
-            end
-
+            parent_representation.representations.first.items += definition_representation.meshes
           else
             add_representation(
               placement_parent,
