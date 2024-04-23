@@ -59,7 +59,7 @@ module BimTools
         @persistent_id_path = persistent_id_path(@instance_path)
         @spatial_structure = SpatialStructureHierarchy.new(@ifc_model, spatial_structure)
         @guid = IfcManager::IfcGloballyUniqueId.new(@ifc_model, @persistent_id_path)
-        ent_type_name = su_instance.definition.get_attribute(
+        entity_type_name = su_instance.definition.get_attribute(
           'AppliedSchemaTypes',
           Settings.ifc_version
         )
@@ -71,12 +71,12 @@ module BimTools
 
         # check if entity is one of the entities that need to be exported (and possibly it's nested entities)
         if @ifc_model.su_entities.empty?
-          if @ifc_model.options[:ifc_entities] == false || @ifc_model.options[:ifc_entities].include?(ent_type_name)
-            create_ifc_entity(ent_type_name, su_instance, placement_parent, su_material, su_layer)
+          if @ifc_model.options[:ifc_entities] == false || @ifc_model.options[:ifc_entities].include?(entity_type_name)
+            create_ifc_entity(entity_type_name, su_instance, placement_parent, su_material, su_layer)
           end
         elsif @ifc_model.su_entities.include?(su_instance)
-          if @ifc_model.options[:ifc_entities] == false || @ifc_model.options[:ifc_entities].include?(ent_type_name)
-            create_ifc_entity(ent_type_name, su_instance, placement_parent, su_material, su_layer)
+          if @ifc_model.options[:ifc_entities] == false || @ifc_model.options[:ifc_entities].include?(entity_type_name)
+            create_ifc_entity(entity_type_name, su_instance, placement_parent, su_material, su_layer)
           end
         else
           create_nested_objects(placement_parent, su_instance, su_material, su_layer)
@@ -100,75 +100,127 @@ module BimTools
       # @param su_material [Sketchup::Material] The SketchUp material to apply to the IFC entity.
       # @param su_layer [Sketchup::Layer] The SketchUp layer to apply to the IFC entity.
       # @return [IfcEntity] The created IFC entity.
-      def create_ifc_entity(ent_type_name, su_instance, placement_parent = nil, su_material = nil, su_layer = nil)
+      def create_ifc_entity(entity_type_name, su_instance, placement_parent = nil, su_material = nil, su_layer = nil)
         su_definition = su_instance.definition
 
-        # Strip any accidental direct Type assignments
-        # @todo should be part of ifc_product_builder
-        if ent_type_name && ent_type_name.end_with?('Type')
-          case ent_type_name
+        entity_type_name = map_entity_type(entity_type_name)
 
-          # Catch missing IfcAirTerminal in Ifc2x3
-          when 'IfcAirTerminalType'
-            ent_type_name = if Settings.ifc_version_compact == 'IFC2X3'
-                              'IfcFlowTerminal'
-                            else
-                              'IfcAirTerminal'
-                            end
-          else
-            ent_base_type_name = ent_type_name.delete_suffix('Type')
-            ent_type_name = ent_base_type_name if @ifc.const_defined? ent_base_type_name
-          end
-        end
+        entity_type = @ifc.const_get(entity_type_name) if entity_type_name
 
-        # Replace IfcWallStandardCase by IfcWall, due to geometry issues and deprecation in IFC 4
-        ent_type_name = 'IfcWall' if ent_type_name == 'IfcWallStandardCase'
+        ifc_entity = determine_ifc_entity(entity_type, su_instance, placement_parent)
 
-        entity_type = @ifc.const_get(ent_type_name) if ent_type_name
-
-        # Don't add unclassified components as direct geometry to spatial elements
-        if entity_type.nil? && placement_parent.is_a?(@ifc::IfcSpatialStructureElement)
-          ifc_entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, su_instance)
-          ifc_entity.globalid = @guid
-          ifc_entity.tag = Types::IfcLabel.new(@ifc_model, @persistent_id_path)
-          assign_entity_attributes(ifc_entity, placement_parent)
-        elsif entity_type.nil?
-
-          # If sketchup object is not an IFC entity it must become part of the parent object geometry
-          ifc_entity = nil
-
-        # Only a single IfcProject entity is allowed in an IFC model
-        elsif entity_type == @ifc::IfcProject
-
-          # @todo: set all correct parameters for IfcProject!!!
-          # Enrich the base IfcProject with properties of the modelled IfcProject
-          ifc_entity = IfcProjectBuilder.modify(@ifc_model, @ifc_model.project) do |modifier|
-            modifier.set_global_id(@guid)
-            modifier.set_name(su_definition.name) unless su_definition.name.empty?
-            modifier.set_description(su_definition.description) unless su_definition.description.empty?
-            modifier.set_attributes_from_su_instance(su_instance)
-          end
-          assign_entity_attributes(ifc_entity, placement_parent)
-        else
-
-          # (!)(?) check against list of valid IFC entities? IfcGroup, IfcProduct
-
-          ifc_entity = entity_type.new(@ifc_model, su_instance)
-          ifc_entity.globalid = @guid if entity_type < @ifc::IfcRoot
-
-          # Set "tag" to component persistant_id like the other BIM Authoring Tools like Revit, Archicad and Tekla are doing
-          # persistant_id in Sketchup is unique for the ComponentInstance placement, but not within the IFC model due to nested components
-          # therefore the full persistent_id_path hierarchy is used
-          ifc_entity.tag = Types::IfcLabel.new(@ifc_model, @persistent_id_path) if defined?(ifc_entity.tag)
-
-          @spatial_structure.add(ifc_entity)
-          assign_entity_attributes(ifc_entity, placement_parent)
-        end
         create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
 
         # We always need a placement parent, so when the current entity is nil, we use the parent
         placement_parent = ifc_entity if ifc_entity
         create_nested_objects(placement_parent, su_instance, su_material, su_layer)
+      end
+
+      # Maps an entity type name to its correct version or base type.
+      #
+      # @param entity_type_name [String] The name of the entity type to be mapped.
+      # @return [String] The mapped entity type name.
+      def map_entity_type(entity_type_name)
+        # Replace IfcWallStandardCase by IfcWall, due to geometry issues and deprecation in IFC 4
+        return 'IfcWall' if entity_type_name == 'IfcWallStandardCase'
+
+        return entity_type_name unless entity_type_name && entity_type_name.end_with?('Type')
+
+        # Strip any accidental direct Type assignments
+        # @todo should be part of ifc_product_builder
+        entity_base_name = entity_type_name.chomp('Type')
+
+        case entity_base_name
+        when 'IfcAirTerminal'
+          # Catch missing IfcAirTerminal in Ifc2x3
+          Settings.ifc_version_compact == 'IFC2X3' ? 'IfcFlowTerminal' : 'IfcAirTerminal'
+        else
+          @ifc.const_defined?(entity_base_name) ? entity_base_name : entity_type_name
+        end
+      end
+
+      # Determines the appropriate IFC entity based on the given entity type, SketchUp instance, and placement parent.
+      #
+      # @param entity_type [Class] The class representing the entity type.
+      # @param su_instance [Sketchup::ComponentInstance] The SketchUp instance.
+      # @param placement_parent [Sketchup::Group, Sketchup::ComponentInstance] The placement parent.
+      # @return [Class] The determined IFC entity class or the entity type class itself.
+      def determine_ifc_entity(entity_type, su_instance, placement_parent)
+        return handle_unclassified_component(su_instance, placement_parent) if entity_type.nil?
+        return handle_ifc_project(su_instance, placement_parent) if entity_type == @ifc::IfcProject
+        return create_ifc_root(entity_type, su_instance, placement_parent) if entity_type < @ifc::IfcRoot
+
+        # Pass the entity type class to the geometry creation method to be caught appropriately
+        entity_type
+      end
+
+      # Handles an unclassified component by determining its placement parent and creating a building element proxy if necessary.
+      #
+      # @param su_instance [Sketchup::ComponentInstance] The SketchUp instance of the unclassified component.
+      # @param placement_parent [IFC::IfcSpatialStructureElement] The placement parent of the unclassified component.
+      # @return [IFC::IfcBuildingElementProxy, nil] The created building element proxy if the placement parent is an IfcSpatialStructureElement, otherwise nil.
+      def handle_unclassified_component(su_instance, placement_parent)
+        # Don't add unclassified components as direct geometry to spatial elements
+        if placement_parent.is_a?(@ifc::IfcSpatialStructureElement)
+          return create_building_element_proxy(su_instance, placement_parent)
+        end
+
+        # If sketchup object is not an IFC entity it must become part of the parent object geometry
+        nil
+      end
+
+      # Modifies the IfcProject entity in the IFC model with the provided parameters.
+      #
+      # @param su_instance [Object] The SketchUp instance associated with the IfcProject.
+      # @param placement_parent [Object] The parent entity for the placement of the IfcProject.
+      # @return [Object] The modified IfcProject entity.
+      def handle_ifc_project(su_instance, placement_parent)
+        # Only a single IfcProject entity is allowed in an IFC model
+        # @todo: set all correct parameters for IfcProject!!!
+        # Enrich the base IfcProject with properties of the modelled IfcProject
+        ifc_entity = IfcProjectBuilder.modify(@ifc_model, @ifc_model.project) do |modifier|
+          modifier.set_global_id(@guid)
+          modifier.set_name(su_definition.name) unless su_definition.name.empty?
+          modifier.set_description(su_definition.description) unless su_definition.description.empty?
+          modifier.set_attributes_from_su_instance(su_instance)
+        end
+        assign_entity_attributes(ifc_entity, placement_parent)
+        ifc_entity
+      end
+
+      # Creates an IFC root entity of the specified type and assigns it to the given SketchUp instance and placement parent.
+      #
+      # @param entity_type [Class] The type of IFC entity to create.
+      # @param su_instance [Sketchup::ComponentInstance] The SketchUp instance to assign to the IFC entity.
+      # @param placement_parent [IFC::IfcObjectPlacement] The placement parent for the IFC entity.
+      # @return [IFC::IfcRoot] The created IFC root entity.
+      def create_ifc_root(entity_type, su_instance, placement_parent)
+        # (!)(?) check against list of valid IFC entities? IfcGroup, IfcProduct
+
+        ifc_entity = entity_type.new(@ifc_model, su_instance)
+        ifc_entity.globalid = @guid if entity_type < @ifc::IfcRoot
+
+        # Set "tag" to component persistant_id like the other BIM Authoring Tools like Revit, Archicad and Tekla are doing
+        # persistant_id in Sketchup is unique for the ComponentInstance placement, but not within the IFC model due to nested components
+        # therefore the full persistent_id_path hierarchy is used
+        ifc_entity.tag = Types::IfcLabel.new(@ifc_model, @persistent_id_path) if defined?(ifc_entity.tag)
+
+        @spatial_structure.add(ifc_entity)
+        assign_entity_attributes(ifc_entity, placement_parent)
+        ifc_entity
+      end
+
+      # Creates a building element proxy in the IFC model based on a SketchUp instance.
+      #
+      # @param su_instance [Sketchup::ComponentInstance] The SketchUp instance to create the proxy from.
+      # @param placement_parent [IFC::IfcObjectPlacement] The parent object placement for the proxy.
+      # @return [IFC::IfcBuildingElementProxy] The created building element proxy.
+      def create_building_element_proxy(su_instance, placement_parent)
+        ifc_entity = @ifc::IfcBuildingElementProxy.new(@ifc_model, su_instance)
+        ifc_entity.globalid = @guid
+        ifc_entity.tag = Types::IfcLabel.new(@ifc_model, @persistent_id_path)
+        assign_entity_attributes(ifc_entity, placement_parent)
+        ifc_entity
       end
 
       # Assigns attributes to an IFC entity and adds it to a parent group if applicable.
@@ -327,43 +379,7 @@ module BimTools
         # When a Sketchup group/component is not classified as an IFC entity it should
         #   become part of the parent object geometry if the parent can have geometry
         when nil
-          definition_manager = @ifc_model.get_definition_manager(definition)
-          if placement_parent.respond_to?(:representation) && !placement_parent.is_a?(@ifc::IfcSpatialStructureElement)
-            parent_representation = placement_parent.representation
-
-            # (?) Can this be improved by using the scaling component from IfcLocalPlacement_su?
-            transformation = placement_parent.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
-
-            if parent_representation
-              definition_representation = definition_manager.get_definition_representation(
-                transformation,
-                su_material
-              )
-
-              # @todo: improve this
-              mappedrepresentation = parent_representation.representations.first.items.first.mappingsource.mappedrepresentation
-              mappedrepresentation.items += definition_representation.meshes
-
-            else
-              add_representation(
-                placement_parent,
-                definition_manager,
-                transformation,
-                su_material,
-                su_layer
-              )
-            end
-          else
-            # go up the placement hierarchy until a parent with a representation is found
-            @ifc_model.create_fallback_entity(
-              @spatial_structure,
-              definition_manager,
-              @su_total_transformation,
-              placement_parent,
-              su_material,
-              su_layer
-            )
-          end
+          add_representation_to_parent(placement_parent, definition_manager, su_material, su_layer)
         else
           if ifc_entity.respond_to?(:representation)
             # calculate the local transformation
@@ -402,14 +418,73 @@ module BimTools
       # @param [Sketchup::Transformation] transformation
       # @param [Sketchup::Material] su_material
       # @param [Sketchup::Layer] su_layer
-      def add_representation(ifc_entity, definition_manager, transformation, su_material, su_layer)
-        shape_representation = definition_manager.get_shape_representation(transformation, su_material, su_layer)
+      def add_representation(ifc_entity, definition_manager, transformation, su_material, su_layer, geometry_type = nil)
+        # geometry_type = 'Brep' if ifc_entity.is_a?(@ifc::IfcSpace)
+        shape_representation = definition_manager.get_shape_representation(
+          transformation,
+          su_material,
+          su_layer,
+          geometry_type
+        )
         if ifc_entity.representation
           ifc_entity.representation.representations.add(shape_representation)
         else
           ifc_entity.representation = IfcProductDefinitionShapeBuilder.build(@ifc_model) do |builder|
             builder.add_representation(shape_representation)
           end
+        end
+      end
+
+      # Adds representation to the parent entity.
+      #
+      # @param placement_parent [Object] The parent entity to which the representation will be added.
+      # @param definition_manager [Object] The definition manager object.
+      # @param su_material [Object] The SketchUp material object.
+      # @param su_layer [Object] The SketchUp layer object.
+      # @param geometry_type [Object, nil] The type of geometry.
+      #
+      # @return [void]
+      def add_representation_to_parent(placement_parent, definition_manager, su_material, su_layer, geometry_type = nil)
+        if placement_parent.respond_to?(:representation) # && !placement_parent.is_a?(@ifc::IfcSpatialStructureElement)
+          parent_representation = placement_parent.representation
+
+          # (?) Can this be improved by using the scaling component from IfcLocalPlacement_su?
+          transformation = placement_parent.objectplacement.ifc_total_transformation.inverse * @su_total_transformation
+
+          if parent_representation
+            definition_representation = definition_manager.get_definition_representation(
+              transformation,
+              su_material
+            )
+
+            # @todo: improve this
+            if @ifc_model.options[:mapped_items]
+              mappedrepresentation = parent_representation.representations.first.items.first.mappingsource.mappedrepresentation
+              mappedrepresentation.items += definition_representation.meshes
+            else
+              parent_representation.representations.first.items += definition_representation.meshes
+            end
+
+          else
+            add_representation(
+              placement_parent,
+              definition_manager,
+              transformation,
+              su_material,
+              su_layer,
+              geometry_type
+            )
+          end
+        else
+          # go up the placement hierarchy until a parent with a representation is found
+          @ifc_model.create_fallback_entity(
+            @spatial_structure,
+            definition_manager,
+            @su_total_transformation,
+            placement_parent,
+            su_material,
+            su_layer
+          )
         end
       end
     end
