@@ -21,6 +21,7 @@
 #
 #
 
+require_relative 'ifc_extruded_area_solid_builder'
 require_relative 'ifc_faceted_brep_builder'
 require_relative 'ifc_mapped_item_builder'
 require_relative 'ifc_product_definition_shape_builder'
@@ -42,10 +43,19 @@ module BimTools
         @mapped_representation = nil
         @representation = nil
         @double_sided_faces = @ifc_model.options[:double_sided_faces]
+        @su_material = su_material
+        @transformation = transformation
         @meshes = create_meshes(ifc_model, faces, transformation, su_material)
       end
 
-      def get_mapped_representation
+      def representations(extrusion = nil)
+        return @meshes if extrusion.nil?
+
+        bottom_face, direction = extrusion
+        [create_extrusion(bottom_face, direction, @su_material, @transformation)]
+      end
+
+      def get_mapped_representation(_extrusion = nil)
         @mapped_representation ||= IfcMappedItemBuilder.build(@ifc_model) do |builder|
           builder.set_mappingsource(get_mapping_source)
         end
@@ -99,12 +109,27 @@ module BimTools
                  end
                end
 
-        if ifc_model.options[:colors]
-          styled_item = @ifc::IfcStyledItem.new(ifc_model, mesh)
-          styled_item.styles = get_surface_styles(ifc_model, su_material, front_material, back_material)
-        end
+        style_item(ifc_model, mesh, su_material, front_material, back_material)
 
         mesh
+      end
+
+      def create_extrusion(face, vector, su_material, transformation)
+        swept_solid = IfcExtrudedAreaSolidBuilder.build(@ifc_model) do |builder|
+          builder.set_sweptarea_from_face(face, transformation)
+          builder.set_extruded_direction(vector.normalize)
+          builder.set_depth(vector.length)
+        end
+        style_item(@ifc_model, swept_solid, su_material, face.material, face.back_material)
+        swept_solid
+      end
+
+      def style_item(ifc_model, item, su_material, front_material, back_material)
+        return unless ifc_model.options[:colors]
+
+        styled_item = @ifc::IfcStyledItem.new(ifc_model, item)
+        styled_item.styles = get_surface_styles(ifc_model, su_material, front_material, back_material)
+        styled_item
       end
 
       def get_surface_styles(ifc_model, parent_material = nil, front_material = nil, back_material = nil)

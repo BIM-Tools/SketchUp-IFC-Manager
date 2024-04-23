@@ -25,6 +25,7 @@ require_relative 'ifc_mapped_item_builder'
 require_relative 'ifc_product_definition_shape_builder'
 require_relative 'definition_representation'
 require_relative 'material_and_styling'
+require_relative 'geometry_helpers'
 
 module BimTools
   module IfcManager
@@ -64,14 +65,16 @@ module BimTools
       # @param [Sketchup::Transformation] transformation
       # @param [Sketchup::Material] su_material
       # @return [IfcFacetedBrep]
-      def get_definition_representation(transformation, su_material = nil)
+      def get_definition_representation(transformation, su_material = nil, geometry_type = nil)
         # Check if geometry must be added
         return nil if @geometry_type == 'None' || @faces.length == 0
+
+        geometry_type ||= @geometry_type
 
         representation_string = get_representation_string(transformation, su_material)
         unless @representations.key?(representation_string)
           @representations[representation_string] =
-            DefinitionRepresentation.new(@ifc_model, @geometry_type, @faces, su_material, transformation)
+            DefinitionRepresentation.new(@ifc_model, geometry_type, @faces, su_material, transformation)
         end
         @representations[representation_string]
       end
@@ -83,43 +86,50 @@ module BimTools
       # @param [Sketchup::Layer] su_layer
       #
       # @return IfcShapeRepresentation
-      def get_shape_representation(transformation, su_material, su_layer = nil)
-        definition_representation = get_definition_representation(transformation, su_material)
+      def get_shape_representation(transformation, su_material, su_layer = nil, geometry_type = nil)
+        geometry_type ||= @geometry_type
+        definition_representation = get_definition_representation(transformation, su_material, geometry_type)
 
         return unless definition_representation
 
-        # Check if Mapped representation should be used
-        if @ifc_model.options[:mapped_items]
-          representation_type = 'MappedRepresentation'
-          representation = definition_representation.get_mapped_representation
-        else
-          representation_type = @geometry_type
-          representation = definition_representation.representation
-        end
+        representation_type, representations = determine_representation(definition_representation, geometry_type)
+        shape_representation = build_shape_representation(representation_type, representations)
 
-        shape_representation = IfcShapeRepresentationBuilder.build(@ifc_model) do |builder|
-          builder.set_contextofitems(@ifc_model.representationcontext)
-          builder.set_representationtype(representation_type)
-          builder.add_item(representation)
-        end
-
-        # set layer
-        if su_layer && @ifc_model.options[:layers]
-
-          # check if IfcPresentationLayerAssignment exists
-          unless @ifc_model.layers[su_layer.name]
-            @ifc_model.layers[su_layer.name] = @ifc::IfcPresentationLayerAssignment.new(@ifc_model, su_layer)
-          end
-
-          # add self to IfcPresentationLayerAssignment
-          @ifc_model.layers[su_layer.name].assigneditems.add(shape_representation)
-        end
+        assign_to_layer(shape_representation, su_layer) if su_layer && @ifc_model.options[:layers]
 
         shape_representation
       end
 
+      def determine_representation(definition_representation, geometry_type)
+        # Check if the geometry can be represented as an extrusion
+        extrusion = (geometry_type == 'SweptSolid' && @definition) && GeometryHelpers.is_extrusion?(@definition)
+
+        geometry_type = @geometry_type if extrusion.nil?
+
+        if @ifc_model.options[:mapped_items]
+          ['MappedRepresentation', [definition_representation.get_mapped_representation(extrusion)]]
+        else
+          [geometry_type, definition_representation.representations(extrusion)]
+        end
+      end
+
+      def build_shape_representation(representation_type, representations)
+        IfcShapeRepresentationBuilder.build(@ifc_model) do |builder|
+          builder.set_contextofitems(@ifc_model.representationcontext)
+          builder.set_representationtype(representation_type)
+          builder.set_items(representations)
+        end
+      end
+
       def get_representation_string(transformation, su_material = nil)
         "#{transformation.to_a}#{su_material}"
+      end
+
+      def assign_to_layer(shape_representation, su_layer)
+        unless @ifc_model.layers[su_layer.name]
+          @ifc_model.layers[su_layer.name] = @ifc::IfcPresentationLayerAssignment.new(@ifc_model, su_layer)
+        end
+        @ifc_model.layers[su_layer.name].assigneditems.add(shape_representation)
       end
     end
   end

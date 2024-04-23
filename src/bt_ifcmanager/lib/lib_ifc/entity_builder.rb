@@ -316,6 +316,9 @@ module BimTools
 
         case ifc_entity
 
+        when @ifc::IfcExtrudedAreaSolid.class
+          add_representation_to_parent(placement_parent, definition_manager, su_material, su_layer, 'SweptSolid')
+
         # IfcZone is a special kind of IfcGroup that can only include IfcSpace objects
         when @ifc::IfcZone
           sub_entity_name = if ifc_entity.name
