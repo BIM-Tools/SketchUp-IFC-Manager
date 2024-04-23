@@ -36,21 +36,22 @@ module BimTools
       @definition = definition
       @type_properties = ifc_model.options[:type_properties]
 
+      persistent_id = definition.persistent_id.to_s
+
       @rel_defines_by_type = @ifc::IfcRelDefinesByType.new(@ifc_model)
       @rel_defines_by_type.relatingtype = self
       @rel_defines_by_type.relatedobjects = IfcManager::Types::Set.new
       @rel_defines_by_type.globalid = IfcManager::IfcGloballyUniqueId.new(ifc_model,
-                                                                          "IfcTypeProduct.#{definition.name}")
+                                                                          "IfcRelDefinesByType.#{persistent_id}")
 
       @name = IfcManager::Types::IfcLabel.new(ifc_model, definition.name)
-      @globalid = IfcManager::IfcGloballyUniqueId.new(ifc_model, "IfcRelDefinesByType.#{definition.name}")
+      @globalid = IfcManager::IfcGloballyUniqueId.new(ifc_model, "IfcTypeProduct.#{persistent_id}")
 
-      # Set "tag" to component persistant_id like the other BIM Authoring Tools like Revit, Archicad and Tekla are doing
-      # (!) persistant_id in Sketchup is unique for the ComponentDefinition, but not within the IFC model due to scaled ComponentInstances
-      @tag = IfcManager::Types::IfcLabel.new(ifc_model, definition.persistent_id.to_s)
+      # Set "tag" to component persistent_id like the other BIM Authoring Tools like Revit, Archicad and Tekla do
+      @tag = IfcManager::Types::IfcLabel.new(ifc_model, persistent_id)
 
       # get attributes from su object and add them to IfcTypeProduct
-      if dicts = definition.attribute_dictionaries
+      if (dicts = definition.attribute_dictionaries)
         dict_reader = IfcManager::IfcDictionaryReader.new(ifc_model, self, dicts, instance_class)
         dict_reader.set_attributes
         if @type_properties

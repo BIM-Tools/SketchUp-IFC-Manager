@@ -68,13 +68,14 @@ module BimTools
           # (!) Check!!!
           @spatial_structure[0] = ifc_entity
         when @ifc::IfcSite
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc::IfcSite, @ifc::IfcProject)
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc::IfcSite, [@ifc::IfcProject])
         when @ifc::IfcBuilding
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc::IfcBuilding, @ifc::IfcSite)
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc::IfcBuilding, [@ifc::IfcSite])
         when @ifc::IfcBuildingStorey
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc::IfcBuildingStorey, @ifc::IfcBuilding)
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc::IfcBuildingStorey, [@ifc::IfcBuilding])
         when @ifc::IfcSpace
-          add_space(ifc_entity, spatial_structure_types)
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc::IfcSpace,
+                             [@ifc::IfcBuildingStorey, @ifc::IfcSite])
         when @ifc::IfcElementAssembly, @ifc::IfcCurtainWall, @ifc::IfcRoof
 
           # add to end but check for basic spatial hierarchy
@@ -93,20 +94,26 @@ module BimTools
 
       # Adds a spatial element to the project's spatial structure.
       #
-      # @param ifc_entity [Object] The IfcSpatialElement instance to be added to the spatial structure.
+      # @param ifc_entity [Object] The IFC entity to which the spatial element will be added.
       # @param spatial_structure_types [Array] An array of spatial structure types.
       # @param structure_type [Object] The structure type of the spatial element.
-      # @param parent_structure_type [Object] The structure type of the parent spatial element.
+      # @param parent_structure_types [Array] An array of parent structure types.
       # @return [void]
-      def add_spatialelement(ifc_entity, spatial_structure_types, structure_type, parent_structure_type)
+      def add_spatialelement(ifc_entity, spatial_structure_types, structure_type, parent_structure_types)
         complex_parent_index = spatial_structure_types.rindex(structure_type)
         if complex_parent_index
           add_complex_spatialelement(ifc_entity, structure_type, complex_parent_index)
-        elsif spatial_structure_types.include?(parent_structure_type)
-          insert_after(ifc_entity, parent_structure_type)
         else
-          add_default_spatialelement(parent_structure_type)
-          insert_after(ifc_entity, parent_structure_type)
+          parent_structure_type = parent_structure_types.find { |type| spatial_structure_types.include?(type) }
+          if parent_structure_type
+            insert_after(ifc_entity, parent_structure_type)
+          else
+            unless parent_structure_types.empty?
+              add_default_spatialelement(parent_structure_types.last)
+              add_spatialelement(ifc_entity, get_spatial_structure_types, structure_type,
+                                 parent_structure_types[0...-1])
+            end
+          end
         end
       end
 
