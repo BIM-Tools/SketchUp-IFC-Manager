@@ -91,21 +91,24 @@ module BimTools
 
         return unless definition_representation
 
-        representation_type, representations = determine_representation(definition_representation, geometry_type)
-        shape_representation = build_shape_representation(representation_type, representations)
+        # Check if the geometry can be represented as an extrusion
+        extrusion = determine_extrusion(geometry_type)
+        geometry_type = @geometry_type if extrusion.nil?
+
+        shape_representation = build_shape_representation(
+          geometry_type,
+          definition_representation.representations(extrusion)
+        )
 
         assign_to_layer(shape_representation, su_layer) if su_layer && @ifc_model.options[:layers]
 
         shape_representation
       end
 
-      def determine_representation(definition_representation, geometry_type)
-        # Check if the geometry can be represented as an extrusion
-        extrusion = (geometry_type == 'SweptSolid' && @definition) && GeometryHelpers.is_extrusion?(@definition)
+      def determine_extrusion(geometry_type)
+        return unless geometry_type == 'SweptSolid' && @definition
 
-        geometry_type = @geometry_type if extrusion.nil?
-
-        [geometry_type, definition_representation.representations(extrusion)]
+        GeometryHelpers.is_extrusion?(@definition)
       end
 
       def build_shape_representation(representation_type, representations)

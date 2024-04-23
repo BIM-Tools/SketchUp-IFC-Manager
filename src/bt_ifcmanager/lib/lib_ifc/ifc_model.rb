@@ -269,7 +269,8 @@ module BimTools
         su_material = nil,
         su_layer = nil,
         entity_name = nil,
-        ent_type_name = 'IfcBuildingElementProxy'
+        ent_type_name = 'IfcBuildingElementProxy',
+        geometry_type = nil
       )
 
         entity_type = @ifc.const_get(ent_type_name)
@@ -297,7 +298,8 @@ module BimTools
           definition_manager,
           scaling,
           su_material,
-          su_layer
+          su_layer,
+          geometry_type
         )
 
         # IFC 4
@@ -326,8 +328,8 @@ module BimTools
       # @param [Sketchup::Transformation] transformation
       # @param [Sketchup::Material] su_material
       # @param [Sketchup::Layer] su_layer
-      def add_representation(ifc_entity, definition_manager, transformation, su_material, su_layer)
-        shape_representation = definition_manager.get_shape_representation(transformation, su_material, su_layer)
+      def add_representation(ifc_entity, definition_manager, transformation, su_material, su_layer, geometry_type = nil)
+        shape_representation = definition_manager.get_shape_representation(transformation, su_material, su_layer, geometry_type)
         if ifc_entity.representation
           ifc_entity.representation.representations.add(shape_representation)
         else

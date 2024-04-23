@@ -477,7 +477,10 @@ module BimTools
             @su_total_transformation,
             placement_parent,
             su_material,
-            su_layer
+            su_layer,
+            nil,
+            'IfcBuildingElementProxy',
+            geometry_type
           )
         end
       end
