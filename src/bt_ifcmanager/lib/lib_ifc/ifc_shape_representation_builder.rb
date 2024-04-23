@@ -34,18 +34,23 @@ module BimTools
       def self.build(ifc_model)
         builder = new(ifc_model)
         yield(builder)
+
+        # Validation/Correction steps
+        builder.set_items unless builder.ifc_shape_representation.items
+        builder.set_representationidentifier('Body') unless builder.ifc_shape_representation.representationidentifier
+        unless builder.ifc_shape_representation.contextofitems
+          builder.set_contextofitems(ifc_model.representationcontext)
+        end
+        builder.set_representationtype('Brep') unless builder.ifc_shape_representation.representationtype
+
         builder.ifc_shape_representation
       end
 
       def initialize(ifc_model)
         @ifc = Settings.ifc_module
         @ifc_model = ifc_model
-        # @definition_managers = Set.new
         @ifc_shape_representation = @ifc::IfcShapeRepresentation.new(ifc_model)
-
         set_representationidentifier('Body')
-        set_items
-        @ifc_shape_representation
       end
 
       # Set IfcShapeRepresentation representation context
