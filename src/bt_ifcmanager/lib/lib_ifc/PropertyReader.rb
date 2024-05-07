@@ -68,11 +68,11 @@ module BimTools
 
         # Skip IfcProduct-only attributes for IfcTypeProduct
         @all_attributes = if instance_class
-                           instance_class_attributes = instance_class.attributes.map { |x| x.to_s }
-                           names & (ifc_entity_attributes + instance_class_attributes).uniq
-                         else
-                           @attributes
-                         end
+                            instance_class_attributes = instance_class.attributes.map { |x| x.to_s }
+                            names & (ifc_entity_attributes + instance_class_attributes).uniq
+                          else
+                            @attributes
+                          end
 
         @propertyset_names = names - @all_attributes
       end
@@ -114,10 +114,14 @@ module BimTools
         end
 
         schema_types.each do |classification_name, classification_value|
-          unless Settings.ifc_version_names.include?(classification_name)
-            @ifc_model.classifications.add_classification_to_entity(@ifc_entity, classification_name,
-                                                                    classification_value, @entity_dict[classification_name])
-          end
+          next if Settings.ifc_version_names.include?(classification_name)
+
+          @ifc_model.classifications.add_classification_to_entity(
+            @ifc_entity,
+            classification_name,
+            classification_value,
+            @entity_dict[classification_name]
+          )
         end
       end
 

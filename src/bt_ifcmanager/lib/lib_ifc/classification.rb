@@ -24,7 +24,7 @@
 module BimTools
   module IfcManager
     require_relative 'ifc_classification_builder'
-    require_relative 'classification_reference'
+    require_relative 'ifc_classification_reference_builder'
     require File.join(PLUGIN_PATH_LIB, 'skc_reader')
 
     class Classification
@@ -39,17 +39,19 @@ module BimTools
         @edition = nil
         @editiondate = nil
         @location = nil
-        # load_skc(skc_file)
+        load_skc(skc_file)
         get_classifiction_details
       end
 
-      # def load_skc(file_name = nil)
-      #   file_name ||= "#{@name}.skc"
-      #   properties = SKC.new(file_name).properties
-      #   @source = properties[:creator]
-      #   @edition = properties[:revision]
-      #   @editiondate = properties[:modified]
-      # end
+      def load_skc(file_name = nil)
+        file_name ||= "#{@name}.skc"
+        properties = SKC.new(file_name).properties
+        @source = properties[:creator]
+        @edition = properties[:revision]
+        @editiondate = properties[:modified]
+      rescue StandardError => e
+        puts "Error: #{e.message}. Skipping SKC file: #{file_name}"
+      end
 
       def get_ifc_classification
         @ifc_classification ||= IfcClassificationBuilder.build(@ifc_model) do |builder|
@@ -63,20 +65,26 @@ module BimTools
 
       def get_classifiction_details
         su_model = @ifc_model.su_model
-        if project_data = su_model.attribute_dictionaries['IfcManager']
-          if classifications = project_data.attribute_dictionaries['Classifications']
-            @source = classifications.get_attribute(@name, 'source')
-            @edition = classifications.get_attribute(@name, 'edition')
-            @editiondate = classifications.get_attribute(@name, 'editiondate')
-            @location = classifications.get_attribute(@name, 'location')
-          end
-        end
+        return unless project_data = su_model.attribute_dictionaries['IfcManager']
+        return unless classifications = project_data.attribute_dictionaries['Classifications']
+
+        @source = classifications.get_attribute(@name, 'source')
+        @edition = classifications.get_attribute(@name, 'edition')
+        @editiondate = classifications.get_attribute(@name, 'editiondate')
+        @location = classifications.get_attribute(@name, 'location')
       end
 
-      def add_classification_reference(ifc_entity, classification_value, identification = nil, location = nil)
+      def add_classification_reference(ifc_entity, classification_value, identification = nil, location = nil,
+                                       name = nil)
+        ifc_classification = get_ifc_classification
         unless @classification_references.key? classification_value
           @classification_references[classification_value] =
-            ClassificationReference.new(@ifc_model, self, classification_value, identification, location)
+            IfcClassificationReferenceBuilder.build(@ifc_model, @name) do |builder|
+              builder.set_location(location) if location
+              builder.set_referencedsource(ifc_classification)
+              builder.set_identification(identification) if identification
+              builder.set_name(name) if name
+            end
         end
         @classification_references[classification_value].add_ifc_entity(ifc_entity)
       end

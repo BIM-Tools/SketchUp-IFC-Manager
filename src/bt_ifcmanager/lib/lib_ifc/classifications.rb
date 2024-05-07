@@ -46,14 +46,19 @@ module BimTools
 
       def add_classification_to_entity(ifc_entity, classification_name, classification_value, classification_dictionary)
         classification = get_classification_by_name(classification_name)
-        classification.add_classification_reference(ifc_entity, classification_value,
-                                                    get_identification(classification_dictionary), get_location(classification_dictionary))
+        classification.add_classification_reference(
+          ifc_entity,
+          classification_value,
+          get_identification(classification_dictionary),
+          get_location(classification_dictionary),
+          get_name(classification_dictionary, classification_value)
+        )
       end
 
       def get_identification(classification_dictionary)
         if classification_dictionary
           classification_dictionary.attribute_dictionaries.each do |dictionary|
-            if %w[identification itemreference class-codenotatie].include? dictionary.name.downcase
+            if %w[identification itemreference class-codenotatie din_code].include? dictionary.name.downcase
               if value = dictionary['value']
                 return value
               elsif value_dictionary = dictionary.attribute_dictionaries[dictionary.name]
@@ -66,15 +71,29 @@ module BimTools
       end
 
       def get_location(classification_dictionary)
+        if classification_dictionary && dictionary = classification_dictionary.attribute_dictionary('Location')
+          if value = dictionary['value']
+            return value
+          elsif value_dictionary = dictionary.attribute_dictionaries[dictionary.name]
+            return value_dictionary['value']
+          end
+        end
+        nil
+      end
+
+      def get_name(classification_dictionary, classification_value)
         if classification_dictionary
-          if dictionary = classification_dictionary.attribute_dictionary('Location')
-            if value = dictionary['value']
-              return value
-            elsif value_dictionary = dictionary.attribute_dictionaries[dictionary.name]
-              return value_dictionary['value']
+          classification_dictionary.attribute_dictionaries.each do |dictionary|
+            if %w[name tekst_nl-sfb  din_text].include? dictionary.name.downcase
+              if value = dictionary['value']
+                return value
+              elsif value_dictionary = dictionary.attribute_dictionaries[dictionary.name]
+                return value_dictionary['value']
+              end
             end
           end
         end
+        return classification_value
         nil
       end
     end
