@@ -40,10 +40,11 @@ module BimTools
       end
 
       def initialize(ifc_model)
-        @ifc = Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
-        @ifc_triangulated_face_set = @ifc::IfcTriangulatedFaceSet.new(ifc_model)
-        @ifc_triangulated_face_set.coordinates = @ifc::IfcCartesianPointList3D.new(ifc_model)
+        @ifc_triangulated_face_set = @ifc_module::IfcTriangulatedFaceSet.new(ifc_model)
+        @ifc_triangulated_face_set.coordinates = @ifc_module::IfcCartesianPointList3D.new(ifc_model)
+        @mirrored = false
 
         # # @todo closed should be true for manifold geometry
         # @closed = false
@@ -69,13 +70,16 @@ module BimTools
         add_parent_texture = faces.any? { |face| face.material.nil? }
         add_material_to_model(parent_material) if add_parent_texture
 
+        front_texture = texture_exists?(front_material)
+        back_texture = texture_exists?(back_material) if double_sided_faces
+        parent_texture = texture_exists?(parent_material)
+
+        @mirrored = true if is_mirroring?(transformation)
+
         meshes = faces.map { |face| [face.mesh(7), get_face_transformation(face).inverse] }
 
         meshes.each do |mesh|
           face_mesh, face_transformation = mesh
-          front_texture = texture_exists?(front_material)
-          back_texture = texture_exists?(back_material) if double_sided_faces
-          parent_texture = texture_exists?(parent_material)
 
           # Calculate UV transformation for parent texture if no texture is applied to the face
           if !(front_texture || back_texture) && parent_texture
@@ -120,9 +124,9 @@ module BimTools
         image_texture = ifc_model.materials[su_material].image_texture
         return unless image_texture
 
-        tex_vert_list = @ifc::IfcTextureVertexList.new(ifc_model)
+        tex_vert_list = @ifc_module::IfcTextureVertexList.new(ifc_model)
         tex_vert_list.texcoordslist = IfcManager::Types::Set.new(uv_coordinates)
-        texture_map = @ifc::IfcIndexedTriangleTextureMap.new(ifc_model)
+        texture_map = @ifc_module::IfcIndexedTriangleTextureMap.new(ifc_model)
         texture_map.mappedto = @ifc_triangulated_face_set
         texture_map.maps = IfcManager::Types::List.new([image_texture])
         texture_map.texcoords = tex_vert_list
@@ -130,6 +134,7 @@ module BimTools
       end
 
       def get_ifc_polygon(point_total, polygon)
+        polygon.reverse! if @mirrored
         polygon.map { |pt_id| IfcManager::Types::IfcInteger.new(@ifc_model, point_total + pt_id.abs) }
       end
 
@@ -228,6 +233,15 @@ module BimTools
       def calculate_uv_transformation(transformation, face_transformation, texture)
         texture_transformation = get_texture_transformation(texture)
         transformation.inverse * face_transformation * texture_transformation
+      end
+
+      def is_mirroring?(transformation)
+        # Calculate the cross product of the x and y axes
+        cross_product = transformation.xaxis * transformation.yaxis
+
+        # If the dot product of the cross product and the z axis is negative,
+        # the transformation includes a mirroring operation
+        cross_product.dot(transformation.zaxis) < 0
       end
     end
   end
