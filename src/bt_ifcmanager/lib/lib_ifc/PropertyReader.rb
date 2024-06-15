@@ -252,7 +252,12 @@ module BimTools
               properties << IfcPropertyBuilder.build(@ifc_model, property.attribute_type) do |builder|
                 builder.set_name(property.name)
                 builder.set_value(ifc_value)
-                builder.set_enumeration_reference(property.options) # in case of enumeration
+                if property.attribute_type == :enumeration
+                  builder.set_enumeration_reference(
+                    property.options,
+                    property.ifc_type_name
+                  )
+                end
               end
             end
           end
@@ -262,7 +267,7 @@ module BimTools
             next unless value
             next if value.is_a?(String) && value.empty?
 
-            properties << IfcPropertyBuilder.build(@ifc_model) do |builder|
+            properties << IfcPropertyBuilder.build(@ifc_model, property.attribute_type) do |builder|
               builder.set_name(key)
               builder.set_value(get_ifc_property_value(value, nil, true))
             end
@@ -295,18 +300,18 @@ module BimTools
 
       def get_ifc_property_value(value, attribute_type, long = false)
         case attribute_type
-        when 'string'
+        when :string
           IfcManager::Types::IfcText.new(@ifc_model, value, long) # check string length?
-        when 'boolean'
+        when :boolean
           IfcManager::Types::IfcBoolean.new(@ifc_model, value, long)
-        when 'double'
+        when :double
           IfcManager::Types::IfcReal.new(@ifc_model, value, long)
-        when 'long'
+        when :long
           IfcManager::Types::IfcInteger.new(@ifc_model, value, long)
-        when 'choice'
+        when :choice
           # Skip this attribute, this is not a value but a reference
           false
-        when 'enumeration'
+        when :enumeration
           if long
             IfcManager::Types::IfcLabel.new(@ifc_model, value, long)
           else
@@ -366,7 +371,7 @@ module BimTools
   # @param [Sketchup::AttributeDictionary] attr_dict
   #
   class Property
-    attr_reader :name, :value, :ifc_type, :attribute_type, :options
+    attr_reader :name, :value, :ifc_type, :ifc_type_name, :attribute_type, :options
 
     UNUSED_DICTS = %i[
       href
@@ -381,7 +386,7 @@ module BimTools
 
       # When value is set the data is stored on this level
       @value = attr_dict['value']
-      @attribute_type = attr_dict['attribute_type']
+      @attribute_type = attr_dict['attribute_type'].to_sym if attr_dict['attribute_type']
 
       # We can't be sure that the unspecified false value is meant as a boolean or
       #  is just imported as an empty value from an IFC file
@@ -408,12 +413,14 @@ module BimTools
 
       value_dict = attr_dict.attribute_dictionaries[ifc_type_name.to_s]
       @value = value_dict['value']
-      @attribute_type = value_dict['attribute_type']
+      @attribute_type = value_dict['attribute_type'].to_sym if attr_dict['attribute_type']
+      @attribute_type = :enumeration if ifc_type_name.start_with?('PEnum_')
       @options = value_dict['options']
 
       # Check for IFC type
-      if ifc_type_name[0].upcase == ifc_type_name[0] && IfcManager.const_defined?(ifc_type_name)
-        @ifc_type = IfcManager.const_get(ifc_type_name)
+      if ifc_type_name[0].upcase == ifc_type_name[0] && IfcManager::Types.const_defined?(ifc_type_name)
+        @ifc_type_name = ifc_type_name
+        @ifc_type = IfcManager::Types.const_get(ifc_type_name)
       end
 
       # Sometimes the value is even nested a level deeper
