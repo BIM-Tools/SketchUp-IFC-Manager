@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  IfcRoot.rb
+#  IfcRoot_su.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
 #

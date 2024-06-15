@@ -216,7 +216,7 @@ module BimTools
       # @param placement_parent [IFC::IfcObjectPlacement] The parent object placement for the proxy.
       # @return [IFC::IfcBuildingElementProxy] The created building element proxy.
       def create_building_element_proxy(su_instance, placement_parent)
-        ifc_entity = @ifc_module::IfcBuildingElementProxy.new(@ifc_model, su_instance)
+        ifc_entity = @ifc_module::IfcBuildingElementProxy.new(@ifc_model, su_instance, @su_total_transformation)
         ifc_entity.globalid = @guid
         ifc_entity.tag = Types::IfcLabel.new(@ifc_model, @persistent_id_path)
         assign_entity_attributes(ifc_entity, placement_parent)
@@ -243,10 +243,16 @@ module BimTools
 
         @spatial_structure.set_parent(ifc_entity)
 
+        if placement_parent == @ifc_model.project
+          transformation = Geom::Transformation.new
+        else
+          transformation = @su_total_transformation
+        end
+
         placement_rel_to = placement_parent.objectplacement if placement_parent.respond_to?(:objectplacement)
         @objectplacement = @ifc_module::IfcLocalPlacement.new(
           @ifc_model,
-          @su_total_transformation,
+          transformation,
           placement_rel_to
         )
         ifc_entity.objectplacement = @objectplacement
@@ -295,10 +301,16 @@ module BimTools
       def create_entity_builder(placement_parent, su_instance, su_material, su_layer)
         return unless instance_visible?(su_instance, @ifc_model.options)
 
+        if placement_parent == @ifc_model.project
+          transformation = su_instance.transformation
+        else
+          transformation = @su_total_transformation
+        end
+
         EntityBuilder.new(
           @ifc_model,
           su_instance,
-          @su_total_transformation,
+          transformation,
           placement_parent,
           @instance_path,
           @spatial_structure,

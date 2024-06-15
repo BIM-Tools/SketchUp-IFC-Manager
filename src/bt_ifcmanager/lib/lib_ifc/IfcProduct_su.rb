@@ -35,12 +35,14 @@ module BimTools
 
     # @param [BimTools::IfcManager::IfcModel] ifc_model
     # @param [nil, #definition] sketchup an empty object (default object), Sketchup::ComponentInstance or Sketchup::Group
-    def initialize(ifc_model, sketchup)
-      super
+    def initialize(ifc_model, sketchup, total_transformation)
+      @total_transformation = total_transformation
+      super(ifc_model, sketchup)
 
       @ifc_module = ifc_model.ifc_module
       @ifc_model = ifc_model
 
+      # TODO: prevent initializing of IfcProduct for non-Sketchup objects
       return unless sketchup.respond_to?(:definition)
 
       @su_object = sketchup
