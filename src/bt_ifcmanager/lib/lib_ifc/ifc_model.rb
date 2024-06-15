@@ -71,11 +71,15 @@ module BimTools
           geometry: 'Brep', #  create geometry for entities
           fast_guid: false, # create simplified guids
           dynamic_attributes: true, #  export dynamic component data
-          types: true,
-          textures: false,
-          export_entities: [],
-          root_entities: [],
-          model_axes: false
+          types: true, #  create IfcTypeProducts
+          # open_file: false, # open created file in given/default application
+          classification_suffix: true, #  add classification suffix to entity names
+          model_axes: false,
+          base_quantities: true, # Export IFC base quantities for certain IFC entities
+          textures: false, # Export textures
+          double_sided_faces: false, # Export double sided faces
+          export_entities: [], # Export only the given entities
+          root_entities: [] # Export only the given entities and their children
         }
         @options = defaults.merge(options)
 

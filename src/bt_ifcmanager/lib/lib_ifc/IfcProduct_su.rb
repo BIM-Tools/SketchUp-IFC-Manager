@@ -25,6 +25,7 @@ require_relative 'ifc_types'
 require_relative 'dynamic_attributes'
 require_relative 'PropertyReader'
 require_relative 'material_and_styling'
+require_relative 'base_quantity_builder'
 
 module BimTools
   module IfcProduct_su
@@ -105,6 +106,18 @@ module BimTools
 
       # collect dynamic component attributes if export option is set
       BimTools::DynamicAttributes.get_dynamic_attributes(ifc_model, self) if ifc_model.options[:dynamic_attributes]
+
+      if ifc_model.options[:base_quantities]
+        add_base_quantities
+      end
+    end
+
+    def add_base_quantities
+      return unless is_a?(@ifc_module::IfcColumn) || is_a?(@ifc_module::IfcBeam) || is_a?(@ifc_module::IfcSlab) || is_a?(@ifc_module::IfcWall)
+
+      BimTools::IfcManager::BaseQuantityBuilder.build(@ifc_model) do |builder|
+        builder.add_base_quantities(self, @su_object)
+      end
     end
 
     # add export summary for IfcProducts

@@ -14,6 +14,7 @@
   :dynamic_attributes: true
   :types: true
   :type_properties: false
+  :base_quantities: false
   :classification_suffix: true
   :model_axes: false
   :textures: false

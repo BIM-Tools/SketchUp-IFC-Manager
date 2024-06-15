@@ -33,11 +33,15 @@
 #   geometry:              'Brep' # ['Brep','Tessellation',false]
 #   fast_guid:             false, # create simplified guids
 #   dynamic_attributes:    false, # export dynamic component data
-#   open_file:             false, # open created file in given/default application
-#   classification_suffix: true # Add ' Classification' suffix to all classification for Revit compatibility
-#   model_axes:            true   # Export using model axes instead of Sketchup internal origin
-#   textures:              false  # Add textures
-#   double_sided_faces:    false  # Add double sided faces
+#   types:                 true,  # create IfcTypeProducts
+####   open_file:          false, # open created file in given/default application
+#   classification_suffix: true,  # Add ' Classification' suffix to all classification for Revit compatibility
+#   model_axes:            true,  # Export using model axes instead of Sketchup internal origin
+#   base_quantities:       false, # Export IFC base quantities for certain IFC entities
+#   textures:              false, # Export textures
+#   double_sided_faces:    false, # Export double sided faces
+#   export_entities:       [],    # Export only the given entities
+#   root_entities:         []     # Export only the given entities and their children
 # load:
 #   classifications:       [],    # ["NL-SfB 2005, tabel 1", "DIN 276-1"]
 #   default_materials:     false  # {'beton'=>[142, 142, 142],'hout'=>[129, 90, 35],'staal'=>[198, 198, 198],'gips'=>[255, 255, 255],'zink'=>[198, 198, 198],'hsb'=>[204, 161, 0],'metselwerk'=>[102, 51, 0],'steen'=>[142, 142, 142],'zetwerk'=>[198, 198, 198],'tegel'=>[255, 255, 255],'aluminium'=>[198, 198, 198],'kunststof'=>[255, 255, 255],'rvs'=>[198, 198, 198],'pannen'=>[30, 30, 30],'bitumen'=>[30, 30, 30],'epdm'=>[30, 30, 30],'isolatie'=>[255, 255, 50],'kalkzandsteen'=>[255, 255, 255],'metalstud'=>[198, 198, 198],'gibo'=>[255, 255, 255],'glas'=>[204, 255, 255],'multiplex'=>[255, 216, 101],'cementdekvloer'=>[198, 198, 198]}
@@ -174,6 +178,12 @@ module BimTools
             @options[:export][:model_axes],
             "Export using model axes instead of Sketchup internal origin"
           )
+          @export_base_quantities = CheckboxOption.new(
+            'base_quantities',
+            "Export IFC base quantities",
+            @options[:export][:base_quantities],
+            "Export IFC base quantities for certain IFC entity types"
+          )
         end
 
         # load classification schemes from settings
@@ -203,6 +213,7 @@ module BimTools
         @options[:export][:double_sided_faces] = @export_double_sided_faces.value
         @options[:export][:classification_suffix] = @export_classification_suffix.value
         @options[:export][:model_axes] = @export_model_axes.value
+        @options[:export][:base_quantities] = @export_base_quantities.value
         File.open(@settings_file, 'w') { |file| file.write(@options.to_yaml) }
         PropertiesWindow.close
         @dialog.close
@@ -415,6 +426,7 @@ module BimTools
           @export_textures.value = false
           @export_double_sided_faces.value = false
           @export_classification_suffix.value = false
+          @export_base_quantities.value = false
           @export_model_axes.value = false
 
           a_form_data = CGI.unescape(s_form_data).split('&')
@@ -453,6 +465,8 @@ module BimTools
               @export_classification_suffix.value = true
             when 'model_axes'
               @export_model_axes.value = true
+            when 'base_quantities'
+              @export_base_quantities.value = true
             when 'ifc_classification'
               update_ifc_classifications << value
             when 'classification'
@@ -543,6 +557,7 @@ module BimTools
         html << @export_type_properties.html
         html << @export_textures.html
         html << @export_double_sided_faces.html
+        html << @export_base_quantities.html
         html << @export_classification_suffix.html
         html << @export_model_axes.html
         html << "      </div>\n"
