@@ -35,9 +35,9 @@ module BimTools
       end
 
       def initialize(ifc_model)
-        @ifc = Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
-        @ifc_product_definition_shape = @ifc::IfcProductDefinitionShape.new(ifc_model)
+        @ifc_product_definition_shape = @ifc_module::IfcProductDefinitionShape.new(ifc_model)
         @ifc_product_definition_shape.representations = Types::List.new
       end
 

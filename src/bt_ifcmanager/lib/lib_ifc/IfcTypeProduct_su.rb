@@ -32,13 +32,13 @@ module BimTools
     # @param [Sketchup::ComponentDefinition] definition
     def initialize(ifc_model, definition, instance_class = nil)
       super(ifc_model, definition)
-      @ifc = IfcManager::Settings.ifc_module
+      @ifc_module = ifc_model.ifc_module
       @definition = definition
       @type_properties = ifc_model.options[:type_properties]
 
       persistent_id = definition.persistent_id.to_s
 
-      @rel_defines_by_type = @ifc::IfcRelDefinesByType.new(@ifc_model)
+      @rel_defines_by_type = @ifc_module::IfcRelDefinesByType.new(@ifc_model)
       @rel_defines_by_type.relatingtype = self
       @rel_defines_by_type.relatedobjects = IfcManager::Types::Set.new
       @rel_defines_by_type.globalid = IfcManager::IfcGloballyUniqueId.new(ifc_model,

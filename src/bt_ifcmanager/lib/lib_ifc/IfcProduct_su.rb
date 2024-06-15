@@ -37,10 +37,12 @@ module BimTools
     # @param [nil, #definition] sketchup an empty object (default object), Sketchup::ComponentInstance or Sketchup::Group
     def initialize(ifc_model, sketchup)
       super
-      @ifc = BimTools::IfcManager::Settings.ifc_module
+
+      @ifc_module = ifc_model.ifc_module
+      @ifc_model = ifc_model
+
       return unless sketchup.respond_to?(:definition)
 
-      @ifc_model = ifc_model
       @su_object = sketchup
       definition = @su_object.definition
 
@@ -57,8 +59,8 @@ module BimTools
           @type_product.add_typed_object(self)
         else
           type_name = self.class.name.split('::').last + 'Type'
-          if @ifc.const_defined?(type_name)
-            type_product = @ifc.const_get(type_name)
+          if @ifc_module.const_defined?(type_name)
+            type_product = @ifc_module.const_get(type_name)
             @type_product = type_product.new(ifc_model, definition, self.class)
             @ifc_model.product_types[definition] = @type_product
             @type_product.add_typed_object(self)
@@ -82,7 +84,7 @@ module BimTools
 
       # set material if sketchup @su_object has a material
       # Material added to Product and not to TypeProduct because a Sketchup ComponentDefinition can have a different material for every Instance
-      if ifc_model.options[:materials] && (is_a? @ifc::IfcElement) && !(is_a? @ifc::IfcFeatureElementSubtraction) && !(is_a? @ifc::IfcVirtualElement)
+      if ifc_model.options[:materials] && (is_a? @ifc_module::IfcElement) && !(is_a? @ifc_module::IfcFeatureElementSubtraction) && !(is_a? @ifc_module::IfcVirtualElement)
 
         # create materialassociation
         su_material = @su_object.material

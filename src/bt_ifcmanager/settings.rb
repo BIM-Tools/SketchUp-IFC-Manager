@@ -220,7 +220,10 @@ module BimTools
           reader = SKC.new(ifc_classification)
           @filters[ifc_classification] = reader
           ifc_version = reader.name
-          IfcXmlParser.new(ifc_version, reader.xsd_schema)
+          xsd_parser = IfcXmlParser.new(ifc_version, reader.xsd_schema)
+          @ifc_version = xsd_parser.ifc_version
+          @ifc_version_compact = xsd_parser.ifc_version_compact
+          @ifc_module = xsd_parser.ifc_module
         rescue StandardError => e
           puts e.message
           UI::Notification.new(IFCMANAGER_EXTENSION, e.message).show

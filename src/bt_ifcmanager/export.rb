@@ -39,14 +39,14 @@ module BimTools
       # reset export messages
       IfcManager.export_messages = []
 
+      # get export options
+      options = Settings.export
+
       # create new progressbar
       pb = ProgressBar.new(4, "Exporting to #{ifc_version = Settings.ifc_version}...")
 
       # start timer
       timer = Time.now
-
-      # get export options
-      options = Settings.export
 
       # update all IFC name fields with the component definition name
       # (?) is this necessary, or should this already be 100% correct at the time of export?

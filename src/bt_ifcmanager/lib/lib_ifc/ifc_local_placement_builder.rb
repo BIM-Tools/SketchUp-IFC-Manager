@@ -33,7 +33,7 @@ module BimTools
       # An IfcLocalPlacement defines the relative placement of a product in relation to the placement of another product or the absolute placement of a product within the geometric representation context of the project.
       #
       # @param ifc_model [Object] The IFC model object.
-      # @return [@ifc::IfcLocalPlacement] The IfcLocalPlacement object.
+      # @return [@ifc_module::IfcLocalPlacement] The IfcLocalPlacement object.
       def self.build(ifc_model, su_total_transformation = nil, placementrelto = nil)
         builder = new(ifc_model, su_total_transformation, placementrelto)
         yield(builder)
@@ -44,9 +44,9 @@ module BimTools
       #
       # @param ifc_model [Object] The IFC model object.
       def initialize(ifc_model, su_total_transformation = nil, placementrelto = nil)
-        @ifc = IfcManager::Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
-        @ifc_local_placement = @ifc::IfcLocalPlacement.new(ifc_model)
+        @ifc_local_placement = @ifc_module::IfcLocalPlacement.new(ifc_model)
 
         # set parent placement
         @placementrelto = placementrelto # if placementrelto.is_a?(IfcLocalPlacement)
@@ -77,19 +77,19 @@ module BimTools
                           end
 
         # set relativeplacement
-        @relativeplacement = @ifc::IfcAxis2Placement3D.new(ifc_model, @transformation)
+        @relativeplacement = @ifc_module::IfcAxis2Placement3D.new(ifc_model, @transformation)
       end
 
       # Sets the placement of the IfcLocalPlacement relative to another placement.
       #
-      # @param placement_rel_to [@ifc::IfcObjectPlacement] Reference to object placement that provides the relative placement with its placement in a grid, local coordinate system or linear referenced placement. If it is omitted, then in the case of linear placement it is established by the origin of horizontal alignment of the referenced IfcAlignment Axis. In the case of local placement it is established by the geometric representation context.
+      # @param placement_rel_to [@ifc_module::IfcObjectPlacement] Reference to object placement that provides the relative placement with its placement in a grid, local coordinate system or linear referenced placement. If it is omitted, then in the case of linear placement it is established by the origin of horizontal alignment of the referenced IfcAlignment Axis. In the case of local placement it is established by the geometric representation context.
       def set_placement_rel_to(placement_rel_to)
         @ifc_local_placement.relativeplacement = placement_rel_to
       end
 
       # Sets the relative placement of the IfcLocalPlacement.
       #
-      # @param relative_placement [@ifc::IfcAxis2Placement] Geometric placement that defines the transformation from the related coordinate system into the relating. The placement can be either 2D or 3D, depending on the dimension count of the coordinate system.
+      # @param relative_placement [@ifc_module::IfcAxis2Placement] Geometric placement that defines the transformation from the related coordinate system into the relating. The placement can be either 2D or 3D, depending on the dimension count of the coordinate system.
       def set_relative_placement(relative_placement)
         @ifc_local_placement.relativeplacement = relative_placement
       end

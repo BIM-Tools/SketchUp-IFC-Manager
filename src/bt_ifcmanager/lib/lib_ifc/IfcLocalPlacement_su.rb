@@ -31,7 +31,7 @@ module BimTools
 
     def initialize(ifc_model, su_total_transformation = Geom::Transformation.new, placementrelto = nil)
       super
-      @ifc = BimTools::IfcManager::Settings.ifc_module
+      @ifc_module = ifc_model.ifc_module
 
       # set parent placement
       @placementrelto = placementrelto # if placementrelto.is_a?(IfcLocalPlacement)
@@ -57,7 +57,7 @@ module BimTools
                           end
 
         # set relativeplacement
-        @relativeplacement = @ifc::IfcAxis2Placement3D.new(ifc_model, @transformation)
+        @relativeplacement = @ifc_module::IfcAxis2Placement3D.new(ifc_model, @transformation)
       end
     end
   end

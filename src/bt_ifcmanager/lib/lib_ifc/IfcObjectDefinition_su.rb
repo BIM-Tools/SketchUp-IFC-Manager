@@ -29,7 +29,8 @@ module BimTools
 
     def initialize(ifc_model, sketchup)
       super
-      @ifc = BimTools::IfcManager::Settings.ifc_module
+
+      @ifc_module = ifc_model.ifc_module
       @ifc_model = ifc_model
     end
 
@@ -38,7 +39,7 @@ module BimTools
     #
     def add_contained_element(object)
       unless @contains_elements
-        @contains_elements = @ifc::IfcRelContainedInSpatialStructure.new(@ifc_model)
+        @contains_elements = @ifc_module::IfcRelContainedInSpatialStructure.new(@ifc_model)
         @contains_elements.relatingstructure = self
         @contains_elements.relatedelements = IfcManager::Types::Set.new
       end
@@ -51,7 +52,7 @@ module BimTools
     #
     def add_related_object(object)
       unless @decomposes
-        @decomposes = @ifc::IfcRelAggregates.new(@ifc_model)
+        @decomposes = @ifc_module::IfcRelAggregates.new(@ifc_model)
         @decomposes.name = IfcManager::Types::IfcLabel.new(@ifc_model, "#{name.value} container") if name
         @decomposes.relatingobject = self
         @decomposes.relatedobjects = IfcManager::Types::Set.new

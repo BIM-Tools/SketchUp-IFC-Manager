@@ -34,9 +34,9 @@ module BimTools
       end
 
       def initialize(ifc_model)
-        @ifc = Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
-        @ifc_mapped_item = @ifc::IfcMappedItem.new(ifc_model)
+        @ifc_mapped_item = @ifc_module::IfcMappedItem.new(ifc_model)
       end
 
       def validate
@@ -50,7 +50,7 @@ module BimTools
 
       def set_mappingtarget(target = nil)
         unless target
-          target = @ifc::IfcCartesianTransformationOperator3D.new(@ifc_model)
+          target = @ifc_module::IfcCartesianTransformationOperator3D.new(@ifc_model)
           target.localorigin = @ifc_model.default_location
         end
         @ifc_mapped_item.mappingtarget = target

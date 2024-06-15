@@ -84,7 +84,7 @@ module BimTools
 
     def initialize(ifc_model)
       super
-      @ifc = BimTools::IfcManager::Settings.ifc_module
+      @ifc_module = ifc_model.ifc_module
       @ifc_model = ifc_model
       @su_model = ifc_model.su_model
       set_units
@@ -120,7 +120,7 @@ module BimTools
     def ifc_unit(unit_type)
       if IFC_UNITS.key? unit_type
         unit_values = IFC_UNITS[unit_type]
-        unit = @ifc::IfcSIUnit.new(@ifc_model)
+        unit = @ifc_module::IfcSIUnit.new(@ifc_model)
         unit.dimensions = '*'
         unit.unittype = unit_values[0]
         unit.prefix = unit_values[1]
@@ -128,8 +128,8 @@ module BimTools
         unit
       else
         unit_values = CONVERSIONBASEDUNITS[unit_type]
-        conversionbasedunit = @ifc::IfcConversionBasedUnit.new(@ifc_model)
-        dimensions = @ifc::IfcDimensionalExponents.new(@ifc_model)
+        conversionbasedunit = @ifc_module::IfcConversionBasedUnit.new(@ifc_model)
+        dimensions = @ifc_module::IfcDimensionalExponents.new(@ifc_model)
         dimensions.lengthexponent = IfcManager::Types::IfcInteger.new(@ifc_model, unit_values[4][0])
         dimensions.massexponent = IfcManager::Types::IfcInteger.new(@ifc_model, unit_values[4][1])
         dimensions.timeexponent = IfcManager::Types::IfcInteger.new(@ifc_model, unit_values[4][2])
@@ -141,9 +141,9 @@ module BimTools
         conversionbasedunit.dimensions = dimensions
         conversionbasedunit.unittype = unit_values[1]
         conversionbasedunit.name = IfcManager::Types::IfcLabel.new(@ifc_model, unit_values[2])
-        measurewithunit = @ifc::IfcMeasureWithUnit.new(@ifc_model)
+        measurewithunit = @ifc_module::IfcMeasureWithUnit.new(@ifc_model)
         conversionbasedunit.conversionfactor = measurewithunit
-        unit = @ifc::IfcSIUnit.new(@ifc_model)
+        unit = @ifc_module::IfcSIUnit.new(@ifc_model)
         case unit_values[1]
         when :lengthunit
           valuecomponent = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, unit_values[3])

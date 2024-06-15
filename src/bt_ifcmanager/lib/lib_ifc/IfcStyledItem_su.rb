@@ -25,7 +25,7 @@ module BimTools
   module IfcStyledItem_su
     def initialize(ifc_model, brep)
       super
-      @ifc = BimTools::IfcManager::Settings.ifc_module
+      @ifc_module = ifc_model.ifc_module
       instance_variable_set(:@attr, ([:Item] + attributes))
 
       # Workaround for bug in IFC XSD's forward from IFC4, missing "item" attribute

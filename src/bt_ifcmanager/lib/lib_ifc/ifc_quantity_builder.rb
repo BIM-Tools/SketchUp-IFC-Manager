@@ -35,7 +35,7 @@ module BimTools
       end
 
       def initialize(ifc_model)
-        @ifc = IfcManager::Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
       end
 
@@ -46,16 +46,16 @@ module BimTools
       def set_value(value)
         case value
         when IfcManager::Types::IfcLengthMeasure
-          @ifc_quantity = @ifc::IfcQuantityLength.new(@ifc_model)
+          @ifc_quantity = @ifc_module::IfcQuantityLength.new(@ifc_model)
           @ifc_quantity.lengthvalue = value
         when IfcManager::Types::IfcAreaMeasure
-          @ifc_quantity = @ifc::IfcQuantityArea.new(@ifc_model)
+          @ifc_quantity = @ifc_module::IfcQuantityArea.new(@ifc_model)
           @ifc_quantity.areavalue = value
         when IfcManager::Types::IfcVolumeMeasure
-          @ifc_quantity = @ifc::IfcQuantityVolume.new(@ifc_model)
+          @ifc_quantity = @ifc_module::IfcQuantityVolume.new(@ifc_model)
           @ifc_quantity.volumevalue = value
         when IfcManager::Types::IfcMassMeasure
-          @ifc_quantity = @ifc::IfcQuantityWeight.new(@ifc_model)
+          @ifc_quantity = @ifc_module::IfcQuantityWeight.new(@ifc_model)
           @ifc_quantity.weightvalue = value
         end
       end

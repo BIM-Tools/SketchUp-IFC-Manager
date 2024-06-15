@@ -47,9 +47,9 @@ module BimTools
       end
 
       def initialize(ifc_model)
-        @ifc = Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
-        @ifc_shape_representation = @ifc::IfcShapeRepresentation.new(ifc_model)
+        @ifc_shape_representation = @ifc_module::IfcShapeRepresentation.new(ifc_model)
         set_representationidentifier('Body')
       end
 
@@ -97,7 +97,7 @@ module BimTools
       # #   # unless @definition_managers.include? definition_manager
       # #   puts 'br'
       # #   @definition_managers << definition_manager
-      # #   brep = @ifc::IfcFacetedBrep.new(@ifc_model, definition_manager.faces, transformation)
+      # #   brep = @ifc_module::IfcFacetedBrep.new(@ifc_model, definition_manager.faces, transformation)
       # #   puts brep.step
       # #   @shaperepresentation.items.add(brep)
       # #   add_styling(brep, su_material)

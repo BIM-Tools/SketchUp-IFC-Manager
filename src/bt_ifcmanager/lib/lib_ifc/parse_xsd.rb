@@ -39,6 +39,8 @@ module BimTools
     # xsd_path = Pathname.new("#{PLUGIN_ROOT_PATH}/bt_ifcmanager/lib/lib_ifc/IFC4x1.xsd")
     # xsd_path = Pathname.new("#{PLUGIN_ROOT_PATH}/bt_ifcmanager/lib/lib_ifc/IFC4x3_RC2.xsd")
     class IfcXmlParser
+      attr_reader :ifc_version, :ifc_version_compact, :ifc_module
+
       ifc_order_file = File.join(File.dirname(__FILE__), 'ifc_order.yml')
       IFC_ORDER = YAML.load_file(ifc_order_file)
 
@@ -52,18 +54,15 @@ module BimTools
       # - A new instance of the ParseXSD class.
       def initialize(ifc_version, xsd_string = nil)
         @ifc_version = ifc_version
-        ifc_version_compact = ifc_version.delete(' ').upcase
-        if BimTools.const_defined?(ifc_version_compact)
+        @ifc_version_compact = ifc_version.delete(' ').upcase
+        if BimTools.const_defined?(@ifc_version_compact)
           puts "#{ifc_version} already loaded"
-          @ifc_module = BimTools.const_get(ifc_version_compact)
+          @ifc_module = BimTools.const_get(@ifc_version_compact)
         else
-          @ifc_module = BimTools.const_set(ifc_version_compact, Module.new)
+          @ifc_module = BimTools.const_set(@ifc_version_compact, Module.new)
           create_ifcentity
           from_string(xsd_string) if xsd_string
         end
-        Settings.ifc_version = ifc_version
-        Settings.ifc_version_compact = ifc_version_compact
-        Settings.ifc_module = @ifc_module
       end
 
       # Parses an XSD file and returns the parsed document.

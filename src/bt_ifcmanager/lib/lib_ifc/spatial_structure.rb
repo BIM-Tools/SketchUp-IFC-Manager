@@ -31,13 +31,13 @@ module BimTools
       # @param ifc_entity [IFC2X3::IfcProduct] IFC Entity
       # @param spatial_hierarchy [Hash<IFC2X3::IfcSpatialStructureElement>] Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
       def initialize(ifc_model, spatial_structure = nil)
-        @ifc = Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @spatial_order = [
-          @ifc::IfcProject,
-          @ifc::IfcSite,
-          @ifc::IfcBuilding,
-          @ifc::IfcBuildingStorey,
-          @ifc::IfcSpace
+          @ifc_module::IfcProject,
+          @ifc_module::IfcSite,
+          @ifc_module::IfcBuilding,
+          @ifc_module::IfcBuildingStorey,
+          @ifc_module::IfcSpace
         ].freeze
         @ifc_model = ifc_model
         @spatial_structure = if spatial_structure
@@ -64,30 +64,33 @@ module BimTools
       def add(ifc_entity)
         spatial_structure_types = get_spatial_structure_types
         case ifc_entity
-        when @ifc::IfcProject
+        when @ifc_module::IfcProject
           # (!) Check!!!
           @spatial_structure[0] = ifc_entity
-        when @ifc::IfcSite
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc::IfcSite, [@ifc::IfcProject])
-        when @ifc::IfcBuilding
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc::IfcBuilding, [@ifc::IfcSite])
-        when @ifc::IfcBuildingStorey
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc::IfcBuildingStorey, [@ifc::IfcBuilding])
-        when @ifc::IfcSpace
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc::IfcSpace,
-                             [@ifc::IfcBuildingStorey, @ifc::IfcSite])
-        when @ifc::IfcElementAssembly, @ifc::IfcCurtainWall, @ifc::IfcRoof
+        when @ifc_module::IfcSite
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcSite, [@ifc_module::IfcProject])
+        when @ifc_module::IfcBuilding
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBuilding, [@ifc_module::IfcSite])
+        when @ifc_module::IfcBuildingStorey
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBuildingStorey,
+                             [@ifc_module::IfcBuilding])
+        when @ifc_module::IfcSpace
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcSpace,
+                             [@ifc_module::IfcBuildingStorey, @ifc_module::IfcSite])
+        when @ifc_module::IfcElementAssembly, @ifc_module::IfcCurtainWall, @ifc_module::IfcRoof
 
           # add to end but check for basic spatial hierarchy
-          if (spatial_structure_types & [@ifc::IfcSpace, @ifc::IfcBuildingStorey, @ifc::IfcSite]).empty?
-            add_default_spatialelement(@ifc::IfcBuildingStorey)
+          if (spatial_structure_types & [@ifc_module::IfcSpace, @ifc_module::IfcBuildingStorey,
+                                         @ifc_module::IfcSite]).empty?
+            add_default_spatialelement(@ifc_module::IfcBuildingStorey)
           end
           @spatial_structure << ifc_entity
         else # IfcProduct, IfcGroup
 
           # don't add but check for basic spatial hierarchy
-          if (spatial_structure_types & [@ifc::IfcSpace, @ifc::IfcBuildingStorey, @ifc::IfcSite]).empty?
-            add_default_spatialelement(@ifc::IfcBuildingStorey)
+          if (spatial_structure_types & [@ifc_module::IfcSpace, @ifc_module::IfcBuildingStorey,
+                                         @ifc_module::IfcSite]).empty?
+            add_default_spatialelement(@ifc_module::IfcBuildingStorey)
           end
         end
       end
@@ -140,7 +143,7 @@ module BimTools
                                                     +'default ' << entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(' ').downcase)
 
           # Add new ObjectPlacement without transformation
-          default_parent.objectplacement = @ifc::IfcLocalPlacement.new(@ifc_model)
+          default_parent.objectplacement = @ifc_module::IfcLocalPlacement.new(@ifc_model)
           default_parent.objectplacement.relativeplacement = @ifc_model.default_placement
           default_parent.objectplacement.placementrelto = parent.objectplacement if parent.respond_to?(:objectplacement)
 
@@ -185,13 +188,13 @@ module BimTools
                  end
         ifc_entity.parent = parent
         case ifc_entity
-        when @ifc::IfcSpatialStructureElement
+        when @ifc_module::IfcSpatialStructureElement
           ifc_entity.parent.add_related_object(ifc_entity)
         else
           case ifc_entity.parent
-          when @ifc::IfcSpatialStructureElement
+          when @ifc_module::IfcSpatialStructureElement
             ifc_entity.parent.add_contained_element(ifc_entity)
-          when @ifc::IfcProject, @ifc::IfcProduct, @ifc::IfcCurtainWall, @ifc::IfcElementAssembly
+          when @ifc_module::IfcProject, @ifc_module::IfcProduct, @ifc_module::IfcCurtainWall, @ifc_module::IfcElementAssembly
             ifc_entity.parent.add_related_object(ifc_entity)
           end
         end
@@ -205,9 +208,9 @@ module BimTools
       # @param placement_parent [Object] The placement parent to check.
       # @return [Object] The placement parent of the element.
       def get_placement_parent(placement_parent)
-        return placement_parent if placement_parent.is_a? @ifc::IfcSpatialStructureElement
+        return placement_parent if placement_parent.is_a? @ifc_module::IfcSpatialStructureElement
 
-        @spatial_structure.find { |entity| entity.is_a? @ifc::IfcSite }
+        @spatial_structure.find { |entity| entity.is_a? @ifc_module::IfcSite }
       end
     end
   end

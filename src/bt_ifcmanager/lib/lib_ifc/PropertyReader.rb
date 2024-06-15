@@ -50,8 +50,8 @@ module BimTools
       }.freeze
 
       def initialize(ifc_model, ifc_entity, entity_dict, instance_class = nil)
-        @ifc = IfcManager::Settings.ifc_module
-        ifc_version = IfcManager::Settings.ifc_version
+        @ifc_module = ifc_model.ifc_module
+        ifc_version = ifc_model.ifc_version
         @ifc_model = ifc_model
         @ifc_entity = ifc_entity
         @instance_class = instance_class

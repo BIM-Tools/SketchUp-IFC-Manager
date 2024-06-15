@@ -35,9 +35,9 @@ module BimTools
       end
 
       def initialize(ifc_model)
-        @ifc = Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
-        @ifc_rel_defines_by_properties = @ifc::IfcRelDefinesByProperties.new(ifc_model)
+        @ifc_rel_defines_by_properties = @ifc_module::IfcRelDefinesByProperties.new(ifc_model)
         @ifc_rel_defines_by_properties.relatedobjects = Types::Set.new
       end
 

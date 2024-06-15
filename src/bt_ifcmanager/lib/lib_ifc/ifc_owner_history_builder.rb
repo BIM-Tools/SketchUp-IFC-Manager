@@ -45,9 +45,9 @@ module BimTools
       #
       # @param ifc_model [Object] The IFC model.
       def initialize(ifc_model)
-        @ifc = IfcManager::Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
-        @ifc_owner_history = @ifc::IfcOwnerHistory.new(@ifc_model)
+        @ifc_owner_history = @ifc_module::IfcOwnerHistory.new(@ifc_model)
       end
 
       # Sets the owning user of the IfcOwnerHistory.
@@ -103,11 +103,11 @@ module BimTools
       #
       # @param su_model [Object] The SketchUp model.
       def owning_user_from_model(su_model)
-        owninguser = @ifc::IfcPersonAndOrganization.new(@ifc_model)
+        owninguser = @ifc_module::IfcPersonAndOrganization.new(@ifc_model)
         owninguser.theperson = IfcPersonBuilder.build(@ifc_model) do |person_builder|
           person_builder.person_data_from_su_model(su_model)
         end
-        owninguser.theorganization = @ifc::IfcOrganization.new(@ifc_model)
+        owninguser.theorganization = @ifc_module::IfcOrganization.new(@ifc_model)
         owninguser.theorganization.name = Types::IfcLabel.new(@ifc_model, '')
         @ifc_owner_history.owninguser = owninguser
         @ifc_owner_history.lastmodifyinguser = owninguser
@@ -119,8 +119,8 @@ module BimTools
       # @param fullname [String] The full name of the owning application.
       # @param identifier [String] The identifier of the owning application.
       def owning_application(version, fullname, identifier)
-        owningapplication = @ifc::IfcApplication.new(@ifc_model)
-        applicationdeveloper = @ifc::IfcOrganization.new(@ifc_model)
+        owningapplication = @ifc_module::IfcApplication.new(@ifc_model)
+        applicationdeveloper = @ifc_module::IfcOrganization.new(@ifc_model)
         applicationdeveloper.name = Types::IfcLabel.new(@ifc_model, 'BIM-Tools')
         owningapplication.applicationdeveloper = applicationdeveloper
         owningapplication.version = Types::IfcLabel.new(@ifc_model, version)

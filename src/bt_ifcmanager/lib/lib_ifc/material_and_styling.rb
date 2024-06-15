@@ -36,7 +36,7 @@ module BimTools
 
       def initialize(ifc_model, su_material = nil)
         @ifc_model = ifc_model
-        @ifc = Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @su_material = su_material
         @image_texture = create_image_texture(su_material)
         @surface_style_rendering = create_surface_style_rendering(su_material)
@@ -62,9 +62,9 @@ module BimTools
                           'IfcMaterial.Default'
                         end
 
-        material_assoc = @ifc::IfcRelAssociatesMaterial.new(@ifc_model)
+        material_assoc = @ifc_module::IfcRelAssociatesMaterial.new(@ifc_model)
         material_assoc.globalid = IfcManager::IfcGloballyUniqueId.new(@ifc_model, persistent_id)
-        material_assoc.relatingmaterial = @ifc::IfcMaterial.new(@ifc_model)
+        material_assoc.relatingmaterial = @ifc_module::IfcMaterial.new(@ifc_model)
         material_assoc.relatingmaterial.name = Types::IfcLabel.new(@ifc_model, material_name)
         material_assoc.relatedobjects = Types::Set.new
         material_assoc
@@ -86,20 +86,20 @@ module BimTools
           surface_style_rendering = get_default_surface_style_rendering(side)
         end
 
-        surface_style = @ifc::IfcSurfaceStyle.new(@ifc_model)
+        surface_style = @ifc_module::IfcSurfaceStyle.new(@ifc_model)
         surface_style.side = side
         surface_style.name = Types::IfcLabel.new(@ifc_model, name)
         surface_style.styles = Types::Set.new([surface_style_rendering])
 
         if @image_texture
-          texture_style = @ifc::IfcSurfaceStyleWithTextures.new(@ifc_model)
+          texture_style = @ifc_module::IfcSurfaceStyleWithTextures.new(@ifc_model)
           texture_style.textures = IfcManager::Types::List.new([@image_texture])
           surface_style.styles.add(texture_style)
         end
 
         # Workaround for mandatory IfcPresentationStyleAssignment in IFC2x3
         if Settings.ifc_version == 'IFC 2x3'
-          style_assignment = @ifc::IfcPresentationStyleAssignment.new(@ifc_model)
+          style_assignment = @ifc_module::IfcPresentationStyleAssignment.new(@ifc_model)
           style_assignment.styles = Types::Set.new([surface_style])
         else
           style_assignment = surface_style
@@ -157,13 +157,13 @@ module BimTools
         su_texture = su_material.texture
         return unless su_texture
 
-        image_texture = @ifc::IfcImageTexture.new(@ifc_model)
+        image_texture = @ifc_module::IfcImageTexture.new(@ifc_model)
         image_texture.repeats = true
         image_texture.repeatt = true
-        texturetransform = @ifc::IfcCartesianTransformationOperator2DnonUniform.new(@ifc_model)
-        texturetransform.axis1 = @ifc::IfcDirection.new(@ifc_model, Geom::Vector2d.new(0, 1))
-        texturetransform.axis2 = @ifc::IfcDirection.new(@ifc_model, Geom::Vector2d.new(1, 0))
-        texturetransform.localorigin = @ifc::IfcCartesianPoint.new(@ifc_model, Geom::Point2d.new(0, 0))
+        texturetransform = @ifc_module::IfcCartesianTransformationOperator2DnonUniform.new(@ifc_model)
+        texturetransform.axis1 = @ifc_module::IfcDirection.new(@ifc_model, Geom::Vector2d.new(0, 1))
+        texturetransform.axis2 = @ifc_module::IfcDirection.new(@ifc_model, Geom::Vector2d.new(1, 0))
+        texturetransform.localorigin = @ifc_module::IfcCartesianPoint.new(@ifc_model, Geom::Point2d.new(0, 0))
         texturetransform.scale = Types::IfcReal.new(@ifc_model,
                                                     Types::IfcLengthMeasure.new(@ifc_model,
                                                                                 su_texture.width).convert)

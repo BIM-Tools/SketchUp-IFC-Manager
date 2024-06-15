@@ -35,16 +35,16 @@ module BimTools
       end
 
       def initialize(ifc_model, property_type)
-        @ifc = IfcManager::Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
         @property_type = property_type
 
         case @property_type
         when :enumeration
-          @ifc_property = @ifc::IfcPropertyEnumeratedValue.new(@ifc_model)
+          @ifc_property = @ifc_module::IfcPropertyEnumeratedValue.new(@ifc_model)
           @ifc_property.enumerationvalues = IfcManager::Types::List.new
         else # :single_value
-          @ifc_property = @ifc::IfcPropertySingleValue.new(@ifc_model)
+          @ifc_property = @ifc_module::IfcPropertySingleValue.new(@ifc_model)
         end
       end
 

@@ -60,10 +60,10 @@ module BimTools
       instance = group.to_component
 
       # set IFC type
-      instance.definition.add_classification(BimTools::IfcManager::Settings.ifc_version, ifc_type)
+      instance.definition.add_classification(IfcManager::Settings.ifc_version, ifc_type)
 
       # Set name in definition, instance and ifc properties
-      BimTools::IfcManager::set_ifc_entity_name(model, instance, name.downcase)
+      IfcManager::set_ifc_entity_name(model, instance, name.downcase)
 
       # set group as selected entity
       selection.clear

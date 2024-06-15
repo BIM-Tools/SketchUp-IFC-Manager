@@ -44,9 +44,9 @@ module BimTools
       end
 
       def initialize(ifc_model)
-        @ifc = Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
-        @ifc_extruded_area_solid = @ifc::IfcExtrudedAreaSolid.new(ifc_model)
+        @ifc_extruded_area_solid = @ifc_module::IfcExtrudedAreaSolid.new(ifc_model)
       end
 
       def set_sweptarea_from_face(face, transformation)
@@ -90,10 +90,10 @@ module BimTools
         outer_curve = create_ifc_polyline(face.outer_loop, transformation_2d)
 
         if face.loops.size > 1
-          profile_def = @ifc::IfcArbitraryProfileDefWithVoids.new(@ifc_model)
+          profile_def = @ifc_module::IfcArbitraryProfileDefWithVoids.new(@ifc_model)
           profile_def.innercurves = face.loops[1..-1].map { |loop| create_ifc_polyline(loop, transformation_2d) }
         else
-          profile_def = @ifc::IfcArbitraryClosedProfileDef.new(@ifc_model)
+          profile_def = @ifc_module::IfcArbitraryClosedProfileDef.new(@ifc_model)
         end
 
         profile_def.profiletype = :AREA
@@ -109,7 +109,7 @@ module BimTools
       # @param [Sketchup::Face] face
       # @param [Object] transformation
       def set_sweptarea(profile_def)
-        raise ArgumentError, 'Invalid profile definition' unless profile_def.is_a?(@ifc::IfcArbitraryClosedProfileDef)
+        raise ArgumentError, 'Invalid profile definition' unless profile_def.is_a?(@ifc_module::IfcArbitraryClosedProfileDef)
 
         @ifc_extruded_area_solid.sweptarea = profile_def
       end
@@ -120,7 +120,7 @@ module BimTools
       #
       # @param [Object] center
       def set_position(transformation)
-        @ifc_extruded_area_solid.position = @ifc::IfcAxis2Placement3D.new(@ifc_model, transformation)
+        @ifc_extruded_area_solid.position = @ifc_module::IfcAxis2Placement3D.new(@ifc_model, transformation)
       end
 
       # Set IfcExtrudedAreaSolid extruded direction
@@ -129,7 +129,7 @@ module BimTools
       #
       # @param [Geom::Vector3d] vector
       def set_extruded_direction(vector)
-        @ifc_extruded_area_solid.extrudeddirection = @ifc::IfcDirection.new(@ifc_model, vector)
+        @ifc_extruded_area_solid.extrudeddirection = @ifc_module::IfcDirection.new(@ifc_model, vector)
       end
 
       # Set IfcExtrudedAreaSolid depth
@@ -147,9 +147,9 @@ module BimTools
         points = loop.vertices.map do |vertex|
           position = Geom::Point2d.new(vertex.position.transform(transformation).x,
                                        vertex.position.transform(transformation).y)
-          @ifc::IfcCartesianPoint.new(@ifc_model, position)
+          @ifc_module::IfcCartesianPoint.new(@ifc_model, position)
         end
-        polyline = @ifc::IfcPolyline.new(@ifc_model)
+        polyline = @ifc_module::IfcPolyline.new(@ifc_model)
         polyline.points = IfcManager::Types::List.new(points)
         polyline
       end
