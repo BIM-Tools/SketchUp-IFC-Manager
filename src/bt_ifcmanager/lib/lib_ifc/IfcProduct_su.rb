@@ -84,6 +84,11 @@ module BimTools
         dict_reader.add_sketchup_instance_properties(ifc_model, self, @su_object)
       end
 
+      # unset ObjectType if a IfcTypeProduct is defined
+      if @type_product && defined?(predefinedtype)
+        @predefinedtype = nil
+      end
+
       # set material if sketchup @su_object has a material
       # Material added to Product and not to TypeProduct because a Sketchup ComponentDefinition can have a different material for every Instance
       if ifc_model.options[:materials] && (is_a? @ifc_module::IfcElement) && !(is_a? @ifc_module::IfcFeatureElementSubtraction) && !(is_a? @ifc_module::IfcVirtualElement)
