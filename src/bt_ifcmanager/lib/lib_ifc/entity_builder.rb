@@ -148,6 +148,7 @@ module BimTools
       def determine_ifc_entity(entity_type, su_instance, placement_parent)
         return handle_unclassified_component(su_instance, placement_parent) if entity_type.nil?
         return handle_ifc_project(su_instance, placement_parent) if entity_type == @ifc_module::IfcProject
+        return create_ifc_product(entity_type, su_instance, placement_parent) if entity_type < @ifc_module::IfcProduct
         return create_ifc_root(entity_type, su_instance, placement_parent) if entity_type < @ifc_module::IfcRoot
 
         # Pass the entity type class to the geometry creation method to be caught appropriately
@@ -198,6 +199,17 @@ module BimTools
         # (!)(?) check against list of valid IFC entities? IfcGroup, IfcProduct
 
         ifc_entity = entity_type.new(@ifc_model, su_instance)
+        ifc_entity.globalid = @guid if entity_type < @ifc_module::IfcRoot
+
+        @spatial_structure.add(ifc_entity)
+        assign_entity_attributes(ifc_entity, placement_parent)
+        ifc_entity
+      end
+
+      def create_ifc_product(entity_type, su_instance, placement_parent)
+        # (!)(?) check against list of valid IFC entities? IfcGroup, IfcProduct
+
+        ifc_entity = entity_type.new(@ifc_model, su_instance, @su_total_transformation)
         ifc_entity.globalid = @guid if entity_type < @ifc_module::IfcRoot
 
         # Set "tag" to component persistant_id like the other BIM Authoring Tools like Revit, Archicad and Tekla are doing
