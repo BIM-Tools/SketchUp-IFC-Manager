@@ -21,6 +21,8 @@
 #
 #
 
+require 'date'
+
 module BimTools
   module IfcManager
     class IfcClassificationBuilder
@@ -68,18 +70,18 @@ module BimTools
 
       def set_editiondate(editiondate)
         if editiondate
-          time = Time.parse(editiondate)
+          date_time = DateTime.parse(editiondate)
 
           # IFC 4
           if @ifc_module.const_defined?(:IfcCalendarDate)
             date = @ifc_module::IfcCalendarDate.new(@ifc_model)
-            date.daycomponent = Types::IfcInteger.new(@ifc_model, time.day)
-            date.monthcomponent = Types::IfcInteger.new(@ifc_model, time.month)
-            date.yearcomponent = Types::IfcInteger.new(@ifc_model, time.year)
+            date.daycomponent = Types::IfcInteger.new(@ifc_model, date_time.day)
+            date.monthcomponent = Types::IfcInteger.new(@ifc_model, date_time.month)
+            date.yearcomponent = Types::IfcInteger.new(@ifc_model, date_time.year)
 
           # IFC 2x3
           else
-            date = Types::IfcDate.new(@ifc_model, time)
+            date = Types::IfcDate.new(@ifc_model, date_time)
           end
           @ifc_classification.editiondate = date
         end
