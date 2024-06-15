@@ -243,7 +243,9 @@ module BimTools
               ifc_value = ifc_type.new(@ifc_model, value, true) if ifc_type
 
               # Check if IFC type is set, otherwise use basic types
-              ifc_value ||= get_ifc_property_value(value, property.attribute_type, true)
+              if !ifc_value || !ifc_value.is_a?(IfcManager::Types::BaseType)
+                ifc_value = get_ifc_property_value(value, property.attribute_type, true)
+              end
 
               next unless ifc_value
 
