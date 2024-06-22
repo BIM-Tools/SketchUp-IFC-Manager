@@ -12,6 +12,11 @@ IfcRoot:
 IfcObject:
   :explicit:
   - :ObjectType
+  :inverse:
+  - :IsDeclaredBy
+  - :Declares
+  - :IsTypedBy
+  - :IsDefinedBy
 IfcActionRequest:
   :explicit:
   - :RequestID
@@ -61,6 +66,10 @@ IfcProduct:
   :explicit:
   - :ObjectPlacement
   - :Representation
+  :inverse:
+  - :ReferencedBy
+  - :PositionedRelativeTo
+  - :ReferencedInStructures
 IfcProductDefinitionShape:
   :inverse:
   - :HasShapeAspects
@@ -191,6 +200,19 @@ IfcBSplineCurve:
 IfcElement:
   :explicit:
   - :Tag
+  :inverse:
+  - :FillsVoids
+  - :ConnectedTo
+  - :IsInterferedByElements
+  - :InterferesElements
+  - :HasProjections
+  - :HasOpenings
+  - :IsConnectionRealization
+  - :ProvidesBoundaries
+  - :ConnectedFrom
+  - :ContainedInStructure
+  - :HasCoverings
+  - :HasSurfaceFeatures
 IfcBeamType:
   :explicit:
   - :PredefinedType
@@ -265,6 +287,12 @@ IfcBoxedHalfSpace:
 IfcSpatialElement:
   :explicit:
   - :LongName
+  :inverse:
+  - :ContainsElements
+  - :ServicedBySystems
+  - :ReferencesElements
+  - :IsInferedByElements
+  - :InterferesElements
 IfcSpatialStructureElement:
   :explicit:
   - :LongName
@@ -277,6 +305,7 @@ IfcBuilding:
 IfcBuildingElementProxy:
   :explicit:
   - :CompositionType
+  - :PredefinedType
 IfcBuildingElementProxyType:
   :explicit:
   - :PredefinedType
@@ -488,6 +517,16 @@ IfcNamedUnit:
   :explicit:
   - :Dimensions
   - :UnitType
+IfcContext:
+  :explicit:
+  - :ObjectType
+  - :LongName
+  - :Phase
+  - :RepresentationContexts
+  - :UnitsInContext
+  :inverse:
+  - :IsDefinedBy
+  - :Declares
 IfcContextDependentUnit:
   :explicit:
   - :Name
@@ -937,6 +976,8 @@ IfcRepresentationContext:
   :explicit:
   - :ContextIdentifier
   - :ContextType
+  :inverse:
+  - :RepresentationsInContext
 IfcRepresentationItem:
   :inverse:
   - :StyledByItem
@@ -948,6 +989,7 @@ IfcGeometricRepresentationContext:
   - :TrueNorth
   :inverse:
   - :HasSubContexts
+  - :HasCoordinateOperation
 IfcGeometricRepresentationSubContext:
   :explicit:
   - :ParentContext
@@ -1200,6 +1242,15 @@ IfcMove:
   - :MoveFrom
   - :MoveTo
   - :PunchList
+IfcObjectDefinition:
+  :inverse:
+    - :HasAssignments
+    - :Nests
+    - :IsNestedBy
+    - :HasContext
+    - :IsDecomposedBy
+    - :Decomposes
+    - :HasAssociations
 IfcObjective:
   :explicit:
   - :BenchmarkValues
@@ -1565,6 +1616,10 @@ IfcReinforcingMesh:
   - :TransverseBarCrossSectionArea
   - :LongitudinalBarSpacing
   - :TransverseBarSpacing
+IfcRelAggregates:
+  :explicit:
+  - :RelatingObject
+  - :RelatedObjects
 IfcRelDecomposes:
   :explicit:
   - :RelatingObject

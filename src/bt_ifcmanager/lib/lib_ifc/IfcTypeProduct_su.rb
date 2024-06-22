@@ -40,7 +40,11 @@ module BimTools
 
       @rel_defines_by_type = @ifc_module::IfcRelDefinesByType.new(@ifc_model)
       @rel_defines_by_type.relatingtype = self
+      # if @rel_defines_by_type.respond_to?(:relatedobjects)
       @rel_defines_by_type.relatedobjects = IfcManager::Types::Set.new
+      # else
+      #   puts 'ERROR: @rel_defines_by_type does not respond to relatedobjects'
+      # end
       @rel_defines_by_type.globalid = IfcManager::IfcGloballyUniqueId.new(ifc_model,
                                                                           "IfcRelDefinesByType.#{persistent_id}")
 
@@ -68,7 +72,17 @@ module BimTools
 
     # @param ifc_entity
     def add_typed_object(ifc_entity)
+      # if @rel_defines_by_type.respond_to?(:relatedobjects)
       @rel_defines_by_type.relatedobjects.add(ifc_entity)
+      # else
+      #   # puts 'ERROR: @rel_defines_by_type does not respond to relatedobjects1'
+      #   if ifc_entity.respond_to?(:istypedby)
+      #     puts '@rel_defines_by_type added to ifc_entity istypedby'
+      #     ifc_entity.istypedby = IfcManager::Types::Set.new([@rel_defines_by_type])
+      #   else
+      #     puts 'ERROR: @rel_defines_by_type does not respond to istypedby'
+      #   end
+      # end
     end
   end
 end

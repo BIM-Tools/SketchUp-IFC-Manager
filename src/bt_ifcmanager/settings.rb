@@ -230,8 +230,8 @@ module BimTools
         begin
           reader = SKC.new(ifc_classification)
           @filters[ifc_classification] = reader
-          ifc_version = reader.name
-          xsd_parser = IfcXmlParser.new(ifc_version, reader.xsd_schema)
+            ifc_version = reader.name
+            xsd_parser = IfcXsdParser.new(ifc_version, reader.xsd_schema)
           @ifc_version = xsd_parser.ifc_version
           @ifc_version_compact = xsd_parser.ifc_version_compact
           @ifc_module = xsd_parser.ifc_module

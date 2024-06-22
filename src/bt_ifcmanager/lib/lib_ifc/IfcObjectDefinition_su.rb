@@ -41,6 +41,9 @@ module BimTools
       unless @contains_elements
         @contains_elements = @ifc_module::IfcRelContainedInSpatialStructure.new(@ifc_model)
         @contains_elements.relatingstructure = self
+        # else
+        #   puts 'ERROR: object does not respond to relatingstructure'
+        # end
         @contains_elements.relatedelements = IfcManager::Types::Set.new
       end
       @contains_elements.relatedelements.add(object)
@@ -54,7 +57,11 @@ module BimTools
       unless @decomposes
         @decomposes = @ifc_module::IfcRelAggregates.new(@ifc_model)
         @decomposes.name = IfcManager::Types::IfcLabel.new(@ifc_model, "#{name.value} container") if name
+        # if @decomposes.respond_to?(:relatingobject)
         @decomposes.relatingobject = self
+        # else
+        #   puts 'ERROR: object does not respond to relatingobject'
+        # end
         @decomposes.relatedobjects = IfcManager::Types::Set.new
       end
       @decomposes.relatedobjects.add(object)

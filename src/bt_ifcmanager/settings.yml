@@ -22,11 +22,12 @@
 :load:
   :classifications:
     NL-SfB tabel 1.skc: true
-    NL-SfB 2005, tabel 1.skc: false
-    DIN 276-1.skc: false
+    NL-SfB 2005, tabel 1.skc: true
+    DIN 276-1.skc: true
   :ifc_classifications:
-    IFC 2x3.skc: true
+    IFC 2x3.skc: false
     IFC4.skc: false
+    IFC 4x3.skc: true
   :template_materials: false
 :properties:
   :common_psets: true

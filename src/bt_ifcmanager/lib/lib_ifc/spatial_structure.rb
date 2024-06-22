@@ -32,19 +32,28 @@ module BimTools
       # @param spatial_hierarchy [Hash<IFC2X3::IfcSpatialStructureElement>] Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
       def initialize(ifc_model, spatial_structure = nil)
         @ifc_module = ifc_model.ifc_module
-        @spatial_order = [
-          @ifc_module::IfcProject,
-          @ifc_module::IfcSite,
-          @ifc_module::IfcBuilding,
-          @ifc_module::IfcBuildingStorey,
-          @ifc_module::IfcSpace
-        ].freeze
+
+        # @todo change Settings.ifc_version in numerical value so we can say ifc_version > '4.2'
+        @spatial_order = if Settings.ifc_version == 'IFC 4x3'
+                           [
+                             @ifc::IfcProject,
+                             @ifc::IfcSite,
+                             @ifc::IfcFacility,
+                             @ifc::IfcFacilityPart,
+                             @ifc::IfcSpace
+                           ].freeze
+                         else
+                           [
+                             @ifc_module::IfcProject,
+                             @ifc_module::IfcSite,
+                             @ifc_module::IfcBuilding,
+                             @ifc_module::IfcBuildingStorey,
+                             @ifc_module::IfcSpace
+                           ].freeze
+                         end
         @ifc_model = ifc_model
-        @spatial_structure = if spatial_structure
-                               spatial_structure.to_a.clone
-                             else
-                               []
-                             end
+        @spatial_structure = spatial_structure.to_a.clone if spatial_structure
+        @spatial_structure ||= []
       end
 
       # Insert given entity into entity path after given type
@@ -69,9 +78,9 @@ module BimTools
           @spatial_structure[0] = ifc_entity
         when @ifc_module::IfcSite
           add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcSite, [@ifc_module::IfcProject])
-        when @ifc_module::IfcBuilding
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBuilding, [@ifc_module::IfcSite])
-        when @ifc_module::IfcBuildingStorey
+        when @ifc_module::IfcBuilding#, *@ifc::IfcFacility.subtypes
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBuilding, [@ifc_module::IfcSite])# || spatial_structure_types.any? { |type| @ifc::IfcFacility.subtypes.include?(type) }
+        when @ifc_module::IfcBuildingStorey#, @ifc::IfcFacilityPart
           add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBuildingStorey,
                              [@ifc_module::IfcBuilding])
         when @ifc_module::IfcSpace
@@ -139,6 +148,8 @@ module BimTools
         # check if default_related_object is already set
         unless parent.default_related_object
           default_parent = entity_class.new(@ifc_model)
+          puts default_parent.class
+          puts default_parent.attributes
           default_parent.name = Types::IfcLabel.new(@ifc_model,
                                                     +'default ' << entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(' ').downcase)
 
