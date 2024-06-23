@@ -201,11 +201,14 @@ IfcElement:
   :explicit:
   - :Tag
   :inverse:
+  - :HasStructuralMember
   - :FillsVoids
   - :ConnectedTo
   - :IsInterferedByElements
   - :InterferesElements
   - :HasProjections
+  - :ReferencedInStructures
+  - :HasPorts
   - :HasOpenings
   - :IsConnectionRealization
   - :ProvidesBoundaries
@@ -291,7 +294,7 @@ IfcSpatialElement:
   - :ContainsElements
   - :ServicedBySystems
   - :ReferencesElements
-  - :IsInferedByElements
+  - :IsInterferedByElements
   - :InterferesElements
 IfcSpatialStructureElement:
   :explicit:
@@ -411,6 +414,11 @@ IfcExternalReference:
 IfcClassificationReference:
   :explicit:
   - :ReferencedSource
+  - :Description
+  - :Sort
+  :inverse:
+  - :ClassificationRefForObjects
+  - :HasReferences
 IfcConnectedFaceSet:
   :explicit:
   - :CfsFaces
@@ -980,6 +988,7 @@ IfcRepresentationContext:
   - :RepresentationsInContext
 IfcRepresentationItem:
   :inverse:
+  - :LayerAssignment
   - :StyledByItem
 IfcGeometricRepresentationContext:
   :explicit:
@@ -1160,6 +1169,10 @@ IfcProductRepresentation:
   - :Name
   - :Description
   - :Representations
+  :inverse:
+  - :ReferencedBy
+  - :PositionedRelativeTo
+  - :ReferencedInStructures
 IfcMaterialDefinition:
   :inverse:
   - :HasProperties
@@ -1244,13 +1257,13 @@ IfcMove:
   - :PunchList
 IfcObjectDefinition:
   :inverse:
-    - :HasAssignments
-    - :Nests
-    - :IsNestedBy
-    - :HasContext
-    - :IsDecomposedBy
-    - :Decomposes
-    - :HasAssociations
+  - :HasAssignments
+  - :Nests
+  - :IsNestedBy
+  - :HasContext
+  - :IsDecomposedBy
+  - :Decomposes
+  - :HasAssociations
 IfcObjective:
   :explicit:
   - :BenchmarkValues
@@ -1621,6 +1634,10 @@ IfcRelAggregates:
   - :RelatingObject
   - :RelatedObjects
 IfcRelDecomposes:
+  :explicit:
+  - :RelatingObject
+  - :RelatedObjects
+IfcRelAggregates:
   :explicit:
   - :RelatingObject
   - :RelatedObjects
@@ -2311,8 +2328,11 @@ IfcTrapeziumProfileDef:
   - :TopXOffset
 IfcTriangulatedFaceSet:
   :explicit:
+  - :Normals
+  - :Closed
   - :CoordIndex
   - :NormalIndex
+  - :PnIndex
 IfcTrimmedCurve:
   :explicit:
   - :BasisCurve

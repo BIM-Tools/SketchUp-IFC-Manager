@@ -41,6 +41,32 @@ module BimTools
 
     # Parses IFC schemas from an XSD file or string.
     class IfcXsdParser
+      attr_reader :ifc_version, :ifc_version_compact, :ifc_module
+
+      # IFC classes that need an additional module mixed in
+      MIXIN_MODULES = %w[
+        IfcAxis2Placement3D
+        IfcCartesianPoint
+        IfcClassificationReference
+        IfcDirection
+        IfcGroup
+        IfcIndexedTriangleTextureMap
+        IfcLocalPlacement
+        IfcObjectDefinition
+        IfcPresentationLayerAssignment
+        IfcProduct
+        IfcRoot
+        IfcRelAggregates
+        IfcRelDefinesByProperties
+        IfcRelDefinesByType
+        IfcRelContainedInSpatialStructure
+        IfcSite
+        IfcSpatialStructureElement
+        IfcStyledItem
+        IfcTypeProduct
+        IfcUnitAssignment
+      ]
+
       ifc_order_file = File.join(File.dirname(__FILE__), 'ifc_order.yml')
       IFC_ORDER = YAML.load_file(ifc_order_file)
 
@@ -194,25 +220,6 @@ module BimTools
         ifc_attributes
       end
 
-      # IFC classes that need an additional module mixed in
-      MIXIN_MODULES = %w[
-        IfcAxis2Placement3D
-        IfcCartesianPoint
-        IfcDirection
-        IfcGroup
-        IfcIndexedTriangleTextureMap
-        IfcLocalPlacement
-        IfcObjectDefinition
-        IfcPresentationLayerAssignment
-        IfcProduct
-        IfcRoot
-        IfcSite
-        IfcSpatialStructureElement
-        IfcStyledItem
-        IfcTypeProduct
-        IfcUnitAssignment
-      ]
-
       # Gets the mixin module for the given IFC class.
       #
       # Parameters:
@@ -263,7 +270,11 @@ module BimTools
         unless @ifc_module.const_defined?(ifc_name)
           mixin = get_mixin(ifc_name)
           subtype = get_subtype(ifc_object, ifc_objects)
+
           ifc_attributes = get_ifc_attributes(ifc_object, ifc_name)
+          ifc_attributes.concat(mixin.required_attributes).uniq! if mixin && mixin.respond_to?(:required_attributes)
+          ifc_attributes = sort_attributes(ifc_name, ifc_attributes)
+
           ifc_class = Class.new(subtype) do
             attr_accessor(*ifc_attributes.map { |x| x.downcase })
 

@@ -267,7 +267,7 @@ module BimTools
             next unless value
             next if value.is_a?(String) && value.empty?
 
-            properties << IfcPropertyBuilder.build(@ifc_model, property.attribute_type) do |builder|
+            properties << IfcPropertyBuilder.build(@ifc_model) do |builder|
               builder.set_name(key)
               builder.set_value(get_ifc_property_value(value, nil, true))
             end
