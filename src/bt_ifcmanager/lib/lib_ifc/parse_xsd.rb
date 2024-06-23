@@ -170,18 +170,27 @@ module BimTools
         end
       end
 
-      # Sorts the attributes of the given IFC class based on the IFC_ORDER yaml file.
+      # Sorts the attributes of the given IFC class based on the IFC_ORDER yaml file and returns explicit and inverse attributes separately.
       #
       # @param ifc_name [String] the name of the IFC entity
       # @param ifc_attributes [Array<String>] the list of attributes of the IFC entity
-      # @return [Array<String>] the sorted list of attributes
+      # @return [Array<Array<String>, Array<String>>] the sorted list of explicit attributes and list of inverse attributes
       def sort_attributes(ifc_name, ifc_attributes)
+        explicit_attributes = ifc_attributes.dup
+        inverse_attributes = []
+
         if IFC_ORDER.key?(ifc_name)
           order = IFC_ORDER[ifc_name]
-          ifc_attributes -= order[:inverse] if order.key?(:inverse)
-          return ifc_attributes.sort_by { |e| order[:explicit].index(e) || Float::INFINITY } if order.key?(:explicit)
+
+          # Separate inverse attributes if they exist
+          inverse_attributes = order[:inverse] if order.key?(:inverse)
+          explicit_attributes -= inverse_attributes
+
+          # Sort explicit attributes if the order is specified
+          explicit_attributes.sort_by! { |e| order[:explicit].index(e) || Float::INFINITY } if order.key?(:explicit)
         end
-        ifc_attributes
+
+        [explicit_attributes, inverse_attributes]
       end
 
       # Gets the attributes of the given IFC object.
@@ -216,7 +225,7 @@ module BimTools
         #   ifc_attributes << :ReferencedSource
         # end
 
-        ifc_attributes = sort_attributes(ifc_name, ifc_attributes)
+        # ifc_attributes = sort_attributes(ifc_name, ifc_attributes)
         ifc_attributes
       end
 
@@ -254,6 +263,10 @@ module BimTools
           def self.attributes
             []
           end
+
+          def self.inverse_attributes
+            []
+          end
         end
         @ifc_module.const_set(:IfcEntity, ifc_class)
       end
@@ -273,7 +286,8 @@ module BimTools
 
           ifc_attributes = get_ifc_attributes(ifc_object, ifc_name)
           ifc_attributes.concat(mixin.required_attributes).uniq! if mixin && mixin.respond_to?(:required_attributes)
-          ifc_attributes = sort_attributes(ifc_name, ifc_attributes)
+          ifc_attributes ||= []
+          ifc_attributes, inverse_attributes = sort_attributes(ifc_name, ifc_attributes)
 
           ifc_class = Class.new(subtype) do
             attr_accessor(*ifc_attributes.map { |x| x.downcase })
@@ -281,6 +295,7 @@ module BimTools
             # @@attribute_list = ifc_attributes
             prepend mixin if mixin
             @attr = ifc_attributes
+            @inverse_attr = inverse_attributes
             def initialize(ifc_model, sketchup = nil, *args)
               @ifc_id = ifc_model.add(self) if @ifc_id.nil?
               super unless self.class.superclass == Object
@@ -290,8 +305,16 @@ module BimTools
               superclass.attributes + @attr
             end
 
+            def self.inverse_attributes
+              superclass.inverse_attributes + @inverse_attr
+            end
+
             def attributes
               self.class.attributes
+            end
+
+            def inverse_attributes
+              self.class.inverse_attributes
             end
           end
           @ifc_module.const_set ifc_name, ifc_class

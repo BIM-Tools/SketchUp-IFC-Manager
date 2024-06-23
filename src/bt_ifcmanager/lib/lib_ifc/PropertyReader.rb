@@ -60,10 +60,13 @@ module BimTools
         @propertyset_names = []
         return unless @ifc_dict
 
+        ifc_entity_attributes = ifc_entity.attributes.map { |x| x.to_s }
+        ifc_entity_inverse_attributes = ifc_entity.inverse_attributes.map { |x| x.to_s }
+
         # split attributes from properties
         names = @ifc_dict.map(&:name)
         names -= UNUSED_DICTS # filter out unwanted dictionaries
-        ifc_entity_attributes = ifc_entity.attributes.map { |x| x.to_s }
+        names -= ifc_entity_inverse_attributes # filter out inverse dictionaries
         @attributes = names & ifc_entity_attributes
 
         # Skip IfcProduct-only attributes for IfcTypeProduct
@@ -418,7 +421,7 @@ module BimTools
       @options = value_dict['options']
 
       # Check for IFC type
-      if ifc_type_name[0].upcase == ifc_type_name[0] && IfcManager::Types.const_defined?(ifc_type_name)
+      if ifc_type_name[0].upcase == ifc_type_name[0] && IfcManager::Types.const_defined?(ifc_type_name.to_s.sub('-', '_'))
         @ifc_type_name = ifc_type_name
         @ifc_type = IfcManager::Types.const_get(ifc_type_name)
       end
