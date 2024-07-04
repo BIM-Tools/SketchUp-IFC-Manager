@@ -142,7 +142,7 @@ module BimTools::IfcManager
   def ifc_cleanup(model, import_path)
     puts 'Start IFC cleanup'
     model.start_operation('IFC Cleanup', true)
-    merge_faces(model.entities)
+    merge_faces(model.active_entities)
     puts 'Start IFC explode file and project containers'
     imported_entities = explode_ifc_files(model, import_path)
     explode_ifc_projects(imported_entities) if imported_entities
@@ -159,7 +159,11 @@ module BimTools::IfcManager
     import_path = UI.openpanel('Open IFC File', default_path, 'IFC Files|*.ifc;*.ifcZIP||')
     if import_path
       model.start_operation('IFC Import', true)
-      model.import(import_path, false)
+      if Sketchup.version.to_i < 18
+        model.import(import_path, false)
+      else
+        model.import(import_path, {:show_summary => false})
+      end
       model.commit_operation
       puts 'IFC import complete'
       ifc_cleanup(model, import_path)
