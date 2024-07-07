@@ -77,7 +77,16 @@ module BimTools
                             @attributes
                           end
 
-        @propertyset_names = names - @all_attributes
+
+        @propertyset_names = names - @all_attributes - ifc_entity_inverse_attributes
+      end
+
+      def handle_predefined_type(value)
+        if value == :userdefined
+          object_type_or_element_type = @ifc_dict['ObjectType'] || @ifc_dict['ElementType']
+          return :notdefined if object_type_or_element_type
+        end
+        value
       end
 
       # Set the IFC entity attributes using all combined attribute possibilitites from IfcProduct and IfcTypeProduct
@@ -87,7 +96,8 @@ module BimTools
         i = 0
         while i < @all_attributes.length
           name = @all_attributes[i]
-          set_attribute(@ifc_dict[name])
+          value = @ifc_dict[name]
+          set_attribute(value)
           i += 1
         end
       end
@@ -170,9 +180,12 @@ module BimTools
 
         property = create_property(attr_dict, name)
         value = property.value
+
         return false if value.nil? || (value.is_a?(String) && value.empty?)
 
         ifc_value = determine_ifc_value(property, value)
+        ifc_value = handle_predefined_type(ifc_value) if ifc_value.is_a?(Symbol) && name == 'PredefinedType'
+
         @ifc_entity.send("#{name.downcase}=", ifc_value) if ifc_value
       end
 
@@ -421,7 +434,8 @@ module BimTools
       @options = value_dict['options']
 
       # Check for IFC type
-      if ifc_type_name[0].upcase == ifc_type_name[0] && IfcManager::Types.const_defined?(ifc_type_name.to_s.sub('-', '_'))
+      if ifc_type_name[0].upcase == ifc_type_name[0] && IfcManager::Types.const_defined?(ifc_type_name.to_s.sub('-',
+                                                                                                                '_'))
         @ifc_type_name = ifc_type_name
         @ifc_type = IfcManager::Types.const_get(ifc_type_name)
       end
