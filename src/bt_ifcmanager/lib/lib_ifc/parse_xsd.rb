@@ -60,7 +60,6 @@ module BimTools
         IfcRelDefinesByProperties
         IfcRelDefinesByType
         IfcRelContainedInSpatialStructure
-        IfcSite
         IfcSpatialStructureElement
         IfcStyledItem
         IfcTypeProduct
@@ -176,18 +175,19 @@ module BimTools
       # @param ifc_attributes [Array<String>] the list of attributes of the IFC entity
       # @return [Array<Array<String>, Array<String>>] the sorted list of explicit attributes and list of inverse attributes
       def sort_attributes(ifc_name, ifc_attributes)
+        order = IFC_ORDER[ifc_name]
+        return [ifc_attributes, []] if order.nil?
+
         explicit_attributes = ifc_attributes.dup
         inverse_attributes = []
 
-        if IFC_ORDER.key?(ifc_name)
-          order = IFC_ORDER[ifc_name]
-
-          # Separate inverse attributes if they exist
-          inverse_attributes = order[:inverse] if order.key?(:inverse)
+        if order.key?(:inverse) && !order[:inverse].nil?
+          inverse_attributes = order[:inverse]
           explicit_attributes -= inverse_attributes
+        end
 
-          # Sort explicit attributes if the order is specified
-          explicit_attributes.sort_by! { |e| order[:explicit].index(e) || Float::INFINITY } if order.key?(:explicit)
+        if order.key?(:explicit) && !order[:explicit].nil?
+          explicit_attributes.sort_by! { |e| order[:explicit].index(e) || Float::INFINITY }
         end
 
         [explicit_attributes, inverse_attributes]
@@ -198,16 +198,14 @@ module BimTools
       # @param ifc_object [REXML::Element] The IFC object.
       # @param ifc_name [String] The name of the IFC class.
       # @return [Array<String>] the list of attributes of the IFC object.
-      def get_ifc_attributes(ifc_object, ifc_name)
-        ifc_attributes = []
+      def get_ifc_attributes(ifc_object, _ifc_name)
+        ifc_attributes = Set.new
         if ifc_object
-          ifc_object.elements.each('xs:complexContent/xs:extension') do |extension|
-            extension.elements.each('xs:attribute') do |attribute|
-              ifc_attributes << attribute.attributes['name'].to_sym if attribute.attributes['name']
-            end
-            extension.elements.each('xs:sequence/xs:element') do |attribute|
-              ifc_attributes << attribute.attributes['name'].to_sym if attribute.attributes['name']
-            end
+          ifc_object.elements.each('xs:complexContent/xs:extension/xs:attribute') do |attribute|
+            ifc_attributes.add(attribute.attributes['name'].to_sym) if attribute.attributes['name']
+          end
+          ifc_object.elements.each('xs:complexContent/xs:extension/xs:sequence/xs:element') do |element|
+            ifc_attributes.add(element.attributes['name'].to_sym) if element.attributes['name']
           end
         end
 
@@ -226,7 +224,8 @@ module BimTools
         # end
 
         # ifc_attributes = sort_attributes(ifc_name, ifc_attributes)
-        ifc_attributes
+
+        ifc_attributes.to_a
       end
 
       # Gets the mixin module for the given IFC class.
@@ -285,7 +284,13 @@ module BimTools
           subtype = get_subtype(ifc_object, ifc_objects)
 
           ifc_attributes = get_ifc_attributes(ifc_object, ifc_name)
-          ifc_attributes.concat(mixin.required_attributes).uniq! if mixin && mixin.respond_to?(:required_attributes)
+
+
+          if mixin && mixin.respond_to?(:required_attributes)
+            ifc_attributes.concat(mixin.required_attributes)
+            ifc_attributes.uniq!
+          end
+
           ifc_attributes ||= []
           ifc_attributes, inverse_attributes = sort_attributes(ifc_name, ifc_attributes)
 
@@ -302,6 +307,8 @@ module BimTools
             end
 
             def self.attributes
+              # puts "#{ifc_name} attributes: #{ifc_attributes}" if ifc_name == 'IfcLocalPlacement'
+              # puts "#{ifc_name} superclass.attributes: #{superclass.attributes}" if ifc_name == 'IfcLocalPlacement'
               superclass.attributes + @attr
             end
 

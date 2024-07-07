@@ -27,7 +27,7 @@ module BimTools
   module IfcLocalPlacement_su
     attr_accessor :transformation, :ifc_total_transformation
 
-    @@DEFAULT_TRANSFORMATION = Geom::Transformation.new().to_a.freeze
+    @@DEFAULT_TRANSFORMATION = Geom::Transformation.new.to_a.freeze
 
     def initialize(ifc_model, su_total_transformation = Geom::Transformation.new, placementrelto = nil)
       super
@@ -48,7 +48,6 @@ module BimTools
         rotation_and_translation, scaling = TransformationHelper.decompose_transformation(su_total_transformation)
 
         @ifc_total_transformation = rotation_and_translation
-
 
         @transformation = if !@placementrelto.nil? && @placementrelto.ifc_total_transformation
                             @placementrelto.ifc_total_transformation.inverse * @ifc_total_transformation
