@@ -128,7 +128,7 @@
 (31.12) buitenwandopeningen; niet gevuld, buitenluchtopeningen
 (31.20) buitenwandopeningen; gevuld met ramen, algemeen (verzamelniveau)
 (31.21) buitenwandopeningen; gevuld met ramen, gesloten ramen
-(31.22) buitenwandopeningen; gevuld met ramen, ramen draaiend aan Ã©Ã©n kant
+(31.22) buitenwandopeningen; gevuld met ramen, ramen draaiend aan één kant
 (31.23) buitenwandopeningen; gevuld met ramen, schuiframen
 (31.24) buitenwandopeningen; gevuld met ramen, ramen draaiend op verticale of horizontale as
 (31.25) buitenwandopeningen; gevuld met ramen, combinatieramen
@@ -144,7 +144,7 @@
 (32.12) binnenwandopeningen; niet gevuld, openingen als doorzicht
 (32.20) binnenwandopeningen; gevuld met ramen, algemeen (verzamelniveau)
 (32.21) binnenwandopeningen; gevuld met ramen, gesloten ramen
-(32.22) binnenwandopeningen; gevuld met ramen, ramen draaiend aan Ã©Ã©n kant
+(32.22) binnenwandopeningen; gevuld met ramen, ramen draaiend aan één kant
 (32.23) binnenwandopeningen; gevuld met ramen, schuiframen
 (32.24) binnenwandopeningen; gevuld met ramen, ramen draaiend op verticale of horizontale as
 (32.25) binnenwandopeningen; gevuld met ramen, combinatieramen
@@ -172,7 +172,7 @@
 (37.12) dakopeningen; niet gevuld, buitenluchtopeningen
 (37.20) dakopeningen; gevuld, algemeen (verzamelniveau)
 (37.21) dakopeningen; gevuld, gesloten ramen
-(37.22) dakopeningen; gevuld, ramen draaiend aan Ã©Ã©n kant
+(37.22) dakopeningen; gevuld, ramen draaiend aan één kant
 (37.23) dakopeningen; gevuld, schuiframen
 (37.24) dakopeningen; gevuld, ramen draaiend op een as
 (37.25) dakopeningen; gevuld, combinatieramen
@@ -233,19 +233,19 @@
 (52.11) afvoeren; regenwater, afvoerinstallatie; in het gebouw
 (52.12) afvoeren; regenwater, afvoerinstallatie; buiten het gebouw
 (52.16) afvoeren; regenwater, pompsysteem, afscheiders, bezinkputten
-(52.19) afvoeren; regenwater, berging, infiltratie 
-(52.20) afvoeren; fecaliÃ«n, algemeen (verzamelniveau)
-(52.21) afvoeren; fecaliÃ«n, standaardsysteem
-(52.22) afvoeren; fecaliÃ«n, vacuÃ¼msysteem
-(52.23) afvoeren; fecaliÃ«n, overdruksysteem
-(52.24) afvoeren; fecaliÃ«n, gescheiden (urine)
-(52.26) afvoeren; fecaliÃ«n, pompsysteem, afscheiders, bezinkputten
+(52.19) afvoeren; regenwater, berging, infiltratie
+(52.20) afvoeren; fecaliën, algemeen (verzamelniveau)
+(52.21) afvoeren; fecaliën, standaardsysteem
+(52.22) afvoeren; fecaliën, vacuümsysteem
+(52.23) afvoeren; fecaliën, overdruksysteem
+(52.24) afvoeren; fecaliën, gescheiden (urine)
+(52.26) afvoeren; fecaliën, pompsysteem, afscheiders, bezinkputten
 (52.30) afvoeren; afvalwater, algemeen (verzamelniveau)
 (52.31) afvoeren; afvalwater, huishoudelijk afval
 (52.32) afvoeren; afvalwater, bedrijfsafval
 (52.36) afvoeren; afvalwater, pompsysteem, afscheiders, bezinkputten
 (52.40) afvoeren; gecombineerd, algemeen (verzamelniveau)
-(52.41) afvoeren; gecombineerd, geÃ¯ntegreerd systeem
+(52.41) afvoeren; gecombineerd, geïntegreerd systeem
 (52.46) afvoeren; gecombineerd, pompsysteem, afscheiders, bezinkputten
 (52.50) afvoeren; vuilwaterafvoer speciaal, algemeen (verzamelniveau)
 (52.51) afvoeren; vuilwaterafvoer speciaal, chemisch verontreinigd afvalwater
@@ -254,7 +254,7 @@
 (52.56) afvoeren; vuilwaterafvoer speciaal, pompsysteem
 (52.60) afvoeren; vaste stoffen, algemeen (verzamelniveau)
 (52.61) afvoeren; vaste stoffen, stortkokers
-(52.62) afvoeren; vaste stoffen, vacuÃ¼msysteem
+(52.62) afvoeren; vaste stoffen, vacuümsysteem
 (52.63) afvoeren; vaste stoffen, persluchtsysteem
 (52.64) afvoeren; vaste stoffen, verdichtingsysteem
 (52.65) afvoeren; vaste stoffen, verbrandingsysteem
@@ -273,7 +273,7 @@
 (53.32) water; bedrijfswater, demi-watersysteem
 (53.33) water; bedrijfswater, gedistilleerd-watersysteem
 (53.34) water; bedrijfswater, zwembad-watersysteem
-(53.36) water; bedrijfswater; drukverhogingsinstallatie 
+(53.36) water; bedrijfswater; drukverhogingsinstallatie
 (53.37) water; bedrijfswater, onderbrekingsinstallatie (breektank)
 (53.39) water; bedrijfswater, voorraadvaten
 (53.40) water; gebruiksstoom en condens, algemeen (verzamelniveau)
@@ -315,9 +315,9 @@
 (54.50) gassen; bijzonder, algemeen (verzamelniveau)
 (54.51) gassen; bijzonder, voorziening; zuivere gassen
 (54.52) gassen; bijzonder, voorziening; menggassen
-(54.60) gassen; vacuÃ¼m, algemeen (verzamelniveau)
-(54.61) gassen; vacuÃ¼m, vacuÃ¼mvoorziening
-(54.63) gassen; vacuÃ¼m, pompsysteem
+(54.60) gassen; vacuüm, algemeen (verzamelniveau)
+(54.61) gassen; vacuüm, vacuümvoorziening
+(54.63) gassen; vacuüm, pompsysteem
 (54.90) vaste gebouwgebonden voorzieningen behorend bij gassen, algemeen (verzamelniveau)
 (55.10) koeling; lokaal, algemeen (verzamelniveau)
 (55.11) koeling; lokaal, raamkoelers/splitsystemen
@@ -346,7 +346,7 @@
 (56.20) verwarming; opwekking centraal, algemeen (verzamelniveau)
 (56.21) verwarming; opwekking centraal, verwarmingstoestellen (ketels, HR, VR, biomassa)
 (56.22) verwarming; opwekking centraal, stoomketels en toebehoren (ontgassers, etc.)
-(56.23) verwarming; opwekking centraal, warmtekrachtkoppeling (WKK) en toebehoren 
+(56.23) verwarming; opwekking centraal, warmtekrachtkoppeling (WKK) en toebehoren
 (56.25) verwarming; opwekking centraal, zonnecollectoren
 (56.26) verwarming; opwekking centraal, electrolyser, brandstofcel
 (56.27) verwarming; opwekking centraal, aardwarmte (geothermie)
@@ -430,12 +430,12 @@
 (61.42) centrale elektrotechnische voorzieningen; energiedistributie middenspanning >1kV, middenspanningsverdeler
 (61.43) centrale elektrotechnische voorzieningen; energiedistributie middenspanning >1kV, voedingleiding MS
 (61.44) centrale elektrotechnische voorzieningen; energiedistributie middenspanning >1kV, transformator
-(61.50) centrale elektrotechnische voorzieningen; energiedistributie laagspanning â‰¤1kV ,algemeen (verzamelniveau)
-(61.51) centrale elektrotechnische voorzieningen; energiedistributie laagspanning â‰¤1kV, voedingsleiding laagspanningshoofdverdeler
-(61.52) centrale elektrotechnische voorzieningen; energiedistributie laagspanning â‰¤1kV, laagspanningshoofdverdeler
-(61.53) centrale elektrotechnische voorzieningen; energiedistributie laagspanning â‰¤1kV, voedingsleiding LS
-(61.54) centrale elektrotechnische voorzieningen; energiedistributie laagspanning â‰¤1kV, sub- en eindverdeler
-(61.55) centrale elektrotechnische voorzieningen; energiedistributie laagspanning â‰¤1kV, medische verdeler (scheidingstransformator)
+(61.50) centrale elektrotechnische voorzieningen; energiedistributie laagspanning ≤1kV ,algemeen (verzamelniveau)
+(61.51) centrale elektrotechnische voorzieningen; energiedistributie laagspanning ≤1kV, voedingsleiding laagspanningshoofdverdeler
+(61.52) centrale elektrotechnische voorzieningen; energiedistributie laagspanning ≤1kV, laagspanningshoofdverdeler
+(61.53) centrale elektrotechnische voorzieningen; energiedistributie laagspanning ≤1kV, voedingsleiding LS
+(61.54) centrale elektrotechnische voorzieningen; energiedistributie laagspanning ≤1kV, sub- en eindverdeler
+(61.55) centrale elektrotechnische voorzieningen; energiedistributie laagspanning ≤1kV, medische verdeler (scheidingstransformator)
 (61.90) vaste gebouwgebonden voorzieningen behorend bij centrale elektrotechnische voorzieningen, algemeen (verzamelniveau)
 (62.10) energievoorziening gebruikersaansluitingen; generiek wissel, algemeen (verzamelniveau)
 (62.11) energievoorziening gebruikersaansluitingen; generiek wissel, voedingsleiding
@@ -450,7 +450,7 @@
 (62.41) energievoorziening gebruikersaansluitingen; specifiek gelijk, voedingsleiding
 (62.42) energievoorziening gebruikersaansluitingen; specifiek gelijk, aansluitpunten
 (62.90) vaste gebouwgebonden voorzieningen behorend bij energievoorziening gebruikersaansluitingen, algemeen (verzamelniveau)
-(63.10) verlichting; verlichting, bediening, regeling en signalering, algemeen (verzamelniveau) 
+(63.10) verlichting; verlichting, bediening, regeling en signalering, algemeen (verzamelniveau)
 (63.11) verlichting; verlichting, bediening, regeling en signalering, voedingsleidingen
 (63.20) verlichting; verlichting standaard armaturen, algemeen (verzamelniveau)
 (63.21) verlichting; verlichting standaard armaturen, armaturen
@@ -478,12 +478,12 @@
 (64.32) communicatie; beelden, beeldreproductie
 (64.33) communicatie; beelden, film/dia/overhead
 (64.34) communicatie; beelden, vergader- en presentatiesystemen
-(64.50) communicatie; geÃ¯ntegreerde systemen, data, algemeen (verzamelniveau)
-(64.51) communicatie; geÃ¯ntegreerde systemen, data, centrale apparatuur
-(64.52) communicatie; geÃ¯ntegreerde systemen, data, distributie bekabeling
-(64.53) communicatie; geÃ¯ntegreerde systemen, data, generiek, aansluitpunten
-(64.54) communicatie; geÃ¯ntegreerde systemen, data, specifiek aansluitpunten
-(64.55) communicatie; geÃ¯ntegreerde systemen, data, decentrale apparatuur
+(64.50) communicatie; geïntegreerde systemen, data, algemeen (verzamelniveau)
+(64.51) communicatie; geïntegreerde systemen, data, centrale apparatuur
+(64.52) communicatie; geïntegreerde systemen, data, distributie bekabeling
+(64.53) communicatie; geïntegreerde systemen, data, generiek, aansluitpunten
+(64.54) communicatie; geïntegreerde systemen, data, specifiek aansluitpunten
+(64.55) communicatie; geïntegreerde systemen, data, decentrale apparatuur
 (64.60) communicatie; antenne-inrichtingen, algemeen (verzamelniveau)
 (64.61) communicatie; antenne-inrichtingen, centrale apparatuur
 (64.62) communicatie; antenne-inrichtingen, voedings- en signaalleidingen
@@ -625,7 +625,7 @@
 (83.24) losse keukeninventaris; bijzonder, transportmiddelen
 (84.10) losse sanitaire inventaris; standaard, algemeen (verzamelniveau)
 (84.11) losse sanitaire inventaris; standaard, afvalvoorzieningen
-(84.12) losse sanitaire inventaris; standaard, voorzieningen t.b.v. hygiÃ«ne
+(84.12) losse sanitaire inventaris; standaard, voorzieningen t.b.v. hygiëne
 (84.13) losse sanitaire inventaris; standaard, accessoires
 (84.20) losse sanitaire inventaris; bijzonder, algemeen (verzamelniveau)
 (84.21) losse sanitaire inventaris; bijzonder, sanitaire toestellen voor bijzondere toepassing
