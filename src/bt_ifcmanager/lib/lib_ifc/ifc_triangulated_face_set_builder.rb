@@ -73,9 +73,9 @@ module BimTools
 
         meshes.each do |mesh|
           face_mesh, face_transformation = mesh
-          front_texture = texture_exists?(front_material)
-          back_texture = texture_exists?(back_material) if double_sided_faces
-          parent_texture = texture_exists?(parent_material)
+          front_texture = texture_exists?(front_material) || false
+          back_texture = double_sided_faces ? (texture_exists?(back_material) || false) : false
+          parent_texture = texture_exists?(parent_material) || false
 
           # Calculate UV transformation for parent texture if no texture is applied to the face
           if !(front_texture || back_texture) && parent_texture
