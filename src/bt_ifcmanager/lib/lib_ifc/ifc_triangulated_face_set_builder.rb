@@ -70,9 +70,9 @@ module BimTools
         add_parent_texture = faces.any? { |face| face.material.nil? }
         add_material_to_model(parent_material) if add_parent_texture
 
-        front_texture = texture_exists?(front_material)
-        back_texture = texture_exists?(back_material) if double_sided_faces
-        parent_texture = texture_exists?(parent_material)
+        front_texture = texture_exists?(front_material) || false
+        back_texture = double_sided_faces ? (texture_exists?(back_material) || false) : false
+        parent_texture = texture_exists?(parent_material) || false
 
         @mirrored = true if is_mirroring?(transformation)
 
