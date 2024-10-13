@@ -84,17 +84,17 @@ module BimTools
       def get_name(classification_dictionary, classification_value)
         if classification_dictionary
           classification_dictionary.attribute_dictionaries.each do |dictionary|
-            if %w[name tekst_nl-sfb  din_text].include? dictionary.name.downcase
-              if value = dictionary['value']
-                return value
-              elsif value_dictionary = dictionary.attribute_dictionaries[dictionary.name]
-                return value_dictionary['value']
-              end
+            next unless %w[name tekst_nl-sfb din_text].include? dictionary.name.downcase
+
+            value = dictionary['value']
+            if value
+              return value
+            elsif dictionary.attribute_dictionaries && (value_dictionary = dictionary.attribute_dictionaries[dictionary.name])
+              return value_dictionary['value'] if value_dictionary['value']
             end
           end
         end
-        return classification_value
-        nil
+        classification_value
       end
     end
   end
