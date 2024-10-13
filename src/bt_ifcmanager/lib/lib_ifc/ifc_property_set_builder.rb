@@ -36,9 +36,9 @@ module BimTools
       end
 
       def initialize(ifc_model)
-        @ifc = IfcManager::Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
-        @ifc_property_set = @ifc::IfcPropertySet.new(ifc_model)
+        @ifc_property_set = @ifc_module::IfcPropertySet.new(ifc_model)
         @ifc_property_set.hasproperties = IfcManager::Types::Set.new
       end
 

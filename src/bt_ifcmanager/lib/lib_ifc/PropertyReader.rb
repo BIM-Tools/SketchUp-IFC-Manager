@@ -50,8 +50,8 @@ module BimTools
       }.freeze
 
       def initialize(ifc_model, ifc_entity, entity_dict, instance_class = nil)
-        @ifc = IfcManager::Settings.ifc_module
-        ifc_version = IfcManager::Settings.ifc_version
+        @ifc_module = ifc_model.ifc_module
+        ifc_version = ifc_model.ifc_version
         @ifc_model = ifc_model
         @ifc_entity = ifc_entity
         @instance_class = instance_class
@@ -60,10 +60,13 @@ module BimTools
         @propertyset_names = []
         return unless @ifc_dict
 
+        ifc_entity_attributes = ifc_entity.attributes.map { |x| x.to_s }
+        ifc_entity_inverse_attributes = ifc_entity.inverse_attributes.map { |x| x.to_s }
+
         # split attributes from properties
         names = @ifc_dict.map(&:name)
         names -= UNUSED_DICTS # filter out unwanted dictionaries
-        ifc_entity_attributes = ifc_entity.attributes.map { |x| x.to_s }
+        names -= ifc_entity_inverse_attributes # filter out inverse dictionaries
         @attributes = names & ifc_entity_attributes
 
         # Skip IfcProduct-only attributes for IfcTypeProduct
@@ -74,7 +77,16 @@ module BimTools
                             @attributes
                           end
 
-        @propertyset_names = names - @all_attributes
+
+        @propertyset_names = names - @all_attributes - ifc_entity_inverse_attributes
+      end
+
+      def handle_predefined_type(value)
+        if value == :userdefined
+          object_type_or_element_type = @ifc_dict['ObjectType'] || @ifc_dict['ElementType']
+          return :notdefined if object_type_or_element_type
+        end
+        value
       end
 
       # Set the IFC entity attributes using all combined attribute possibilitites from IfcProduct and IfcTypeProduct
@@ -84,7 +96,8 @@ module BimTools
         i = 0
         while i < @all_attributes.length
           name = @all_attributes[i]
-          set_attribute(@ifc_dict[name])
+          value = @ifc_dict[name]
+          set_attribute(value)
           i += 1
         end
       end
@@ -167,9 +180,12 @@ module BimTools
 
         property = create_property(attr_dict, name)
         value = property.value
+
         return false if value.nil? || (value.is_a?(String) && value.empty?)
 
         ifc_value = determine_ifc_value(property, value)
+        ifc_value = handle_predefined_type(ifc_value) if ifc_value.is_a?(Symbol) && name == 'PredefinedType'
+
         @ifc_entity.send("#{name.downcase}=", ifc_value) if ifc_value
       end
 
@@ -243,14 +259,21 @@ module BimTools
               ifc_value = ifc_type.new(@ifc_model, value, true) if ifc_type
 
               # Check if IFC type is set, otherwise use basic types
-              ifc_value ||= get_ifc_property_value(value, property.attribute_type, true)
+              if !ifc_value || !ifc_value.is_a?(IfcManager::Types::BaseType)
+                ifc_value = get_ifc_property_value(value, property.attribute_type, true)
+              end
 
               next unless ifc_value
 
               properties << IfcPropertyBuilder.build(@ifc_model, property.attribute_type) do |builder|
                 builder.set_name(property.name)
                 builder.set_value(ifc_value)
-                builder.set_enumeration_reference(property.options) # in case of enumeration
+                if property.attribute_type == :enumeration
+                  builder.set_enumeration_reference(
+                    property.options,
+                    property.ifc_type_name
+                  )
+                end
               end
             end
           end
@@ -293,18 +316,18 @@ module BimTools
 
       def get_ifc_property_value(value, attribute_type, long = false)
         case attribute_type
-        when 'string'
+        when :string
           IfcManager::Types::IfcText.new(@ifc_model, value, long) # check string length?
-        when 'boolean'
+        when :boolean
           IfcManager::Types::IfcBoolean.new(@ifc_model, value, long)
-        when 'double'
+        when :double
           IfcManager::Types::IfcReal.new(@ifc_model, value, long)
-        when 'long'
+        when :long
           IfcManager::Types::IfcInteger.new(@ifc_model, value, long)
-        when 'choice'
+        when :choice
           # Skip this attribute, this is not a value but a reference
           false
-        when 'enumeration'
+        when :enumeration
           if long
             IfcManager::Types::IfcLabel.new(@ifc_model, value, long)
           else
@@ -364,7 +387,7 @@ module BimTools
   # @param [Sketchup::AttributeDictionary] attr_dict
   #
   class Property
-    attr_reader :name, :value, :ifc_type, :attribute_type, :options
+    attr_reader :name, :value, :ifc_type, :ifc_type_name, :attribute_type, :options
 
     UNUSED_DICTS = %i[
       href
@@ -379,7 +402,7 @@ module BimTools
 
       # When value is set the data is stored on this level
       @value = attr_dict['value']
-      @attribute_type = attr_dict['attribute_type']
+      @attribute_type = attr_dict['attribute_type'].to_sym if attr_dict['attribute_type']
 
       # We can't be sure that the unspecified false value is meant as a boolean or
       #  is just imported as an empty value from an IFC file
@@ -406,12 +429,15 @@ module BimTools
 
       value_dict = attr_dict.attribute_dictionaries[ifc_type_name.to_s]
       @value = value_dict['value']
-      @attribute_type = value_dict['attribute_type']
+      @attribute_type = value_dict['attribute_type'].to_sym if attr_dict['attribute_type']
+      @attribute_type = :enumeration if ifc_type_name.start_with?('PEnum_')
       @options = value_dict['options']
 
       # Check for IFC type
-      if ifc_type_name[0].upcase == ifc_type_name[0] && IfcManager.const_defined?(ifc_type_name)
-        @ifc_type = IfcManager.const_get(ifc_type_name)
+      if ifc_type_name[0].upcase == ifc_type_name[0] && IfcManager::Types.const_defined?(ifc_type_name.to_s.sub('-',
+                                                                                                                '_'))
+        @ifc_type_name = ifc_type_name
+        @ifc_type = IfcManager::Types.const_get(ifc_type_name)
       end
 
       # Sometimes the value is even nested a level deeper

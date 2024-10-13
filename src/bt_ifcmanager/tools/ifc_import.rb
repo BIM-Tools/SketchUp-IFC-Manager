@@ -35,7 +35,7 @@ module BimTools::IfcManager
     end
     j = 0
     while j < delete.length
-      delete[j].erase!
+      delete[j].erase! unless delete[j].deleted?
       j += 1
     end
   end
@@ -159,7 +159,11 @@ module BimTools::IfcManager
     import_path = UI.openpanel('Open IFC File', default_path, 'IFC Files|*.ifc;*.ifcZIP||')
     if import_path
       model.start_operation('IFC Import', true)
-      model.import(import_path, false)
+      if Sketchup.version.to_i < 18
+        model.import(import_path, false)
+      else
+        model.import(import_path, { show_summary: false })
+      end
       model.commit_operation
       puts 'IFC import complete'
       ifc_cleanup(model, import_path)

@@ -1,0 +1,252 @@
+// A few entries have been added to the whitelist so that our simplify filter gives the same list as it does for the IFC 2x3 schema - SketchUp team, Jan. 5, 2021
+
+IfcBeam
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcBuilding
+{
+  Name
+  Description
+  ObjectType
+  ElevationOfRefHeight
+  ElevationOfTerrain
+  LongName
+  CompositionType
+}
+
+IfcBuildingElementProxy
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcBuildingStorey
+{
+  Name
+  Description
+  ObjectType
+  Elevation
+  LongName
+  CompositionType
+}
+
+IfcColumn
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcCurtainWall
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcDoor
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  OverallHeight
+  OverallWidth
+  OperationType
+  UserDefinedOperationType
+  PredefinedType
+}
+
+IfcFooting
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcFurnishingElement
+{
+  Name
+  Description
+  ObjectType
+  Tag
+}
+
+IfcMember
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcPile
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  ConstructionType
+  PredefinedType
+}
+
+IfcPlate
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcProject
+{
+  Name
+  Description
+  ObjectType
+  LongName
+  Phase
+}
+
+IfcRailing
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcRamp
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcRampFlight
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcRoof
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcSite
+{
+  Name
+  Description
+  ObjectType
+  CompositionType
+  LongName
+  LandTitleNumber
+  RefElevation
+  RefLatitude
+  RefLongitude
+}
+
+IfcSlab
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcSpace
+{
+  Name
+  Description
+  ObjectType
+  CompositionType
+  LongName
+  InteriorOrExteriorSpace
+  ElevationWithFlooring
+}
+
+IfcStair
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcStairFlight
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  NumberOfRiser
+  NumberOfTreads
+  RiserHeight
+  TreadLength
+  PredefinedType
+}
+
+IfcWall
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcWallStandardCase
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  PredefinedType
+}
+
+IfcWindow
+{
+  Name
+  Description
+  ObjectType
+  Tag
+  OverallHeight
+  OverallWidth
+  PartitioningType
+  PredefinedType
+  UserDefinedPartitioningType
+}
+
+// Blacklist Attributes
+{
+  instanceAttributes
+}

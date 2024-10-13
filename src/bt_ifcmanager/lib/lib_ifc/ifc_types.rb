@@ -237,7 +237,7 @@ module BimTools
       # END_TYPE;
       class IfcDate < BaseType
         def initialize(ifc_model, value, long = false)
-          raise TypeError, "expected a Time, got #{value.class.name}" unless value.is_a?(Time)
+          raise TypeError, "expected a Time, got #{value.class.name}" unless value.is_a?(DateTime)
 
           super
           @value = value
@@ -921,6 +921,17 @@ module BimTools
 
       # TYPE IfcYearNumber = INTEGER;
       # END_TYPE;
+
+      class PEnum_ElementStatus
+        def initialize(ifc_model, value, long = true)
+          @value = value
+        end
+
+        def step
+          @value
+        end
+      end
+
     end
   end
 end

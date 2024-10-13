@@ -29,7 +29,7 @@ module BimTools
     @related_objects = nil
     attr_accessor :relating_object, :related_objects
 
-    def initialize(ifc_model, sketchup)
+    def initialize(ifc_model, sketchup, total_transformation = nil)
       # set default CompositionType
       @compositiontype = :element
       super

@@ -25,6 +25,7 @@ require_relative 'ifc_types'
 require_relative 'dynamic_attributes'
 require_relative 'PropertyReader'
 require_relative 'material_and_styling'
+require_relative 'base_quantity_builder'
 
 module BimTools
   module IfcProduct_su
@@ -35,12 +36,16 @@ module BimTools
 
     # @param [BimTools::IfcManager::IfcModel] ifc_model
     # @param [nil, #definition] sketchup an empty object (default object), Sketchup::ComponentInstance or Sketchup::Group
-    def initialize(ifc_model, sketchup)
-      super
-      @ifc = BimTools::IfcManager::Settings.ifc_module
+    def initialize(ifc_model, sketchup, total_transformation)
+      @total_transformation = total_transformation
+      super(ifc_model, sketchup)
+
+      @ifc_module = ifc_model.ifc_module
+      @ifc_model = ifc_model
+
+      # TODO: prevent initializing of IfcProduct for non-Sketchup objects
       return unless sketchup.respond_to?(:definition)
 
-      @ifc_model = ifc_model
       @su_object = sketchup
       definition = @su_object.definition
 
@@ -57,8 +62,8 @@ module BimTools
           @type_product.add_typed_object(self)
         else
           type_name = self.class.name.split('::').last + 'Type'
-          if @ifc.const_defined?(type_name)
-            type_product = @ifc.const_get(type_name)
+          if @ifc_module.const_defined?(type_name)
+            type_product = @ifc_module.const_get(type_name)
             @type_product = type_product.new(ifc_model, definition, self.class)
             @ifc_model.product_types[definition] = @type_product
             @type_product.add_typed_object(self)
@@ -80,9 +85,14 @@ module BimTools
         dict_reader.add_sketchup_instance_properties(ifc_model, self, @su_object)
       end
 
+      # unset ObjectType if a IfcTypeProduct is defined
+      if @type_product && defined?(predefinedtype)
+        @predefinedtype = nil
+      end
+
       # set material if sketchup @su_object has a material
       # Material added to Product and not to TypeProduct because a Sketchup ComponentDefinition can have a different material for every Instance
-      if ifc_model.options[:materials] && (is_a? @ifc::IfcElement) && !(is_a? @ifc::IfcFeatureElementSubtraction) && !(is_a? @ifc::IfcVirtualElement)
+      if ifc_model.options[:materials] && (is_a? @ifc_module::IfcElement) && !(is_a? @ifc_module::IfcFeatureElementSubtraction) && !(is_a? @ifc_module::IfcVirtualElement)
 
         # create materialassociation
         su_material = @su_object.material
@@ -96,6 +106,20 @@ module BimTools
 
       # collect dynamic component attributes if export option is set
       BimTools::DynamicAttributes.get_dynamic_attributes(ifc_model, self) if ifc_model.options[:dynamic_attributes]
+
+      return unless ifc_model.options[:base_quantities]
+
+      add_base_quantities
+    end
+
+    def add_base_quantities
+      unless is_a?(@ifc_module::IfcColumn) || is_a?(@ifc_module::IfcBeam) || is_a?(@ifc_module::IfcSlab) || is_a?(@ifc_module::IfcWall)
+        return
+      end
+
+      BimTools::IfcManager::BaseQuantityBuilder.build(@ifc_model) do |builder|
+        builder.add_base_quantities(self, @su_object)
+      end
     end
 
     # add export summary for IfcProducts

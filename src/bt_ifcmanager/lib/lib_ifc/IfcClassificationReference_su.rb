@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-#  IfcRoot_su.rb
+#  IfcClassificationReference_su.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -21,18 +21,10 @@
 #
 #
 
-require_relative('IfcGloballyUniqueId')
-
 module BimTools
-  module IfcRoot_su
-    def initialize(ifc_model, sketchup = nil)
-      @sketchup = sketchup
-      @ownerhistory = ifc_model.owner_history
-      super
-    end
-
-    def globalid
-      @globalid ||= BimTools::IfcManager::IfcGloballyUniqueId.new(@sketchup)
+  module IfcClassificationReference_su
+    def self.required_attributes
+      [:ReferencedSource]
     end
   end
 end

@@ -116,19 +116,19 @@ module BimTools
           if entry = zip_file.find_entry('document.xml')
             raise 'File too large when extracted' if entry.size > MAX_SIZE
 
-            document = REXML::Document.new(entry.get_input_stream.read)
-            document.elements.each('classificationDocument') do |element|
-              element.elements.each('cls:Classification') do |element|
-                if xsd_file = element.attributes['xsdFile']
-                  break
+              document = REXML::Document.new(entry.get_input_stream.read)
+              document.elements.each('classificationDocument') do |document_element|
+                document_element.elements.each('cls:Classification') do |classification_element|
+                  if xsd_file = classification_element.attributes['xsdFile']
+                    break
+                  end
                 end
+                break
               end
-              break
             end
-          end
 
           # Read XSD file
-          raise 'Unable to read classification' unless entry = zip_file.find_entry(xsd_file)
+          raise 'Unable to read classification, invalid SKC-file' unless entry = zip_file.find_entry(xsd_file)
           raise 'File too large when extracted' if entry.size > MAX_SIZE
 
           return entry.get_input_stream.read

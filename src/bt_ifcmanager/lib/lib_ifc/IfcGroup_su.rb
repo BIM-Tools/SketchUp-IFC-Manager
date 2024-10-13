@@ -30,8 +30,8 @@ module BimTools
     # @param [Sketchup::ComponentDefinition] sketchup
     def initialize(ifc_model, sketchup = nil)
       super
-      @ifc = BimTools::IfcManager::Settings.ifc_module
-      @rel = @ifc::IfcRelAssignsToGroup.new(ifc_model)
+      @ifc_module = ifc_model.ifc_module
+      @rel = @ifc_module::IfcRelAssignsToGroup.new(ifc_model)
       @rel.relatinggroup = self
       @rel.relatedobjects = IfcManager::Types::Set.new
 
@@ -39,7 +39,6 @@ module BimTools
       if sketchup.is_a?(Sketchup::Group) || sketchup.is_a?(Sketchup::ComponentInstance)
 
         # get properties from su object and add them to ifc object
-        ifc_version = BimTools::IfcManager::Settings.ifc_version
         definition = sketchup.definition
 
         # (?) set name, here? is this a duplicate?

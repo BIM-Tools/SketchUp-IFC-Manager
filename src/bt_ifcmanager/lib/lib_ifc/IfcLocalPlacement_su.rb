@@ -27,11 +27,11 @@ module BimTools
   module IfcLocalPlacement_su
     attr_accessor :transformation, :ifc_total_transformation
 
-    @@DEFAULT_TRANSFORMATION = Geom::Transformation.new().to_a.freeze
+    @@DEFAULT_TRANSFORMATION = Geom::Transformation.new.to_a.freeze
 
     def initialize(ifc_model, su_total_transformation = Geom::Transformation.new, placementrelto = nil)
       super
-      @ifc = BimTools::IfcManager::Settings.ifc_module
+      @ifc_module = ifc_model.ifc_module
 
       # set parent placement
       @placementrelto = placementrelto # if placementrelto.is_a?(IfcLocalPlacement)
@@ -49,7 +49,6 @@ module BimTools
 
         @ifc_total_transformation = rotation_and_translation
 
-
         @transformation = if !@placementrelto.nil? && @placementrelto.ifc_total_transformation
                             @placementrelto.ifc_total_transformation.inverse * @ifc_total_transformation
                           else
@@ -57,7 +56,7 @@ module BimTools
                           end
 
         # set relativeplacement
-        @relativeplacement = @ifc::IfcAxis2Placement3D.new(ifc_model, @transformation)
+        @relativeplacement = @ifc_module::IfcAxis2Placement3D.new(ifc_model, @transformation)
       end
     end
   end

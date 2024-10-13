@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-#  ifc_triangulated_face_set_builder.rb
+#  ifc_polygonal_face_set_builder.rb.rb
 #
-#  Copyright 2022 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -26,29 +26,28 @@ require_relative 'material_and_styling'
 
 module BimTools
   module IfcManager
-    class IfcTriangulatedFaceSetBuilder
-      attr_reader :ifc_triangulated_face_set
+    class IfcPolygonalFaceSetBuilder
+      attr_reader :ifc_polygonal_face_set
 
       def self.build(ifc_model)
         builder = new(ifc_model)
         yield(builder)
 
-        builder.ifc_triangulated_face_set.coordinates ||= IfcManager::Types::List.new
-        builder.ifc_triangulated_face_set.coordindex ||= IfcManager::Types::List.new
+        builder.ifc_polygonal_face_set.coordinates ||= IfcManager::Types::List.new
+        builder.ifc_polygonal_face_set.faces ||= IfcManager::Types::List.new
 
-        builder.ifc_triangulated_face_set
+        builder.ifc_polygonal_face_set
       end
 
       def initialize(ifc_model)
-        @ifc_module = ifc_model.ifc_module
+        @ifc = Settings.ifc_module
         @ifc_model = ifc_model
-        @ifc_triangulated_face_set = @ifc_module::IfcTriangulatedFaceSet.new(ifc_model)
-        @ifc_triangulated_face_set.coordinates = @ifc_module::IfcCartesianPointList3D.new(ifc_model)
-        @mirrored = false
+        @ifc_polygonal_face_set = @ifc::IfcPolygonalFaceSet.new(ifc_model)
+        @ifc_polygonal_face_set.coordinates = @ifc::IfcCartesianPointList3D.new(ifc_model)
 
         # # @todo closed should be true for manifold geometry
         # @closed = false
-        @coordindex = IfcManager::Types::List.new
+        @faces = IfcManager::Types::List.new
       end
 
       def set_faces(
@@ -63,23 +62,18 @@ module BimTools
         points = []
         uv_coordinates_front = []
         uv_coordinates_back = []
-        normals_front = []
-        normals_back = []
         point_total = 0
 
         add_parent_texture = faces.any? { |face| face.material.nil? }
         add_material_to_model(parent_material) if add_parent_texture
 
-        front_texture = texture_exists?(front_material) || false
-        back_texture = double_sided_faces ? (texture_exists?(back_material) || false) : false
-        parent_texture = texture_exists?(parent_material) || false
-
-        @mirrored = true if is_mirroring?(transformation)
-
-        meshes = faces.map { |face| [face.mesh(7), get_face_transformation(face).inverse] }
+        meshes = faces.map { |face| [face, get_face_transformation(face).inverse] }
 
         meshes.each do |mesh|
-          face_mesh, face_transformation = mesh
+          face, face_transformation = mesh
+          front_texture = texture_exists?(front_material)
+          back_texture = texture_exists?(back_material) if double_sided_faces
+          parent_texture = texture_exists?(parent_material)
 
           # Calculate UV transformation for parent texture if no texture is applied to the face
           if !(front_texture || back_texture) && parent_texture
@@ -87,25 +81,20 @@ module BimTools
                                                             parent_material.texture)
           end
 
-          face_mesh.transform! transformation
+          face.transform! transformation
 
-          point_total = process_faces(face_mesh, point_total, points, uv_coordinates_front, uv_coordinates_back,
-                                      normals_front, normals_back, front_texture, back_texture, parent_texture, uv_transformation, double_sided_faces)
+          point_total = process_faces(face, point_total, points, uv_coordinates_front, uv_coordinates_back,
+                                      front_texture, back_texture, parent_texture, uv_transformation, double_sided_faces)
         end
 
-        @ifc_triangulated_face_set.coordinates.coordlist = IfcManager::Types::List.new(points.map do |point|
+        @ifc_polygonal_face_set.coordinates.coordlist = IfcManager::Types::List.new(points.map do |point|
           IfcManager::Types::List.new(point.to_a.map do |coord|
             IfcManager::Types::IfcLengthMeasure.new(ifc_model, coord)
           end)
         end)
 
-        @ifc_triangulated_face_set.closed = @closed
-        @ifc_triangulated_face_set.normals = IfcManager::Types::List.new(normals_front.map do |normal|
-          IfcManager::Types::List.new(normal.to_a.map do |coord|
-            IfcManager::Types::IfcParameterValue.new(ifc_model, coord)
-          end)
-        end)
-        @ifc_triangulated_face_set.coordindex = @coordindex
+        @ifc_polygonal_face_set.closed = @closed
+        @ifc_polygonal_face_set.faces = @faces
 
         return unless ifc_model.textures && (front_texture || back_texture || parent_texture)
 
@@ -124,17 +113,16 @@ module BimTools
         image_texture = ifc_model.materials[su_material].image_texture
         return unless image_texture
 
-        tex_vert_list = @ifc_module::IfcTextureVertexList.new(ifc_model)
+        tex_vert_list = @ifc::IfcTextureVertexList.new(ifc_model)
         tex_vert_list.texcoordslist = IfcManager::Types::Set.new(uv_coordinates)
-        texture_map = @ifc_module::IfcIndexedTriangleTextureMap.new(ifc_model)
-        texture_map.mappedto = @ifc_triangulated_face_set
+        texture_map = @ifc::IfcIndexedTriangleTextureMap.new(ifc_model)
+        texture_map.mappedto = @ifc_polygonal_face_set
         texture_map.maps = IfcManager::Types::List.new([image_texture])
         texture_map.texcoords = tex_vert_list
         nil
       end
 
       def get_ifc_polygon(point_total, polygon)
-        polygon.reverse! if @mirrored
         polygon.map { |pt_id| IfcManager::Types::IfcInteger.new(@ifc_model, point_total + pt_id.abs) }
       end
 
@@ -166,13 +154,11 @@ module BimTools
         Geom::Transformation.axes(projected_origin, axes[0], axes[1], axes[2])
       end
 
-      def process_faces(face_mesh, point_total, points, uv_coordinates_front, uv_coordinates_back, normals_front,
-                        normals_back, front_texture, back_texture, parent_texture, uv_transformation, double_sided_faces)
+      def process_faces(face_mesh, point_total, points, uv_coordinates_front, uv_coordinates_back, front_texture,
+                        back_texture, parent_texture, uv_transformation, double_sided_faces)
         (1..face_mesh.count_points).each do |mesh_point_id|
           index = mesh_point_id + point_total - 1
           points[index] = face_mesh.point_at(mesh_point_id)
-          normals_front[index] = face_mesh.normal_at(mesh_point_id)
-          normals_back[index] = face_mesh.normal_at(mesh_point_id) if double_sided_faces
           if front_texture || back_texture || parent_texture
             process_textures(front_texture, back_texture, parent_texture, face_mesh, mesh_point_id, points,
                              uv_coordinates_front, uv_coordinates_back, uv_transformation, double_sided_faces, index)
@@ -180,7 +166,7 @@ module BimTools
         end
 
         face_mesh.polygons.each do |polygon|
-          @coordindex.add(IfcManager::Types::List.new(get_ifc_polygon(point_total, polygon)))
+          @faces.add(IfcManager::Types::List.new(get_ifc_polygon(point_total, polygon)))
         end
 
         point_total += face_mesh.count_points
@@ -233,15 +219,6 @@ module BimTools
       def calculate_uv_transformation(transformation, face_transformation, texture)
         texture_transformation = get_texture_transformation(texture)
         transformation.inverse * face_transformation * texture_transformation
-      end
-
-      def is_mirroring?(transformation)
-        # Calculate the cross product of the x and y axes
-        cross_product = transformation.xaxis * transformation.yaxis
-
-        # If the dot product of the cross product and the z axis is negative,
-        # the transformation includes a mirroring operation
-        cross_product.dot(transformation.zaxis) < 0
       end
     end
   end

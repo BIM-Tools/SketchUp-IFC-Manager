@@ -59,20 +59,20 @@ module BimTools
       # @param [IfcModel]
       # @param [IfcProject | nil] ifc_entity OPTIONAL existing IFC entity to modify
       def initialize(ifc_model, ifc_entity = nil)
-        @ifc = Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
 
         if ifc_entity
-          if ifc_entity.class != @ifc::IfcProject
-            raise ArgumentError, "Must be of type #{@ifc::IfcProject}, got #{ifc_entity.class}"
+          if ifc_entity.class != @ifc_module::IfcProject
+            raise ArgumentError, "Must be of type #{@ifc_module::IfcProject}, got #{ifc_entity.class}"
           end
 
           @ifc_entity = ifc_entity
         else
-          @ifc_entity = @ifc::IfcProject.new(ifc_model, ifc_model.su_model) # @todo su_model needed parameter?
+          @ifc_entity = @ifc_module::IfcProject.new(ifc_model, ifc_model.su_model) # @todo su_model needed parameter?
         end
         # Set project units to sketchup units
-        @ifc_entity.unitsincontext = @ifc::IfcUnitAssignment.new(ifc_model)
+        @ifc_entity.unitsincontext = @ifc_module::IfcUnitAssignment.new(ifc_model)
       end
 
       def validate

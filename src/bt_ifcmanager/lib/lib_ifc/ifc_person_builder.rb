@@ -52,9 +52,9 @@ module BimTools
       # @param ifc_model [IFCModel] The IFC model to add the person to.
       # @return [IfcPersonBuilder] A new instance of the IfcPersonBuilder class.
       def initialize(ifc_model)
-        @ifc = IfcManager::Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
-        @ifc_person = @ifc::IfcPerson.new(@ifc_model)
+        @ifc_person = @ifc_module::IfcPerson.new(@ifc_model)
       end
 
       # Sets the user identification for the IFC person.

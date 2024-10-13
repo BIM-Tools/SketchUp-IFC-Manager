@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <documentProperties xmlns="http://www.sketchup.com/schemas/1.0/documentproperties" xmlns:dp="http://www.sketchup.com/schemas/1.0/documentproperties" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sketchup.com/schemas/1.0/documentproperties http://www.sketchup.com/schemas/1.0/documentproperties.xsd">
 
-  <dp:title>NL-SfB tabel 1</dp:title>
+  <dp:title>IFC4X3_ADD2</dp:title>
 
-  <dp:description>Het NL/SfB-systeem is de officiële Nederlandse versie van de internationaal erkende SfB-classificatie, een specifiek op de bouwsector gerichte indeling/codering methodiek.</dp:description>
+  <dp:description>The Industry Foundation Classes (IFC) are an open international standard for sharing Building Information Model (BIM) data.</dp:description>
 
-  <dp:creator>Ketenstandaard</dp:creator>
+  <dp:creator>buildingSMART</dp:creator>
 
   <dp:keywords></dp:keywords>
 
   <dp:lastModifiedBy></dp:lastModifiedBy>
 
-  <dp:revision>2021</dp:revision>
+  <dp:revision>1</dp:revision>
 
-  <dp:created>2005-12-31T12:00:00</dp:created>
+  <dp:created>2024-04-01T00:00:00</dp:created>
 
-  <dp:modified>2021-12-22T12:00:00</dp:modified>
+  <dp:modified>2024-04-01T00:00:00</dp:modified>
 
-  <dp:thumbnail></dp:thumbnail>
+  <dp:thumbnail>doc_thumbnail.png</dp:thumbnail>
 
   <dp:generator dp:name="Classification" dp:version="1"/>
 

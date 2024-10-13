@@ -35,15 +35,15 @@ module BimTools
       end
 
       def initialize(ifc_model)
-        @ifc = Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
 
         # IFC2x3 IfcSurfaceStyleRendering
         # @todo IFC4 IfcSurfaceStyleShading (transparency change)
-        if @ifc::IfcSurfaceStyleShading.respond_to?(:transparency)
-          @ifc_surface_style_rendering = @ifc::IfcSurfaceStyleShading.new(ifc_model)
+        if @ifc_module::IfcSurfaceStyleShading.respond_to?(:transparency)
+          @ifc_surface_style_rendering = @ifc_module::IfcSurfaceStyleShading.new(ifc_model)
         else
-          @ifc_surface_style_rendering = @ifc::IfcSurfaceStyleRendering.new(ifc_model)
+          @ifc_surface_style_rendering = @ifc_module::IfcSurfaceStyleRendering.new(ifc_model)
           @ifc_surface_style_rendering.reflectancemethod = :notdefined
         end
       end
@@ -56,7 +56,7 @@ module BimTools
         green_ratio = color.green.to_f / 255
         blue_ratio = color.blue.to_f / 255
 
-        colourrgb = @ifc::IfcColourRgb.new(@ifc_model)
+        colourrgb = @ifc_module::IfcColourRgb.new(@ifc_model)
         colourrgb.red = Types::IfcNormalisedRatioMeasure.new(@ifc_model, red_ratio)
         colourrgb.green = Types::IfcNormalisedRatioMeasure.new(@ifc_model, green_ratio)
         colourrgb.blue = Types::IfcNormalisedRatioMeasure.new(@ifc_model, blue_ratio)

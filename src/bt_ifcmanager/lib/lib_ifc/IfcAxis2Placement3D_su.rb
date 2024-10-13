@@ -25,11 +25,11 @@ module BimTools
   module IfcAxis2Placement3D_su
     def initialize(ifc_model, transformation = nil)
       super
-      @ifc = BimTools::IfcManager::Settings.ifc_module
+      @ifc_module = ifc_model.ifc_module
       if transformation.is_a? Geom::Transformation
-        @location = @ifc::IfcCartesianPoint.new(ifc_model, transformation.origin)
-        @axis = @ifc::IfcDirection.new(ifc_model, transformation.zaxis)
-        @refdirection = @ifc::IfcDirection.new(ifc_model, transformation.xaxis)
+        @location = @ifc_module::IfcCartesianPoint.new(ifc_model, transformation.origin)
+        @axis = @ifc_module::IfcDirection.new(ifc_model, transformation.zaxis)
+        @refdirection = @ifc_module::IfcDirection.new(ifc_model, transformation.xaxis)
       end
     end
   end

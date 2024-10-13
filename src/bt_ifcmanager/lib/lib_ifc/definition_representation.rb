@@ -35,7 +35,7 @@ module BimTools
       attr_reader :shape_representation_builder, :meshes
 
       def initialize(ifc_model, geometry_type, faces, su_material, transformation)
-        @ifc = Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
         @geometry_type = geometry_type
         @ifc_shape_representation_builder = nil
@@ -106,7 +106,7 @@ module BimTools
       def style_item(ifc_model, item, su_material, front_material, back_material)
         return unless ifc_model.options[:colors]
 
-        styled_item = @ifc::IfcStyledItem.new(ifc_model, item)
+        styled_item = @ifc_module::IfcStyledItem.new(ifc_model, item)
         styled_item.styles = get_surface_styles(ifc_model, su_material, front_material, back_material)
         styled_item
       end

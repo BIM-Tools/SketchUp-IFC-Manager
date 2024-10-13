@@ -35,9 +35,9 @@ module BimTools
       end
 
       def initialize(ifc_model)
-        @ifc = IfcManager::Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
-        @ifc_element_quantity = @ifc::IfcElementQuantity.new(ifc_model)
+        @ifc_element_quantity = @ifc_module::IfcElementQuantity.new(ifc_model)
         @ifc_element_quantity.quantities = IfcManager::Types::Set.new
       end
 

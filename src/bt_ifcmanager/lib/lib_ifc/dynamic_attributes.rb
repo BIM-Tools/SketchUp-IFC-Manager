@@ -32,7 +32,7 @@ require_relative 'ifc_element_quantity_builder'
 module BimTools
   module DynamicAttributes
     def self.get_dynamic_attributes(ifc_model, ifc_object)
-      @ifc = IfcManager::Settings.ifc_module
+      @ifc_module = ifc_model.ifc_module
       @ifc_model = ifc_model
       instance = ifc_object.su_object
       definition = instance.definition

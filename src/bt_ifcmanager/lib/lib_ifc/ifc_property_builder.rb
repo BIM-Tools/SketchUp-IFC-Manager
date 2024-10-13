@@ -35,16 +35,16 @@ module BimTools
       end
 
       def initialize(ifc_model, property_type)
-        @ifc = IfcManager::Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
         @property_type = property_type
 
         case @property_type
         when :enumeration
-          @ifc_property = @ifc::IfcPropertyEnumeratedValue.new(@ifc_model)
+          @ifc_property = @ifc_module::IfcPropertyEnumeratedValue.new(@ifc_model)
           @ifc_property.enumerationvalues = IfcManager::Types::List.new
         else # :single_value
-          @ifc_property = @ifc::IfcPropertySingleValue.new(@ifc_model)
+          @ifc_property = @ifc_module::IfcPropertySingleValue.new(@ifc_model)
         end
       end
 
@@ -53,35 +53,37 @@ module BimTools
       end
 
       def set_value(ifc_value)
-        if ifc_value
-          case @property_type
-          when :enumeration
-            @ifc_property.enumerationvalues.add(ifc_value)
-            @ifc_property.enumerationvalues.long = true
-          else # :single_value
-            @ifc_property.nominalvalue = ifc_value
-            @ifc_property.nominalvalue.long = true
-          end
+        return unless ifc_value
+
+        case @property_type
+        when :enumeration
+          @ifc_property.enumerationvalues.add(ifc_value)
+        else # :single_value
+          @ifc_property.nominalvalue = ifc_value
+          @ifc_property.nominalvalue.long = true
         end
       end
 
-      def set_enumeration_reference(options)
-        if options && @property_type == :enumeration
-          property_name = @ifc_property.name
-          ifc_options = options.map do |item|
-            IfcManager::Types::IfcLabel.new(@ifc_model, item, true)
-          end
-          enumeration_values = IfcManager::Types::List.new(ifc_options)
-          if @ifc_model.property_enumerations.key?(property_name) && (@ifc_model.property_enumerations[property_name].enumerationvalues.step == enumeration_values.step)
-            property_enumeration = @ifc_model.property_enumerations[property_name]
-          else
-            property_enumeration = @ifc::IfcPropertyEnumeration.new(@ifc_model)
-            property_enumeration.name = IfcManager::Types::IfcLabel.new(@ifc_model, property_name)
-            property_enumeration.enumerationvalues = enumeration_values
-            @ifc_model.property_enumerations[property_name] = property_enumeration
-          end
-          @ifc_property.enumerationreference = property_enumeration
+      def set_enumeration_reference(options, property_enumeration_name = nil)
+        return unless options
+
+        property_name = @ifc_property.name
+        ifc_options = options.map do |item|
+          IfcManager::Types::IfcLabel.new(@ifc_model, item, true)
         end
+        enumeration_values = IfcManager::Types::List.new(ifc_options)
+        if @ifc_model.property_enumerations.key?(property_name.value) && (@ifc_model.property_enumerations[property_name.value].enumerationvalues.step == enumeration_values.step)
+          property_enumeration = @ifc_model.property_enumerations[property_name.value]
+        else
+          property_enumeration = @ifc_module::IfcPropertyEnumeration.new(@ifc_model)
+          property_enumeration.name = IfcManager::Types::IfcLabel.new(
+            @ifc_model,
+            property_enumeration_name || property_name
+          )
+          property_enumeration.enumerationvalues = enumeration_values
+          @ifc_model.property_enumerations[property_name.value] = property_enumeration
+        end
+        @ifc_property.enumerationreference = property_enumeration
       end
     end
   end

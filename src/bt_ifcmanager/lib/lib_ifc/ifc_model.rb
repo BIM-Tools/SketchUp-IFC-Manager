@@ -50,7 +50,7 @@ module BimTools
 
       attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications,
                     :classificationassociations, :product_types, :property_enumerations
-      attr_reader :su_model, :project, :ifc_objects, :project_data, :export_summary, :options, :su_entities, :units,
+      attr_reader :su_model, :project, :ifc_objects, :ifc_module, :ifc_version, :project_data, :export_summary, :options, :su_entities, :units,
                   :default_location, :default_axis, :default_refdirection, :default_placement, :textures
 
       # Initializes a new IfcModel instance.
@@ -71,11 +71,15 @@ module BimTools
           geometry: 'Brep', #  create geometry for entities
           fast_guid: false, # create simplified guids
           dynamic_attributes: true, #  export dynamic component data
-          types: true,
-          textures: false,
-          export_entities: [],
-          root_entities: [],
-          model_axes: false
+          types: true, #  create IfcTypeProducts
+          # open_file: false, # open created file in given/default application
+          classification_suffix: true, #  add classification suffix to entity names
+          model_axes: false,
+          base_quantities: true, # Export IFC base quantities for certain IFC entities
+          textures: false, # Export textures
+          double_sided_faces: false, # Export double sided faces
+          export_entities: [], # Export only the given entities
+          root_entities: [] # Export only the given entities and their children
         }
         @options = defaults.merge(options)
 
@@ -84,7 +88,8 @@ module BimTools
         su_model.set_attribute('IfcManager', 'description', '')
         @project_data = su_model.attribute_dictionaries['IfcManager']
 
-        @ifc = Settings.ifc_module
+        @ifc_module = Settings.ifc_module
+        @ifc_version = Settings.ifc_version
         @su_model = su_model
         @su_entities = @options[:export_entities]
         @ifc_id = 0
@@ -98,7 +103,7 @@ module BimTools
         # Enable texture export if textures option is enabled and the active IFC version is capable of exporting textures
         # We cannot use TextureWriter for writing textures because it only loads textures from objects, not materials directly.
         # but we do need it to get UV coordinates for textures.
-        if @options[:textures] && @ifc.const_defined?(:IfcTextureMap) && @ifc::IfcTextureMap.method_defined?(:maps)
+        if @options[:textures] && @ifc_module.const_defined?(:IfcTextureMap) && @ifc_module::IfcTextureMap.method_defined?(:maps)
           @textures = Sketchup.create_texture_writer
         end
 
@@ -136,7 +141,7 @@ module BimTools
         @units = @project.unitsincontext
 
         # Create default origin and axes for re-use throughout the model
-        @default_placement = @ifc::IfcAxis2Placement3D.new(self, Geom::Transformation.new)
+        @default_placement = @ifc_module::IfcAxis2Placement3D.new(self, Geom::Transformation.new)
         @default_location = @default_placement.location
         @default_axis = @default_placement.axis
         @default_refdirection = @default_placement.refdirection
@@ -189,18 +194,18 @@ module BimTools
 
       # Create new IfcGeometricRepresentationContext
       def create_representationcontext
-        context = @ifc::IfcGeometricRepresentationContext.new(self)
+        context = @ifc_module::IfcGeometricRepresentationContext.new(self)
         context.contexttype = Types::IfcLabel.new(self, 'Model')
         context.coordinatespacedimension = '3'
-        context.worldcoordinatesystem = @ifc::IfcAxis2Placement2D.new(self)
+        context.worldcoordinatesystem = @ifc_module::IfcAxis2Placement2D.new(self)
 
         # Older Sketchup versions don't have Point2d and Vector2d
         if Geom.const_defined?(:Point2d)
-          context.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self, Geom::Point2d.new(0, 0))
-          context.truenorth = @ifc::IfcDirection.new(self, Geom::Vector2d.new(0, 1))
+          context.worldcoordinatesystem.location = @ifc_module::IfcCartesianPoint.new(self, Geom::Point2d.new(0, 0))
+          context.truenorth = @ifc_module::IfcDirection.new(self, Geom::Vector2d.new(0, 1))
         else
-          context.worldcoordinatesystem.location = @ifc::IfcCartesianPoint.new(self, Geom::Point3d.new(0, 0, 0))
-          context.truenorth = @ifc::IfcDirection.new(self, Geom::Vector3d.new(0, 1, 0))
+          context.worldcoordinatesystem.location = @ifc_module::IfcCartesianPoint.new(self, Geom::Point3d.new(0, 0, 0))
+          context.truenorth = @ifc_module::IfcDirection.new(self, Geom::Vector3d.new(0, 1, 0))
         end
         context
       end
@@ -273,8 +278,8 @@ module BimTools
         geometry_type = nil
       )
 
-        entity_type = @ifc.const_get(ent_type_name)
-        ifc_entity = entity_type.new(self, nil)
+        entity_type = @ifc_module.const_get(ent_type_name)
+        ifc_entity = entity_type.new(self, nil, total_transformation)
         entity_name ||= definition_manager.name
         ifc_entity.name = Types::IfcLabel.new(self, entity_name)
         spatial_structure.add(ifc_entity)
@@ -287,7 +292,7 @@ module BimTools
         transformation = total_transformation * placement_parent.objectplacement.ifc_total_transformation.inverse
         rotation_and_translation, scaling = TransformationHelper.decompose_transformation(transformation)
 
-        ifc_entity.objectplacement = @ifc::IfcLocalPlacement.new(
+        ifc_entity.objectplacement = @ifc_module::IfcLocalPlacement.new(
           self,
           rotation_and_translation,
           placement_parent.objectplacement

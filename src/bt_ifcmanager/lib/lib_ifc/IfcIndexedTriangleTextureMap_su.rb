@@ -23,9 +23,7 @@ module BimTools
   module IfcIndexedTriangleTextureMap_su
     def initialize(ifc_model)
       super
-      @ifc = BimTools::IfcManager::Settings.ifc_module
       instance_variable_set(:@attr, ([:MappedTo] + attributes))
-
 
       # Workaround for bug in IFC XSD's forward from IFC4, missing "mappedto" attribute
       unless attributes.include? :MappedTo

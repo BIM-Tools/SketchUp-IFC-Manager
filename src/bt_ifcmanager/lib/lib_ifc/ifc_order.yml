@@ -3,6 +3,12 @@ IfcCompositeCurve:
   :explicit:
   - :Segments
   - :SelfIntersect
+IfcCourse:
+  :explicit:
+  - :PredefinedType
+IfcCourseType:
+  :explicit:
+  - :PredefinedType
 IfcRoot:
   :explicit:
   - :GlobalId
@@ -12,6 +18,11 @@ IfcRoot:
 IfcObject:
   :explicit:
   - :ObjectType
+  :inverse:
+  - :IsDeclaredBy
+  - :Declares
+  - :IsTypedBy
+  - :IsDefinedBy
 IfcActionRequest:
   :explicit:
   - :RequestID
@@ -61,6 +72,10 @@ IfcProduct:
   :explicit:
   - :ObjectPlacement
   - :Representation
+  :inverse:
+  - :ReferencedBy
+  - :PositionedRelativeTo
+  - :ReferencedInStructures
 IfcProductDefinitionShape:
   :inverse:
   - :HasShapeAspects
@@ -181,6 +196,12 @@ IfcAxis2Placement3D:
   :explicit:
   - :Axis
   - :RefDirection
+IfcBridge:
+  :explicit:
+  - :PredefinedType
+IfcBridgePart:
+  :explicit:
+  - :PredefinedType
 IfcBSplineCurve:
   :explicit:
   - :Degree
@@ -191,6 +212,26 @@ IfcBSplineCurve:
 IfcElement:
   :explicit:
   - :Tag
+  :inverse:
+  - :HasStructuralMember
+  - :FillsVoids
+  - :ConnectedTo
+  - :IsInterferedByElements
+  - :InterferesElements
+  - :HasProjections
+  - :ReferencedInStructures
+  - :HasPorts
+  - :HasProjections
+  - :HasOpenings
+  - :IsConnectionRealization
+  - :ProvidesBoundaries
+  - :ConnectedFrom
+  - :ContainedInStructure
+  - :HasCoverings
+  - :HasSurfaceFeatures
+IfcBeam:
+  :explicit:
+  - :PredefinedType
 IfcBeamType:
   :explicit:
   - :PredefinedType
@@ -202,6 +243,11 @@ IfcSurfaceTexture:
   - :Mode
   - :TextureTransform
   - :Parameter
+IfcSurfaceFeature:
+  :explicit:
+  - :PredefinedType
+  :inverse:
+  - :AdheresToElement
 IfcBlobTexture:
   :explicit:
   - :RasterFormat
@@ -265,6 +311,12 @@ IfcBoxedHalfSpace:
 IfcSpatialElement:
   :explicit:
   - :LongName
+  :inverse:
+  - :ContainsElements
+  - :ServicedBySystems
+  - :ReferencesElements
+  - :IsInterferedByElements
+  - :InterferesElements
 IfcSpatialStructureElement:
   :explicit:
   - :LongName
@@ -277,6 +329,7 @@ IfcBuilding:
 IfcBuildingElementProxy:
   :explicit:
   - :CompositionType
+  - :PredefinedType
 IfcBuildingElementProxyType:
   :explicit:
   - :PredefinedType
@@ -330,14 +383,17 @@ IfcCartesianTransformationOperator3DnonUniform:
 IfcCenterLineProfileDef:
   :explicit:
   - :Thickness
-IfcEdgeFeature:
-  :explicit:
-  - :FeatureLength
 IfcChamferEdgeFeature:
   :explicit:
   - :Width
   - :Height
 IfcChillerType:
+  :explicit:
+  - :PredefinedType
+IfcChimney:
+  :explicit:
+  - :PredefinedType
+IfcChimneyType:
   :explicit:
   - :PredefinedType
 IfcConic:
@@ -358,6 +414,14 @@ IfcClassification:
   - :Edition
   - :EditionDate
   - :Name
+  - :Description
+  - :Location
+  - :Specification
+  - :ReferenceTokens
+  :inverse:
+  - :Contains
+  - :ClassificationForObjects
+  - :HasReferences
 IfcClassificationItem:
   :explicit:
   - :Notation
@@ -373,15 +437,14 @@ IfcClassificationNotation:
 IfcClassificationNotationFacet:
   :explicit:
   - :NotationValue
-IfcExternalReference:
-  :explicit:
-  - :Location
-  - :ItemReference
-  - :Identification
-  - :Name
 IfcClassificationReference:
   :explicit:
   - :ReferencedSource
+  - :Description
+  - :Sort
+  :inverse:
+  - :ClassificationRefForObjects
+  - :HasReferences
 IfcConnectedFaceSet:
   :explicit:
   - :CfsFaces
@@ -396,6 +459,9 @@ IfcColourRgb:
   - :Red
   - :Green
   - :Blue
+IfcColumn:
+  :explicit:
+  - :PredefinedType
 IfcColumnType:
   :explicit:
   - :PredefinedType
@@ -488,6 +554,16 @@ IfcNamedUnit:
   :explicit:
   - :Dimensions
   - :UnitType
+IfcContext:
+  :explicit:
+  - :ObjectType
+  - :LongName
+  - :Phase
+  - :RepresentationContexts
+  - :UnitsInContext
+  :inverse:
+  - :IsDefinedBy
+  - :Declares
 IfcContextDependentUnit:
   :explicit:
   - :Name
@@ -642,6 +718,12 @@ IfcDimensionalExponents:
 IfcDirection:
   :explicit:
   - :DirectionRatios
+IfcDiscreteAccessory:
+  :explicit:
+  - :PredefinedType
+IfcDiscreteAccessoryType:
+  :explicit:
+  - :PredefinedType
 IfcDistributionChamberElementType:
   :explicit:
   - :PredefinedType
@@ -651,6 +733,10 @@ IfcDistributionControlElement:
 IfcDistributionPort:
   :explicit:
   - :FlowDirection
+IfcDistributionSystem:
+  :explicit:
+  - :LongName
+  - :PredefinedType
 IfcDocumentElectronicFormat:
   :explicit:
   - :FileExtension
@@ -725,6 +811,9 @@ IfcDuctSegmentType:
 IfcDuctSilencerType:
   :explicit:
   - :PredefinedType
+IfcEarthworksFill:
+  :explicit:
+  - :PredefinedType
 IfcEdge:
   :explicit:
   - :EdgeStart
@@ -736,6 +825,15 @@ IfcEdgeCurve:
 IfcEdgeLoop:
   :explicit:
   - :EdgeList
+IfcEdgeFeature:
+  :explicit:
+  - :FeatureLength
+IfcExternalReference:
+  :explicit:
+  - :Location
+  - :ItemReference
+  - :Identification
+  - :Name
 IfcElectricApplianceType:
   :explicit:
   - :PredefinedType
@@ -802,6 +900,12 @@ IfcEvaporativeCoolerType:
 IfcEvaporatorType:
   :explicit:
   - :PredefinedType
+IfcMarineFacility:
+  :explicit:
+  - :PredefinedType
+IfcMarinePart:
+  :explicit:
+  - :PredefinedType
 IfcMaterialProperties:
   :explicit:
   - :Material
@@ -838,6 +942,13 @@ IfcManifoldSolidBrep:
 IfcFacetedBrepWithVoids:
   :explicit:
   - :Voids
+IfcFacility:
+IfcFacilityPart:
+  :explicit:
+  - :UsageType
+IfcFacilityPartCommon:
+  :explicit:
+  - :PredefinedType
 IfcStructuralConnectionCondition:
   :explicit:
   - :Name
@@ -902,6 +1013,9 @@ IfcFluidFlowProperties:
 IfcFooting:
   :explicit:
   - :PredefinedType
+IfcFootingType:
+  :explicit:
+  - :PredefinedType
 IfcFuelProperties:
   :explicit:
   - :CombustionTemperature
@@ -933,12 +1047,21 @@ IfcGeneralProfileProperties:
 IfcGeometricSet:
   :explicit:
   - :Elements
+IfcGeographicElement:
+  :explicit:
+  - :PredefinedType
+IfcGeographicElementType:
+  :explicit:
+  - :PredefinedType
 IfcRepresentationContext:
   :explicit:
   - :ContextIdentifier
   - :ContextType
+  :inverse:
+  - :RepresentationsInContext
 IfcRepresentationItem:
   :inverse:
+  - :LayerAssignment
   - :StyledByItem
 IfcGeometricRepresentationContext:
   :explicit:
@@ -948,6 +1071,7 @@ IfcGeometricRepresentationContext:
   - :TrueNorth
   :inverse:
   - :HasSubContexts
+  - :HasCoordinateOperation
 IfcGeometricRepresentationSubContext:
   :explicit:
   - :ParentContext
@@ -1118,6 +1242,10 @@ IfcProductRepresentation:
   - :Name
   - :Description
   - :Representations
+  :inverse:
+  - :ReferencedBy
+  - :PositionedRelativeTo
+  - :ReferencedInStructures
 IfcMaterialDefinition:
   :inverse:
   - :HasProperties
@@ -1174,6 +1302,9 @@ IfcMechanicalSteelMaterialProperties:
   - :ProportionalStress
   - :PlasticStrain
   - :Relaxations
+IfcMember:
+  :explicit:
+  - :PredefinedType
 IfcMemberType:
   :explicit:
   - :PredefinedType
@@ -1200,12 +1331,27 @@ IfcMove:
   - :MoveFrom
   - :MoveTo
   - :PunchList
+IfcObjectDefinition:
+  :inverse:
+  - :HasAssignments
+  - :Nests
+  - :IsNestedBy
+  - :HasContext
+  - :IsDecomposedBy
+  - :Decomposes
+  - :HasAssociations
 IfcObjective:
   :explicit:
   - :BenchmarkValues
   - :ResultValues
   - :ObjectiveQualifier
   - :UserDefinedQualifier
+IfcObjectPlacement:
+  :explicit:
+  - :PlacementRelTo
+  :inverse:
+  - :PlacesObject
+  - :ReferencedByPlacements
 IfcOccupant:
   :explicit:
   - :PredefinedType
@@ -1320,6 +1466,9 @@ IfcPile:
 IfcPipeFittingType:
   :explicit:
   - :PredefinedType
+IfcPipeSegment:
+  :explicit:
+  - :PredefinedType
 IfcPipeSegmentType:
   :explicit:
   - :PredefinedType
@@ -1343,6 +1492,11 @@ IfcPointOnCurve:
   :explicit:
   - :BasisCurve
   - :PointParameter
+IfcPort:
+  :inverse:
+  - :ContainedIn
+  - :ConnectedFrom
+  - :ConnectedTo
 IfcPointOnSurface:
   :explicit:
   - :BasisSurface
@@ -1485,10 +1639,22 @@ IfcQuantityVolume:
 IfcQuantityWeight:
   :explicit:
   - :WeightValue
+IfcRail:
+  :explicit:
+  - :PredefinedType
+IfcRailType:
+  :explicit:
+  - :PredefinedType
 IfcRailing:
   :explicit:
   - :PredefinedType
 IfcRailingType:
+  :explicit:
+  - :PredefinedType
+IfcRailway:
+  :explicit:
+  - :PredefinedType
+IfcRailwayPart:
   :explicit:
   - :PredefinedType
 IfcRamp:
@@ -1565,6 +1731,14 @@ IfcReinforcingMesh:
   - :TransverseBarCrossSectionArea
   - :LongitudinalBarSpacing
   - :TransverseBarSpacing
+IfcRelAdheresToElement:
+  :explicit:
+  - :RelatingElement
+  - :RelatedSurfaceFeatures
+IfcRelAggregates:
+  :explicit:
+  - :RelatingObject
+  - :RelatedObjects
 IfcRelDecomposes:
   :explicit:
   - :RelatingObject
@@ -1772,15 +1946,31 @@ IfcRightCircularCylinder:
   :explicit:
   - :Height
   - :Radius
+IfcRoad:
+  :explicit:
+  - :PredefinedType
+IfcRoadPart:
+  :explicit:
+  - :PredefinedType
 IfcRoof:
   :explicit:
   - :ShapeType
+  - :PredefinedType
+IfcRoofType:
+  :explicit:
+  - :PredefinedType
 IfcRoundedEdgeFeature:
   :explicit:
   - :Radius
 IfcRoundedRectangleProfileDef:
   :explicit:
   - :RoundingRadius
+IfcSign:
+  :explicit:
+  - :PredefinedType
+IfcSignType:
+  :explicit:
+  - :PredefinedType
 IfcSIUnit:
   :explicit:
   - :Prefix
@@ -2237,6 +2427,12 @@ IfcTimeSeriesSchedule:
 IfcTimeSeriesValue:
   :explicit:
   - :ListValues
+IfcTrackElement:
+  :explicit:
+  - :PredefinedType
+IfcTrackElementType:
+  :explicit:
+  - :PredefinedType
 IfcTransformerType:
   :explicit:
   - :PredefinedType
@@ -2256,8 +2452,11 @@ IfcTrapeziumProfileDef:
   - :TopXOffset
 IfcTriangulatedFaceSet:
   :explicit:
+  - :Normals
+  - :Closed
   - :CoordIndex
   - :NormalIndex
+  - :PnIndex
 IfcTrimmedCurve:
   :explicit:
   - :BasisCurve
@@ -2311,6 +2510,9 @@ IfcVirtualGridIntersection:
   :explicit:
   - :IntersectingAxes
   - :OffsetDistances
+IfcWall:
+  :explicit:
+  - :PredefinedType
 IfcWallType:
   :explicit:
   - :PredefinedType

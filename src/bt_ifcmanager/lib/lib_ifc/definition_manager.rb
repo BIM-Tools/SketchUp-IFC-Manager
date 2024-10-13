@@ -34,7 +34,7 @@ module BimTools
       attr_reader :definition, :name, :faces, :representations
 
       def initialize(ifc_model, definition)
-        @ifc = Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
         @geometry_type = get_geometry_type(ifc_model)
         @definition = definition
@@ -55,7 +55,7 @@ module BimTools
         geometry_type = ifc_model.options[:geometry]
 
         # Fallback to Brep when Tessellation not available in current IFC schema
-        geometry_type = 'Brep' if geometry_type == 'Tessellation' && !@ifc.const_defined?(:IfcTriangulatedFaceSet)
+        geometry_type = 'Brep' if geometry_type == 'Tessellation' && !@ifc_module.const_defined?(:IfcTriangulatedFaceSet)
         geometry_type
       end
 
@@ -125,7 +125,7 @@ module BimTools
 
       def assign_to_layer(shape_representation, su_layer)
         unless @ifc_model.layers[su_layer.name]
-          @ifc_model.layers[su_layer.name] = @ifc::IfcPresentationLayerAssignment.new(@ifc_model, su_layer)
+          @ifc_model.layers[su_layer.name] = @ifc_module::IfcPresentationLayerAssignment.new(@ifc_model, su_layer)
         end
         @ifc_model.layers[su_layer.name].assigneditems.add(shape_representation)
       end

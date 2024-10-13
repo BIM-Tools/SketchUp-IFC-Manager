@@ -34,14 +34,14 @@ module BimTools
       end
 
       def initialize(ifc_model, classification_name)
-        @ifc = IfcManager::Settings.ifc_module
+        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
-        @ifc_classification_reference = @ifc::IfcClassificationReference.new(ifc_model)
+        @ifc_classification_reference = @ifc_module::IfcClassificationReference.new(ifc_model)
         @classification_ref_for_objects = get_association(classification_name)
       end
 
       def set_location(location)
-        if Settings.ifc_version == 'IFC 2x3'
+        if @ifc_model.ifc_version == 'IFC 2x3'
           @ifc_classification_reference.location = IfcManager::Types::IfcLabel.new(@ifc_model, location)
         else
           @ifc_classification_reference.location = IfcManager::Types::IfcURIReference.new(@ifc_model, location)
@@ -52,7 +52,7 @@ module BimTools
         identifier = IfcManager::Types::IfcIdentifier.new(@ifc_model, identification)
 
         # IFC 2x3
-        if @ifc::IfcClassificationReference.method_defined?(:itemreference)
+        if @ifc_module::IfcClassificationReference.method_defined?(:itemreference)
           @ifc_classification_reference.itemreference = identifier
 
         # IFC 4
@@ -70,7 +70,7 @@ module BimTools
       end
 
       def get_association(classification_name)
-        @ifc::IfcRelAssociatesClassification.new(@ifc_model).tap do |rel|
+        @ifc_module::IfcRelAssociatesClassification.new(@ifc_model).tap do |rel|
           rel.name = get_rel_associates_classification_name(classification_name)
           rel.relatedobjects = Types::Set.new
           rel.relatingclassification = @ifc_classification_reference
