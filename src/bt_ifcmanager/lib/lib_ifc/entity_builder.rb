@@ -134,6 +134,9 @@ module BimTools
         when 'IfcAirTerminal'
           # Catch missing IfcAirTerminal in Ifc2x3
           Settings.ifc_version_compact == 'IFC2X3' ? 'IfcFlowTerminal' : 'IfcAirTerminal'
+        when 'IfcPipeSegment'
+          # Catch missing IfcPipeSegment in Ifc2x3
+          Settings.ifc_version_compact == 'IFC2X3' ? 'IfcFlowSegment' : 'IfcPipeSegment'
         else
           @ifc_module.const_defined?(entity_base_name) ? entity_base_name : entity_type_name
         end
@@ -245,7 +248,9 @@ module BimTools
         # if parent is a IfcGroup, add entity to group
         if placement_parent.is_a?(@ifc_module::IfcGroup) && ifc_entity.is_a?(@ifc_module::IfcObjectDefinition)
           if placement_parent.is_a?(@ifc_module::IfcZone)
-            placement_parent.add(ifc_entity) if ifc_entity.is_a?(@ifc_module::IfcZone) || ifc_entity.is_a?(@ifc_module::IfcSpace)
+            if ifc_entity.is_a?(@ifc_module::IfcZone) || ifc_entity.is_a?(@ifc_module::IfcSpace)
+              placement_parent.add(ifc_entity)
+            end
           else
             placement_parent.add(ifc_entity)
           end
@@ -255,11 +260,11 @@ module BimTools
 
         @spatial_structure.set_parent(ifc_entity)
 
-        if placement_parent == @ifc_model.project
-          transformation = Geom::Transformation.new
-        else
-          transformation = @su_total_transformation
-        end
+        transformation = if placement_parent == @ifc_model.project
+                           Geom::Transformation.new
+                         else
+                           @su_total_transformation
+                         end
 
         placement_rel_to = placement_parent.objectplacement if placement_parent.respond_to?(:objectplacement)
         @objectplacement = @ifc_module::IfcLocalPlacement.new(
@@ -313,11 +318,11 @@ module BimTools
       def create_entity_builder(placement_parent, su_instance, su_material, su_layer)
         return unless instance_visible?(su_instance, @ifc_model.options)
 
-        if placement_parent == @ifc_model.project
-          transformation = su_instance.transformation
-        else
-          transformation = @su_total_transformation
-        end
+        transformation = if placement_parent == @ifc_model.project
+                           su_instance.transformation
+                         else
+                           @su_total_transformation
+                         end
 
         EntityBuilder.new(
           @ifc_model,
