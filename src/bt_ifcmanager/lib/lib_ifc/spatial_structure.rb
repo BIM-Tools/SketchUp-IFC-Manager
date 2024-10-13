@@ -34,27 +34,28 @@ module BimTools
         @ifc_module = ifc_model.ifc_module
 
         # @todo change Settings.ifc_version in numerical value so we can say ifc_version > '4.2'
-        @spatial_order = if Settings.ifc_version == 'IFC 4x3'
-                           [
-                             @ifc_module::IfcProject,
-                             @ifc_module::IfcSite,
-                             @ifc_module::IfcFacility,
-                             @ifc_module::IfcFacilityPart,
-                             @ifc_module::IfcBuildingStorey,
-                             @ifc_module::IfcSpace
-                           ].freeze
-                         else
-                           [
-                             @ifc_module::IfcProject,
-                             @ifc_module::IfcSite,
-                             @ifc_module::IfcBuilding,
-                             @ifc_module::IfcBuildingStorey,
-                             @ifc_module::IfcSpace
-                           ].freeze
-                         end
+        @spatial_order = get_spatial_order
         @ifc_model = ifc_model
         @spatial_structure = spatial_structure.to_a.clone if spatial_structure
         @spatial_structure ||= []
+      end
+
+      # Returns the spatial order of IFC entities based on the defined classes in the IFC module.
+      #
+      # This method dynamically checks if certain IFC classes are defined in the @ifc_module
+      # and builds the spatial order array accordingly. If a class is not defined, it falls
+      # back to an alternative class.
+      #
+      # @return [Array] An array of IFC classes in the spatial order.
+      def get_spatial_order
+        [
+          @ifc_module::IfcProject,
+          @ifc_module::IfcSite,
+          @ifc_module.const_defined?(:IfcFacility) ? @ifc_module.const_get(:IfcFacility) : @ifc_module::IfcBuilding,
+          @ifc_module.const_defined?(:IfcFacilityPart) ? @ifc_module.const_get(:IfcFacilityPart) : @ifc_module::IfcBuildingStorey,
+          @ifc_module::IfcBuildingStorey,
+          @ifc_module::IfcSpace
+        ].freeze
       end
 
       # Insert given entity into entity path after given type
@@ -75,63 +76,63 @@ module BimTools
         spatial_structure_types = get_spatial_structure_types
         case ifc_entity
         when @ifc_module::IfcProject
-          # (!) Check!!!
           @spatial_structure[0] = ifc_entity
         when @ifc_module::IfcSite
           add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcSite, [@ifc_module::IfcProject])
-        # when @ifc_module::IfcBuilding
-        #   add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBuilding, [@ifc_module::IfcSite])
-        # when @ifc_module::IfcBridge
-        #   add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBridge, [@ifc_module::IfcSite])
-        # when @ifc_module::IfcMarineFacility
-        #   add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcMarineFacility, [@ifc_module::IfcSite])
-        # when @ifc_module::IfcRailway
-        #   add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcRailway, [@ifc_module::IfcSite])
-        # when @ifc_module::IfcRoad
-        #   add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcRoad, [@ifc_module::IfcSite])
-        when ->(entity) { entity.is_a?(@ifc_module::IfcFacility) || entity.class < @ifc_module::IfcFacility }
-          add_spatialelement(ifc_entity, spatial_structure_types, ifc_entity.class, [@ifc_module::IfcSite])
-        # when ->(entity) { entity.is_a?(@ifc_module::IfcFacilityPart) || entity.class < @ifc_module::IfcFacilityPart }
-        #   add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBuildingStorey,
-        #                      [@ifc_module::IfcBuildingStorey, @ifc_module::IfcBuilding])
+        when @ifc_module::IfcBuilding
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBuilding, [@ifc_module::IfcSite])
         when @ifc_module::IfcBuildingStorey
           add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBuildingStorey,
                              [@ifc_module::IfcBuildingStorey, @ifc_module::IfcBuilding])
-        when @ifc_module::IfcBridgePart
-          add_spatialelement(ifc_entity, spatial_structure_types, ifc_entity.class,
-                             [@ifc_module::IfcBridgePart, @ifc_module::IfcBridge])
-        when @ifc_module::IfcFacilityPartCommon
-          add_spatialelement(ifc_entity, spatial_structure_types, ifc_entity.class,
-                             [@ifc_module::IfcBridge, @ifc_module::IfcBuilding, @ifc_module::IfcMarineFacility, @ifc_module::IfcRailway, @ifc_module::IfcRoad, @ifc_module::IfcFacility])
-        when @ifc_module::IfcMarineFacility
-          add_spatialelement(ifc_entity, spatial_structure_types, ifc_entity.class,
-                             [@ifc_module::IfcMarinePart, @ifc_module::IfcMarineFacility])
-        when @ifc_module::IfcRailwayPart
-          add_spatialelement(ifc_entity, spatial_structure_types, ifc_entity.class,
-                             [@ifc_module::IfcRailwayPart, @ifc_module::IfcRailway])
-        when @ifc_module::IfcRoadPart
-          add_spatialelement(ifc_entity, spatial_structure_types, ifc_entity.class,
-                             [@ifc_module::IfcRoadPart, @ifc_module::IfcRoad])
-        # when ->(entity) { entity.is_a?(@ifc_module::IfcFacilityPart)}
-        #   add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcFacilityPart, [@ifc_module::IfcFacility])
         when @ifc_module::IfcSpace
           add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcSpace,
                              [@ifc_module::IfcBuildingStorey, @ifc_module::IfcSite])
         when @ifc_module::IfcElementAssembly, @ifc_module::IfcCurtainWall, @ifc_module::IfcRoof
-
-          # add to end but check for basic spatial hierarchy
           if (spatial_structure_types & [@ifc_module::IfcSpace, @ifc_module::IfcBuildingStorey,
                                          @ifc_module::IfcSite]).empty?
             add_default_spatialelement(@ifc_module::IfcBuildingStorey)
           end
           @spatial_structure << ifc_entity
-        else # IfcProduct, IfcGroup
-
-          # don't add but check for basic spatial hierarchy
+        when ->(entity) { entity.is_a?(@ifc_module::IfcProduct) && !entity.is_a?(@ifc_module::IfcSpatialElement) }
           if (spatial_structure_types & [@ifc_module::IfcSpace, @ifc_module::IfcBuildingStorey,
                                          @ifc_module::IfcSite]).empty?
             add_default_spatialelement(@ifc_module::IfcBuildingStorey)
           end
+        when ->(entity) { entity.is_a?(@ifc_module::IfcGroup) }
+          if (spatial_structure_types & [@ifc_module::IfcSpace, @ifc_module::IfcBuildingStorey,
+                                         @ifc_module::IfcSite]).empty?
+            add_default_spatialelement(@ifc_module::IfcBuildingStorey)
+          end
+        when ->(entity) { @ifc_module.const_defined?(:IfcBridge) && entity.is_a?(@ifc_module::IfcBridge) }
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBridge, [@ifc_module::IfcSite])
+        when ->(entity) { @ifc_module.const_defined?(:IfcBridgePart) && entity.is_a?(@ifc_module::IfcBridgePart) }
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBridgePart,
+                             [@ifc_module::IfcBridgePart, @ifc_module::IfcBridge])
+        when ->(entity) { @ifc_module.const_defined?(:IfcRailway) && entity.is_a?(@ifc_module::IfcRailway) }
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcRailway, [@ifc_module::IfcSite])
+
+        when ->(entity) { @ifc_module.const_defined?(:IfcRailwayPart) && entity.is_a?(@ifc_module::IfcRailwayPart) }
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcRailwayPart,
+                             [@ifc_module::IfcRailwayPart, @ifc_module::IfcRailway])
+        when ->(entity) { @ifc_module.const_defined?(:IfcRoad) && entity.is_a?(@ifc_module::IfcRoad) }
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcRoad, [@ifc_module::IfcSite])
+        when ->(entity) { @ifc_module.const_defined?(:IfcRoadPart) && entity.is_a?(@ifc_module::IfcRoadPart) }
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcRoadPart,
+                             [@ifc_module::IfcRoadPart, @ifc_module::IfcRoad])
+        when lambda { |entity|
+               @ifc_module.const_defined?(:IfcMarineFacility) && entity.is_a?(@ifc_module::IfcMarineFacility)
+             }
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcMarineFacility,
+                             [@ifc_module::IfcSite])
+        when lambda { |entity|
+               @ifc_module.const_defined?(:IfcMarineFacilityPart) && entity.is_a?(@ifc_module::IfcMarineFacilityPart)
+             }
+          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcMarineFacilityPart,
+                             [@ifc_module::IfcMarineFacilityPart, @ifc_module::IfcMarineFacility])
+        when ->(entity) { @ifc_module.const_defined?(:IfcFacility) && entity.is_a?(@ifc_module::IfcFacility) }
+          add_spatialelement(ifc_entity, spatial_structure_types, ifc_entity.class, [@ifc_module::IfcSite])
+        when ->(entity) { @ifc_module.const_defined?(:IfcFacilityPart) && entity.is_a?(@ifc_module::IfcFacilityPart) }
+          add_spatialelement(ifc_entity, spatial_structure_types, ifc_entity.class, [@ifc_module::IfcFacility])
         end
       end
 
@@ -149,7 +150,9 @@ module BimTools
           ifc_entity.compositiontype = :partial
           insert_after(ifc_entity, structure_type)
         else
-          parent_structure_type = spatial_structure_types.reverse_each.find { |type| parent_structure_types.include?(type) }
+          parent_structure_type = spatial_structure_types.reverse_each.find do |type|
+            parent_structure_types.include?(type)
+          end
           if parent_structure_type
             insert_after(ifc_entity, parent_structure_type)
           else
