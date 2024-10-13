@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<documentProperties xmlns="http://www.sketchup.com/schemas/1.0/documentproperties" xmlns:dp="http://www.sketchup.com/schemas/1.0/documentproperties" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sketchup.com/schemas/1.0/documentproperties http://www.sketchup.com/schemas/1.0/documentproperties.xsd">
+
+  <dp:title>IFC4X3_ADD2</dp:title>
+
+  <dp:description>The Industry Foundation Classes (IFC) are an open international standard for sharing Building Information Model (BIM) data.</dp:description>
+
+  <dp:creator>buildingSMART</dp:creator>
+
+  <dp:keywords></dp:keywords>
+
+  <dp:lastModifiedBy></dp:lastModifiedBy>
+
+  <dp:revision>1</dp:revision>
+
+  <dp:created>2024-04-01T00:00:00</dp:created>
+
+  <dp:modified>2024-04-01T00:00:00</dp:modified>
+
+  <dp:thumbnail>doc_thumbnail.png</dp:thumbnail>
+
+  <dp:generator dp:name="Classification" dp:version="1"/>
+
+</documentProperties>

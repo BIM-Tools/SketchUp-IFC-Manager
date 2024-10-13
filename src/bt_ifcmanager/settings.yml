@@ -27,7 +27,7 @@
   :ifc_classifications:
     IFC 2x3.skc: false
     IFC4.skc: false
-    IFC 4x3.skc: true
+    IFC4X3_ADD2.skc: true
   :template_materials: false
 :properties:
   :common_psets: true

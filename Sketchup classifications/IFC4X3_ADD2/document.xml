@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<classificationDocument xmlns="http://www.sketchup.com/schemas/sketchup/1.0/classification" xmlns:r="http://www.sketchup.com/schemas/1.0/references" xmlns:cls="http://www.sketchup.com/schemas/sketchup/1.0/classification" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sketchup.com/schemas/sketchup/1.0/classification http://www.sketchup.com/schemas/sketchup/1.0/classification.xsd">
+  <cls:Classification xsdFile="Schemas/IFC4X3_ADD2.xsd"></cls:Classification>
+</classificationDocument>
