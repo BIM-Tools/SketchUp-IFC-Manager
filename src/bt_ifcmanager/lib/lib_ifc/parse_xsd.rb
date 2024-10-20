@@ -53,6 +53,7 @@ module BimTools
         IfcIndexedTriangleTextureMap
         IfcLocalPlacement
         IfcObjectDefinition
+        IfcPile
         IfcPresentationLayerAssignment
         IfcProduct
         IfcRoot
