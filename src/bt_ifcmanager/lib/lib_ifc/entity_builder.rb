@@ -111,6 +111,8 @@ module BimTools
 
         create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
 
+        add_placement_parent_relationships(ifc_entity, placement_parent)
+
         # We always need a placement parent, so when the current entity is nil, we use the parent
         placement_parent = ifc_entity if ifc_entity
         create_nested_objects(placement_parent, su_instance, su_material, su_layer)
@@ -515,6 +517,23 @@ module BimTools
             geometry_type
           )
         end
+      end
+
+      # Adds additional relationships between the given IFC entity and its placement parent.
+      #
+      # @param ifc_entity [Object] The IFC entity to which relationships will be added.
+      # @param placement_parent [Object] The parent entity to which the IFC entity is related.
+      # @return [void]
+      def add_placement_parent_relationships(ifc_entity, placement_parent)
+        return unless placement_parent
+
+        return if ifc_entity == placement_parent
+
+        unless ifc_entity.is_a?(@ifc_module::IfcSurfaceFeature) && placement_parent.is_a?(@ifc_module::IfcProduct)
+          return
+        end # TODO: should be IfcElement
+
+        placement_parent.add_surface_feature(ifc_entity)
       end
     end
   end

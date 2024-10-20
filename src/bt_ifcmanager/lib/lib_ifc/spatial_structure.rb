@@ -221,6 +221,8 @@ module BimTools
                  end
         ifc_entity.parent = parent
         case ifc_entity
+        when @ifc_module::IfcSurfaceFeature
+          # skip
         when @ifc_module::IfcSpatialStructureElement
           ifc_entity.parent.add_related_object(ifc_entity)
         else

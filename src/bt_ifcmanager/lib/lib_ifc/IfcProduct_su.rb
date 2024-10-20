@@ -26,6 +26,7 @@ require_relative 'dynamic_attributes'
 require_relative 'PropertyReader'
 require_relative 'material_and_styling'
 require_relative 'base_quantity_builder'
+require_relative 'ifc_rel_adheres_to_element_builder'
 
 module BimTools
   module IfcProduct_su
@@ -33,6 +34,7 @@ module BimTools
 
     @su_object = nil
     @parent = nil
+    @has_surface_features = nil
 
     # @param [BimTools::IfcManager::IfcModel] ifc_model
     # @param [nil, #definition] sketchup an empty object (default object), Sketchup::ComponentInstance or Sketchup::Group
@@ -90,19 +92,15 @@ module BimTools
         @predefinedtype = nil
       end
 
-      # set material if sketchup @su_object has a material
-      # Material added to Product and not to TypeProduct because a Sketchup ComponentDefinition can have a different material for every Instance
-      if ifc_model.options[:materials] && (is_a? @ifc_module::IfcElement) && !(is_a? @ifc_module::IfcFeatureElementSubtraction) && !(is_a? @ifc_module::IfcVirtualElement)
-
-        # create materialassociation
-        su_material = @su_object.material
-        unless ifc_model.materials.include?(su_material)
-          ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(ifc_model, su_material)
-        end
-
-        # add product to materialassociation
-        ifc_model.materials[su_material].add_to_material(self)
-      end
+      # TODO: dont exclude on class but on relaggregates
+      add_material_association if ifc_model.options[:materials] &&
+                                  (is_a? @ifc_module::IfcElement) &&
+                                  !(is_a? @ifc_module::IfcFeatureElementSubtraction) &&
+                                  !(is_a? @ifc_module::IfcVirtualElement) &&
+                                  !(is_a? @ifc_module::IfcSpatialElement) &&
+                                  !(is_a? @ifc_module::IfcRoof) &&
+                                  !(is_a? @ifc_module::IfcElementAssembly) &&
+                                  !(is_a? @ifc_module::IfcCurtainWall)
 
       # collect dynamic component attributes if export option is set
       BimTools::DynamicAttributes.get_dynamic_attributes(ifc_model, self) if ifc_model.options[:dynamic_attributes]
@@ -110,6 +108,43 @@ module BimTools
       return unless ifc_model.options[:base_quantities]
 
       add_base_quantities
+    end
+
+    # Adds a surface feature to the IFC element.
+    #
+    # @param surface_feature [Object] The surface feature to be added.
+    # @return [void]
+    def add_surface_feature(surface_feature)
+      create_ifc_rel_adheres_to_element unless @has_surface_features
+      @has_surface_features.add_related_surface_feature(surface_feature)
+    end
+
+    # add export summary for IfcProducts
+    def step
+      @ifc_model.summary_add(self.class.name.split('::').last)
+      super
+    end
+
+    private
+
+    # Creates an IfcRelAdheresToElement relationship for the IFC element.
+    #
+    # @return [void]
+    def create_ifc_rel_adheres_to_element
+      @has_surface_features = BimTools::IfcManager::IfcRelAdheresToElementBuilder.build(@ifc_model) do |builder|
+        builder.set_relating_element(self)
+      end
+    end
+
+    # set material if sketchup @su_object has a material
+    # Material added to Product and not to TypeProduct because a Sketchup ComponentDefinition can have a different material for every Instance
+    def add_material_association
+      su_material = @su_object.material
+      unless @ifc_model.materials.include?(su_material)
+        @ifc_model.materials[su_material] = BimTools::IfcManager::MaterialAndStyling.new(@ifc_model, su_material)
+      end
+
+      @ifc_model.materials[su_material].add_to_material(self)
     end
 
     def add_base_quantities
@@ -120,12 +155,6 @@ module BimTools
       BimTools::IfcManager::BaseQuantityBuilder.build(@ifc_model) do |builder|
         builder.add_base_quantities(self, @su_object)
       end
-    end
-
-    # add export summary for IfcProducts
-    def step
-      @ifc_model.summary_add(self.class.name.split('::').last)
-      super
     end
   end
 end
