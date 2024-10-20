@@ -93,7 +93,9 @@ module BimTools
             add_default_spatialelement(@ifc_module::IfcBuildingStorey)
           end
           @spatial_structure << ifc_entity
-        when ->(entity) { entity.is_a?(@ifc_module::IfcProduct) && !entity.is_a?(@ifc_module::IfcSpatialElement) }
+        when lambda { |entity|
+               entity.is_a?(@ifc_module::IfcProduct) && !entity.is_a?(@ifc_module::IfcSpatialStructureElement)
+             }
           if (spatial_structure_types & [@ifc_module::IfcSpace, @ifc_module::IfcBuildingStorey,
                                          @ifc_module::IfcSite]).empty?
             add_default_spatialelement(@ifc_module::IfcBuildingStorey)
@@ -220,9 +222,11 @@ module BimTools
                    @spatial_structure[-1]
                  end
         ifc_entity.parent = parent
+
+        # IfcSurfaceFeature is not part of the normal spatial structure
+        return if defined?(@ifc_module::IfcSurfaceFeature) && ifc_entity.is_a?(@ifc_module::IfcSurfaceFeature)
+
         case ifc_entity
-        when @ifc_module::IfcSurfaceFeature
-          # skip
         when @ifc_module::IfcSpatialStructureElement
           ifc_entity.parent.add_related_object(ifc_entity)
         else

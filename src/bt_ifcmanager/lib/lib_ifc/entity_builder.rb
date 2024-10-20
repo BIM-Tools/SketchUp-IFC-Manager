@@ -526,14 +526,14 @@ module BimTools
       # @return [void]
       def add_placement_parent_relationships(ifc_entity, placement_parent)
         return unless placement_parent
-
         return if ifc_entity == placement_parent
 
-        unless ifc_entity.is_a?(@ifc_module::IfcSurfaceFeature) && placement_parent.is_a?(@ifc_module::IfcProduct)
-          return
-        end # TODO: should be IfcElement
-
-        placement_parent.add_surface_feature(ifc_entity)
+        if defined?(@ifc_module::IfcSurfaceFeature) &&
+           defined?(@ifc_module::IfcRelAdheresToElement) &&
+           ifc_entity.is_a?(@ifc_module::IfcSurfaceFeature) &&
+           placement_parent.is_a?(@ifc_module::IfcProduct) # TODO: should be IfcElement
+          placement_parent.add_surface_feature(ifc_entity)
+        end
       end
     end
   end

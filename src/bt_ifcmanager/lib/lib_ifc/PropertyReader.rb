@@ -77,16 +77,17 @@ module BimTools
                             @attributes
                           end
 
-
         @propertyset_names = names - @all_attributes - ifc_entity_inverse_attributes
       end
 
       def handle_predefined_type(value)
-        if value == :userdefined
+        if value == 'userdefined'
           object_type_or_element_type = @ifc_dict['ObjectType'] || @ifc_dict['ElementType']
           return :notdefined if object_type_or_element_type
         end
-        value
+        return value if value.is_a?(Symbol)
+
+        value.is_a?(String) ? value.to_sym : value.value.to_sym # TODO: hacky fix
       end
 
       # Set the IFC entity attributes using all combined attribute possibilitites from IfcProduct and IfcTypeProduct
@@ -184,7 +185,7 @@ module BimTools
         return false if value.nil? || (value.is_a?(String) && value.empty?)
 
         ifc_value = determine_ifc_value(property, value)
-        ifc_value = handle_predefined_type(ifc_value) if ifc_value.is_a?(Symbol) && name == 'PredefinedType'
+        ifc_value = handle_predefined_type(ifc_value) if name == 'PredefinedType'
 
         @ifc_entity.send("#{name.downcase}=", ifc_value) if ifc_value
       end

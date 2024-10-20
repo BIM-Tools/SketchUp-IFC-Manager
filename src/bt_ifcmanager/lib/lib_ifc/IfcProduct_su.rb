@@ -97,10 +97,11 @@ module BimTools
                                   (is_a? @ifc_module::IfcElement) &&
                                   !(is_a? @ifc_module::IfcFeatureElementSubtraction) &&
                                   !(is_a? @ifc_module::IfcVirtualElement) &&
-                                  !(is_a? @ifc_module::IfcSpatialElement) &&
+                                  !(is_a? @ifc_module::IfcSpatialStructureElement) &&
                                   !(is_a? @ifc_module::IfcRoof) &&
                                   !(is_a? @ifc_module::IfcElementAssembly) &&
-                                  !(is_a? @ifc_module::IfcCurtainWall)
+                                  !(is_a? @ifc_module::IfcCurtainWall) &&
+                                  !(defined?(@ifc_module::IfcSpatialZone) && is_a?(@ifc_module::IfcSpatialZone))
 
       # collect dynamic component attributes if export option is set
       BimTools::DynamicAttributes.get_dynamic_attributes(ifc_model, self) if ifc_model.options[:dynamic_attributes]
