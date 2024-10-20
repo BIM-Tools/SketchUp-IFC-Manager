@@ -68,6 +68,9 @@ module BimTools
 
       # Set PredefinedType to default value when not set
       @predefinedtype = :notdefined if defined?(predefinedtype) && @predefinedtype.nil?
+
+      # Set AssemblyPlace to default value when not set, for IfcFurnitureType
+      @assemblyplace = :notdefined if defined?(assemblyplace) && @assemblyplace.nil?
     end
 
     # @param ifc_entity
