@@ -23,60 +23,85 @@
 
 module BimTools
   module IfcSite_su
+    @reflatitude = nil
+    @reflongitude = nil
+
     # add project location, if set in sketchup model
     # (!) north angle still missing?
     def set_latlong
-      if Sketchup.active_model.georeferenced?
-        local_point = Geom::Point3d.new([0, 0, 0])
-        @latlong = Sketchup.active_model.point_to_latlong(local_point)
+      return unless Sketchup.active_model.georeferenced?
+
+      local_point = Geom::Point3d.new([0, 0, 0])
+      @latlong = Sketchup.active_model.point_to_latlong(local_point)
+    end
+
+    def reflatitude=(values)
+      if valid_latlong_list?(values)
+        @reflatitude = values
+      else
+        puts 'Invalid reflatitude values'
       end
     end
 
-    def latitude
-      return lat_long_ifc(@latlong[1]) if @latlong
+    def reflongitude=(values)
+      if valid_latlong_list?(values)
+        @reflongitude = values
+      else
+        puts 'Invalid reflongitude values'
+      end
     end
 
-    def longtitude
-      return lat_long_ifc(@latlong[0]) if @latlong
+    def reflatitude
+      lat_long_ifc(@latlong[1]) if @latlong
+    end
+
+    def reflongitude
+      lat_long_ifc(@latlong[0]) if @latlong
     end
 
     def elevation
-      return IfcManager::Types::IfcLengthMeasure.new(@ifc_model, @latlong[2]) if @latlong
+      IfcManager::Types::IfcLengthMeasure.new(@ifc_model, @latlong[2]) if @latlong
+    end
+
+    private
+
+    def valid_latlong_list?(values)
+      values.is_a?(Array) && values.all? { |v| v.is_a?(IfcCompoundPlaneAngleMeasure) }
     end
 
     # convert sketchup latlong coordinate (decimal) to IFC notation (degrees)
     def lat_long_ifc(coordinate)
-      if Sketchup.active_model.georeferenced?
-        d = coordinate.abs
-        neg_pos = (coordinate / d).to_int
+      return unless Sketchup.active_model.georeferenced?
 
-        # degrees
-        i = d.to_int
-        deg = i * neg_pos
+      d = coordinate.abs
+      neg_pos = (coordinate / d).to_int
 
-        # minutes
-        d -= i
-        d *= 60
-        i = d.to_int
+      # degrees
+      i = d.to_int
+      deg = i * neg_pos
 
-        min = i * neg_pos
+      # minutes
+      d -= i
+      d *= 60
+      i = d.to_int
 
-        # seconds
-        d -= i
-        d *= 60
-        i = d.to_int
-        sec = i * neg_pos
+      min = i * neg_pos
 
-        # millionth-seconds
-        d -= i
-        d *= 1_000_000
-        i = d.to_int
-        msec = i * neg_pos
+      # seconds
+      d -= i
+      d *= 60
+      i = d.to_int
+      sec = i * neg_pos
 
-        # (!) values should be Ifc INTEGER objects instead of Strings(!)
-        # (!) returned object should be of type IFC LIST instead of IFC SET
-        IfcManager::Types::List.new([deg.to_s, min.to_s, sec.to_s, msec.to_s])
-      end
+      # millionth-seconds
+      d -= i
+      d *= 1_000_000
+      i = d.to_int
+      msec = i * neg_pos
+
+      # (!) values should be Ifc INTEGER objects instead of Strings(!)
+      # (!) returned object should be of type IFC LIST instead of IFC SET
+      IfcManager::Types::List.new([deg.to_s, min.to_s, sec.to_s, msec.to_s])
     end
   end
 end

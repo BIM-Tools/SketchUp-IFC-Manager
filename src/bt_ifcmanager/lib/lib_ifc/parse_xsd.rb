@@ -60,6 +60,7 @@ module BimTools
         IfcRelDefinesByProperties
         IfcRelDefinesByType
         IfcRelContainedInSpatialStructure
+        IfcSite
         IfcSpatialStructureElement
         IfcStyledItem
         IfcTypeProduct
@@ -241,6 +242,7 @@ module BimTools
         mixin_file = Pathname.new("#{PLUGIN_ROOT_PATH}/bt_ifcmanager/lib/lib_ifc/#{ifc_name}_su.rb")
         if mixin_file.exist?
           require_relative(mixin_file)
+          puts "loaded #{ifc_name}_su"
           return BimTools.const_get(ifc_name + '_su')
         end
         nil
@@ -284,7 +286,6 @@ module BimTools
           subtype = get_subtype(ifc_object, ifc_objects)
 
           ifc_attributes = get_ifc_attributes(ifc_object, ifc_name)
-
 
           if mixin && mixin.respond_to?(:required_attributes)
             ifc_attributes.concat(mixin.required_attributes)

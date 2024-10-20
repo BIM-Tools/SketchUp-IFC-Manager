@@ -26,7 +26,6 @@ require_relative 'step_types'
 module BimTools
   module IfcManager
     module Types
-
       # https://technical.buildingsmart.org/wp-content/uploads/2018/05/IFC2x-Model-Implementation-Guide-V2-0b.pdf
       # page 19 and 20
       def self.replace_char(in_string)
@@ -207,6 +206,49 @@ module BimTools
       # OR
       # ((SELF[1] <= 0) AND (SELF[2] <= 0) AND (SELF[3] <= 0) AND ((SIZEOF(SELF) = 3) OR (SELF[4] <= 0)));
       # END_TYPE;
+      class IfcCompoundPlaneAngleMeasure < BaseType
+        def initialize(ifc_model, values, long = false)
+          super(ifc_model, values, long)
+          @values = values.map(&:to_i)
+          validate!
+        end
+
+        def step
+          val = @values.join(',')
+          val = add_long(val) if @long
+          val
+        end
+
+        private
+
+        def validate!
+          raise ArgumentError, 'List must have 3 or 4 integers' unless (3..4).include?(@values.size)
+          raise ArgumentError, 'Minutes must be in range' unless minutes_in_range?
+          raise ArgumentError, 'Seconds must be in range' unless seconds_in_range?
+          raise ArgumentError, 'Microseconds must be in range' unless microseconds_in_range?
+          raise ArgumentError, 'Sign must be consistent' unless consistent_sign?
+        end
+
+        def minutes_in_range?
+          @values[1].abs < 60
+        end
+
+        def seconds_in_range?
+          @values[2].abs < 60
+        end
+
+        def microseconds_in_range?
+          @values.size == 3 || @values[3].abs < 1_000_000
+        end
+
+        def consistent_sign?
+          if @values[0] >= 0
+            @values.all? { |v| v >= 0 }
+          else
+            @values.all? { |v| v <= 0 }
+          end
+        end
+      end
 
       # TYPE IfcContextDependentMeasure = REAL;
       # END_TYPE;
@@ -923,7 +965,7 @@ module BimTools
       # END_TYPE;
 
       class PEnum_ElementStatus
-        def initialize(ifc_model, value, long = true)
+        def initialize(_ifc_model, value, _long = true)
           @value = value
         end
 
@@ -931,7 +973,6 @@ module BimTools
           @value
         end
       end
-
     end
   end
 end
