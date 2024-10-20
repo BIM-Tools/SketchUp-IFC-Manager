@@ -279,8 +279,11 @@ module BimTools
         #   could be better set from within IfcBuildingStorey?
         return unless ifc_entity.is_a?(@ifc_module::IfcBuildingStorey)
 
+        return unless ['IFC 4x3', 'IFC4X3_ADD2'].include?(Settings.ifc_version_compact)
+
         elevation = @objectplacement.ifc_total_transformation.origin.z
         ifc_entity.elevation = Types::IfcLengthMeasure.new(@ifc_model, elevation)
+        # ElevationOfFFLRelative
       end
 
       # find nested objects (geometry and entities)
