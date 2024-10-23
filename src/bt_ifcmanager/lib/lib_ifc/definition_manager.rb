@@ -55,7 +55,9 @@ module BimTools
         geometry_type = ifc_model.options[:geometry]
 
         # Fallback to Brep when Tessellation not available in current IFC schema
-        geometry_type = 'Brep' if geometry_type == 'Tessellation' && !@ifc_module.const_defined?(:IfcTriangulatedFaceSet)
+        if geometry_type == 'Tessellation' && !@ifc_module.const_defined?(:IfcTriangulatedFaceSet)
+          geometry_type = 'Brep'
+        end
         geometry_type
       end
 
@@ -113,7 +115,7 @@ module BimTools
 
       def build_shape_representation(representation_type, representations)
         IfcShapeRepresentationBuilder.build(@ifc_model) do |builder|
-          builder.set_contextofitems(@ifc_model.representationcontext)
+          builder.set_contextofitems(@ifc_model.representation_sub_context_body)
           builder.set_representationtype(representation_type)
           builder.set_items(representations)
         end

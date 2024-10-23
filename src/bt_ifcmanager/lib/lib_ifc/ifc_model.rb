@@ -22,6 +22,8 @@
 #
 
 require_relative 'ifc_types'
+require_relative 'ifc_geometric_representation_context_builder'
+require_relative 'ifc_geometric_representation_sub_context_builder'
 require_relative 'ifc_owner_history_builder'
 require_relative 'ifc_product_definition_shape_builder'
 require_relative 'ifc_project_builder'
@@ -48,10 +50,11 @@ module BimTools
       # - add_su_object
       # - add_ifc_object
 
-      attr_accessor :owner_history, :representationcontext, :layers, :materials, :classifications,
-                    :classificationassociations, :product_types, :property_enumerations
-      attr_reader :su_model, :project, :ifc_objects, :ifc_module, :ifc_version, :project_data, :export_summary, :options, :su_entities, :units,
-                  :default_location, :default_axis, :default_refdirection, :default_placement, :textures
+      attr_reader :owner_history, :representationcontext, :representation_sub_context_body, :layers, :materials,
+                  :classifications, :classificationassociations, :product_types, :property_enumerations,
+                  :su_model, :project, :ifc_objects, :ifc_module, :ifc_version, :project_data,
+                  :export_summary, :options, :su_entities, :units, :default_location, :default_axis,
+                  :default_refdirection, :default_placement, :textures
 
       # Initializes a new IfcModel instance.
       # (?) could be enhanced to also accept other sketchup objects
@@ -118,7 +121,7 @@ module BimTools
         @property_enumerations = {}
 
         # create IfcOwnerHistory for all IFC objects
-        @owner_history = BimTools::IfcManager::IfcOwnerHistoryBuilder.build(self) do |builder|
+        @owner_history = IfcOwnerHistoryBuilder.build(self) do |builder|
           builder.owning_user_from_model(su_model)
           builder.owning_application(VERSION, 'IFC manager for sketchup', 'su_ifcmanager')
           builder.change_action = '.ADDED.'
@@ -127,7 +130,17 @@ module BimTools
         end
 
         # create IfcGeometricRepresentationContext for all IFC geometry objects
-        @representationcontext = create_representationcontext
+        @representationcontext = IfcGeometricRepresentationContextBuilder.build(self) do |builder|
+          builder.set_context_type('Model')
+        end
+
+        @representation_sub_context_body = IfcGeometricRepresentationSubContextBuilder.build(self) do |builder|
+          builder
+            .set_context_identifier('Body')
+            .set_context_type('Model')
+            .set_parent_context(@representationcontext)
+            .set_target_view('model_view')
+        end
 
         # create new IfcProject
         @project = IfcProjectBuilder.build(self) do |builder|
@@ -190,24 +203,6 @@ module BimTools
         else
           @export_summary[class_name] = 1
         end
-      end
-
-      # Create new IfcGeometricRepresentationContext
-      def create_representationcontext
-        context = @ifc_module::IfcGeometricRepresentationContext.new(self)
-        context.contexttype = Types::IfcLabel.new(self, 'Model')
-        context.coordinatespacedimension = '3'
-        context.worldcoordinatesystem = @ifc_module::IfcAxis2Placement2D.new(self)
-
-        # Older Sketchup versions don't have Point2d and Vector2d
-        if Geom.const_defined?(:Point2d)
-          context.worldcoordinatesystem.location = @ifc_module::IfcCartesianPoint.new(self, Geom::Point2d.new(0, 0))
-          context.truenorth = @ifc_module::IfcDirection.new(self, Geom::Vector2d.new(0, 1))
-        else
-          context.worldcoordinatesystem.location = @ifc_module::IfcCartesianPoint.new(self, Geom::Point3d.new(0, 0, 0))
-          context.truenorth = @ifc_module::IfcDirection.new(self, Geom::Vector3d.new(0, 1, 0))
-        end
-        context
       end
 
       # Recursively create IFC objects for all given SketchUp entities and add those to the model
@@ -334,7 +329,8 @@ module BimTools
       # @param [Sketchup::Material] su_material
       # @param [Sketchup::Layer] su_layer
       def add_representation(ifc_entity, definition_manager, transformation, su_material, su_layer, geometry_type = nil)
-        shape_representation = definition_manager.get_shape_representation(transformation, su_material, su_layer, geometry_type)
+        shape_representation = definition_manager.get_shape_representation(transformation, su_material, su_layer,
+                                                                           geometry_type)
         if ifc_entity.representation
           ifc_entity.representation.representations.add(shape_representation)
         else

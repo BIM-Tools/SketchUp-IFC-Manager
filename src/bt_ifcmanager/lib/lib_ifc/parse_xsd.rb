@@ -49,6 +49,7 @@ module BimTools
         IfcCartesianPoint
         IfcClassificationReference
         IfcDirection
+        IfcGeometricRepresentationSubContext
         IfcGroup
         IfcIndexedTriangleTextureMap
         IfcLocalPlacement

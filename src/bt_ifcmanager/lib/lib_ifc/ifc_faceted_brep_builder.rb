@@ -64,22 +64,6 @@ module BimTools
         @flipped = !(@su_transformation.xaxis * @su_transformation.yaxis % @su_transformation.zaxis < 0)
       end
 
-      def set_contextofitems(representationcontext)
-        @ifc_faceted_brep.contextofitems = representationcontext
-      end
-
-      def set_representationidentifier(identifier = 'Body')
-        @ifc_faceted_brep.representationidentifier = Types::IfcLabel.new(@ifc_model, identifier)
-      end
-
-      def set_items(items = [])
-        @ifc_faceted_brep.items = Types::Set.new(items)
-      end
-
-      def add_item(item)
-        @ifc_faceted_brep.items.add(item)
-      end
-
       def set_styling(su_material)
         if @ifc_model.options[:colors] && !@ifc_model.materials[su_material]
           @ifc_model.materials[su_material] = IfcManager::MaterialAndStyling.new(@ifc_model, su_material)
