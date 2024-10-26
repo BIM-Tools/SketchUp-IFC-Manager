@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  IfcPile_su.rb
+#  IfcCoordinateOperation_su.rb
 #
 #  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
 #
@@ -22,15 +22,27 @@
 #
 
 module BimTools
-  module IfcPile_su
-    @constructiontype = nil
-    attr_reader :constructiontype
+  module IfcCoordinateOperation_su
+    def initialize(ifc_model, _sketchup)
+      super
 
-    def constructiontype=(value)
-      if BimTools::IfcManager::Settings.ifc_version == 'IFC 2x3'
-        @constructiontype = value.value.to_sym
-      else
-        puts 'ConstructionType attribute deprecated'
+      # Workaround for missing "SourceCRS" attribute in XSD schema for IFC4 and IFC4X3
+      return if ifc_model.ifc_version == 'IFC 2x3'
+
+      instance_variable_set(:@attr, ([:SourceCRS] + attributes))
+
+      return if attributes.include? :SourceCRS
+
+      @sourcecrs = nil
+      define_singleton_method(:attributes) do
+        attributes = self.class.attributes
+        attributes.insert(0, :SourceCRS)
+      end
+      define_singleton_method(:sourcecrs) do
+        @sourcecrs
+      end
+      define_singleton_method(:sourcecrs=) do |sourcecrs|
+        @sourcecrs = sourcecrs
       end
     end
   end

@@ -28,6 +28,7 @@ require_relative 'ifc_owner_history_builder'
 require_relative 'ifc_product_definition_shape_builder'
 require_relative 'ifc_project_builder'
 require_relative 'ifc_shape_representation_builder'
+require_relative 'geolocation_builder'
 require_relative 'spatial_structure'
 require_relative 'entity_builder'
 require_relative 'definition_manager'
@@ -169,6 +170,9 @@ module BimTools
                          else
                            Geom::Transformation.new
                          end
+
+        # Add georeference
+        GeolocationBuilder.new(self).setup_geolocation
 
         # When no entities are given for export, pass all model entities to create ifc objects
         # if nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked

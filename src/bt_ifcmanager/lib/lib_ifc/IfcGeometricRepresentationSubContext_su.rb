@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 #  IfcGeometricRepresentationSubContext_su.rb
 #
-#  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -26,18 +28,18 @@ module BimTools
       instance_variable_set(:@attr, ([:ParentContext] + attributes))
 
       # Workaround for bug in IFC XSD's forward from IFC4X3, missing "parentcontext" attribute
-      unless attributes.include? :ParentContext
-        @parentcontext = nil
-        define_singleton_method(:attributes) do
-          attributes = self.class.attributes
-          return attributes.insert(6, :ParentContext)
-        end
-        define_singleton_method(:parentcontext) do
-          return @parentcontext
-        end
-        define_singleton_method(:parentcontext=) do |parentcontext|
-          return @parentcontext = parentcontext
-        end
+      return if attributes.include? :ParentContext
+
+      @parentcontext = nil
+      define_singleton_method(:attributes) do
+        attributes = self.class.attributes
+        attributes.insert(6, :ParentContext)
+      end
+      define_singleton_method(:parentcontext) do
+        @parentcontext
+      end
+      define_singleton_method(:parentcontext=) do |parentcontext|
+        @parentcontext = parentcontext
       end
     end
   end

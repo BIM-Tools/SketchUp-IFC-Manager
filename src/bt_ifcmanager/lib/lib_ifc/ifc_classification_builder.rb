@@ -69,28 +69,25 @@ module BimTools
       end
 
       def set_editiondate(editiondate)
-        if editiondate
-          date_time = DateTime.parse(editiondate)
+        return unless editiondate
 
-          # IFC 4
-          if @ifc_module.const_defined?(:IfcCalendarDate)
-            date = @ifc_module::IfcCalendarDate.new(@ifc_model)
-            date.daycomponent = Types::IfcInteger.new(@ifc_model, date_time.day)
-            date.monthcomponent = Types::IfcInteger.new(@ifc_model, date_time.month)
-            date.yearcomponent = Types::IfcInteger.new(@ifc_model, date_time.year)
+        date_time = DateTime.parse(editiondate)
 
-          # IFC 2x3
-          else
-            date = Types::IfcDate.new(@ifc_model, date_time)
-          end
-          @ifc_classification.editiondate = date
+        if @ifc_model.ifc_version == 'IFC 2x3'
+          date = @ifc_module::IfcCalendarDate.new(@ifc_model)
+          date.daycomponent = Types::IfcInteger.new(@ifc_model, date_time.day)
+          date.monthcomponent = Types::IfcInteger.new(@ifc_model, date_time.month)
+          date.yearcomponent = Types::IfcInteger.new(@ifc_model, date_time.year)
+        else
+          date = Types::IfcDate.new(@ifc_model, date_time)
         end
+        @ifc_classification.editiondate = date
       end
 
       def set_location(location = nil)
-        if location && defined?(@ifc_classification.location)
-          @ifc_classification.location = IfcManager::Types::IfcURIReference.new(@ifc_model, location)
-        end
+        return unless location && defined?(@ifc_classification.location)
+
+        @ifc_classification.location = IfcManager::Types::IfcURIReference.new(@ifc_model, location)
       end
     end
   end

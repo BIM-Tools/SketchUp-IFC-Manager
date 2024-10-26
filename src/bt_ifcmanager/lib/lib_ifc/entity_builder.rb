@@ -135,10 +135,10 @@ module BimTools
         case entity_base_name
         when 'IfcAirTerminal'
           # Catch missing IfcAirTerminal in Ifc2x3
-          Settings.ifc_version_compact == 'IFC2X3' ? 'IfcFlowTerminal' : 'IfcAirTerminal'
+          @ifc_model.ifc_version == 'IFC 2x3' ? 'IfcFlowTerminal' : 'IfcAirTerminal'
         when 'IfcPipeSegment'
           # Catch missing IfcPipeSegment in Ifc2x3
-          Settings.ifc_version_compact == 'IFC2X3' ? 'IfcFlowSegment' : 'IfcPipeSegment'
+          @ifc_model.ifc_version == 'IFC 2x3' ? 'IfcFlowSegment' : 'IfcPipeSegment'
         else
           @ifc_module.const_defined?(entity_base_name) ? entity_base_name : entity_type_name
         end
@@ -305,7 +305,7 @@ module BimTools
         #   could be better set from within IfcBuildingStorey?
         return unless ifc_entity.is_a?(@ifc_module::IfcBuildingStorey)
 
-        return unless %w[IFC2X3 IFC4].include?(Settings.ifc_version_compact)
+        return unless ['IFC 2x3', 'IFC 4'].include?(@ifc_model.ifc_version)
 
         elevation = @objectplacement.ifc_total_transformation.origin.z
         ifc_entity.elevation = Types::IfcLengthMeasure.new(@ifc_model, elevation)

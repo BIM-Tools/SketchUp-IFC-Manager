@@ -48,6 +48,7 @@ module BimTools
         IfcAxis2Placement3D
         IfcCartesianPoint
         IfcClassificationReference
+        IfcCoordinateOperation
         IfcDirection
         IfcGeometricRepresentationSubContext
         IfcGroup
