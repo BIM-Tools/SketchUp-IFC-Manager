@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-#  IfcGroup_su.rb
+#  common_object_attributes.rb
 #
-#  Copyright 2021 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,36 +22,27 @@
 #
 
 require_relative 'ifc_types'
-require_relative 'common_object_attributes'
+require_relative 'PropertyReader'
 
 module BimTools
-  module IfcGroup_su
-    include BimTools::CommonObjectAttributes
-
+  module CommonObjectAttributes
     # @param [IfcManager::IfcModel] ifc_model
     # @param [Sketchup::ComponentInstance] su_instance
-    def initialize(ifc_model, su_instance = nil)
-      super
-      @ifc_module = ifc_model.ifc_module
+    def add_common_attributes(ifc_model, su_instance)
+      su_definition = su_instance.definition
+      dictionaries = su_definition.attribute_dictionaries
 
-      @rel = @ifc_module::IfcRelAssignsToGroup.new(ifc_model)
-      @rel.relatinggroup = self
-      @rel.relatedobjects = IfcManager::Types::Set.new
+      return unless dictionaries
 
-      # (?) set name, here? is this a duplicate?
-      @name = IfcManager::Types::IfcLabel.new(ifc_model, su_instance.definition.name)
+      dict_reader = IfcManager::IfcDictionaryReader.new(ifc_model, self, dictionaries)
+      dict_reader.set_attributes
 
-      add_common_attributes(ifc_model, su_instance)
-    end
-
-    def add(entity)
-      @rel.relatedobjects.add(entity)
-    end
-
-    # add export summary for IfcProducts
-    def step
-      @ifc_model.summary_add(self.class.name.split('::').last)
-      super
+      unless ifc_model.options[:type_properties]
+        dict_reader.add_propertysets
+        dict_reader.add_sketchup_definition_properties(ifc_model, self, su_definition)
+        dict_reader.add_classifications
+      end
+      dict_reader.add_sketchup_instance_properties(ifc_model, self, su_instance)
     end
   end
 end

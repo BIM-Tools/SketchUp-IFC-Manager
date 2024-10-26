@@ -22,14 +22,16 @@
 #
 
 require_relative 'ifc_types'
+require_relative 'common_object_attributes'
 require_relative 'dynamic_attributes'
-require_relative 'PropertyReader'
 require_relative 'material_and_styling'
 require_relative 'base_quantity_builder'
 require_relative 'ifc_rel_adheres_to_element_builder'
 
 module BimTools
   module IfcProduct_su
+    include BimTools::CommonObjectAttributes
+
     attr_accessor :su_object, :parent, :total_transformation, :type_product
 
     @su_object = nil
@@ -51,10 +53,9 @@ module BimTools
       @su_object = sketchup
       definition = @su_object.definition
 
-      # When instance name is set, use that, otherwise use definition name
       # (?) set name, here? is this a duplicate?
-      name = @su_object.name
-      name = definition.name if name.length == 0
+      name = @su_object.name unless @su_object.name.empty?
+      name ||= definition.name
       @name = IfcManager::Types::IfcLabel.new(ifc_model, name)
 
       # Set IfcProductType
@@ -74,18 +75,7 @@ module BimTools
       end
       @type_properties = ifc_model.options[:type_properties] && @type_product
 
-      # get attributes from su object and add them to IfcProduct
-      if dicts = definition.attribute_dictionaries
-        dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(ifc_model, self, dicts)
-        dict_reader.set_attributes
-
-        unless @type_properties
-          dict_reader.add_propertysets
-          dict_reader.add_sketchup_definition_properties(ifc_model, self, @su_object.definition)
-          dict_reader.add_classifications
-        end
-        dict_reader.add_sketchup_instance_properties(ifc_model, self, @su_object)
-      end
+      add_common_attributes(ifc_model, @su_object)
 
       # unset ObjectType if a IfcTypeProduct is defined
       if @type_product && defined?(predefinedtype)
