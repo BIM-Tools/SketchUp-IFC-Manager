@@ -51,10 +51,10 @@ module BimTools
       # - add_ifc_object
 
       attr_reader :owner_history, :representationcontext, :representation_sub_context_body, :layers, :materials,
-                  :classifications, :classificationassociations, :product_types, :property_enumerations,
-                  :su_model, :project, :ifc_objects, :ifc_module, :ifc_version, :project_data,
-                  :export_summary, :options, :su_entities, :units, :default_location, :default_axis,
-                  :default_refdirection, :default_placement, :textures
+                  :classifications, :classificationassociations, :groups, :product_types,
+                  :property_enumerations, :su_model, :project, :ifc_objects, :ifc_module, :ifc_version,
+                  :project_data, :export_summary, :options, :su_entities, :units, :default_location,
+                  :default_axis, :default_refdirection, :default_placement, :textures
 
       # Initializes a new IfcModel instance.
       # (?) could be enhanced to also accept other sketchup objects
@@ -101,6 +101,7 @@ module BimTools
         # create collections for materials and layers
         @materials = {}
         @layers = {}
+        @groups = {}
         @classifications = IfcManager::Classifications.new(self)
 
         # Enable texture export if textures option is enabled and the active IFC version is capable of exporting textures

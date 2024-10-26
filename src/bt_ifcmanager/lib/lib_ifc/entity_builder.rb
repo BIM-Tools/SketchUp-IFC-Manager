@@ -154,6 +154,7 @@ module BimTools
         return handle_unclassified_component(su_instance, placement_parent) if entity_type.nil?
         return handle_ifc_project(su_instance, placement_parent) if entity_type == @ifc_module::IfcProject
         return create_ifc_product(entity_type, su_instance, placement_parent) if entity_type < @ifc_module::IfcProduct
+        return create_ifc_group(entity_type, su_instance, placement_parent) if entity_type < @ifc_module::IfcGroup
         return create_ifc_root(entity_type, su_instance, placement_parent) if entity_type < @ifc_module::IfcRoot
 
         # Pass the entity type class to the geometry creation method to be caught appropriately
@@ -204,10 +205,33 @@ module BimTools
         # (!)(?) check against list of valid IFC entities? IfcGroup, IfcProduct
 
         ifc_entity = entity_type.new(@ifc_model, su_instance)
-        ifc_entity.globalid = @guid if entity_type < @ifc_module::IfcRoot
+        ifc_entity.globalid = @guid
 
         @spatial_structure.add(ifc_entity)
         assign_entity_attributes(ifc_entity, placement_parent)
+        ifc_entity
+      end
+
+      # Creates an IFC group and assigns it to the given SketchUp instance.
+      #
+      # @param entity_type [Class] The type of IFC entity to create.
+      # @param su_instance [Sketchup::ComponentInstance] The SketchUp instance to assign to the IFC entity.
+      # @param placement_parent [IFC::IfcObjectPlacement] The placement parent for the IFC entity.
+      # @return [IFC::IfcGroup] The created IFC group.
+      def create_ifc_group(entity_type, su_instance, placement_parent)
+        group_name = su_instance.name unless su_instance.name.empty?
+        group_name ||= su_instance.definition.name
+
+        return @ifc_model.groups[group_name] if @ifc_model.groups.key?(group_name)
+
+        ifc_entity = entity_type.new(@ifc_model, su_instance)
+        ifc_entity.globalid = @guid
+
+        @spatial_structure.add(ifc_entity)
+        assign_entity_attributes(ifc_entity, placement_parent)
+
+        @ifc_model.groups[group_name] = ifc_entity
+
         ifc_entity
       end
 
@@ -215,7 +239,7 @@ module BimTools
         # (!)(?) check against list of valid IFC entities? IfcGroup, IfcProduct
 
         ifc_entity = entity_type.new(@ifc_model, su_instance, @su_total_transformation)
-        ifc_entity.globalid = @guid if entity_type < @ifc_module::IfcRoot
+        ifc_entity.globalid = @guid
 
         # Set "tag" to component persistant_id like the other BIM Authoring Tools like Revit, Archicad and Tekla are doing
         # persistant_id in Sketchup is unique for the ComponentInstance placement, but not within the IFC model due to nested components
