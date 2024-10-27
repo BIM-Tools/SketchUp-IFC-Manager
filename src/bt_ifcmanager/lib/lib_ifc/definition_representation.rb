@@ -37,6 +37,7 @@ module BimTools
       def initialize(ifc_model, geometry_type, faces, su_material, transformation)
         @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
+        @ifc_version = ifc_model.ifc_version
         @geometry_type = geometry_type
         @ifc_shape_representation_builder = nil
         @representation = nil
@@ -53,13 +54,13 @@ module BimTools
         [create_extrusion(bottom_face, direction, @su_material, @transformation)]
       end
 
-      # Set the definition-representations OWN representation using it's faces
+      # Set the definition-representations OWN representation using its faces
       def create_meshes(ifc_model, faces, transformation, su_material = nil)
         # if su_material
         faces_by_material = faces.group_by { |face| [face.material, face.back_material] }
         if faces_by_material.length > 0
-          return faces_by_material.map do |face_materials, face_group|
-            create_mesh(ifc_model, face_group, transformation, su_material, face_materials)
+          return faces_by_material.map do |face_materials, grouped_faces|
+            create_mesh(ifc_model, grouped_faces, transformation, su_material, face_materials)
           end
         end
         # end
@@ -112,7 +113,7 @@ module BimTools
       end
 
       def get_surface_styles(ifc_model, parent_material = nil, front_material = nil, back_material = nil)
-        if Settings.ifc_version_compact == 'IFC2X3' || @double_sided_faces == false
+        if @ifc_version == 'IFC 2x3' || @double_sided_faces == false
           return Types::Set.new([ifc_model.get_styling(front_material, :both)]) if front_material
 
           Types::Set.new([ifc_model.get_styling(parent_material, :both)])

@@ -23,7 +23,7 @@
 
 module BimTools
   module IfcRelContainedInSpatialStructure_su
-    def self.required_attributes
+    def self.required_attributes(_ifc_version)
       [:RelatingStructure]
     end
   end

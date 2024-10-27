@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  IfcClassificationReference_su.rb
+#  IfcElementAssembly_su.rb
 #
 #  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
 #
@@ -22,9 +22,17 @@
 #
 
 module BimTools
-  module IfcClassificationReference_su
-    def self.required_attributes(_ifc_version)
-      [:ReferencedSource]
+  module IfcElementAssembly_su
+    attr_reader :assemblyplace
+
+    def assemblyplace=(value)
+      @assemblyplace = if value.is_a?(String)
+                         value.to_sym
+                       elsif value.respond_to?(:value)
+                         value.value.to_sym
+                       else
+                         value.to_sym
+                       end # TODO: hacky fix, should be part of PropertyReader
     end
   end
 end
