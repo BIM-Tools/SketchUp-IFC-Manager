@@ -101,11 +101,13 @@ module BimTools
       add_base_quantities
     end
 
-    # Adds a surface feature to the IFC element.
+    # Adds a surface feature to the IFC element (not every IfcProduct).
     #
     # @param surface_feature [Object] The surface feature to be added.
     # @return [void]
     def add_surface_feature(surface_feature)
+      return unless is_a?(@ifc_module::IfcElement)
+
       create_ifc_rel_adheres_to_element unless @has_surface_features
       @has_surface_features.add_related_surface_feature(surface_feature)
     end

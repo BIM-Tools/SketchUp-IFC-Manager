@@ -26,6 +26,7 @@
 require 'pathname'
 require 'rexml/document'
 require 'yaml'
+require 'set'
 
 require_relative File.join('.', 'step')
 
@@ -46,9 +47,11 @@ module BimTools
       # IFC classes that need an additional module mixed in
       MIXIN_MODULES = %w[
         IfcAxis2Placement3D
+        IfcBuildingElementProxy
         IfcCartesianPoint
         IfcClassificationReference
         IfcDirection
+        IfcElementAssembly
         IfcGeometricRepresentationSubContext
         IfcGroup
         IfcIndexedTriangleTextureMap
@@ -63,6 +66,7 @@ module BimTools
         IfcRelDefinesByType
         IfcRelContainedInSpatialStructure
         IfcSite
+        IfcSpace
         IfcSpatialStructureElement
         IfcStyledItem
         IfcTypeProduct
@@ -201,7 +205,7 @@ module BimTools
       # @param ifc_object [REXML::Element] The IFC object.
       # @param ifc_name [String] The name of the IFC class.
       # @return [Array<String>] the list of attributes of the IFC object.
-      def get_ifc_attributes(ifc_object, _ifc_name)
+      def get_ifc_attributes(ifc_object, _ifc_name, mixin)
         ifc_attributes = Set.new
         if ifc_object
           ifc_object.elements.each('xs:complexContent/xs:extension/xs:attribute') do |attribute|
@@ -212,21 +216,10 @@ module BimTools
           end
         end
 
-        # # Catch special cases where the XML schema deviates from the EXPRESS schema
-        # case ifc_name
-        # when 'IfcRelAggregates'
-        #   ifc_attributes << :RelatingObject
-        # when 'IfcRelDefinesByType'
-        #   ifc_attributes << :RelatedObjects
-        # when 'IfcRelDefinesByProperties'
-        #   ifc_attributes << :RelatedObjects
-        # when 'IfcRelContainedInSpatialStructure'
-        #   ifc_attributes << :RelatingStructure
-        # when 'IfcClassificationReference'
-        #   ifc_attributes << :ReferencedSource
-        # end
-
-        # ifc_attributes = sort_attributes(ifc_name, ifc_attributes)
+        # Catch special cases where the XML schema deviates from the EXPRESS schema
+        if mixin && mixin.respond_to?(:required_attributes)
+          ifc_attributes.merge(mixin.required_attributes(@ifc_version))
+        end
 
         ifc_attributes.to_a
       end
@@ -287,12 +280,7 @@ module BimTools
           mixin = get_mixin(ifc_name)
           subtype = get_subtype(ifc_object, ifc_objects)
 
-          ifc_attributes = get_ifc_attributes(ifc_object, ifc_name)
-
-          if mixin && mixin.respond_to?(:required_attributes)
-            ifc_attributes.concat(mixin.required_attributes)
-            ifc_attributes.uniq!
-          end
+          ifc_attributes = get_ifc_attributes(ifc_object, ifc_name, mixin)
 
           ifc_attributes ||= []
           ifc_attributes, inverse_attributes = sort_attributes(ifc_name, ifc_attributes)

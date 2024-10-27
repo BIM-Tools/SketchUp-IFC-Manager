@@ -55,13 +55,14 @@ module BimTools
       )
         @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
+        @ifc_version = ifc_model.ifc_version
         @instance_path = Sketchup::InstancePath.new(instance_path.to_a + [su_instance])
         @persistent_id_path = persistent_id_path(@instance_path)
         @spatial_structure = SpatialStructureHierarchy.new(@ifc_model, spatial_structure)
         @guid = IfcManager::IfcGloballyUniqueId.new(@ifc_model, @persistent_id_path)
         entity_type_name = su_instance.definition.get_attribute(
           'AppliedSchemaTypes',
-          ifc_model.ifc_version
+          @ifc_version
         )
         su_material = su_instance.material if su_instance.material
         su_layer = su_instance.layer if su_instance.layer.name != 'Layer0' || su_layer.nil?
@@ -102,11 +103,8 @@ module BimTools
       # @return [IfcEntity] The created IFC entity.
       def create_ifc_entity(entity_type_name, su_instance, placement_parent = nil, su_material = nil, su_layer = nil)
         su_definition = su_instance.definition
-
         entity_type_name = map_entity_type(entity_type_name)
-
         entity_type = @ifc_module.const_get(entity_type_name) if entity_type_name
-
         ifc_entity = determine_ifc_entity(entity_type, su_instance, placement_parent)
 
         create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
@@ -135,10 +133,10 @@ module BimTools
         case entity_base_name
         when 'IfcAirTerminal'
           # Catch missing IfcAirTerminal in Ifc2x3
-          Settings.ifc_version_compact == 'IFC2X3' ? 'IfcFlowTerminal' : 'IfcAirTerminal'
+          @ifc_version == 'IFC 2x3' ? 'IfcFlowTerminal' : 'IfcAirTerminal'
         when 'IfcPipeSegment'
           # Catch missing IfcPipeSegment in Ifc2x3
-          Settings.ifc_version_compact == 'IFC2X3' ? 'IfcFlowSegment' : 'IfcPipeSegment'
+          @ifc_version == 'IFC 2x3' ? 'IfcFlowSegment' : 'IfcPipeSegment'
         else
           @ifc_module.const_defined?(entity_base_name) ? entity_base_name : entity_type_name
         end
@@ -305,7 +303,7 @@ module BimTools
         #   could be better set from within IfcBuildingStorey?
         return unless ifc_entity.is_a?(@ifc_module::IfcBuildingStorey)
 
-        return unless %w[IFC2X3 IFC4].include?(Settings.ifc_version_compact)
+        return unless ['IFC 2x3', 'IFC 4'].include?(@ifc_version)
 
         elevation = @objectplacement.ifc_total_transformation.origin.z
         ifc_entity.elevation = Types::IfcLengthMeasure.new(@ifc_model, elevation)

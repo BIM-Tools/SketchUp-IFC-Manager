@@ -98,7 +98,7 @@ module BimTools
         end
 
         # Workaround for mandatory IfcPresentationStyleAssignment in IFC2x3
-        if Settings.ifc_version == 'IFC 2x3'
+        if @ifc_model.ifc_version == 'IFC 2x3'
           style_assignment = @ifc_module::IfcPresentationStyleAssignment.new(@ifc_model)
           style_assignment.styles = Types::Set.new([surface_style])
         else
