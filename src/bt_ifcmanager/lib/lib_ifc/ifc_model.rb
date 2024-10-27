@@ -172,7 +172,7 @@ module BimTools
                          end
 
         # Add georeference
-        GeolocationBuilder.new(self).setup_geolocation
+        GeolocationBuilder.new(self).setup_geolocation if @options[:georeference]
 
         # When no entities are given for export, pass all model entities to create ifc objects
         # if nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked

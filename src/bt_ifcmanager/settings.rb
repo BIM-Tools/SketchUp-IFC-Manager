@@ -38,6 +38,7 @@
 #   classification_suffix: true,  # Add ' Classification' suffix to all classification for Revit compatibility
 #   model_axes:            true,  # Export using model axes instead of Sketchup internal origin
 #   base_quantities:       false, # Export IFC base quantities for certain IFC entities
+#   georeference:          false, # Export model location as IFC GEO reference in UTM coordinates
 #   textures:              false, # Export textures
 #   double_sided_faces:    false, # Export double sided faces
 #   export_entities:       [],    # Export only the given entities
@@ -184,6 +185,12 @@ module BimTools
             @options[:export][:base_quantities],
             "Export IFC base quantities for certain IFC entity types"
           )
+          @export_georeference = CheckboxOption.new(
+            'georeference',
+            "Export IFC georeference",
+            @options[:export][:georeference],
+            "Export model location as IFC GEO reference in UTM coordinates"
+          )
         end
 
         # load classification schemes from settings
@@ -214,6 +221,7 @@ module BimTools
         @options[:export][:classification_suffix] = @export_classification_suffix.value
         @options[:export][:model_axes] = @export_model_axes.value
         @options[:export][:base_quantities] = @export_base_quantities.value
+        @options[:export][:georeference] = @export_georeference.value
         File.open(@settings_file, 'w') { |file| file.write(@options.to_yaml) }
         PropertiesWindow.close
         @dialog.close
@@ -427,6 +435,7 @@ module BimTools
           @export_double_sided_faces.value = false
           @export_classification_suffix.value = false
           @export_base_quantities.value = false
+          @export_georeference.value = false
           @export_model_axes.value = false
 
           a_form_data = CGI.unescape(s_form_data).split('&')
@@ -467,6 +476,8 @@ module BimTools
               @export_model_axes.value = true
             when 'base_quantities'
               @export_base_quantities.value = true
+            when 'georeference'
+              @export_georeference.value = true
             when 'ifc_classification'
               update_ifc_classifications << value
             when 'classification'
@@ -558,6 +569,7 @@ module BimTools
         html << @export_textures.html
         html << @export_double_sided_faces.html
         html << @export_base_quantities.html
+        html << @export_georeference.html
         html << @export_classification_suffix.html
         html << @export_model_axes.html
         html << "      </div>\n"

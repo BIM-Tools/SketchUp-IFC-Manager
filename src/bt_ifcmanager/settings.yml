@@ -15,6 +15,7 @@
   :types: true
   :type_properties: false
   :base_quantities: false
+  :georeference: true
   :classification_suffix: true
   :model_axes: false
   :textures: false
@@ -26,8 +27,8 @@
     DIN 276-1.skc: true
   :ifc_classifications:
     IFC 2x3.skc: false
-    IFC4.skc: false
-    IFC4X3_ADD2.skc: true
+    IFC4.skc: true
+    IFC4X3_ADD2.skc: false
   :template_materials: false
 :properties:
   :common_psets: true
