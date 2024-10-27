@@ -99,10 +99,19 @@ module BimTools
       end
 
       def set_from_utm(representationcontext, projected_crs, utm_point)
+        # Determine the hemisphere based on the zone letter
+        hemisphere = utm_point.zone_letter >= 'N' ? 'N' : 'S'
+        y = utm_point.y
+        x = utm_point.x
+        equator_height = 10_000_000
+
+        # Adjust the y value if the hemisphere is south
+        utm_point.y = 2 * equator_height - utm_point.y if hemisphere == 'S'
+
         set_source_crs(representationcontext)
         set_target_crs(projected_crs)
-        set_eastings(utm_point.x)
-        set_northings(utm_point.y)
+        set_eastings(x)
+        set_northings(y)
         set_orthogonalheight(0.0)
         set_xaxisabscissa(1.0)
         set_xaxisordinate(0.0)

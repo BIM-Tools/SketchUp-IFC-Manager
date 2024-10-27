@@ -103,7 +103,8 @@ module BimTools
 
         return unless @ifc_version != 'IFC 2x3'
 
-        utm_point = Geom::LatLong.new([latitude, longitude]).to_utm
+        # utm_point = Geom::LatLong.new([latitude, longitude]).to_utm
+        utm_point = su_model.point_to_utm(Geom::Point3d.new(0, 0, 0))
 
         projected_crs = IfcManager::IfcProjectedCRSBuilder.build(@ifc_model) do |builder|
           builder.set_from_utm(utm_point)
