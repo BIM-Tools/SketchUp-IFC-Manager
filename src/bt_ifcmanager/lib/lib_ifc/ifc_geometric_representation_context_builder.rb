@@ -75,18 +75,10 @@ module BimTools
       end
 
       def set_default_world_coordinate_system
-        # Older Sketchup versions don't have Point2d
-        if Geom.const_defined?(:Point2d)
-          @ifc_geometric_representation_context.worldcoordinatesystem = @ifc_module::IfcAxis2Placement2D.new(@ifc_model)
-          @ifc_geometric_representation_context.worldcoordinatesystem.location = @ifc_module::IfcCartesianPoint.new(
-            @ifc_model, Geom::Point2d.new(0, 0)
-          )
-        else
-          @ifc_geometric_representation_context.worldcoordinatesystem = @ifc_module::IfcAxis2Placement3D.new(@ifc_model)
-          @ifc_geometric_representation_context.worldcoordinatesystem.location = @ifc_module::IfcCartesianPoint.new(
-            @ifc_model, Geom::Point3d.new(0, 0, 0)
-          )
-        end
+        @ifc_geometric_representation_context.worldcoordinatesystem = @ifc_module::IfcAxis2Placement3D.new(@ifc_model)
+        @ifc_geometric_representation_context.worldcoordinatesystem.location = @ifc_module::IfcCartesianPoint.new(
+          @ifc_model, Geom::Point3d.new(0, 0, 0)
+        )
         self
       end
 
