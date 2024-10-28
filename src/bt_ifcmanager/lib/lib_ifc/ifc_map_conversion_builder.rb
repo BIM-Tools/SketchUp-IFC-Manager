@@ -106,7 +106,7 @@ module BimTools
         equator_height = 10_000_000
 
         # Adjust the y value if the hemisphere is south
-        utm_point.y = 2 * equator_height - utm_point.y if hemisphere == 'S'
+        y = 2 * equator_height - y if hemisphere == 'S'
 
         set_source_crs(representationcontext)
         set_target_crs(projected_crs)
