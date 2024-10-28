@@ -23,7 +23,10 @@
 
 module BimTools
   module IfcRelAggregates_su
-    def self.required_attributes
+    def self.required_attributes(ifc_version)
+      # In IFC2X3, the attribute 'RelatingObject' is part of its parent class 'IfcRelDecomposes'.
+      return [] if ifc_version == 'IFC 2x3'
+
       [:RelatingObject]
     end
   end

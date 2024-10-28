@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  IfcClassificationReference_su.rb
+#  IfcBuildingElementProxy_su.rb
 #
 #  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
 #
@@ -22,9 +22,29 @@
 #
 
 module BimTools
-  module IfcClassificationReference_su
-    def self.required_attributes(_ifc_version)
-      [:ReferencedSource]
+  module IfcBuildingElementProxy_su
+    VALID_COMPOSITION_TYPES = %i[COMPLEX ELEMENT PARTIAL].freeze
+
+    attr_reader :compositiontype
+
+    def initialize(ifc_model, sketchup, _total_transformation)
+      @ifc_version = ifc_model.ifc_version
+      super
+    end
+
+    # CompositionType attribute deprecated in IFC4
+    def compositiontype=(value)
+      return unless @ifc_version == 'IFC 2x3'
+
+      enum_value = if value.is_a?(String)
+                     value.upcase.to_sym
+                   elsif value.respond_to?(:value)
+                     value.value.upcase.to_sym
+                   else
+                     value.to_sym
+                   end
+
+      @compositiontype = VALID_COMPOSITION_TYPES.include?(enum_value) ? enum_value : nil
     end
   end
 end

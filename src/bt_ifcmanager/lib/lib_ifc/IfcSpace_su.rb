@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  IfcClassificationReference_su.rb
+#  IfcSpace_su.rb
 #
 #  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
 #
@@ -22,9 +22,29 @@
 #
 
 module BimTools
-  module IfcClassificationReference_su
-    def self.required_attributes(_ifc_version)
-      [:ReferencedSource]
+  module IfcSpace_su
+    VALID_ENUM_VALUES = %i[INTERNAL EXTERNAL NOTDEFINED].freeze
+
+    attr_reader :interiororexteriorspace
+
+    def initialize(ifc_model, sketchup, total_transformation)
+      @ifc_version = ifc_model.ifc_version
+      super
+    end
+
+    # InteriorOrExteriorSpace renamed to PredefinedType in IFC4
+    def interiororexteriorspace=(value)
+      return unless @ifc_version == 'IFC 2x3'
+
+      enum_value = if value.is_a?(String)
+                     value.upcase.to_sym
+                   elsif value.respond_to?(:value)
+                     value.value.upcase.to_sym
+                   else
+                     value.to_sym
+                   end
+
+      @interiororexteriorspace = VALID_ENUM_VALUES.include?(enum_value) ? enum_value : :NOTDEFINED
     end
   end
 end

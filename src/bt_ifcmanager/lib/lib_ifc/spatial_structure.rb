@@ -223,8 +223,10 @@ module BimTools
                  end
         ifc_entity.parent = parent
 
-        # IfcSurfaceFeature is not part of the normal spatial structure
-        return if defined?(@ifc_module::IfcSurfaceFeature) && ifc_entity.is_a?(@ifc_module::IfcSurfaceFeature)
+        # IfcSurfaceFeature is not part of the normal spatial structure from IFC4X3 onwards
+        return if defined?(@ifc_module::IfcSurfaceFeature) &&
+                  defined?(@ifc_module::IfcRelAdheresToElement) &&
+                  ifc_entity.is_a?(@ifc_module::IfcSurfaceFeature)
 
         case ifc_entity
         when @ifc_module::IfcSpatialStructureElement
