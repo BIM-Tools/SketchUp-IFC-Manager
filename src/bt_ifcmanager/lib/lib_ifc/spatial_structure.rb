@@ -177,28 +177,29 @@ module BimTools
         index = @spatial_order.rindex { |cls| entity_class < cls }
         index = index.nil? ? 0 : index - 1
         parent_class = @spatial_order[index]
-        add_default_spatialelement(parent_class) unless spatial_structure_types.include?(parent_class)
-        spatial_structure_types = get_spatial_structure_types
+
+        unless spatial_structure_types.include?(parent_class)
+          add_default_spatialelement(parent_class)
+          spatial_structure_types = get_spatial_structure_types
+        end
 
         parent_index = spatial_structure_types.rindex(parent_class) || spatial_structure_types.length - 1
         parent = @spatial_structure[parent_index]
 
-        # check if default_related_object is already set
-        unless parent.default_related_object
-          default_parent = entity_class.new(@ifc_model)
-          default_parent.name = Types::IfcLabel.new(@ifc_model,
-                                                    +'default ' << entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(' ').downcase)
+        default_parent = entity_class.new(@ifc_model)
+        default_parent.name = Types::IfcLabel.new(@ifc_model,
+                                                  +'default ' << entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(' ').downcase)
 
-          # Add new ObjectPlacement without transformation
-          default_parent.objectplacement = @ifc_module::IfcLocalPlacement.new(@ifc_model)
-          default_parent.objectplacement.relativeplacement = @ifc_model.default_placement
-          default_parent.objectplacement.placementrelto = parent.objectplacement if parent.respond_to?(:objectplacement)
+        # Add new ObjectPlacement without transformation
+        default_parent.objectplacement = @ifc_module::IfcLocalPlacement.new(@ifc_model)
+        default_parent.objectplacement.relativeplacement = @ifc_model.default_placement
+        default_parent.objectplacement.placementrelto = parent.objectplacement if parent.respond_to?(:objectplacement)
 
-          # set default related element
-          parent.default_related_object = default_parent
-        end
+        # set default related element
+        parent.default_related_object = default_parent
+
         add(parent.default_related_object)
-        set_parent(parent.default_related_object)
+        set_parent(default_parent)
       end
 
       def to_a
