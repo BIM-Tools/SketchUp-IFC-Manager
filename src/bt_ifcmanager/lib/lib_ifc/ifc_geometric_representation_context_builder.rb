@@ -40,7 +40,6 @@ module BimTools
         @ifc_geometric_representation_context = @ifc_module::IfcGeometricRepresentationContext.new(ifc_model)
         set_coordinate_space_dimension('3')
         # set_precision(1.0e-5)
-        set_default_world_coordinate_system
         set_default_true_north
       end
 
@@ -64,21 +63,17 @@ module BimTools
         self
       end
 
-      def set_world_coordinate_system(system)
-        @ifc_geometric_representation_context.worldcoordinatesystem = system
+      def set_world_coordinate_system(transformation = nil)
+        transformation ||= Geom::Transformation.new
+        @ifc_geometric_representation_context.worldcoordinatesystem = @ifc_module::IfcAxis2Placement3D.new(
+          @ifc_model,
+          transformation
+        )
         self
       end
 
       def set_true_north(direction)
         @ifc_geometric_representation_context.truenorth = direction
-        self
-      end
-
-      def set_default_world_coordinate_system
-        @ifc_geometric_representation_context.worldcoordinatesystem = @ifc_module::IfcAxis2Placement3D.new(@ifc_model)
-        @ifc_geometric_representation_context.worldcoordinatesystem.location = @ifc_module::IfcCartesianPoint.new(
-          @ifc_model, Geom::Point3d.new(0, 0, 0)
-        )
         self
       end
 

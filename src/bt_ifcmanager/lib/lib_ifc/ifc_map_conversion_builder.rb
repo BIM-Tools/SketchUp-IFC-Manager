@@ -98,7 +98,7 @@ module BimTools
         length_measure.convert
       end
 
-      def set_from_utm(representationcontext, projected_crs, utm_point)
+      def set_from_utm(representationcontext, projected_crs, utm_point, world_transformation)
         # Determine the hemisphere based on the zone letter
         hemisphere = utm_point.zone_letter >= 'N' ? 'N' : 'S'
         y = utm_point.y
@@ -113,8 +113,8 @@ module BimTools
         set_eastings(x)
         set_northings(y)
         set_orthogonalheight(0.0)
-        set_xaxisabscissa(1.0)
-        set_xaxisordinate(0.0)
+        set_xaxisabscissa(world_transformation.xaxis.x)
+        set_xaxisordinate(world_transformation.xaxis.y)
         set_scale(calculate_scale(@ifc_model))
       end
     end

@@ -50,11 +50,6 @@ module BimTools
       def validate
         @north_vector ||= Geom::Vector3d.new([0, 1, 0])
         @origin_point ||= Geom::Point3d.new([0, 0, 0])
-      end
-
-      def validate
-        @north_vector ||= Geom::Vector3d.new([0, 1, 0])
-        @origin_point ||= Geom::Point3d.new([0, 0, 0])
         validate_latitude_longitude
       end
 
@@ -83,7 +78,7 @@ module BimTools
         @ifc::IfcDirection.new(@ifc_model, Geom::Vector3d.new([Math.cos(angle), Math.sin(angle), 0]))
       end
 
-      def setup_geolocation
+      def setup_geolocation(world_transformation)
         su_model = @ifc_model.su_model
         return unless su_model.georeferenced?
 
@@ -103,15 +98,14 @@ module BimTools
 
         return unless @ifc_version != 'IFC 2x3'
 
-        # utm_point = Geom::LatLong.new([latitude, longitude]).to_utm
-        utm_point = su_model.point_to_utm(Geom::Point3d.new(0, 0, 0))
+        utm_point = su_model.point_to_utm(world_transformation.origin)
 
         projected_crs = IfcManager::IfcProjectedCRSBuilder.build(@ifc_model) do |builder|
           builder.set_from_utm(utm_point)
         end
 
         IfcManager::IfcMapConversionBuilder.build(@ifc_model) do |builder|
-          builder.set_from_utm(@ifc_model.representationcontext, projected_crs, utm_point)
+          builder.set_from_utm(@ifc_model.representationcontext, projected_crs, utm_point, world_transformation)
         end
         # add_additional_ifc_entities(@ifc_model.representationcontext, utm_point)
       end
