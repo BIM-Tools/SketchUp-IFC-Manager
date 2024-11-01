@@ -58,13 +58,8 @@ module BimTools
         @ifc_projected_crs.geodeticdatum = Types::IfcIdentifier.new(@ifc_model, geodeticdatum)
       end
 
-      def set_mapunit(unit = :METRE)
-        mapunit = @ifc::IfcSIUnit.new(@ifc_model)
-        mapunit.dimensions = '*'
-        mapunit.unittype = :LENGTHUNIT
-        mapunit.prefix = nil
-        mapunit.name = unit
-        @ifc_projected_crs.mapunit = mapunit
+      def set_mapunit(map_unit)
+        @ifc_projected_crs.mapunit = map_unit
       end
 
       # Calculates the EPSG code based on the UTM point.
@@ -92,7 +87,7 @@ module BimTools
         set_name(epsg_name)
         set_description(epsg_description)
         set_geodeticdatum('WGS 84')
-        set_mapunit(:METRE)
+        set_mapunit(@ifc_model.units.length_unit_entity)
       end
     end
   end

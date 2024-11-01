@@ -25,7 +25,7 @@ require_relative 'ifc_types'
 
 module BimTools
   module IfcUnitAssignment_su
-    attr_reader :length_unit, :area_unit, :volume_unit
+    attr_reader :length_unit, :area_unit, :volume_unit, :length_unit_entity, :area_unit_entity, :volume_unit_entity
 
     LENGTH_UNITS = %i[
       Inches
@@ -88,10 +88,12 @@ module BimTools
       @ifc_model = ifc_model
       @su_model = ifc_model.su_model
       set_units
-      @units = IfcManager::Types::Set.new
-      @units.add(ifc_unit(@length_unit))
-      @units.add(ifc_unit(@area_unit))
-      @units.add(ifc_unit(@volume_unit))
+
+      @length_unit_entity = ifc_unit(@length_unit)
+      @area_unit_entity = ifc_unit(@area_unit)
+      @volume_unit_entity = ifc_unit(@volume_unit)
+
+      @units = IfcManager::Types::Set.new([@length_unit_entity, @area_unit_entity, @volume_unit_entity])
     end
 
     def set_units
