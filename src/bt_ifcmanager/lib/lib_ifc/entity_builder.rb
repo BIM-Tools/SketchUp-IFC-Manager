@@ -103,6 +103,8 @@ module BimTools
       # @return [IfcEntity] The created IFC entity.
       def create_ifc_entity(entity_type_name, su_instance, placement_parent = nil, su_material = nil, su_layer = nil)
         su_definition = su_instance.definition
+
+        # ifc_type_product = entity_type_name if entity_type_name&.end_with?('Type')
         entity_type_name = map_entity_type(entity_type_name)
         entity_type = @ifc_module.const_get(entity_type_name) if entity_type_name
         ifc_entity = determine_ifc_entity(entity_type, su_instance, placement_parent)

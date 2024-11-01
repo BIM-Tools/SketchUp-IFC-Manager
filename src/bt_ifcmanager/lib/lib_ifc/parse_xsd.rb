@@ -50,6 +50,7 @@ module BimTools
         IfcBuildingElementProxy
         IfcCartesianPoint
         IfcClassificationReference
+        IfcCoordinateOperation
         IfcDirection
         IfcElementAssembly
         IfcGeometricRepresentationSubContext

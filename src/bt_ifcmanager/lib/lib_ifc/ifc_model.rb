@@ -28,6 +28,7 @@ require_relative 'ifc_owner_history_builder'
 require_relative 'ifc_product_definition_shape_builder'
 require_relative 'ifc_project_builder'
 require_relative 'ifc_shape_representation_builder'
+require_relative 'geolocation_builder'
 require_relative 'spatial_structure'
 require_relative 'entity_builder'
 require_relative 'definition_manager'
@@ -130,9 +131,17 @@ module BimTools
           builder.creation_date = creation_date
         end
 
+        # Set root transformation as base for all other transformations
+        world_transformation = if @options[:model_axes]
+                                 su_model.axes.transformation.inverse
+                               else
+                                 Geom::Transformation.new
+                               end
+
         # create IfcGeometricRepresentationContext for all IFC geometry objects
         @representationcontext = IfcGeometricRepresentationContextBuilder.build(self) do |builder|
           builder.set_context_type('Model')
+          builder.set_world_coordinate_system
         end
 
         @representation_sub_context_body = IfcGeometricRepresentationSubContextBuilder.build(self) do |builder|
@@ -163,19 +172,15 @@ module BimTools
         # create a hash with all Sketchup ComponentDefinitions and their IfcProductType counterparts
         @product_types = {}
 
-        # Set root transformation as base for all other transformations
-        transformation = if @options[:model_axes]
-                           su_model.axes.transformation.inverse
-                         else
-                           Geom::Transformation.new
-                         end
+        # Add georeference
+        GeolocationBuilder.new(self).setup_geolocation(world_transformation.inverse) if @options[:georeference]
 
         # When no entities are given for export, pass all model entities to create ifc objects
         # if nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked
         if @options[:root_entities].empty?
-          create_ifc_objects(su_model.entities, transformation)
+          create_ifc_objects(su_model.entities, world_transformation)
         else
-          create_ifc_objects(@options[:root_entities], transformation)
+          create_ifc_objects(@options[:root_entities], world_transformation)
         end
       end
 

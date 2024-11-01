@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  IfcGeometricRepresentationSubContext_su.rb
+#  IfcCoordinateOperation_su.rb
 #
 #  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
 #
@@ -22,24 +22,27 @@
 #
 
 module BimTools
-  module IfcGeometricRepresentationSubContext_su
-    def initialize(ifc_model)
+  module IfcCoordinateOperation_su
+    def initialize(ifc_model, _sketchup)
       super
-      instance_variable_set(:@attr, ([:ParentContext] + attributes))
 
-      # Workaround for bug in IFC XSD's forward from IFC4X3, missing "parentcontext" attribute
-      return if attributes.include? :ParentContext
+      # Workaround for missing "SourceCRS" attribute in XSD schema for IFC4 and IFC4X3
+      return if ifc_model.ifc_version == 'IFC 2x3'
 
-      @parentcontext = nil
+      instance_variable_set(:@attr, ([:SourceCRS] + attributes))
+
+      return if attributes.include? :SourceCRS
+
+      @sourcecrs = nil
       define_singleton_method(:attributes) do
         attributes = self.class.attributes
-        attributes.insert(6, :ParentContext)
+        attributes.insert(0, :SourceCRS)
       end
-      define_singleton_method(:parentcontext) do
-        @parentcontext
+      define_singleton_method(:sourcecrs) do
+        @sourcecrs
       end
-      define_singleton_method(:parentcontext=) do |parentcontext|
-        @parentcontext = parentcontext
+      define_singleton_method(:sourcecrs=) do |sourcecrs|
+        @sourcecrs = sourcecrs
       end
     end
   end

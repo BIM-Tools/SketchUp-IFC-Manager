@@ -113,14 +113,14 @@ module BimTools
       # @param [SketchupComponentInstance] su_object
       def set_attributes_from_su_instance(su_instance)
         su_definition = su_instance.definition
-        if dicts = su_definition.attribute_dictionaries
-          dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(@ifc_model, @ifc_entity, dicts)
-          dict_reader.set_attributes
-          dict_reader.add_propertysets
-          dict_reader.add_sketchup_definition_properties(@ifc_model, @ifc_entity, su_definition)
-          dict_reader.add_classifications
-          dict_reader.add_sketchup_instance_properties(@ifc_model, @ifc_entity, su_instance)
-        end
+        return unless dicts = su_definition.attribute_dictionaries
+
+        dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(@ifc_model, @ifc_entity, dicts)
+        dict_reader.set_attributes
+        dict_reader.add_propertysets
+        dict_reader.add_sketchup_definition_properties(@ifc_model, @ifc_entity, su_definition)
+        dict_reader.add_classifications
+        dict_reader.add_sketchup_instance_properties(@ifc_model, @ifc_entity, su_instance)
       end
     end
   end

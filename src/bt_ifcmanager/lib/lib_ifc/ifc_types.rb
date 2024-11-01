@@ -214,31 +214,21 @@ module BimTools
         end
 
         def step
+          # TODO: inherit from List
           val = @values.join(',')
-          val = add_long(val) if @long
-          val
+          return add_long(val) if @long
+
+          "(#{val})"
         end
 
         private
 
         def validate!
           raise ArgumentError, 'List must have 3 or 4 integers' unless (3..4).include?(@values.size)
-          raise ArgumentError, 'Minutes must be in range' unless minutes_in_range?
-          raise ArgumentError, 'Seconds must be in range' unless seconds_in_range?
-          raise ArgumentError, 'Microseconds must be in range' unless microseconds_in_range?
+          raise ArgumentError, 'Minutes must be in range' unless @values[1].abs < 60
+          raise ArgumentError, 'Seconds must be in range' unless @values[2].abs < 60
+          raise ArgumentError, 'Microseconds must be in range' if @values.size == 4 && @values[3].abs >= 1_000_000
           raise ArgumentError, 'Sign must be consistent' unless consistent_sign?
-        end
-
-        def minutes_in_range?
-          @values[1].abs < 60
-        end
-
-        def seconds_in_range?
-          @values[2].abs < 60
-        end
-
-        def microseconds_in_range?
-          @values.size == 3 || @values[3].abs < 1_000_000
         end
 
         def consistent_sign?
@@ -279,7 +269,7 @@ module BimTools
       # END_TYPE;
       class IfcDate < BaseType
         def initialize(ifc_model, value, long = false)
-          raise TypeError, "expected a Time, got #{value.class.name}" unless value.is_a?(DateTime)
+          raise TypeError, "expected a DateTime, got #{value.class.name}" unless value.is_a?(DateTime)
 
           super
           @value = value
@@ -505,6 +495,7 @@ module BimTools
       class IfcLengthMeasure < IfcReal
         def initialize(ifc_model, value, long = false, geometry = true)
           super(ifc_model, value, long)
+          @ifc_model = ifc_model
           @geometry = geometry
         end
 
@@ -963,16 +954,6 @@ module BimTools
 
       # TYPE IfcYearNumber = INTEGER;
       # END_TYPE;
-
-      class PEnum_ElementStatus
-        def initialize(_ifc_model, value, _long = true)
-          @value = value
-        end
-
-        def step
-          @value
-        end
-      end
     end
   end
 end
