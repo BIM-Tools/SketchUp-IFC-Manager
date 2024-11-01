@@ -92,7 +92,7 @@ module BimTools
       #
       # @param ifc_model [Object] The IFC model to calculate the scale factor for.
       # @return [Numeric] The scale factor calculated for the given `ifc_model`.
-      def calculate_scale(ifc_model)
+      def calculate_utm_scale_factor(ifc_model)
         length_measure = IfcManager::Types::IfcLengthMeasure.new(ifc_model, 1.0.m)
 
         length_measure.convert
@@ -108,14 +108,16 @@ module BimTools
         # Adjust the y value if the hemisphere is south
         y = 2 * equator_height - y if hemisphere == 'S'
 
+        model_scale = calculate_utm_scale_factor(@ifc_model)
+
         set_source_crs(representationcontext)
         set_target_crs(projected_crs)
-        set_eastings(x)
-        set_northings(y)
+        set_eastings(x * model_scale)
+        set_northings(y * model_scale)
         set_orthogonalheight(0.0)
         set_xaxisabscissa(world_transformation.xaxis.x)
         set_xaxisordinate(world_transformation.xaxis.y)
-        set_scale(calculate_scale(@ifc_model))
+        set_scale(1.0)
       end
     end
   end
