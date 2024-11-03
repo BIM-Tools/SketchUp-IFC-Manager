@@ -21,46 +21,44 @@
 #
 #
 
+require_relative 'ifc_types'
+
 module BimTools
   module IfcSite_su
-    @reflatitude = nil
-    @reflongitude = nil
+    # def reflatitude=(values)
+    #   if valid_latlong_list?(values)
+    #     @reflatitude = values
+    #   else
+    #     puts 'Invalid reflatitude values'
+    #   end
+    # end
 
-    # add project location, if set in sketchup model
-    # (!) north angle still missing?
-    def set_latlong
-      return unless Sketchup.active_model.georeferenced?
+    # def reflongitude=(values)
+    #   if valid_latlong_list?(values)
+    #     @reflongitude = values
+    #   else
+    #     puts 'Invalid reflongitude values'
+    #   end
+    # end
 
-      local_point = Geom::Point3d.new([0, 0, 0])
-      @latlong = Sketchup.active_model.point_to_latlong(local_point)
-    end
+    # Sets the reference latitude, longitude, and elevation for the given IfcSite entity
+    # based on the corresponding values from the SketchUp model.
+    #
+    # @param ifc_site [IfcSite] The IfcSite entity to set the attributes for.
+    # @return [void]
+    def set_geo_location_from_model
+      geo_reference = @ifc_model.su_model.attribute_dictionary('GeoReference')
+      # shadow_info = @ifc_model.su_model.shadow_info
+      # latitude = shadow_info['Latitude']
+      # longitude = shadow_info['Longitude']
+      # elevation = shadow_info['Elevation']
+      latitude = geo_reference['Latitude']
+      longitude = geo_reference['Longitude']
+      elevation = geo_reference['ModelTranslationZ'] ? geo_reference['ModelTranslationZ'] * -1 : 0
 
-    def reflatitude=(values)
-      if valid_latlong_list?(values)
-        @reflatitude = values
-      else
-        puts 'Invalid reflatitude values'
-      end
-    end
-
-    def reflongitude=(values)
-      if valid_latlong_list?(values)
-        @reflongitude = values
-      else
-        puts 'Invalid reflongitude values'
-      end
-    end
-
-    def reflatitude
-      lat_long_ifc(@latlong[1]) if @latlong
-    end
-
-    def reflongitude
-      lat_long_ifc(@latlong[0]) if @latlong
-    end
-
-    def elevation
-      IfcManager::Types::IfcLengthMeasure.new(@ifc_model, @latlong[2]) if @latlong
+      self.reflatitude = convert_to_compound_plane_angle_measure(latitude) if latitude
+      self.reflongitude = convert_to_compound_plane_angle_measure(longitude) if longitude
+      self.refelevation = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, elevation) if elevation
     end
 
     private
@@ -69,39 +67,17 @@ module BimTools
       values.is_a?(Array) && values.all? { |v| v.is_a?(IfcCompoundPlaneAngleMeasure) }
     end
 
-    # convert sketchup latlong coordinate (decimal) to IFC notation (degrees)
-    def lat_long_ifc(coordinate)
-      return unless Sketchup.active_model.georeferenced?
+    # Converts a decimal degree value to a compound plane angle measure.
+    #
+    # @param decimal_degrees [Float] The decimal degree value to be converted.
+    # @return [Types::IfcCompoundPlaneAngleMeasure] The converted compound plane angle measure.
+    def convert_to_compound_plane_angle_measure(decimal_degrees)
+      degrees = decimal_degrees.to_i
+      minutes = ((decimal_degrees - degrees) * 60).to_i
+      seconds = (((decimal_degrees - degrees) * 60 - minutes) * 60).to_i
+      millionths = ((((decimal_degrees - degrees) * 60 - minutes) * 60 - seconds) * 1_000_000).to_i
 
-      d = coordinate.abs
-      neg_pos = (coordinate / d).to_int
-
-      # degrees
-      i = d.to_int
-      deg = i * neg_pos
-
-      # minutes
-      d -= i
-      d *= 60
-      i = d.to_int
-
-      min = i * neg_pos
-
-      # seconds
-      d -= i
-      d *= 60
-      i = d.to_int
-      sec = i * neg_pos
-
-      # millionth-seconds
-      d -= i
-      d *= 1_000_000
-      i = d.to_int
-      msec = i * neg_pos
-
-      # (!) values should be Ifc INTEGER objects instead of Strings(!)
-      # (!) returned object should be of type IFC LIST instead of IFC SET
-      IfcManager::Types::List.new([deg.to_s, min.to_s, sec.to_s, msec.to_s])
+      IfcManager::Types::IfcCompoundPlaneAngleMeasure.new(@ifc_model, [degrees, minutes, seconds, millionths])
     end
   end
 end

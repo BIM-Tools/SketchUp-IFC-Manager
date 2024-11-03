@@ -37,10 +37,10 @@ module BimTools
       def initialize(ifc_model)
         @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
+        @su_model = ifc_model.su_model
         @ifc_geometric_representation_context = @ifc_module::IfcGeometricRepresentationContext.new(ifc_model)
         set_coordinate_space_dimension('3')
         # set_precision(1.0e-5)
-        set_default_true_north
       end
 
       def set_context_identifier(identifier)
@@ -64,11 +64,14 @@ module BimTools
       end
 
       def set_world_coordinate_system(transformation = nil)
-        transformation ||= Geom::Transformation.new
-        @ifc_geometric_representation_context.worldcoordinatesystem = @ifc_module::IfcAxis2Placement3D.new(
-          @ifc_model,
-          transformation
-        )
+        if @ifc_geometric_representation_context.worldcoordinatesystem.nil?
+          @ifc_geometric_representation_context.worldcoordinatesystem = @ifc_model.default_placement
+        else
+          @ifc_geometric_representation_context.worldcoordinatesystem = @ifc_module::IfcAxis2Placement3D.new(
+            @ifc_model,
+            transformation
+          )
+        end
         self
       end
 
@@ -77,16 +80,58 @@ module BimTools
         self
       end
 
+      # Sets the default TrueNorth direction for the IFC geometric representation context.
+      # The default direction is (0, 1) in the xy-plane.
+      # Uses Geom::Vector2d if available, otherwise falls back to Geom::Vector3d.
+      #
+      # @return [self] Returns the builder instance for method chaining.
       def set_default_true_north
-        # Older Sketchup versions don't have Vector2d
-        if Geom.const_defined?(:Vector2d)
-          @ifc_geometric_representation_context.truenorth = @ifc_module::IfcDirection.new(@ifc_model,
-                                                                                          Geom::Vector2d.new(0, 1))
+        @ifc_geometric_representation_context.truenorth = create_direction(0, 1)
+        self
+      end
+
+      # Sets TrueNorth based on an input angle in degrees.
+      # Uses Geom::Vector2d if available, otherwise falls back to Geom::Vector3d.
+      #
+      # @param angle_degrees [Float] The angle in degrees where north is zero.
+      # @return [self] Returns the builder instance for method chaining.
+      def set_true_north_from_angle(angle_degrees)
+        angle_radians = angle_degrees.radians
+        x = Math.sin(angle_radians)
+        y = Math.cos(angle_radians)
+        @ifc_geometric_representation_context.truenorth = create_direction(x, y)
+        self
+      end
+
+      # Retrieves the north angle from the SketchUp model and sets TrueNorth.
+      # If the angle is nil, it sets the default True North direction.
+      #
+      # @return [self] Returns the builder instance for method chaining.
+      def set_true_north_from_model
+        north_angle = @su_model.shadow_info['NorthAngle']
+        if north_angle.nil?
+          set_default_true_north
         else
-          @ifc_geometric_representation_context.truenorth = @ifc_module::IfcDirection.new(@ifc_model,
-                                                                                          Geom::Vector3d.new(0, 1, 0))
+          set_true_north_from_angle(north_angle)
         end
         self
+      end
+
+      private
+
+      # Creates a direction vector based on the provided x and y components.
+      # Uses Geom::Vector2d if available, otherwise falls back to Geom::Vector3d.
+      #
+      # @param x [Float] The x component of the direction vector.
+      # @param y [Float] The y component of the direction vector.
+      # @return [IfcDirection] The created IfcDirection object.
+      def create_direction(x, y)
+        direction = if Geom.const_defined?(:Vector2d)
+                      Geom::Vector2d.new(x, y)
+                    else
+                      Geom::Vector3d.new(x, y, 0)
+                    end
+        @ifc_module::IfcDirection.new(@ifc_model, direction)
       end
     end
   end

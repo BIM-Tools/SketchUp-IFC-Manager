@@ -79,6 +79,9 @@ module BimTools
           @spatial_structure[0] = ifc_entity
         when @ifc_module::IfcSite
           add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcSite, [@ifc_module::IfcProject])
+          ifc_entity.set_geo_location_from_model if spatial_structure_types.none? do |type|
+                                                      type == @ifc_module::IfcSite
+                                                    end
         when @ifc_module::IfcBuilding
           add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBuilding, [@ifc_module::IfcSite])
         when @ifc_module::IfcBuildingStorey
@@ -197,6 +200,7 @@ module BimTools
 
         # set default related element
         parent.default_related_object = default_parent
+        puts "Adding default #{default_parent.class} to #{parent.class}"
 
         add(parent.default_related_object)
         set_parent(default_parent)
