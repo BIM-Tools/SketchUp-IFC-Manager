@@ -66,6 +66,7 @@ module BimTools
         IfcRelDefinesByProperties
         IfcRelDefinesByType
         IfcRelContainedInSpatialStructure
+        IfcRoof
         IfcSite
         IfcSpace
         IfcSpatialStructureElement
