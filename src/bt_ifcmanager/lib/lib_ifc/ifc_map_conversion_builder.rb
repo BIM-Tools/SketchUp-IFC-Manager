@@ -114,7 +114,6 @@ module BimTools
         set_target_crs(projected_crs)
         set_eastings(x * model_scale)
         set_northings(y * model_scale)
-        set_orthogonalheight(0.0)
         set_xaxisabscissa(world_transformation.xaxis.x)
         set_xaxisordinate(world_transformation.xaxis.y)
         set_scale(1.0)

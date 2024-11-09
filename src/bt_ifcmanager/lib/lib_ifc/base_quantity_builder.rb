@@ -24,7 +24,6 @@
 require_relative 'ifc_element_quantity_builder'
 require_relative 'ifc_quantity_builder'
 
-
 # Sketchup width = x
 # Sketchup height = y
 # Sketchup depth = z
@@ -48,30 +47,50 @@ module BimTools
       def add_base_quantities(ifc_product, su_object)
         case ifc_product
         when @ifc_module::IfcColumn
-          calculate_and_add_base_quantities(ifc_product, su_object, ifc_product.total_transformation, 'Column', :depth, :max)
+          calculate_and_add_base_quantities(
+            ifc_product, su_object, ifc_product.total_transformation,
+            'Column', :depth, :max
+          )
         when @ifc_module::IfcBeam
-          calculate_and_add_base_quantities(ifc_product, su_object, ifc_product.total_transformation, 'Beam', :depth, :max)
+          calculate_and_add_base_quantities(
+            ifc_product, su_object, ifc_product.total_transformation,
+            'Beam', :depth, :max
+          )
         when @ifc_module::IfcSlab
-          calculate_and_add_base_quantities(ifc_product, su_object, ifc_product.total_transformation, 'Slab', :depth, :min)
+          calculate_and_add_base_quantities(
+            ifc_product, su_object, ifc_product.total_transformation,
+            'Slab', :depth, :min
+          )
         when @ifc_module::IfcWall
-          calculate_and_add_base_quantities(ifc_product, su_object, ifc_product.total_transformation, 'Wall', :height, :min)
+          calculate_and_add_base_quantities(
+            ifc_product, su_object, ifc_product.total_transformation,
+            'Wall', :height, :min
+          )
         end
       end
 
       private
 
-      def calculate_and_add_base_quantities(ifc_product, su_object, transformation, type, length_direction,
-                                            comparison_method)
+      def calculate_and_add_base_quantities(
+        ifc_product,
+        su_object,
+        transformation,
+        type,
+        length_direction,
+        comparison_method
+      )
+        return unless su_object
+        return unless transformation
+
         volume = su_object.volume
         return unless volume > 0
-
 
         bounding_box = su_object.definition.bounds
         len_x = bounding_box.width
         len_y = bounding_box.height
         len_z = bounding_box.depth
-        return unless transformation
 
+        # TODO: replace with properly supported scale factors
         len_x = transformation.xscale * len_x
         len_y = transformation.yscale * len_y
         len_z = transformation.zscale * len_z
@@ -125,7 +144,6 @@ module BimTools
           builder.set_name("Qto_#{type}BaseQuantities")
           builder.set_quantities(quantities)
         end
-
 
         IfcRelDefinesByPropertiesBuilder.build(@ifc_model) do |builder|
           builder.set_relatingpropertydefinition(elementquantity)

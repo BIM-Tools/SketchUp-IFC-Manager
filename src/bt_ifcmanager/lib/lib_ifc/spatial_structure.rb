@@ -186,7 +186,7 @@ module BimTools
         parent_index = spatial_structure_types.rindex(parent_class) || spatial_structure_types.length - 1
         parent = @spatial_structure[parent_index]
 
-        default_parent = entity_class.new(@ifc_model)
+        default_parent = entity_class.new(@ifc_model, nil, nil)
         default_parent.name = Types::IfcLabel.new(@ifc_model,
                                                   +'default ' << entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(' ').downcase)
 

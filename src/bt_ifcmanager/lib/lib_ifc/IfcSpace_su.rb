@@ -27,7 +27,7 @@ module BimTools
 
     attr_reader :interiororexteriorspace
 
-    def initialize(ifc_model, sketchup, total_transformation)
+    def initialize(ifc_model, su_instance, su_total_transformation)
       @ifc_version = ifc_model.ifc_version
       super
     end

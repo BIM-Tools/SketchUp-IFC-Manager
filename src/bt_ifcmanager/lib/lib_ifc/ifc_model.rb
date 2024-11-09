@@ -119,6 +119,9 @@ module BimTools
         #   the different sketchup component definitions
         @definition_manager = collect_component_definitions(@su_model).to_h
 
+        # create a hash with all Sketchup ComponentDefinitions and their IfcProductType counterparts
+        @product_types = {}
+
         # Re use property enumerations when possible
         @property_enumerations = {}
 
@@ -138,10 +141,17 @@ module BimTools
                                  Geom::Transformation.new
                                end
 
+        # Create default origin and axes for re-use throughout the model
+        @default_placement = @ifc_module::IfcAxis2Placement3D.new(self, Geom::Transformation.new)
+        @default_location = @default_placement.location
+        @default_axis = @default_placement.axis
+        @default_refdirection = @default_placement.refdirection
+
         # create IfcGeometricRepresentationContext for all IFC geometry objects
         @representationcontext = IfcGeometricRepresentationContextBuilder.build(self) do |builder|
-          builder.set_context_type('Model')
-          builder.set_world_coordinate_system
+          builder
+            .set_context_type('Model')
+            .set_world_coordinate_system
         end
 
         @representation_sub_context_body = IfcGeometricRepresentationSubContextBuilder.build(self) do |builder|
@@ -162,15 +172,6 @@ module BimTools
 
         # set_units
         @units = @project.unitsincontext
-
-        # Create default origin and axes for re-use throughout the model
-        @default_placement = @ifc_module::IfcAxis2Placement3D.new(self, Geom::Transformation.new)
-        @default_location = @default_placement.location
-        @default_axis = @default_placement.axis
-        @default_refdirection = @default_placement.refdirection
-
-        # create a hash with all Sketchup ComponentDefinitions and their IfcProductType counterparts
-        @product_types = {}
 
         # Add georeference
         GeolocationBuilder.new(self).setup_geolocation(world_transformation.inverse) if @options[:georeference]
