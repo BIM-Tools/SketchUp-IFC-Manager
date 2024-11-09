@@ -25,21 +25,29 @@ require_relative 'ifc_types'
 
 module BimTools
   module IfcSite_su
-    # def reflatitude=(values)
-    #   if valid_latlong_list?(values)
-    #     @reflatitude = values
-    #   else
-    #     puts 'Invalid reflatitude values'
-    #   end
-    # end
+    def initialize(ifc_model, su_instance, su_total_transformation)
+      @ifc_model = ifc_model
+      @su_model = ifc_model.su_model
+      super
+    end
 
-    # def reflongitude=(values)
-    #   if valid_latlong_list?(values)
-    #     @reflongitude = values
-    #   else
-    #     puts 'Invalid reflongitude values'
-    #   end
-    # end
+    def reflatitude=(_values)
+      # if valid_latlong_list?(values)
+      #   @reflatitude = values
+      # else
+      #   puts 'Invalid reflatitude values'
+      # end
+      puts 'Function not implemented'
+    end
+
+    def reflongitude=(_values)
+      # if valid_latlong_list?(values)
+      #   @reflongitude = values
+      # else
+      #   puts 'Invalid reflongitude values'
+      # end
+      puts 'Function not implemented'
+    end
 
     # Sets the reference latitude, longitude, and elevation for the given IfcSite entity
     # based on the corresponding values from the SketchUp model.
@@ -47,6 +55,7 @@ module BimTools
     # @param ifc_site [IfcSite] The IfcSite entity to set the attributes for.
     # @return [void]
     def set_geo_location_from_model
+      @su_model.axes.transformation
       geo_reference = @ifc_model.su_model.attribute_dictionary('GeoReference')
       # shadow_info = @ifc_model.su_model.shadow_info
       # latitude = shadow_info['Latitude']
@@ -56,9 +65,9 @@ module BimTools
       longitude = geo_reference['Longitude']
       elevation = geo_reference['ModelTranslationZ'] ? geo_reference['ModelTranslationZ'] * -1 : 0
 
-      self.reflatitude = convert_to_compound_plane_angle_measure(latitude) if latitude
-      self.reflongitude = convert_to_compound_plane_angle_measure(longitude) if longitude
-      self.refelevation = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, elevation) if elevation
+      @reflatitude = convert_to_compound_plane_angle_measure(latitude) if latitude
+      @reflongitude = convert_to_compound_plane_angle_measure(longitude) if longitude
+      @refelevation = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, elevation) if elevation
     end
 
     private

@@ -50,7 +50,6 @@ module BimTools
       def validate
         @north_vector ||= Geom::Vector3d.new([0, 1, 0])
         @origin_point ||= Geom::Point3d.new([0, 0, 0])
-        validate_latitude_longitude
       end
 
       def set_origin(point)
@@ -76,11 +75,9 @@ module BimTools
         @geo_reference = su_model.attribute_dictionary('GeoReference')
         return unless @geo_reference
 
-        latlong_point = su_model.point_to_latlong(world_transformation.origin)
-
-        validate_latitude_longitude
-
         return unless @ifc_version != 'IFC 2x3'
+
+        latlong_point = su_model.point_to_latlong(world_transformation.origin)
 
         utm_point = su_model.point_to_utm(world_transformation.origin)
 
