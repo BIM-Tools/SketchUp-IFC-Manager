@@ -104,10 +104,50 @@ module BimTools
       def create_ifc_entity(entity_type_name, su_instance, placement_parent = nil, su_material = nil, su_layer = nil)
         su_definition = su_instance.definition
 
-        # ifc_type_product = entity_type_name if entity_type_name&.end_with?('Type')
-        entity_type_name = map_entity_type(entity_type_name)
-        entity_type = @ifc_module.const_get(entity_type_name) if entity_type_name
-        ifc_entity = determine_ifc_entity(entity_type, su_instance, placement_parent)
+        case entity_type_name
+        when nil
+          entity_class = nil
+          type_product_class = nil
+        # Replace IfcWallStandardCase by IfcWall, due to geometry issues and deprecation in IFC 4
+        when 'IfcWallStandardCase'
+          entity_class = @ifc_module::IfcWall
+          type_product_class = @ifc_module::IfcWallType
+        when 'IfcFlowTerminal'
+          entity_class = @ifc_module::IfcFlowTerminal
+          type_product_class = @ifc_module::IfcDistributionElementType
+        when 'IfcAirTerminalType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcAirTerminal
+          type_product_class = @ifc_module::IfcAirTerminalType
+        when 'IfcPipeSegmentType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcPipeSegment
+          type_product_class = @ifc_module::IfcPipeSegmentType
+        else
+          if @ifc_module.const_defined?(entity_type_name)
+            ifc_class = @ifc_module.const_get(entity_type_name)
+            if ifc_class < @ifc_module::IfcTypeProduct
+              ifc_product_name = entity_type_name.chomp('Type')
+              entity_class = @ifc_module.const_defined?(ifc_product_name) ? @ifc_module.const_get(ifc_product_name) : nil
+              type_product_class = entity_class ? ifc_class : nil
+            elsif ifc_class < @ifc_module::IfcProduct
+              entity_class = ifc_class
+              ifc_type_product_name = "#{entity_type_name}Type"
+              if @ifc_module.const_defined?(ifc_type_product_name)
+                type_product_class = @ifc_module.const_get(ifc_type_product_name)
+              end
+            else
+              entity_class = ifc_class
+              type_product_class = nil
+            end
+          elsif entity_type_name.end_with?('Type')
+            ifc_product_name = entity_type_name.chomp('Type')
+            entity_class = @ifc_module.const_get(ifc_product_name) if @ifc_module.const_defined?(ifc_product_name)
+            type_product_class = nil
+          end
+        end
+        ifc_type_product = get_type_product(type_product_class, entity_class, su_definition)
+        ifc_entity = determine_ifc_entity(entity_class, su_instance, placement_parent)
+
+        ifc_type_product.add_typed_object(ifc_entity) if ifc_type_product && ifc_entity
 
         create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
 
@@ -116,6 +156,18 @@ module BimTools
         # We always need a placement parent, so when the current entity is nil, we use the parent
         placement_parent = ifc_entity if ifc_entity
         create_nested_objects(placement_parent, su_instance, su_material, su_layer)
+      end
+
+      # Retrieves or creates an IfcTypeProduct for the given SketchUp definition.
+      #
+      # @param type_product_class [Class] The class of the IfcTypeProduct to create.
+      # @param entity_class [Class] The class of the IFC entity.
+      # @param su_definition [Sketchup::ComponentDefinition] The SketchUp definition to associate with the IfcTypeProduct.
+      # @return [IfcTypeProduct, nil] The retrieved or created IfcTypeProduct, or nil if conditions are not met.
+      def get_type_product(type_product_class, entity_class, su_definition)
+        return nil unless @ifc_model.options[:types] && type_product_class && entity_class
+
+        @ifc_model.product_types[su_definition] ||= type_product_class.new(@ifc_model, su_definition, entity_class)
       end
 
       # Maps an entity type name to its correct version or base type.

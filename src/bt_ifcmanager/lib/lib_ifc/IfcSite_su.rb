@@ -21,46 +21,22 @@
 #
 #
 
+require_relative 'ifc_types'
+
 module BimTools
   module IfcSite_su
-    @reflatitude = nil
-    @reflongitude = nil
-
-    # add project location, if set in sketchup model
-    # (!) north angle still missing?
-    def set_latlong
-      return unless Sketchup.active_model.georeferenced?
-
-      local_point = Geom::Point3d.new([0, 0, 0])
-      @latlong = Sketchup.active_model.point_to_latlong(local_point)
+    def initialize(ifc_model, su_instance, su_total_transformation)
+      @ifc_model = ifc_model
+      @su_model = ifc_model.su_model
+      super
     end
 
-    def reflatitude=(values)
-      if valid_latlong_list?(values)
-        @reflatitude = values
-      else
-        puts 'Invalid reflatitude values'
-      end
+    def reflatitude=(_values)
+      puts "Function 'reflatitude=' for 'IfcSite' not implemented"
     end
 
-    def reflongitude=(values)
-      if valid_latlong_list?(values)
-        @reflongitude = values
-      else
-        puts 'Invalid reflongitude values'
-      end
-    end
-
-    def reflatitude
-      lat_long_ifc(@latlong[1]) if @latlong
-    end
-
-    def reflongitude
-      lat_long_ifc(@latlong[0]) if @latlong
-    end
-
-    def elevation
-      IfcManager::Types::IfcLengthMeasure.new(@ifc_model, @latlong[2]) if @latlong
+    def reflongitude=(_values)
+      puts "Function 'reflongitude=' for 'IfcSite' not implemented"
     end
 
     private
@@ -69,39 +45,17 @@ module BimTools
       values.is_a?(Array) && values.all? { |v| v.is_a?(IfcCompoundPlaneAngleMeasure) }
     end
 
-    # convert sketchup latlong coordinate (decimal) to IFC notation (degrees)
-    def lat_long_ifc(coordinate)
-      return unless Sketchup.active_model.georeferenced?
+    # Converts a decimal degree value to a compound plane angle measure.
+    #
+    # @param decimal_degrees [Float] The decimal degree value to be converted.
+    # @return [Types::IfcCompoundPlaneAngleMeasure] The converted compound plane angle measure.
+    def convert_to_compound_plane_angle_measure(decimal_degrees)
+      degrees = decimal_degrees.to_i
+      minutes = ((decimal_degrees - degrees) * 60).to_i
+      seconds = (((decimal_degrees - degrees) * 60 - minutes) * 60).to_i
+      millionths = ((((decimal_degrees - degrees) * 60 - minutes) * 60 - seconds) * 1_000_000).to_i
 
-      d = coordinate.abs
-      neg_pos = (coordinate / d).to_int
-
-      # degrees
-      i = d.to_int
-      deg = i * neg_pos
-
-      # minutes
-      d -= i
-      d *= 60
-      i = d.to_int
-
-      min = i * neg_pos
-
-      # seconds
-      d -= i
-      d *= 60
-      i = d.to_int
-      sec = i * neg_pos
-
-      # millionth-seconds
-      d -= i
-      d *= 1_000_000
-      i = d.to_int
-      msec = i * neg_pos
-
-      # (!) values should be Ifc INTEGER objects instead of Strings(!)
-      # (!) returned object should be of type IFC LIST instead of IFC SET
-      IfcManager::Types::List.new([deg.to_s, min.to_s, sec.to_s, msec.to_s])
+      IfcManager::Types::IfcCompoundPlaneAngleMeasure.new(@ifc_model, [degrees, minutes, seconds, millionths])
     end
   end
 end

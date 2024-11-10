@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  IfcPile_su.rb
+#  IfcRoof_su.rb
 #
 #  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
 #
@@ -22,27 +22,14 @@
 #
 
 module BimTools
-  module IfcPile_su
-    VALID_CONSTRUCTION_TYPES = %i[
-      CAST_IN_PLACE
-      COMPOSITE
-      PRECAST_CONCRETE
-      PREFAB_STEEL
-      USERDEFINED
-      NOTDEFINED
-    ].freeze
-
-    attr_reader :constructiontype
-
+  module IfcRoof_su
     def initialize(ifc_model, sketchup, _total_transformation)
       @ifc_version = ifc_model.ifc_version
       super
     end
 
-    # ConstructionType attribute deprecated in IFC4
-    def constructiontype=(value)
-      return unless @ifc_version == 'IFC 2x3'
-
+    # ShapeType attribute renamed to PredefinedType in IFC4
+    def predefinedtype=(value)
       # TODO: hacky fix, should be part of PropertyReader
       enum_value = if value.is_a?(String)
                      value.upcase.to_sym
@@ -52,7 +39,29 @@ module BimTools
                      value.to_sym
                    end
 
-      @constructiontype = VALID_CONSTRUCTION_TYPES.include?(enum_value) ? enum_value : nil
+      if @ifc_version == 'IFC 2x3'
+        @shapetype = enum_value
+      else
+        @predefinedtype = enum_value
+      end
+    end
+
+    # ShapeType attribute renamed to PredefinedType in IFC4
+    def shapetype=(value)
+      # TODO: hacky fix, should be part of PropertyReader
+      enum_value = if value.is_a?(String)
+                     value.upcase.to_sym
+                   elsif value.respond_to?(:value)
+                     value.value.upcase.to_sym
+                   else
+                     value.to_sym
+                   end
+
+      if @ifc_version == 'IFC 2x3'
+        @shapetype = enum_value
+      else
+        @predefinedtype = enum_value
+      end
     end
   end
 end

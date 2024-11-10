@@ -60,13 +60,17 @@ module BimTools
       def get_file_description
         file_description = if @file_description.nil?
                              # get correct MVD for IFC version
-                             mvd = if Settings.ifc_version_compact == 'IFC2X3'
+                             mvd = case Settings.ifc_version
+                                   when 'IFC 2x3'
                                      'CoordinationView_V2.0'
-                                   else
+                                   when 'IFC 4'
                                      'ReferenceView_V1.2'
+                                   else
+                                     'ReferenceView'
                                    end
-                             export_options = @ifc_model.options.map { |k, v| "'Option [#{k}: #{v}]'" }.join(",\n")
-                             "(\n'ViewDefinition [#{mvd}]',\n#{export_options}\n)"
+                             #  export_options = @ifc_model.options.map { |k, v| "'Option [#{k}: #{v}]'" }.join(",\n")
+                             #  "(\n'ViewDefinition [#{mvd}]',\n#{export_options}\n)"
+                             "('ViewDefinition [#{mvd}]')"
                            else
                              @file_description
                            end
@@ -77,7 +81,8 @@ module BimTools
         timestamp = time.strftime('%Y-%m-%dT%H:%M:%S')
         version_number = Sketchup.version_number / 100_000_000.floor
         originating_system = "SketchUp 20#{version_number} (#{Sketchup.version})"
-        "FILE_NAME('#{IfcManager::Types.replace_char(File.basename(file_path))}','#{timestamp}',(''),(''),'IFC-manager for SketchUp (#{VERSION})','#{originating_system}','')"
+        authorization = 'None'
+        "FILE_NAME('#{IfcManager::Types.replace_char(File.basename(file_path))}','#{timestamp}',(''),(''),'IFC-manager for SketchUp (#{VERSION})','#{originating_system}','#{authorization}')"
       end
 
       def get_file_schema
