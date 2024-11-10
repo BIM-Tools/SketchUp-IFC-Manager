@@ -41,6 +41,7 @@ module BimTools
         @name = definition.name
         @representations = {}
         @faces = definition.entities.select { |entity| entity.instance_of?(Sketchup::Face) }
+        @manifold = definition.instances[0].manifold?
       end
 
       # Get IFC representation for a component instance
@@ -75,7 +76,7 @@ module BimTools
         representation_string = get_representation_string(transformation, su_material)
         unless @representations.key?(representation_string)
           @representations[representation_string] =
-            DefinitionRepresentation.new(@ifc_model, geometry_type, @faces, su_material, transformation)
+            DefinitionRepresentation.new(@ifc_model, geometry_type, @faces, su_material, transformation, @manifold)
         end
         @representations[representation_string]
       end
@@ -93,9 +94,14 @@ module BimTools
 
         return unless definition_representation
 
-        # Check if the geometry can be represented as an extrusion
-        extrusion = determine_extrusion(geometry_type)
-        geometry_type = @geometry_type if extrusion.nil?
+        # Check if solid or shell
+        if @manifold
+          # Check if the geometry can be represented as an extrusion
+          extrusion = determine_extrusion(geometry_type)
+          geometry_type = @geometry_type if extrusion.nil?
+        else
+          geometry_type = 'SurfaceModel'
+        end
 
         shape_representation = build_shape_representation(
           geometry_type,

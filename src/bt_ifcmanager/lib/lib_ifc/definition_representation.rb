@@ -34,7 +34,7 @@ module BimTools
     class DefinitionRepresentation
       attr_reader :shape_representation_builder, :meshes
 
-      def initialize(ifc_model, geometry_type, faces, su_material, transformation)
+      def initialize(ifc_model, geometry_type, faces, su_material, transformation, manifold = false)
         @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
         @ifc_version = ifc_model.ifc_version
@@ -45,6 +45,7 @@ module BimTools
         @su_material = su_material
         @transformation = transformation
         @meshes = create_meshes(ifc_model, faces, transformation, su_material)
+        @manifold = manifold
       end
 
       def representations(extrusion = nil)
@@ -84,7 +85,7 @@ module BimTools
                else
                  IfcFacetedBrepBuilder.build(ifc_model) do |builder|
                    builder.set_transformation(transformation)
-                   builder.set_outer(faces)
+                   builder.set_outer(faces, @manifold)
                    # builder.set_styling(su_material)
                  end
                end

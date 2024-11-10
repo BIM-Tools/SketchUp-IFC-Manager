@@ -41,16 +41,19 @@ module BimTools
         @vertices = {}
 
         @ifc_faceted_brep = @ifc_module::IfcFacetedBrep.new(ifc_model)
-
-        @ifc_faceted_brep
       end
 
       def validate
         raise ArgumentError, 'Missing value for IfcFacetedBrep Outer' unless @ifc_faceted_brep.outer
       end
 
-      def set_outer(su_faces)
-        @ifc_faceted_brep.outer = @ifc_module::IfcClosedShell.new(@ifc_model, su_faces)
+      def set_outer(su_faces, manifold = false)
+        @ifc_faceted_brep.outer = if manifold
+
+                                    @ifc_module::IfcClosedShell.new(@ifc_model, su_faces)
+                                  else
+                                    @ifc_module::IfcOpenShell.new(@ifc_model, su_faces)
+                                  end
         faces = su_faces.map { |face| add_face(face) }
         @ifc_faceted_brep.outer.cfsfaces = IfcManager::Types::Set.new(faces)
       end
@@ -65,9 +68,10 @@ module BimTools
       end
 
       def set_styling(su_material)
-        if @ifc_model.options[:colors] && !@ifc_model.materials[su_material]
-          @ifc_model.materials[su_material] = IfcManager::MaterialAndStyling.new(@ifc_model, su_material)
-        end
+        return unless @ifc_model.options[:colors] && !@ifc_model.materials[su_material]
+
+        @ifc_model.materials[su_material] = IfcManager::MaterialAndStyling.new(@ifc_model, su_material)
+
         # @ifc_model.materials[su_material].add_to_styling(@ifc_faceted_brep)
       end
 
