@@ -58,21 +58,7 @@ module BimTools
       name ||= definition.name
       @name = IfcManager::Types::IfcLabel.new(ifc_model, name)
 
-      # Set IfcProductType
-      if ifc_model.options[:types]
-        if @ifc_model.product_types.key?(definition)
-          @type_product = @ifc_model.product_types[definition]
-          @type_product.add_typed_object(self)
-        else
-          type_name = self.class.name.split('::').last + 'Type'
-          if @ifc_module.const_defined?(type_name)
-            type_product = @ifc_module.const_get(type_name)
-            @type_product = type_product.new(ifc_model, definition, self.class)
-            @ifc_model.product_types[definition] = @type_product
-            @type_product.add_typed_object(self)
-          end
-        end
-      end
+      @type_product = @ifc_model.product_types[definition] if @ifc_model.product_types.key?(definition)
       @type_properties = ifc_model.options[:type_properties] && @type_product
 
       add_common_attributes(ifc_model, @su_object)

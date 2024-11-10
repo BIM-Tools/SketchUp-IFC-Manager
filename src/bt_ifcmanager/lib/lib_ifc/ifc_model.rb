@@ -248,7 +248,9 @@ module BimTools
       end
 
       def collect_component_definitions(su_model)
-        su_model.definitions.map do |definition|
+        su_model.definitions
+                .select { |definition| definition.instances.any? }
+                .map do |definition|
           [definition, DefinitionManager.new(self, definition)]
         end
       end
