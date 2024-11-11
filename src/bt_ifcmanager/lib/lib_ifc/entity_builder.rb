@@ -234,6 +234,8 @@ module BimTools
       # @param placement_parent [Object] The parent entity for the placement of the IfcProject.
       # @return [Object] The modified IfcProject entity.
       def handle_ifc_project(su_instance, placement_parent)
+        su_definition = su_instance.definition
+
         # Only a single IfcProject entity is allowed in an IFC model
         # @todo: set all correct parameters for IfcProject!!!
         # Enrich the base IfcProject with properties of the modelled IfcProject
