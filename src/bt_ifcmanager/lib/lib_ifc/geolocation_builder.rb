@@ -79,7 +79,10 @@ module BimTools
 
         # LatLong point includes the Z value
         latlong_point = su_model.point_to_latlong(world_transformation.origin)
-        utm_point = su_model.point_to_utm(world_transformation.origin)
+
+        # @TODO: what happens when the 0,0,0 is just over the edge on another UTM tile?
+        # utm_point = su_model.point_to_utm(world_transformation.origin)
+        utm_point = su_model.point_to_utm(Geom::Point3d.new)
 
         projected_crs = IfcManager::IfcProjectedCRSBuilder.build(@ifc_model) do |builder|
           builder.set_from_utm(utm_point)
@@ -87,7 +90,7 @@ module BimTools
 
         IfcManager::IfcMapConversionBuilder.build(@ifc_model) do |builder|
           builder.set_from_utm(@ifc_model.representationcontext, projected_crs, utm_point, world_transformation)
-          builder.set_orthogonalheight(latlong_point.z)
+          builder.set_orthogonalheight(latlong_point.z.m)
         end
         # add_additional_ifc_entities(@ifc_model.representationcontext, utm_point)
       end

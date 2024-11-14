@@ -55,19 +55,19 @@ module BimTools
       def set_eastings(eastings)
         return unless eastings
 
-        @ifc_map_conversion.eastings = IfcManager::Types::IfcReal.new(@ifc_model, eastings)
+        @ifc_map_conversion.eastings = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, eastings)
       end
 
       def set_northings(northings)
         return unless northings
 
-        @ifc_map_conversion.northings = IfcManager::Types::IfcReal.new(@ifc_model, northings)
+        @ifc_map_conversion.northings = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, northings)
       end
 
       def set_orthogonalheight(orthogonalheight)
         return unless orthogonalheight
 
-        @ifc_map_conversion.orthogonalheight = IfcManager::Types::IfcReal.new(@ifc_model, orthogonalheight)
+        @ifc_map_conversion.orthogonalheight = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, orthogonalheight)
       end
 
       def set_xaxisabscissa(xaxisabscissa)
@@ -101,21 +101,27 @@ module BimTools
       def set_from_utm(representationcontext, projected_crs, utm_point, world_transformation)
         # Determine the hemisphere based on the zone letter
         hemisphere = utm_point.zone_letter >= 'N' ? 'N' : 'S'
-        y = utm_point.y
-        x = utm_point.x
+        utm_y = utm_point.y
+        utm_x = utm_point.x
         equator_height = 10_000_000
 
         # Adjust the y value if the hemisphere is south
-        y = 2 * equator_height - y if hemisphere == 'S'
+        utm_y = 2 * equator_height - utm_y if hemisphere == 'S'
 
-        model_scale = calculate_utm_scale_factor(@ifc_model)
+        # Combine the UTM and world transformations
+        utm_transformation = Geom::Transformation.translation([utm_x.m, utm_y.m, 0])
+        transformation = utm_transformation * world_transformation
+        origin = transformation.origin
+        xaxis = transformation.xaxis
+
+        # model_scale = calculate_utm_scale_factor(@ifc_model)
 
         set_source_crs(representationcontext)
         set_target_crs(projected_crs)
-        set_eastings(x * model_scale)
-        set_northings(y * model_scale)
-        set_xaxisabscissa(world_transformation.xaxis.x)
-        set_xaxisordinate(world_transformation.xaxis.y)
+        set_eastings(origin.x)
+        set_northings(origin.y)
+        set_xaxisabscissa(xaxis.x)
+        set_xaxisordinate(xaxis.y)
         set_scale(1.0)
       end
     end
