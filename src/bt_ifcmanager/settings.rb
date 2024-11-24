@@ -66,13 +66,15 @@ module BimTools
                   :ifc_version_names,
                   :active_classifications,
                   :common_psets,
-                  :export_classifications
+                  :export_classifications,
+                  :development_mode
 
       @template_materials = false
       @common_psets = true
       @settings_file = File.join(PLUGIN_PATH, 'settings.yml')
       @ifc_classifications = {}
       @ifc_version_names = []
+      @development_mode = false
 
       # classifications shown in properties window
       @active_classifications = {}
@@ -193,6 +195,11 @@ module BimTools
           )
         end
 
+        # Load development mode from settings
+        if @options[:development_mode].is_a? TrueClass
+          @development_mode = true
+        end
+
         # load classification schemes from settings
         read_ifc_classifications
         read_classifications
@@ -222,6 +229,7 @@ module BimTools
         @options[:export][:model_axes] = @export_model_axes.value
         @options[:export][:base_quantities] = @export_base_quantities.value
         @options[:export][:georeference] = @export_georeference.value
+        @options[:development_mode] = @development_mode
         File.open(@settings_file, 'w') { |file| file.write(@options.to_yaml) }
         PropertiesWindow.close
         @dialog.close
