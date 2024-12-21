@@ -88,6 +88,25 @@ module BimTools
         @ifc_shape_representation.items.add(item)
       end
 
+      def set_of_product_representation(ifc_product_definition_shape)
+        puts 'set_of_product_representation'
+        return unless ifc_product_definition_shape
+
+        puts ifc_product_definition_shape
+
+        @ifc_shape_representation.ofproductrepresentation = Types::Set.new([ifc_product_definition_shape])
+      end
+
+      # (!) this is not in the ifc schema
+      def set_of_product(ifc_entity)
+        @ifc_shape_representation.ofproduct = ifc_entity
+      end
+
+      # (!) this is not in the ifc schema
+      def set_global_id(globalid)
+        @ifc_shape_representation.global_id = globalid
+      end
+
       # def add_definition_manager(definition_manager)
       #   @definition_managers << definition_manager
       # end

@@ -104,6 +104,19 @@ module BimTools
       super
     end
 
+    # add export summary for IfcProducts
+    def ifcx
+      @ifc_model.summary_add(self.class.name.split('::').last)
+
+      {
+        'def' => 'class',
+        'type' => 'UsdGeom:Xform',
+        'comment' => "instance of: #{@name.value}",
+        'name' => globalid.to_uuid,
+        'children' => (Array(@decomposes) + Array(@contains_elements) + Array(@representation)).compact.flatten.map(&:ifcx).flatten
+      }
+    end
+
     private
 
     # Creates an IfcRelAdheresToElement relationship for the IFC element.

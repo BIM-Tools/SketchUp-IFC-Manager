@@ -64,7 +64,7 @@ module BimTools
 
         material_assoc = @ifc_module::IfcRelAssociatesMaterial.new(@ifc_model)
         material_assoc.globalid = IfcManager::IfcGloballyUniqueId.new(@ifc_model, persistent_id)
-        material_assoc.relatingmaterial = @ifc_module::IfcMaterial.new(@ifc_model)
+        material_assoc.relatingmaterial = @ifc_module::IfcMaterial.new(@ifc_model, su_material)
         material_assoc.relatingmaterial.name = Types::IfcLabel.new(@ifc_model, material_name)
         material_assoc.relatedobjects = Types::Set.new
         material_assoc

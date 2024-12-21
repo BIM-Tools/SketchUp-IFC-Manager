@@ -75,6 +75,10 @@ module BimTools
         def ref
           step
         end
+
+        def ifcx
+          @value
+        end
       end
 
       # TYPE IfcReal = REAL;
@@ -94,6 +98,10 @@ module BimTools
 
         def step
           to_step_string(@value)
+        end
+
+        def ifcx
+          @value
         end
       end
 
@@ -131,6 +139,10 @@ module BimTools
           val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
           val = add_long(val) if @long
           val
+        end
+
+        def ifcx
+          @value
         end
       end
 
@@ -179,6 +191,10 @@ module BimTools
           value
         end
 
+        def ifcx
+          @value
+        end
+
         def true?(obj)
           obj.to_s == 'true'
         end
@@ -221,6 +237,10 @@ module BimTools
           "(#{val})"
         end
 
+        def ifcx
+          @values
+        end
+
         private
 
         def validate!
@@ -260,6 +280,10 @@ module BimTools
           val = add_long(val) if @long
           val
         end
+
+        def ifcx
+          @value
+        end
       end
 
       # TYPE IfcCurvatureMeasure = REAL;
@@ -279,6 +303,10 @@ module BimTools
           value = @value.strftime("'%Y-%m-%d'")
           value = add_long(value) if @long
           value
+        end
+
+        def ifcx
+          @value.strftime('%Y-%m-%d')
         end
       end
 
@@ -404,6 +432,10 @@ module BimTools
           val = add_long(val) if @long
           val
         end
+
+        def ifcx
+          @value
+        end
       end
 
       # TYPE IfcIlluminanceMeasure = REAL;
@@ -432,6 +464,10 @@ module BimTools
           val = @value.to_s
           val = add_long(val) if @long
           val
+        end
+
+        def ifcx
+          @value
         end
       end
 
@@ -476,6 +512,10 @@ module BimTools
           val = "'#{str_replace}'"
           val = add_long(val) if @long
           val
+        end
+
+        def ifcx
+          @value
         end
       end
 
@@ -559,6 +599,14 @@ module BimTools
             to_step_string(@value)
           end
         end
+
+        def ifcx
+          if @geometry
+            convert
+          else
+            @value
+          end
+        end
       end
 
       # TYPE IfcLineIndex = LIST [2:?] OF IfcPositiveInteger;
@@ -581,7 +629,8 @@ module BimTools
       class Logical < BaseType
         attr_reader :value
 
-        def initialize(value)
+        def initialize(ifc_model, value, long = false)
+          super
           @value = value.to_s
         end
 
@@ -589,6 +638,10 @@ module BimTools
           val = ".#{@value.upcase}."
           val = add_long(val) if @long
           val
+        end
+
+        def ifcx
+          @value
         end
       end
 
@@ -625,6 +678,10 @@ module BimTools
           val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
           val = add_long(val) if @long
           val
+        end
+
+        def ifcx
+          @value
         end
       end
 
@@ -722,6 +779,10 @@ module BimTools
             to_step_string(@value)
           end
         end
+
+        def ifcx
+          @value
+        end
       end
 
       # TYPE IfcPositivePlaneAngleMeasure = IfcPlaneAngleMeasure;
@@ -752,6 +813,20 @@ module BimTools
       # TYPE IfcRatioMeasure = REAL;
       # END_TYPE;
       class IfcRatioMeasure < IfcReal
+        def initialize(ifc_model, value, long = false)
+          super
+          @value = value.to_f
+        end
+
+        def step
+          val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
+          val = add_long(val) if @long
+          val
+        end
+
+        def ifcx
+          @value
+        end
       end
 
       # TYPE IfcNormalisedRatioMeasure = IfcRatioMeasure;
@@ -764,6 +839,10 @@ module BimTools
           return unless @value < 0 || @value > 1
 
           raise 'Error creating IfcNormalisedRatioMeasure: Normalized ratio shall be a non-negative value less than or equal to 1.0'
+        end
+
+        def ifcx
+          @value
         end
       end
 
@@ -840,6 +919,10 @@ module BimTools
           val = add_long(val) if @long
           val
         end
+
+        def ifcx
+          @value
+        end
       end
 
       # TYPE IfcTextAlignment = STRING;
@@ -913,6 +996,10 @@ module BimTools
           val = add_long(val) if @long
           val
         end
+
+        def ifcx
+          @value
+        end
       end
 
       # TYPE IfcVaporPermeabilityMeasure = REAL;
@@ -934,6 +1021,10 @@ module BimTools
           val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
           val = add_long(val) if @long
           val
+        end
+
+        def ifcx
+          @value
         end
       end
 

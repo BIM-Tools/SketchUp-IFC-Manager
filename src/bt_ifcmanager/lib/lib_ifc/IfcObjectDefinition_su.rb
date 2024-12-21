@@ -66,5 +66,17 @@ module BimTools
       end
       @decomposes.relatedobjects.add(object)
     end
+
+    def ifcx
+      return unless @decomposes || @contains_elements
+
+      {
+        'def' => 'class',
+        'type' => 'UsdGeom:Xform',
+        'comment' => "instance of: #{@name.value}",
+        'name' => globalid.to_uuid,
+        'children' => (Array(@decomposes) + Array(@contains_elements)).compact.flatten.map(&:ifcx).flatten
+      }
+    end
   end
 end

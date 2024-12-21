@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  IfcRelContainedInSpatialStructure_su.rb
+#  IfcRelAssociatesMaterial_su.rb
 #
 #  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
 #
@@ -22,20 +22,19 @@
 #
 
 module BimTools
-  module IfcRelContainedInSpatialStructure_su
-    def self.required_attributes(_ifc_version)
-      [:RelatingStructure]
-    end
-
+  module IfcRelAssociatesMaterial_su
     def ifcx
-      return unless @relatingstructure
-
-      @relatedelements.map do |relatedelement|
+      @relatedobjects.map do |relatedobject|
         {
-          'def' => 'def',
-          'comment' => 'spatial containment:', # {relatedelement.name.value}, relating object: #{@relatedelement.name.value}",
-          'name' => relatedelement.globalid.to_uuid,
-          'inherits' => ["</#{relatedelement.globalid.to_uuid}>"]
+          'def' => 'over',
+          'name' => relatedobject.globalid.to_uuid,
+          'attributes' => {
+            'UsdShade:MaterialBindingAPI' => {
+              'material:binding' => {
+                'ref' => "</#{@relatingmaterial.name.value.gsub(/[^0-9A-Za-z]/, '_')}>"
+              }
+            }
+          }
         }
       end
     end

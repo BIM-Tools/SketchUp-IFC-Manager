@@ -33,6 +33,7 @@ require_relative 'spatial_structure'
 require_relative 'entity_builder'
 require_relative 'definition_manager'
 require_relative 'step_writer'
+require_relative 'ifcx_writer'
 require_relative '../transformation_helper'
 
 require_relative 'classifications'
@@ -196,11 +197,17 @@ module BimTools
       end
 
       # write the IfcModel to given filepath
-      # (?) could be enhanced to also accept multiple ifc types like step / ifczip / ifcxml
+      # (?) could be enhanced to also accept multiple ifc types like step / ifczip / ifcxml / ifcJson / ifcx
       # (?) could be enhanced with export options hash
       def export(file_path)
-        step_writer = IfcStepWriter.new(self)
-        step_writer.write(file_path)
+        case File.extname(file_path).downcase
+        when '.ifcx'
+          ifcx_writer = IfcXWriter.new(self)
+          ifcx_writer.write(file_path)
+        else
+          step_writer = IfcStepWriter.new(self)
+          step_writer.write(file_path)
+        end
       end
 
       # add object class name to export summary
@@ -301,6 +308,7 @@ module BimTools
           rotation_and_translation,
           placement_parent.objectplacement
         )
+        ifc_entity.objectplacement.places_object = ifc_entity
 
         add_representation(
           ifc_entity,
@@ -338,14 +346,21 @@ module BimTools
       # @param [Sketchup::Material] su_material
       # @param [Sketchup::Layer] su_layer
       def add_representation(ifc_entity, definition_manager, transformation, su_material, su_layer, geometry_type = nil)
-        shape_representation = definition_manager.get_shape_representation(transformation, su_material, su_layer,
-                                                                           geometry_type)
+        product_definition_shape_builder = IfcProductDefinitionShapeBuilder.build(@ifc_model) do |builder|
+          builder.add_product(ifc_entity)
+        end
+
+        shape_representation = definition_manager.get_shape_representation(
+          transformation,
+          su_material,
+          su_layer,
+          geometry_type,
+          ifc_entity
+        )
         if ifc_entity.representation
           ifc_entity.representation.representations.add(shape_representation)
         else
-          ifc_entity.representation = IfcProductDefinitionShapeBuilder.build(self) do |builder|
-            builder.add_representation(shape_representation)
-          end
+          product_definition_shape_builder.add_representation(shape_representation)
         end
       end
     end

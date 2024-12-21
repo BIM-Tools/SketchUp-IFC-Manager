@@ -32,9 +32,10 @@ module BimTools
     # Class that manages a specific representation for
     #   a sketchup component definition including material and transformation
     class DefinitionRepresentation
-      attr_reader :shape_representation_builder, :meshes
+      attr_reader :shape_representation_builder, :meshes, :globalid
 
       def initialize(ifc_model, geometry_type, faces, su_material, transformation)
+        @globalid = IfcManager::IfcGloballyUniqueId.new(@ifc_model)
         @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
         @ifc_version = ifc_model.ifc_version
@@ -80,6 +81,7 @@ module BimTools
                      back_material,
                      @double_sided_faces
                    )
+                   builder.set_global_id(@globalid) # not in ifc schema
                  end
                else
                  IfcFacetedBrepBuilder.build(ifc_model) do |builder|

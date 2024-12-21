@@ -113,6 +113,10 @@ module BimTools
                              uv_coordinates_back, double_sided_faces)
       end
 
+      def set_global_id(global_id)
+        @ifc_triangulated_face_set.globalid = global_id
+      end
+
       private
 
       def create_texture_map(ifc_model, su_material, uv_coordinates)

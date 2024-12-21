@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  IfcRelContainedInSpatialStructure_su.rb
+#  IfcTriangulatedFaceSet_su.rb
 #
 #  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
 #
@@ -22,22 +22,31 @@
 #
 
 module BimTools
-  module IfcRelContainedInSpatialStructure_su
-    def self.required_attributes(_ifc_version)
-      [:RelatingStructure]
-    end
+  module IfcTriangulatedFaceSet_su
+    attr_accessor :globalid
 
     def ifcx
-      return unless @relatingstructure
+      usd_mesh = {
+        'faceVertexIndices' => [],
+        'points' => []
+      }
 
-      @relatedelements.map do |relatedelement|
-        {
-          'def' => 'def',
-          'comment' => 'spatial containment:', # {relatedelement.name.value}, relating object: #{@relatedelement.name.value}",
-          'name' => relatedelement.globalid.to_uuid,
-          'inherits' => ["</#{relatedelement.globalid.to_uuid}>"]
-        }
+      @coordinates.coordlist.each do |coord|
+        usd_mesh['points'] << [coord[0].ifcx, coord[1].ifcx, coord[2].ifcx]
       end
+
+      @coordindex.each do |index_list|
+        usd_mesh['faceVertexIndices'] += index_list.map { |index| index.value - 1 } # Adjust for 0-based indexing
+      end
+
+      {
+        'def' => 'over',
+        'comment' => 'triangulated face set',
+        'name' => @globalid.to_uuid,
+        'attributes' => {
+          'UsdGeom:Mesh' => usd_mesh
+        }
+      }
     end
   end
 end

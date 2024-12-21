@@ -116,13 +116,13 @@ module BimTools
       dirname = File.dirname(model_path)
 
       # enter save path
-      export_path = UI.savepanel('Export to IFC (.ifc/.ifcZIP)', dirname, filename)
+      export_path = UI.savepanel('Export to IFC (.ifc/.ifcZIP/.ifcx)', dirname, filename)
 
       # only start export if path is valid
       unless export_path.nil?
 
         # make sure file_path ends in "ifc"
-        export_path << '.ifc' unless ['.ifc', '.ifczip'].include? File.extname(export_path).downcase
+        export_path << '.ifcx' unless ['.ifc', '.ifczip', '.ifcx'].include? File.extname(export_path).downcase
 
         model.start_operation('IFC Manager export', true)
         export(export_path)

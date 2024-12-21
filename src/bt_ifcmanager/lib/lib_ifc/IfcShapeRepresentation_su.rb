@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  IfcRelContainedInSpatialStructure_su.rb
+#  IfcShapeRepresentation_su.rb
 #
 #  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
 #
@@ -22,22 +22,21 @@
 #
 
 module BimTools
-  module IfcRelContainedInSpatialStructure_su
-    def self.required_attributes(_ifc_version)
-      [:RelatingStructure]
-    end
+  module IfcShapeRepresentation_su
+    attr_accessor :ofproductrepresentation, :ofproduct, :global_id
 
     def ifcx
-      return unless @relatingstructure
+      return nil unless @items.count > 0
+      return unless @ofproduct
 
-      @relatedelements.map do |relatedelement|
-        {
-          'def' => 'def',
-          'comment' => 'spatial containment:', # {relatedelement.name.value}, relating object: #{@relatedelement.name.value}",
-          'name' => relatedelement.globalid.to_uuid,
-          'inherits' => ["</#{relatedelement.globalid.to_uuid}>"]
-        }
-      end
+      product_definition_shape_id = "#{@global_id.to_uuid}"
+
+      {
+        'def' => 'class',
+        'type' => 'UsdGeom:Mesh',
+        'comment' => "shape representation: #{@ofproduct.name.value}",
+        'name' => product_definition_shape_id
+      }
     end
   end
 end

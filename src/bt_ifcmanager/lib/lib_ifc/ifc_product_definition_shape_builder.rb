@@ -31,7 +31,7 @@ module BimTools
       def self.build(ifc_model)
         builder = new(ifc_model)
         yield(builder)
-        builder.ifc_product_definition_shape
+        builder
       end
 
       def initialize(ifc_model)
@@ -43,6 +43,17 @@ module BimTools
 
       def add_representation(representation)
         @ifc_product_definition_shape.representations.add(representation)
+      end
+
+      # Add a product to the product definition shape
+      # to set inverse relationship ShapeOfProduct
+      def add_product(ifc_entity)
+        @ifc_product_definition_shape.shapeofproduct = [ifc_entity]
+      end
+
+      # (!) this is not in the ifc schema
+      def set_global_id(globalid)
+        @ifc_product_definition_shape.global_id = globalid
       end
     end
   end

@@ -194,6 +194,7 @@ module BimTools
         default_parent.objectplacement = @ifc_module::IfcLocalPlacement.new(@ifc_model)
         default_parent.objectplacement.relativeplacement = @ifc_model.default_placement
         default_parent.objectplacement.placementrelto = parent.objectplacement if parent.respond_to?(:objectplacement)
+        default_parent.objectplacement.places_object = default_parent
 
         # set default related element
         parent.default_related_object = default_parent

@@ -87,7 +87,13 @@ module BimTools
       # @param [Sketchup::Layer] su_layer
       #
       # @return IfcShapeRepresentation
-      def get_shape_representation(transformation, su_material, su_layer = nil, geometry_type = nil)
+      def get_shape_representation(
+        transformation,
+        su_material,
+        su_layer = nil,
+        geometry_type = nil,
+        ifc_entity = nil
+      )
         geometry_type ||= @geometry_type
         definition_representation = get_definition_representation(transformation, su_material, geometry_type)
 
@@ -97,10 +103,14 @@ module BimTools
         extrusion = determine_extrusion(geometry_type)
         geometry_type = @geometry_type if extrusion.nil?
 
-        shape_representation = build_shape_representation(
-          geometry_type,
-          definition_representation.representations(extrusion)
-        )
+        shape_representation = IfcShapeRepresentationBuilder.build(@ifc_model) do |builder|
+          builder.set_contextofitems(@ifc_model.representation_sub_context_body)
+          builder.set_representationtype(geometry_type)
+          builder.set_items(definition_representation.representations(extrusion))
+          builder.set_of_product(ifc_entity)
+          builder.set_global_id(definition_representation.globalid)
+        end
+        definition_representation.shape_representation_builder
 
         assign_to_layer(shape_representation, su_layer) if su_layer && @ifc_model.options[:layers]
 
@@ -111,14 +121,6 @@ module BimTools
         return unless geometry_type == 'SweptSolid' && @definition
 
         GeometryHelpers.is_extrusion?(@definition)
-      end
-
-      def build_shape_representation(representation_type, representations)
-        IfcShapeRepresentationBuilder.build(@ifc_model) do |builder|
-          builder.set_contextofitems(@ifc_model.representation_sub_context_body)
-          builder.set_representationtype(representation_type)
-          builder.set_items(representations)
-        end
       end
 
       def get_representation_string(transformation, su_material = nil)
