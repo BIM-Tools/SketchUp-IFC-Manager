@@ -146,7 +146,6 @@ module BimTools
         end
         ifc_type_product = get_type_product(type_product_class, entity_class, su_definition)
         ifc_entity = determine_ifc_entity(entity_class, su_instance, placement_parent)
-
         ifc_type_product.add_typed_object(ifc_entity) if ifc_type_product && ifc_entity
 
         create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
@@ -281,7 +280,6 @@ module BimTools
         ifc_entity = entity_type.new(@ifc_model, su_instance)
         ifc_entity.globalid = @guid
 
-        @spatial_structure.add(ifc_entity)
         assign_entity_attributes(ifc_entity, placement_parent)
 
         @ifc_model.groups[group_name] = ifc_entity
@@ -314,6 +312,8 @@ module BimTools
         ifc_entity = @ifc_module::IfcBuildingElementProxy.new(@ifc_model, su_instance, @su_total_transformation)
         ifc_entity.globalid = @guid
         ifc_entity.tag = Types::IfcLabel.new(@ifc_model, @persistent_id_path)
+
+        @spatial_structure.add(ifc_entity)
         assign_entity_attributes(ifc_entity, placement_parent)
         ifc_entity
       end
@@ -338,18 +338,12 @@ module BimTools
 
         return unless ifc_entity.is_a?(@ifc_module::IfcProduct)
 
-        @spatial_structure.set_parent(ifc_entity)
+        spatial_parent = ifc_entity.parent
 
-        transformation = if placement_parent == @ifc_model.project
-                           Geom::Transformation.new
-                         else
-                           @su_total_transformation
-                         end
-
-        placement_rel_to = placement_parent.objectplacement if placement_parent.respond_to?(:objectplacement)
+        placement_rel_to = spatial_parent.objectplacement if spatial_parent.respond_to?(:objectplacement)
         @objectplacement = @ifc_module::IfcLocalPlacement.new(
           @ifc_model,
-          transformation,
+          @su_total_transformation,
           placement_rel_to
         )
         ifc_entity.objectplacement = @objectplacement
@@ -401,11 +395,7 @@ module BimTools
       def create_entity_builder(placement_parent, su_instance, su_material, su_layer)
         return unless instance_visible?(su_instance, @ifc_model.options)
 
-        transformation = if placement_parent == @ifc_model.project
-                           su_instance.transformation
-                         else
-                           @su_total_transformation
-                         end
+        transformation = @su_total_transformation
 
         EntityBuilder.new(
           @ifc_model,
@@ -442,7 +432,6 @@ module BimTools
             @spatial_structure,
             definition_manager,
             @su_total_transformation,
-            placement_parent,
             su_material,
             su_layer,
             sub_entity_name,
@@ -465,7 +454,6 @@ module BimTools
             @spatial_structure,
             definition_manager,
             @su_total_transformation,
-            placement_parent,
             su_material,
             su_layer,
             sub_entity_name
@@ -483,7 +471,6 @@ module BimTools
             @spatial_structure,
             definition_manager,
             @su_total_transformation,
-            placement_parent,
             su_material,
             su_layer,
             sub_entity_name
@@ -517,7 +504,6 @@ module BimTools
               @spatial_structure,
               definition_manager,
               @su_total_transformation,
-              placement_parent,
               su_material,
               su_layer
             )
@@ -587,7 +573,6 @@ module BimTools
             @spatial_structure,
             definition_manager,
             @su_total_transformation,
-            placement_parent,
             su_material,
             su_layer,
             nil,

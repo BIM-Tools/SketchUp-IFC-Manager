@@ -32,40 +32,18 @@ module BimTools
       # @param spatial_hierarchy [Hash<IFC2X3::IfcSpatialStructureElement>] Hash with all parent IfcSpatialStructureElements above this one in the hierarchy
       def initialize(ifc_model, spatial_structure = nil)
         @ifc_module = ifc_model.ifc_module
-
-        # @todo change Settings.ifc_version in numerical value so we can say ifc_version > '4.2'
-        @spatial_order = get_spatial_order
         @ifc_model = ifc_model
         @spatial_structure = spatial_structure.to_a.clone if spatial_structure
         @spatial_structure ||= []
       end
 
-      # Returns the spatial order of IFC entities based on the defined classes in the IFC module.
+      # Insert given entity into entity path after given entity
       #
-      # This method dynamically checks if certain IFC classes are defined in the @ifc_module
-      # and builds the spatial order array accordingly. If a class is not defined, it falls
-      # back to an alternative class.
-      #
-      # @return [Array] An array of IFC classes in the spatial order.
-      def get_spatial_order
-        [
-          @ifc_module::IfcProject,
-          @ifc_module::IfcSite,
-          @ifc_module.const_defined?(:IfcFacility) ? @ifc_module.const_get(:IfcFacility) : @ifc_module::IfcBuilding,
-          @ifc_module.const_defined?(:IfcFacilityPart) ? @ifc_module.const_get(:IfcFacilityPart) : @ifc_module::IfcBuildingStorey,
-          @ifc_module::IfcBuildingStorey,
-          @ifc_module::IfcSpace
-        ].freeze
-      end
-
-      # Insert given entity into entity path after given type
-      #
-      # @param ifc_entity [BimTools::IFC2X3::IfcProduct]
-      # @param ifc_type [BimTools::IFC2X3::IfcProduct] class
-      def insert_after(ifc_entity, ifc_type)
-        index = get_spatial_structure_types.rindex(ifc_type)
-        index += 1
-        @spatial_structure.insert(index, ifc_entity)
+      # @param ifc_entity [IfcProduct]
+      # @param parent_entity [IfcProduct]
+      def insert_after(ifc_entity, parent_entity)
+        index = @spatial_structure.index(parent_entity)
+        @spatial_structure.insert(index + 1, ifc_entity)
       end
 
       # Adds an IfcProduct entity to the correct place in the spatial structure.
@@ -73,155 +51,159 @@ module BimTools
       # @param ifc_entity [Object] The IFC entity to be added.
       # @return [void]
       def add(ifc_entity)
-        spatial_structure_types = get_spatial_structure_types
-        case ifc_entity
-        when @ifc_module::IfcProject
+        return if ifc_entity.is_a?(@ifc_module::IfcGroup)
+
+        if ifc_entity.is_a?(@ifc_module::IfcProject)
           @spatial_structure[0] = ifc_entity
-        when @ifc_module::IfcSite
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcSite, [@ifc_module::IfcProject])
-        when @ifc_module::IfcBuilding
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBuilding, [@ifc_module::IfcSite])
-        when @ifc_module::IfcBuildingStorey
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBuildingStorey,
-                             [@ifc_module::IfcBuildingStorey, @ifc_module::IfcBuilding])
-        when @ifc_module::IfcSpace
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcSpace,
-                             [@ifc_module::IfcBuildingStorey, @ifc_module::IfcSite])
-        when @ifc_module::IfcElementAssembly, @ifc_module::IfcCurtainWall, @ifc_module::IfcRoof
-          if (spatial_structure_types & [@ifc_module::IfcSpace, @ifc_module::IfcBuildingStorey,
-                                         @ifc_module::IfcSite]).empty?
-            add_default_spatialelement(@ifc_module::IfcBuildingStorey)
-          end
-          @spatial_structure << ifc_entity
-        when lambda { |entity|
-               entity.is_a?(@ifc_module::IfcProduct) && !entity.is_a?(@ifc_module::IfcSpatialStructureElement)
-             }
-          if (spatial_structure_types & [@ifc_module::IfcSpace, @ifc_module::IfcBuildingStorey,
-                                         @ifc_module::IfcSite]).empty?
-            add_default_spatialelement(@ifc_module::IfcBuildingStorey)
-          end
-        when ->(entity) { entity.is_a?(@ifc_module::IfcGroup) }
-          if (spatial_structure_types & [@ifc_module::IfcSpace, @ifc_module::IfcBuildingStorey,
-                                         @ifc_module::IfcSite]).empty?
-            add_default_spatialelement(@ifc_module::IfcBuildingStorey)
-          end
-        when ->(entity) { @ifc_module.const_defined?(:IfcBridge) && entity.is_a?(@ifc_module::IfcBridge) }
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBridge, [@ifc_module::IfcSite])
-        when ->(entity) { @ifc_module.const_defined?(:IfcBridgePart) && entity.is_a?(@ifc_module::IfcBridgePart) }
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcBridgePart,
-                             [@ifc_module::IfcBridgePart, @ifc_module::IfcBridge])
-        when ->(entity) { @ifc_module.const_defined?(:IfcRailway) && entity.is_a?(@ifc_module::IfcRailway) }
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcRailway, [@ifc_module::IfcSite])
-
-        when ->(entity) { @ifc_module.const_defined?(:IfcRailwayPart) && entity.is_a?(@ifc_module::IfcRailwayPart) }
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcRailwayPart,
-                             [@ifc_module::IfcRailwayPart, @ifc_module::IfcRailway])
-        when ->(entity) { @ifc_module.const_defined?(:IfcRoad) && entity.is_a?(@ifc_module::IfcRoad) }
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcRoad, [@ifc_module::IfcSite])
-        when ->(entity) { @ifc_module.const_defined?(:IfcRoadPart) && entity.is_a?(@ifc_module::IfcRoadPart) }
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcRoadPart,
-                             [@ifc_module::IfcRoadPart, @ifc_module::IfcRoad])
-        when lambda { |entity|
-               @ifc_module.const_defined?(:IfcMarineFacility) && entity.is_a?(@ifc_module::IfcMarineFacility)
-             }
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcMarineFacility,
-                             [@ifc_module::IfcSite])
-        when lambda { |entity|
-               @ifc_module.const_defined?(:IfcMarineFacilityPart) && entity.is_a?(@ifc_module::IfcMarineFacilityPart)
-             }
-          add_spatialelement(ifc_entity, spatial_structure_types, @ifc_module::IfcMarineFacilityPart,
-                             [@ifc_module::IfcMarineFacilityPart, @ifc_module::IfcMarineFacility])
-        when ->(entity) { @ifc_module.const_defined?(:IfcFacility) && entity.is_a?(@ifc_module::IfcFacility) }
-          add_spatialelement(ifc_entity, spatial_structure_types, ifc_entity.class, [@ifc_module::IfcSite])
-        when ->(entity) { @ifc_module.const_defined?(:IfcFacilityPart) && entity.is_a?(@ifc_module::IfcFacilityPart) }
-          add_spatialelement(ifc_entity, spatial_structure_types, ifc_entity.class, [@ifc_module::IfcFacility])
+          return
         end
-      end
-
-      # Adds a spatial element to the project's spatial structure.
-      #
-      # @param ifc_entity [Object] The IFC entity to which the spatial element will be added.
-      # @param spatial_structure_types [Array] An array of spatial structure types.
-      # @param structure_type [Object] The structure type of the spatial element.
-      # @param parent_structure_types [Array] An array of parent structure types.
-      # @return [void]
-      def add_spatialelement(ifc_entity, spatial_structure_types, structure_type, parent_structure_types)
-        complex_parent_index = spatial_structure_types.rindex(structure_type)
-        if complex_parent_index
-          @spatial_structure[complex_parent_index].compositiontype = :complex
-          ifc_entity.compositiontype = :partial
-          insert_after(ifc_entity, structure_type)
-        else
-          parent_structure_type = spatial_structure_types.reverse_each.find do |type|
-            parent_structure_types.include?(type)
-          end
-          if parent_structure_type
-            insert_after(ifc_entity, parent_structure_type)
-          else
-            unless parent_structure_types.empty?
-              add_default_spatialelement(parent_structure_types.last)
-              add_spatialelement(ifc_entity, get_spatial_structure_types, structure_type, parent_structure_types)
-            end
-          end
-        end
-      end
-
-      # Adds a default spatial element to the spatial structure hierarchy
-      # for given class and add to entity path.
-      #
-      # @param entity_class [Class] The class of the entity for which to add a default spatial element.
-      # @return [void]
-      def add_default_spatialelement(entity_class)
-        spatial_structure_types = get_spatial_structure_types
-        # find parent type, if entity not present find the next one
-        index = @spatial_order.rindex { |cls| entity_class < cls }
-        index = index.nil? ? 0 : index - 1
-        parent_class = @spatial_order[index]
-
-        unless spatial_structure_types.include?(parent_class)
-          add_default_spatialelement(parent_class)
-          spatial_structure_types = get_spatial_structure_types
-        end
-
-        parent_index = spatial_structure_types.rindex(parent_class) || spatial_structure_types.length - 1
-        parent = @spatial_structure[parent_index]
-
-        default_parent = entity_class.new(@ifc_model, nil, nil)
-        default_parent.name = Types::IfcLabel.new(@ifc_model,
-                                                  +'default ' << entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(' ').downcase)
-
-        # Add new ObjectPlacement without transformation
-        default_parent.objectplacement = @ifc_module::IfcLocalPlacement.new(@ifc_model)
-        default_parent.objectplacement.relativeplacement = @ifc_model.default_placement
-        default_parent.objectplacement.placementrelto = parent.objectplacement if parent.respond_to?(:objectplacement)
-
-        # set default related element
-        parent.default_related_object = default_parent
-
-        add(parent.default_related_object)
-        set_parent(default_parent)
+        add_recursive(ifc_entity.class, ifc_entity)
       end
 
       def to_a
         @spatial_structure
       end
 
-      def get_spatial_structure_types
-        @spatial_structure.map(&:class)
+      private
+
+      # Adds an IFC entity to the spatial structure recursively.
+      #
+      # This method attempts to add an IFC entity to the spatial structure, ensuring
+      # that it is placed under an appropriate parent entity. If no suitable parent
+      # is found, it creates a new parent entity of the preferred type.
+      #
+      # @param [Class] ifc_class The class of the IFC entity to be added.
+      # @param [Object, nil] ifc_entity The IFC entity to be added. If nil, a default
+      #   entity of the specified class will be created.
+      # @return [Object] The IFC entity that was added to the spatial structure.
+      def add_recursive(ifc_class, ifc_entity = nil)
+        parent_structure_types = if ifc_class < @ifc_module::IfcSpatialStructureElement
+                                   possible_spatial_parent_types(ifc_class)
+                                 elsif @ifc_module.const_defined?(:IfcFacilityPart)
+                                   [@ifc_module::IfcBuildingStorey, @ifc_module::IfcFacilityPart, @ifc_module::IfcSite,
+                                    @ifc_module::IfcSpace]
+                                 else
+                                   [@ifc_module::IfcBuildingStorey, @ifc_module::IfcSite, @ifc_module::IfcSpace]
+                                 end
+
+        # If an entity of class ifc_class is already in the spatial structure, set that as parent
+        parent = @spatial_structure.reverse.find do |entity|
+          entity.is_a?(ifc_class)
+        end
+
+        # If the entity is a spatial structure element, set the composition type to a valid value
+        if ifc_entity && ifc_entity.is_a?(@ifc_module::IfcSpatialStructureElement)
+          if parent && parent.is_a?(@ifc_module::IfcSpatialStructureElement)
+            parent.compositiontype = :complex
+            ifc_entity.compositiontype = :partial
+          elsif ifc_entity.compositiontype == :complex || ifc_entity.compositiontype == :partial
+            ifc_entity.compositiontype = :element
+          end
+        end
+
+        # # Add a default storey in case the parent is a building and the entity is not a spatial structure element
+        # if ifc_entity && !ifc_entity.is_a?(@ifc_module::IfcSpatialStructureElement) && @spatial_structure.any? do |entity|
+        #      entity.is_a?(@ifc_module::IfcBuilding)
+        #    end
+        #   parent_structure_types = [@ifc_module::IfcBuildingStorey]
+        # end
+
+        # If no parent of the given class is found, try to find a parent from one of the preferred parent types
+        parent ||= @spatial_structure.reverse.find do |entity|
+          parent_structure_types.any? { |parent_structure_type| entity.is_a?(parent_structure_type) }
+        end
+
+        # If no parent is found, create a new parent of the first preferred parent type
+        parent = add_recursive(parent_structure_types.first) if parent.nil? && !parent_structure_types.empty?
+
+        raise "No valid parent found for #{ifc_class}" if parent.nil?
+
+        if [@ifc_module::IfcElementAssembly, @ifc_module::IfcCurtainWall, @ifc_module::IfcRoof].include?(ifc_class)
+          @spatial_structure << ifc_entity
+        end
+
+        parent ||= @spatial_structure.last unless ifc_entity.is_a?(@ifc_module::IfcSpatialStructureElement)
+
+        ifc_entity ||= get_default_child_of_type(parent, ifc_class)
+        insert_after(ifc_entity, parent) if ifc_entity.is_a?(@ifc_module::IfcSpatialStructureElement)
+        set_parent(ifc_entity, parent) unless ifc_entity.is_a?(@ifc_module::IfcProject)
+
+        ifc_entity
+      end
+
+      def possible_spatial_parent_types(ifc_class)
+        if ifc_class == @ifc_module::IfcSite
+          [@ifc_module::IfcProject]
+        elsif ifc_class == @ifc_module::IfcBuilding
+          [@ifc_module::IfcSite]
+        elsif ifc_class == @ifc_module::IfcBuildingStorey
+          [@ifc_module::IfcBuilding, @ifc_module::IfcSite]
+        elsif ifc_class == @ifc_module::IfcSpace
+          if @ifc_module.const_defined?(:IfcFacility)
+            [@ifc_module::IfcBuildingStorey, @ifc_module::IfcFacility, @ifc_module::IfcSite]
+          else
+            [@ifc_module::IfcBuildingStorey, @ifc_module::IfcSite]
+          end
+        elsif @ifc_module.const_defined?(:IfcBridge) && ifc_class == @ifc_module::IfcBridge
+          [@ifc_module::IfcSite]
+        elsif @ifc_module.const_defined?(:IfcBridgePart) && ifc_class == @ifc_module::IfcBridgePart
+          [@ifc_module::IfcBridge]
+        elsif @ifc_module.const_defined?(:IfcRailway) && ifc_class == @ifc_module::IfcRailway
+          [@ifc_module::IfcSite]
+        elsif @ifc_module.const_defined?(:IfcRailwayPart) && ifc_class == @ifc_module::IfcRailwayPart
+          [@ifc_module::IfcRailway]
+        elsif @ifc_module.const_defined?(:IfcRoad) && ifc_class == @ifc_module::IfcRoad
+          [@ifc_module::IfcSite]
+        elsif @ifc_module.const_defined?(:IfcRoadPart) && ifc_class == @ifc_module::IfcRoadPart
+          [@ifc_module::IfcRoad]
+        elsif @ifc_module.const_defined?(:IfcMarineFacility) && ifc_class == @ifc_module::IfcMarineFacility
+          [@ifc_module::IfcSite]
+        elsif @ifc_module.const_defined?(:IfcMarineFacilityPart) && ifc_class == @ifc_module::IfcMarineFacilityPart
+          [@ifc_module::IfcMarineFacility]
+        elsif @ifc_module.const_defined?(:IfcFacility) && ifc_class == @ifc_module::IfcFacility
+          [@ifc_module::IfcSite]
+        elsif @ifc_module.const_defined?(:IfcFacilityPart) && ifc_class == @ifc_module::IfcFacilityPart
+          [@ifc_module::IfcFacility]
+        else
+          [@ifc_module::IfcBuilding, @ifc_module::IfcSite, @ifc_module::IfcBuildingStorey]
+        end
+      end
+
+      def get_default_child_of_type(parent, entity_class)
+        # Check if the parent already has a default child of the given type
+        existing_child = parent.default_decomposing_object_of_type(entity_class)
+        return existing_child if existing_child
+
+        # Create a new default child entity
+        default_child = entity_class.new(@ifc_model, nil, nil)
+        name = "default #{entity_class.name.split('::').last.split(/(?=[A-Z])/).drop(1).join(' ').downcase}"
+        default_child.name = Types::IfcLabel.new(@ifc_model, name)
+        parent.add_default_decomposing_object(default_child)
+
+        # Add a new ObjectPlacement without transformation
+        default_child.objectplacement = @ifc_module::IfcLocalPlacement.new(@ifc_model)
+        default_child.objectplacement.relativeplacement = @ifc_model.default_placement
+
+        # Link placement to the parent, if applicable
+        unless parent.is_a?(@ifc_module::IfcProject)
+          default_child.objectplacement.placementrelto = parent.objectplacement
+        end
+
+        default_child
       end
 
       # Add entity to the model structure
-      def set_parent(ifc_entity)
+      def set_parent(ifc_entity, parent)
         index = @spatial_structure.index(ifc_entity)
-        parent = if index
-                   if index > 1
-                     @spatial_structure[index - 1]
-                   else
-                     @spatial_structure[0]
-                   end
-                 else
-                   @spatial_structure[-1]
-                 end
+        # parent = if index
+        #            if index > 1
+        #              @spatial_structure[index - 1]
+        #            else
+        #              @spatial_structure[0]
+        #            end
+        #          else
+        #            @spatial_structure[-1]
+        #          end
         ifc_entity.parent = parent
 
         # IfcSurfaceFeature is not part of the normal spatial structure from IFC4X3 onwards
@@ -240,19 +222,6 @@ module BimTools
             ifc_entity.parent.add_related_object(ifc_entity)
           end
         end
-      end
-
-      # Returns the placement parent of an element.
-      #
-      # If the given placement_parent is an instance of IfcSpatialStructureElement, it is returned as is.
-      # Otherwise, it searches for the first object of type IfcSite in the @spatial_structure collection and returns it.
-      #
-      # @param placement_parent [Object] The placement parent to check.
-      # @return [Object] The placement parent of the element.
-      def get_placement_parent(placement_parent)
-        return placement_parent if placement_parent.is_a? @ifc_module::IfcSpatialStructureElement
-
-        @spatial_structure.find { |entity| entity.is_a? @ifc_module::IfcSite }
       end
     end
   end

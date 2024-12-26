@@ -35,8 +35,8 @@ module BimTools
 
       # set parent placement
       @placementrelto = placementrelto # if placementrelto.is_a?(IfcLocalPlacement)
-
-      return unless su_total_transformation.is_a?(Geom::Transformation)
+      
+      raise('input must be sketchup transform') unless su_total_transformation.is_a?(Geom::Transformation)
 
       # Re-use default placement if no transformation is applied
       if su_total_transformation && su_total_transformation.to_a == @@DEFAULT_TRANSFORMATION

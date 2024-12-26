@@ -240,7 +240,6 @@ module BimTools
           spatial_structure,
           DefinitionManager.new(self, @su_model),
           Geom::Transformation.new,
-          nil, # placement_parent???
           nil,
           nil,
           'model_geometry'
@@ -274,7 +273,6 @@ module BimTools
         spatial_structure,
         definition_manager,
         total_transformation = nil,
-        placement_parent = nil,
         su_material = nil,
         su_layer = nil,
         entity_name = nil,
@@ -288,18 +286,15 @@ module BimTools
         ifc_entity.name = Types::IfcLabel.new(self, entity_name)
         spatial_structure.add(ifc_entity)
 
-        # (?) Do we need this? Shouldn't placement_parent always be of type IfcSpatialStructureElement at this point?
-        # The only case is that placement_parent is of type IfcProject, can't we prevent that from happening?
-        # Can it actually be nil?
-        placement_parent = spatial_structure.get_placement_parent(placement_parent)
+        spatial_parent = ifc_entity.parent
 
-        transformation = total_transformation * placement_parent.objectplacement.ifc_total_transformation.inverse
+        transformation = total_transformation * spatial_parent.objectplacement.ifc_total_transformation.inverse
         rotation_and_translation, scaling = TransformationHelper.decompose_transformation(transformation)
 
         ifc_entity.objectplacement = @ifc_module::IfcLocalPlacement.new(
           self,
           rotation_and_translation,
-          placement_parent.objectplacement
+          spatial_parent.objectplacement
         )
 
         add_representation(
@@ -319,7 +314,7 @@ module BimTools
 
         # Add to spatial hierarchy
         spatial_structure.add(ifc_entity)
-        spatial_structure.set_parent(ifc_entity)
+        # spatial_structure.set_parent(ifc_entity)
 
         # create materialassociation
         materials[su_material] = MaterialAndStyling.new(self, su_material) unless materials.include?(su_material)
