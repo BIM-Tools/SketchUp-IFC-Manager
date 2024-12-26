@@ -76,10 +76,7 @@ module BimTools
           property_enumeration = @ifc_model.property_enumerations[property_name.value]
         else
           property_enumeration = @ifc_module::IfcPropertyEnumeration.new(@ifc_model)
-          property_enumeration.name = IfcManager::Types::IfcLabel.new(
-            @ifc_model,
-            property_enumeration_name || property_name
-          )
+          property_enumeration.name = property_enumeration_name || property_name
           property_enumeration.enumerationvalues = enumeration_values
           @ifc_model.property_enumerations[property_name.value] = property_enumeration
         end
