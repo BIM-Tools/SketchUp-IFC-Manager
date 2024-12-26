@@ -108,6 +108,12 @@ module BimTools
         #   parent_structure_types = [@ifc_module::IfcBuildingStorey]
         # end
 
+        # Set the parent to a decomposing IfcProduct if that is in the spatial structure
+        if [@ifc_module::IfcElementAssembly, @ifc_module::IfcCurtainWall,
+            @ifc_module::IfcRoof].include?(@spatial_structure.last.class) && !ifc_entity.is_a?(@ifc_module::IfcSpatialStructureElement) && ifc_entity.is_a?(@ifc_module::IfcProduct)
+          parent = @spatial_structure.last
+        end
+
         # If no parent of the given class is found, try to find a parent from one of the preferred parent types
         parent ||= @spatial_structure.reverse.find do |entity|
           parent_structure_types.any? { |parent_structure_type| entity.is_a?(parent_structure_type) }
