@@ -35,7 +35,7 @@ module BimTools
 
       # set parent placement
       @placementrelto = placementrelto # if placementrelto.is_a?(IfcLocalPlacement)
-      
+
       raise('input must be sketchup transform') unless su_total_transformation.is_a?(Geom::Transformation)
 
       # Re-use default placement if no transformation is applied
@@ -44,10 +44,7 @@ module BimTools
         @ifc_total_transformation = su_total_transformation
       else
 
-        # (?) What happens with the scaling component?
-        rotation_and_translation, scaling = TransformationHelper.decompose_transformation(su_total_transformation)
-
-        @ifc_total_transformation = rotation_and_translation
+        @ifc_total_transformation = su_total_transformation
 
         @transformation = if !@placementrelto.nil? && @placementrelto.ifc_total_transformation
                             @placementrelto.ifc_total_transformation.inverse * @ifc_total_transformation

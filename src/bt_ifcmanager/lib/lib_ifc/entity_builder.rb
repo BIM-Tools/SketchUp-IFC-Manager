@@ -25,6 +25,7 @@ require_relative 'ifc_types'
 require_relative 'IfcGloballyUniqueId'
 require_relative 'spatial_structure'
 require_relative 'ifc_project_builder'
+require_relative '../transformation_helper'
 
 module BimTools
   module IfcManager
@@ -121,6 +122,9 @@ module BimTools
         when 'IfcPipeSegmentType'
           entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcPipeSegment
           type_product_class = @ifc_module::IfcPipeSegmentType
+        when 'IfcDuctSegmentType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcDuctSegment
+          type_product_class = @ifc_module::IfcDuctSegmentType
         else
           if @ifc_module.const_defined?(entity_type_name)
             ifc_class = @ifc_module.const_get(entity_type_name)
@@ -148,13 +152,41 @@ module BimTools
         ifc_entity = determine_ifc_entity(entity_class, su_instance, placement_parent)
         ifc_type_product.add_typed_object(ifc_entity) if ifc_type_product && ifc_entity
 
-        create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer)
+        mesh_transformation = add_object_placement(ifc_entity, @su_total_transformation)
+
+        create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer, mesh_transformation)
 
         add_placement_parent_relationships(ifc_entity, placement_parent)
 
         # We always need a placement parent, so when the current entity is nil, we use the parent
         placement_parent = ifc_entity if ifc_entity
         create_nested_objects(placement_parent, su_instance, su_material, su_layer)
+      end
+
+      def add_object_placement(ifc_entity, su_total_transformation)
+        return su_total_transformation unless ifc_entity.is_a?(@ifc_module::IfcProduct)
+
+        rotation_and_translation, scaling_and_reflection = TransformationHelper.decompose_transformation(su_total_transformation)
+
+        spatial_parent = ifc_entity.parent
+        placement_rel_to = spatial_parent.objectplacement if spatial_parent.respond_to?(:objectplacement)
+
+        ifc_entity.objectplacement = @ifc_module::IfcLocalPlacement.new(
+          @ifc_model,
+          rotation_and_translation,
+          placement_rel_to
+        )
+
+        # set elevation for buildingstorey
+        # (?) is this the best place to define building storey elevation?
+        #   could be better set from within IfcBuildingStorey?
+        if ifc_entity.is_a?(@ifc_module::IfcBuildingStorey) && ['IFC 2x3', 'IFC 4'].include?(@ifc_version)
+          elevation = ifc_entity.objectplacement.ifc_total_transformation.origin.z
+          ifc_entity.elevation = Types::IfcLengthMeasure.new(@ifc_model, elevation)
+          # ElevationOfFFLRelative
+        end
+
+        scaling_and_reflection
       end
 
       # Retrieves or creates an IfcTypeProduct for the given SketchUp definition.
@@ -336,28 +368,7 @@ module BimTools
           end
         end
 
-        return unless ifc_entity.is_a?(@ifc_module::IfcProduct)
-
-        spatial_parent = ifc_entity.parent
-
-        placement_rel_to = spatial_parent.objectplacement if spatial_parent.respond_to?(:objectplacement)
-        @objectplacement = @ifc_module::IfcLocalPlacement.new(
-          @ifc_model,
-          @su_total_transformation,
-          placement_rel_to
-        )
-        ifc_entity.objectplacement = @objectplacement
-
-        # set elevation for buildingstorey
-        # (?) is this the best place to define building storey elevation?
-        #   could be better set from within IfcBuildingStorey?
-        return unless ifc_entity.is_a?(@ifc_module::IfcBuildingStorey)
-
-        return unless ['IFC 2x3', 'IFC 4'].include?(@ifc_version)
-
-        elevation = @objectplacement.ifc_total_transformation.origin.z
-        ifc_entity.elevation = Types::IfcLengthMeasure.new(@ifc_model, elevation)
-        # ElevationOfFFLRelative
+        nil unless ifc_entity.is_a?(@ifc_module::IfcProduct)
       end
 
       # find nested objects (geometry and entities)
@@ -396,7 +407,6 @@ module BimTools
         return unless instance_visible?(su_instance, @ifc_model.options)
 
         transformation = @su_total_transformation
-
         EntityBuilder.new(
           @ifc_model,
           su_instance,
@@ -409,7 +419,7 @@ module BimTools
         )
       end
 
-      def create_geometry(definition, ifc_entity, placement_parent = nil, su_material, su_layer)
+      def create_geometry(definition, ifc_entity, placement_parent = nil, su_material, su_layer, mesh_transformation)
         definition_manager = @ifc_model.get_definition_manager(definition)
 
         # create geometry from faces
@@ -483,13 +493,6 @@ module BimTools
           add_representation_to_parent(placement_parent, definition_manager, su_material, su_layer)
         else
           if ifc_entity.respond_to?(:representation)
-            # calculate the local transformation
-            # if the SU object if not an IfcProduct (cannot have a representation ), then BREP needs to be transformed with SU object transformation
-            mesh_transformation = if ifc_entity.is_a?(@ifc_module::IfcProduct)
-                                    @objectplacement.ifc_total_transformation.inverse * @su_total_transformation
-                                  else
-                                    @su_total_transformation
-                                  end
             add_representation(
               ifc_entity,
               definition_manager,
