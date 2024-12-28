@@ -341,10 +341,6 @@ module BimTools
       # @param [Sketchup::Material] su_material
       # @param [Sketchup::Layer] su_layer
       def add_representation(ifc_entity, definition_manager, transformation, su_material, su_layer, geometry_type = nil)
-        product_definition_shape_builder = IfcProductDefinitionShapeBuilder.build(self) do |builder|
-          builder.add_product(ifc_entity)
-        end
-
         shape_representation = definition_manager.get_shape_representation(
           transformation,
           su_material,
@@ -355,7 +351,9 @@ module BimTools
         if ifc_entity.representation
           ifc_entity.representation.representations.add(shape_representation)
         else
-          product_definition_shape_builder.add_representation(shape_representation)
+          ifc_entity.representation = IfcProductDefinitionShapeBuilder.build(self) do |builder|
+            builder.add_representation(shape_representation)
+          end
         end
       end
     end
