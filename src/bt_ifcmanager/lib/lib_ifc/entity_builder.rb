@@ -119,12 +119,54 @@ module BimTools
         when 'IfcAirTerminalType'
           entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcAirTerminal
           type_product_class = @ifc_module::IfcAirTerminalType
+        when 'IfcAudioVisualApplianceType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcAudioVisualAppliance
+          type_product_class = @ifc_module::IfcAudioVisualApplianceType
+        when 'IfcCommunicationsApplianceType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcCommunicationsAppliance
+          type_product_class = @ifc_module::IfcCommunicationsApplianceType
+        when 'IfcElectricApplianceType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcElectricAppliance
+          type_product_class = @ifc_module::IfcElectricApplianceType
+        when 'IfcFireSuppressionTerminalType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcFireSuppressionTerminal
+          type_product_class = @ifc_module::IfcFireSuppressionTerminalType
+        when 'IfcLampType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcLamp
+          type_product_class = @ifc_module::IfcLampType
+        when 'IfcLightFixtureType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcLightFixture
+          type_product_class = @ifc_module::IfcLightFixtureType
+        when 'IfcMedicalDeviceType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcMedicalDevice
+          type_product_class = @ifc_module::IfcMedicalDeviceType
+        when 'IfcOutletType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcOutlet
+          type_product_class = @ifc_module::IfcOutletType
+        when 'IfcSanitaryTerminalType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcSanitaryTerminal
+          type_product_class = @ifc_module::IfcSanitaryTerminalType
+        when 'IfcSpaceHeaterType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcSpaceHeater
+          type_product_class = @ifc_module::IfcSpaceHeaterType
+        when 'IfcStackTerminalType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcStackTerminal
+          type_product_class = @ifc_module::IfcStackTerminalType
+        when 'IfcWasteTerminalType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcWasteTerminal
+          type_product_class = @ifc_module::IfcWasteTerminalType
         when 'IfcPipeSegmentType'
           entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcPipeSegment
           type_product_class = @ifc_module::IfcPipeSegmentType
         when 'IfcDuctSegmentType'
           entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcDuctSegment
           type_product_class = @ifc_module::IfcDuctSegmentType
+        when 'IfcCableCarrierSegmentType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcCableCarrierSegment
+          type_product_class = @ifc_module::IfcCableCarrierSegmentType
+        when 'IfcCableSegmentType'
+          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcCableSegment
+          type_product_class = @ifc_module::IfcCableSegmentType
         else
           if @ifc_module.const_defined?(entity_type_name)
             ifc_class = @ifc_module.const_get(entity_type_name)
@@ -199,32 +241,6 @@ module BimTools
         return nil unless @ifc_model.options[:types] && type_product_class && entity_class
 
         @ifc_model.product_types[su_definition] ||= type_product_class.new(@ifc_model, su_definition, entity_class)
-      end
-
-      # Maps an entity type name to its correct version or base type.
-      #
-      # @param entity_type_name [String] The name of the entity type to be mapped.
-      # @return [String] The mapped entity type name.
-      def map_entity_type(entity_type_name)
-        # Replace IfcWallStandardCase by IfcWall, due to geometry issues and deprecation in IFC 4
-        return 'IfcWall' if entity_type_name == 'IfcWallStandardCase'
-
-        return entity_type_name unless entity_type_name && entity_type_name.end_with?('Type')
-
-        # Strip any accidental direct Type assignments
-        # @todo should be part of ifc_product_builder
-        entity_base_name = entity_type_name.chomp('Type')
-
-        case entity_base_name
-        when 'IfcAirTerminal'
-          # Catch missing IfcAirTerminal in Ifc2x3
-          @ifc_version == 'IFC 2x3' ? 'IfcFlowTerminal' : 'IfcAirTerminal'
-        when 'IfcPipeSegment'
-          # Catch missing IfcPipeSegment in Ifc2x3
-          @ifc_version == 'IFC 2x3' ? 'IfcFlowSegment' : 'IfcPipeSegment'
-        else
-          @ifc_module.const_defined?(entity_base_name) ? entity_base_name : entity_type_name
-        end
       end
 
       # Determines the appropriate IFC entity based on the given entity type, SketchUp instance, and placement parent.
