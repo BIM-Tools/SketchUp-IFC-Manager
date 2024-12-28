@@ -29,7 +29,7 @@ module BimTools
       return nil unless @items.count > 0
       return unless @ofproduct
 
-      product_definition_shape_id = "#{@global_id.to_uuid}"
+      product_definition_shape_id = "#{@global_id.ifcx}"
 
       {
         'def' => 'class',

@@ -112,7 +112,7 @@ module BimTools
         'def' => 'class',
         'type' => 'UsdGeom:Xform',
         'comment' => "instance of: #{@name.value}",
-        'name' => globalid.to_uuid,
+        'name' => globalid.ifcx,
         'children' => (Array(@decomposes) + Array(@contains_elements) + Array(@representation)).compact.flatten.map(&:ifcx).flatten
       }
     end

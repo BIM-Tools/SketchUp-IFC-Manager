@@ -29,7 +29,7 @@ module BimTools
       product = @shapeofproduct[0] if @shapeofproduct.length > 0
       return unless product
 
-      product_definition_shape_id = @global_id.to_uuid || 'default-uuid'
+      product_definition_shape_id = @global_id.ifcx || 'default-uuid'
       product_definition_shape_path = "</#{product_definition_shape_id}>"
 
       {

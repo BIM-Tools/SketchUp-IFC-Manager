@@ -132,7 +132,7 @@ module BimTools
 
       # return the full UUID
       def ifcx
-        to_uuid
+        @hex_guid
       end
     end
   end

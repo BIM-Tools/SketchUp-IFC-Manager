@@ -55,7 +55,7 @@ module BimTools
 
       {
         'def' => 'over',
-        'name' => places_object.globalid.to_uuid,
+        'name' => places_object.globalid.ifcx,
         'attributes' => {
           'xformOp' => { 'transform' => transform_matrix.each_slice(4).to_a }
         }

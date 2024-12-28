@@ -27,7 +27,7 @@ module BimTools
       @relatedobjects.map do |relatedobject|
         {
           'def' => 'over',
-          'name' => relatedobject.globalid.to_uuid,
+          'name' => relatedobject.globalid.ifcx,
           'attributes' => {
             'UsdShade:MaterialBindingAPI' => {
               'material:binding' => {

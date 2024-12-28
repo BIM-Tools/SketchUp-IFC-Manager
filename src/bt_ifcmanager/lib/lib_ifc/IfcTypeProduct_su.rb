@@ -93,8 +93,8 @@ module BimTools
         'def' => 'class',
         'type' => 'UsdGeom:Xform',
         'comment' => "IfcTypeProduct: #{@name.value}",
-        'name' => @globalid.to_uuid,
-        'inherits' => ["</#{@globalid.to_uuid}_Body>"]
+        'name' => @globalid.ifcx,
+        'inherits' => ["</#{@globalid.ifcx}_Body>"]
       }
     end
   end

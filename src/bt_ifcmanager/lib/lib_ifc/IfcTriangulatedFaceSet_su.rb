@@ -42,7 +42,7 @@ module BimTools
       {
         'def' => 'over',
         'comment' => 'triangulated face set',
-        'name' => @globalid.to_uuid,
+        'name' => @globalid.ifcx,
         'attributes' => {
           'UsdGeom:Mesh' => usd_mesh
         }

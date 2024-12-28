@@ -78,7 +78,7 @@ module BimTools
 
       def create_data_section
         project_name = @ifc_model.project.name.value
-        project_uuid = @ifc_model.project.globalid.to_uuid
+        project_uuid = @ifc_model.project.globalid.ifcx
 
         project_object = {
           'def' => 'def',
