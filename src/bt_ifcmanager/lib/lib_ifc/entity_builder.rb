@@ -250,8 +250,8 @@ module BimTools
       # @param placement_parent [IFC::IfcSpatialStructureElement] The placement parent of the unclassified component.
       # @return [IFC::IfcBuildingElementProxy, nil] The created building element proxy if the placement parent is an IfcSpatialStructureElement, otherwise nil.
       def handle_unclassified_component(su_instance, placement_parent)
-        # Don't add unclassified components as direct geometry to spatial elements
-        if placement_parent.is_a?(@ifc_module::IfcSpatialStructureElement)
+        # Don't add unclassified components as direct geometry to spatial elements or groups
+        if placement_parent.is_a?(@ifc_module::IfcSpatialStructureElement) || placement_parent.is_a?(@ifc_module::IfcGroup)
           return create_building_element_proxy(su_instance, placement_parent)
         end
 
