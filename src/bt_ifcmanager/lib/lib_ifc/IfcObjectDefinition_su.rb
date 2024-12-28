@@ -25,13 +25,16 @@ require_relative 'ifc_types'
 
 module BimTools
   module IfcObjectDefinition_su
-    attr_accessor :decomposes, :default_related_object
+    attr_accessor :decomposes, :default_decomposing_objects
 
     def initialize(ifc_model, sketchup)
       super
-
       @ifc_module = ifc_model.ifc_module
       @ifc_model = ifc_model
+
+      # keep track of default decomposing objects
+      # which are added when a valid spatial parent is not present in the spatial hierarchy
+      @default_decomposing_objects = []
     end
 
     # Add an element for which this element is the spatial container
@@ -47,6 +50,14 @@ module BimTools
         @contains_elements.relatedelements = IfcManager::Types::Set.new
       end
       @contains_elements.relatedelements.add(object)
+    end
+
+    def add_default_decomposing_object(ifc_entity)
+      @default_decomposing_objects << ifc_entity
+    end
+
+    def default_decomposing_object_of_type(type)
+      @default_decomposing_objects.find { |ifc_entity| ifc_entity.is_a?(type) }
     end
 
     # Add an object from which this element is decomposed

@@ -78,6 +78,7 @@ IfcProduct:
   - :ReferencedInStructures
 IfcProductDefinitionShape:
   :inverse:
+  - :ShapeOfProduct
   - :HasShapeAspects
 IfcStyledItem:
   :explicit:
@@ -1923,6 +1924,10 @@ IfcRepresentation:
   - :RepresentationIdentifier
   - :RepresentationType
   - :Items
+  :inverse:
+  - :RepresentationMap
+  - :LayerAssignments
+  - :OfProductRepresentation
 IfcRepresentationMap:
   :explicit:
   - :MappingOrigin
@@ -2036,6 +2041,10 @@ IfcShapeAspect:
   - :Description
   - :ProductDefinitional
   - :PartOfProductDefinitionShape
+IfcShapeModel:
+  :inverse:
+  - :OfShapeAspect
+IfcShapeRepresentation:
 IfcShellBasedSurfaceModel:
   :explicit:
   - :SbsmBoundary

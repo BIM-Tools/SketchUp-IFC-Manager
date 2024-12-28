@@ -22,12 +22,14 @@ module BimTools
       scale_z = z_axis.length
 
       # Check if the transformation is flipped.
-      is_flipped = x_axis.cross(y_axis).samedirection?(z_axis)
+      is_flipped_x = y_axis.cross(z_axis).samedirection?(x_axis)
+      is_flipped_y = x_axis.cross(y_axis).samedirection?(z_axis)
+      is_flipped_z = z_axis.cross(x_axis).samedirection?(y_axis)
 
       # Adjust the scaling factors if the transformation is flipped.
-      scale_y = -scale_y unless is_flipped
-
-      scaling = Geom::Transformation.scaling(scale_x, scale_y, scale_z)
+      scale_x = -scale_x unless is_flipped_x
+      scale_y = -scale_y unless is_flipped_y
+      scale_z = -scale_z unless is_flipped_z
 
       # Calculate the rotation by normalizing the original matrix columns.
       rotation_matrix = [
@@ -39,8 +41,9 @@ module BimTools
       rotation = Geom::Transformation.new(rotation_matrix)
 
       rotation_and_translation = translation * rotation
+      scaling_and_reflection = Geom::Transformation.scaling(scale_x, scale_y, scale_z) # Geom::Transformation.new # transformation * rotation_and_translation.inverse
 
-      [rotation_and_translation, scaling]
+      [rotation_and_translation, scaling_and_reflection]
     end
   end
 end

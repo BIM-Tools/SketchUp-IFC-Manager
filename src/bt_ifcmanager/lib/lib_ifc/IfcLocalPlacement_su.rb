@@ -21,43 +21,41 @@
 #
 #
 
-require_relative '../transformation_helper'
-
 module BimTools
   module IfcLocalPlacement_su
     attr_accessor :transformation, :ifc_total_transformation
 
-    @@DEFAULT_TRANSFORMATION = Geom::Transformation.new.to_a.freeze
+    DEFAULT_TRANSFORMATION = Geom::Transformation.new.to_a.freeze
 
     def initialize(ifc_model, su_total_transformation = Geom::Transformation.new, placementrelto = nil)
+      raise('input must be sketchup transform') unless su_total_transformation.is_a?(Geom::Transformation)
+
       super
       @ifc_module = ifc_model.ifc_module
+      @placementrelto = placementrelto
+      @ifc_total_transformation = su_total_transformation
 
-      # set parent placement
-      @placementrelto = placementrelto # if placementrelto.is_a?(IfcLocalPlacement)
+      @transformation = calculate_transformation
 
-      return unless su_total_transformation.is_a?(Geom::Transformation)
+      @relativeplacement = determine_relative_placement(ifc_model)
+    end
 
-      # Re-use default placement if no transformation is applied
-      if su_total_transformation && su_total_transformation.to_a == @@DEFAULT_TRANSFORMATION
-        @relativeplacement = ifc_model.default_placement
-        @ifc_total_transformation = su_total_transformation
-      else
+    private
 
-        # (?) What happens with the scaling component?
-        rotation_and_translation, scaling = TransformationHelper.decompose_transformation(su_total_transformation)
+    def calculate_transformation
+      return @ifc_total_transformation unless @placementrelto && @placementrelto.ifc_total_transformation
 
-        @ifc_total_transformation = rotation_and_translation
+      @placementrelto.ifc_total_transformation.inverse * @ifc_total_transformation
+    end
 
-        @transformation = if !@placementrelto.nil? && @placementrelto.ifc_total_transformation
-                            @placementrelto.ifc_total_transformation.inverse * @ifc_total_transformation
-                          else
-                            @ifc_total_transformation
-                          end
+    def determine_relative_placement(ifc_model)
+      return ifc_model.default_placement if default_transformation?
 
-        # set relativeplacement
-        @relativeplacement = @ifc_module::IfcAxis2Placement3D.new(ifc_model, @transformation)
-      end
+      @ifc_module::IfcAxis2Placement3D.new(ifc_model, @transformation)
+    end
+
+    def default_transformation?
+      @transformation.to_a == DEFAULT_TRANSFORMATION
     end
   end
 end
