@@ -26,6 +26,7 @@ require_relative 'IfcGloballyUniqueId'
 require_relative 'spatial_structure'
 require_relative 'ifc_project_builder'
 require_relative '../transformation_helper'
+require_relative '../transformation_helper'
 
 module BimTools
   module IfcManager
