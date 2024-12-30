@@ -29,27 +29,14 @@ module BimTools
     end
 
     def ifcx
-      return nil unless @su_material
-
-      color = @su_material.color
       name = @name.value.gsub(/[^0-9A-Za-z]/, '_')
+      shaders = ifc5_shaders(@su_material)
+
       [{
         'def' => 'def',
         'type' => 'UsdShade:Material',
         'name' => name,
-        'children' => [
-          {
-            'def' => 'def',
-            'type' => 'UsdShade:Shader',
-            'name' => 'Shader',
-            'attributes' => {
-              'info:id' => 'UsdPreviewSurface',
-              'inputs:diffuseColor' => [color.red / 255.0, color.green / 255.0, color.blue / 255.0],
-              'inputs:opacity' => color.alpha / 255.0,
-              'outputs:surface' => nil
-            }
-          }
-        ]
+        'children' => shaders
       }, {
         'def' => 'over',
         'name' => name,
@@ -62,6 +49,27 @@ module BimTools
         }
 
       }]
+    end
+
+    def ifc5_shaders(su_material)
+      color = if su_material
+                @su_material.color
+              else
+                Sketchup::Color.new(255, 255, 255, 255)
+              end
+      [
+        {
+          'def' => 'def',
+          'type' => 'UsdShade:Shader',
+          'name' => 'Shader',
+          'attributes' => {
+            'info:id' => 'UsdPreviewSurface',
+            'inputs:diffuseColor' => [color.red / 255.0, color.green / 255.0, color.blue / 255.0],
+            'inputs:opacity' => color.alpha / 255.0,
+            'outputs:surface' => nil
+          }
+        }
+      ]
     end
   end
 end
