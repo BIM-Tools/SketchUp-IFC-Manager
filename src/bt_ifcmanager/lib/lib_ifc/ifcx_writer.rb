@@ -98,9 +98,9 @@ module BimTools
             obj.is_a?(@ifc_module::IfcLocalPlacement) ||
             obj.is_a?(@ifc_module::IfcRelAssociatesMaterial) ||
             obj.is_a?(@ifc_module::IfcRelDefinesByProperties) ||
+            obj.is_a?(@ifc_module::IfcClassificationReference) ||
             obj.is_a?(@ifc_module::IfcShapeRepresentation)
         end.flat_map do |obj|
-          puts obj.class
           result = obj.ifcx
           result.is_a?(Array) ? result : [result]
         end

@@ -89,10 +89,7 @@ module BimTools
       end
 
       def set_of_product_representation(ifc_product_definition_shape)
-        puts 'set_of_product_representation'
         return unless ifc_product_definition_shape
-
-        puts ifc_product_definition_shape
 
         @ifc_shape_representation.ofproductrepresentation = Types::Set.new([ifc_product_definition_shape])
       end
