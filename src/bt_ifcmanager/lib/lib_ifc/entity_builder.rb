@@ -26,6 +26,7 @@ require_relative 'IfcGloballyUniqueId'
 require_relative 'spatial_structure'
 require_relative 'ifc_project_builder'
 require_relative '../transformation_helper'
+require_relative '../transformation_helper'
 
 module BimTools
   module IfcManager
@@ -218,6 +219,7 @@ module BimTools
           rotation_and_translation,
           placement_rel_to
         )
+        ifc_entity.objectplacement.places_object = ifc_entity
 
         # set elevation for buildingstorey
         # (?) is this the best place to define building storey elevation?
@@ -539,18 +541,23 @@ module BimTools
       # @param [Sketchup::Layer] su_layer
       def add_representation(ifc_entity, definition_manager, transformation, su_material, su_layer, geometry_type = nil)
         # geometry_type = 'Brep' if ifc_entity.is_a?(@ifc_module::IfcSpace)
+
         shape_representation = definition_manager.get_shape_representation(
           transformation,
           su_material,
           su_layer,
-          geometry_type
+          geometry_type,
+          ifc_entity
         )
         if ifc_entity.representation
           ifc_entity.representation.representations.add(shape_representation)
         else
-          ifc_entity.representation = IfcProductDefinitionShapeBuilder.build(@ifc_model) do |builder|
+          product_definition_shape = IfcProductDefinitionShapeBuilder.build(@ifc_model) do |builder|
+            builder.add_product(ifc_entity)
+            builder.set_global_id(shape_representation.globalid)
             builder.add_representation(shape_representation)
           end
+          ifc_entity.representation = product_definition_shape
         end
       end
 
@@ -575,7 +582,9 @@ module BimTools
               transformation,
               su_material
             )
-            parent_representation.representations.first.items += definition_representation.meshes
+            if parent_representation.representations.first
+              parent_representation.representations.first.items += definition_representation.meshes
+            end
           else
             add_representation(
               placement_parent,

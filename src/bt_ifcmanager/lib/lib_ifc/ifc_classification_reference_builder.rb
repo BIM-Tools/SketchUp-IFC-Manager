@@ -38,14 +38,15 @@ module BimTools
         @ifc_model = ifc_model
         @ifc_classification_reference = @ifc_module::IfcClassificationReference.new(ifc_model)
         @classification_ref_for_objects = get_association(classification_name)
+        @ifc_classification_reference.classificationrefforobjects = @classification_ref_for_objects
       end
 
       def set_location(location)
-        if @ifc_model.ifc_version == 'IFC 2x3'
-          @ifc_classification_reference.location = IfcManager::Types::IfcLabel.new(@ifc_model, location)
-        else
-          @ifc_classification_reference.location = IfcManager::Types::IfcURIReference.new(@ifc_model, location)
-        end
+        @ifc_classification_reference.location = if @ifc_model.ifc_version == 'IFC 2x3'
+                                                   IfcManager::Types::IfcLabel.new(@ifc_model, location)
+                                                 else
+                                                   IfcManager::Types::IfcURIReference.new(@ifc_model, location)
+                                                 end
       end
 
       def set_identification(identification)

@@ -104,7 +104,7 @@ module BimTools
         length = 2
         ifc_guid.each_char do |char|
           n = GUID64.index(char.to_s)
-          bin = bin << n.to_s(2).rjust(length, '0')
+          bin <<= n.to_s(2).rjust(length, '0')
           length = 6
         end
         [bin].pack('B*').unpack('H*')[0]
@@ -112,7 +112,9 @@ module BimTools
 
       # convert IfcGloballyUniqueId into UUID
       def to_uuid
-        @hex_guid.insert(20, '-').insert(16, '-').insert(12, '-').insert(8, '-')
+        raise "Invalid GUID length: #{@hex_guid.length}. Expected 32 characters." unless @hex_guid.length == 32
+
+        @hex_guid.dup.insert(20, '-').insert(16, '-').insert(12, '-').insert(8, '-')
       end
 
       def new_guid
@@ -126,6 +128,11 @@ module BimTools
         # SecureRandom.uuid: creates a 128 bit UUID hex string
         # convert to hex
         unformat_guid(SecureRandom.uuid)
+      end
+
+      # return the UUID without dashes
+      def ifcx
+        @hex_guid
       end
     end
   end

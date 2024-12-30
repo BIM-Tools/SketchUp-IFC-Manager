@@ -466,10 +466,21 @@ IfcColumn:
 IfcColumnType:
   :explicit:
   - :PredefinedType
+IfcPropertyAbstraction:
+  :inverse:
+  - :HasExternalReferences
 IfcProperty:
   :explicit:
   - :Name
   - :Description
+  - :Specification
+  :inverse:
+  - :PartOfPset
+  - :PropertyForDependance
+  - :PropertyDependsOn
+  - :PartOfComplex
+  - :HasConstraints
+  - :HasApprovals
 IfcComplexProperty:
   :explicit:
   - :UsageName

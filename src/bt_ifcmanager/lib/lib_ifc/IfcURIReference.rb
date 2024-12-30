@@ -38,5 +38,11 @@ module BimTools::IfcManager
       val = add_long(val) if @long
       val
     end
+
+    def ifcx
+      val = "'#{@value}'"
+      val = add_long(val) if @long
+      val
+    end
   end
 end

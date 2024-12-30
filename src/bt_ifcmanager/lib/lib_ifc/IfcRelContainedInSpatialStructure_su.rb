@@ -26,5 +26,18 @@ module BimTools
     def self.required_attributes(_ifc_version)
       [:RelatingStructure]
     end
+
+    def ifcx
+      return unless @relatingstructure
+
+      @relatedelements.map do |relatedelement|
+        {
+          'def' => 'def',
+          'comment' => 'spatial containment:', # {relatedelement.name.value}, relating object: #{@relatedelement.name.value}",
+          'name' => "#{relatedelement.name.ifcx} - #{relatedelement.globalid.ifcx}",
+          'inherits' => ["</#{relatedelement.globalid.ifcx}>"]
+        }
+      end
+    end
   end
 end

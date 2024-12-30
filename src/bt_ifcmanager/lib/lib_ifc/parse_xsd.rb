@@ -29,6 +29,7 @@ require 'yaml'
 require 'set'
 
 require_relative File.join('.', 'step')
+require_relative File.join('.', 'ifcx')
 
 module BimTools
   module IfcManager
@@ -57,20 +58,25 @@ module BimTools
         IfcGroup
         IfcIndexedTriangleTextureMap
         IfcLocalPlacement
+        IfcMaterial
         IfcObjectDefinition
         IfcPile
         IfcPresentationLayerAssignment
         IfcProduct
+        IfcProductDefinitionShape
         IfcRoot
         IfcRelAggregates
+        IfcRelAssociatesMaterial
         IfcRelDefinesByProperties
         IfcRelDefinesByType
         IfcRelContainedInSpatialStructure
         IfcRoof
+        IfcShapeRepresentation
         IfcSite
         IfcSpace
         IfcSpatialStructureElement
         IfcStyledItem
+        IfcTriangulatedFaceSet
         IfcTypeProduct
         IfcUnitAssignment
       ]
@@ -254,6 +260,7 @@ module BimTools
 
         ifc_class = Class.new do
           include Step
+          include IfcX
           def initialize(ifc_model, _sketchup = nil, *_args)
             @ifc_model = ifc_model
           end

@@ -23,7 +23,7 @@
 
 module BimTools
   module IfcLocalPlacement_su
-    attr_accessor :transformation, :ifc_total_transformation
+    attr_accessor :transformation, :ifc_total_transformation, :places_object
 
     DEFAULT_TRANSFORMATION = Geom::Transformation.new.to_a.freeze
 
@@ -38,6 +38,28 @@ module BimTools
       @transformation = calculate_transformation
 
       @relativeplacement = determine_relative_placement(ifc_model)
+    end
+
+    def ifcx
+      @transformation ||= Geom::Transformation.new
+
+      transform_matrix = @transformation.to_a
+
+      # Convert the origin coordinates to the correct units
+      origin_indices = [12, 13, 14]
+      origin_indices.each do |index|
+        coord = transform_matrix[index]
+        converted_coord = BimTools::IfcManager::Types::IfcLengthMeasure.new(@ifc_model, coord).convert
+        transform_matrix[index] = converted_coord
+      end
+
+      {
+        'def' => 'over',
+        'name' => @places_object.globalid.ifcx,
+        'attributes' => {
+          'xformOp' => { 'transform' => transform_matrix.each_slice(4).to_a }
+        }
+      }
     end
 
     private

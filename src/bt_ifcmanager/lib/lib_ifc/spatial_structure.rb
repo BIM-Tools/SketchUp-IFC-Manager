@@ -189,6 +189,7 @@ module BimTools
         # Add a new ObjectPlacement without transformation
         default_child.objectplacement = @ifc_module::IfcLocalPlacement.new(@ifc_model)
         default_child.objectplacement.relativeplacement = @ifc_model.default_placement
+        default_child.objectplacement.places_object = default_child
 
         # Link placement to the parent, if applicable
         unless parent.is_a?(@ifc_module::IfcProject)

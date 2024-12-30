@@ -29,5 +29,17 @@ module BimTools
 
       [:RelatingObject]
     end
+
+    def ifcx
+      @relatedobjects.map do |relatedobject|
+        {
+          'def' => 'def',
+          'comment' => "spatial aggregation: #{relatedobject.name.value}, relating object: #{@relatingobject.name.value}",
+
+          'name' => "#{relatedobject.name.ifcx} - #{relatedobject.globalid.ifcx}",
+          'inherits' => ["</#{relatedobject.globalid.ifcx}>"]
+        }
+      end
+    end
   end
 end

@@ -53,5 +53,11 @@ module BimTools
       @ifc_model.summary_add(self.class.name.split('::').last)
       super
     end
+
+    # add export summary for IfcProducts
+    def ifcx
+      @ifc_model.summary_add(self.class.name.split('::').last)
+      super
+    end
   end
 end

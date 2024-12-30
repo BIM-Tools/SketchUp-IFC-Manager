@@ -34,6 +34,10 @@ module BimTools
         def step
           "(#{map { |item| property_to_step(item) }.join(',')})"
         end
+
+        def ifcx
+          map { |item| item.ifcx }
+        end
       end
 
       class Set < ::Set
@@ -45,6 +49,10 @@ module BimTools
 
         def step
           "(#{map { |item| property_to_step(item) }.join(',')})"
+        end
+
+        def ifcx
+          map { |item| item.ifcx }.to_a
         end
       end
 
@@ -59,6 +67,10 @@ module BimTools
           val = ".#{@value.upcase}."
           val = add_long(val) if @long
           val
+        end
+
+        def ifcx
+          @value
         end
       end
     end

@@ -44,6 +44,17 @@ module BimTools
       def add_representation(representation)
         @ifc_product_definition_shape.representations.add(representation)
       end
+
+      # Add a product to the product definition shape
+      # to set inverse relationship ShapeOfProduct
+      def add_product(ifc_entity)
+        @ifc_product_definition_shape.shapeofproduct = [ifc_entity]
+      end
+
+      # (!) this is not in the ifc schema
+      def set_global_id(global_id)
+        @ifc_product_definition_shape.globalid = global_id
+      end
     end
   end
 end
