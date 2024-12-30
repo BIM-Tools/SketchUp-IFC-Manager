@@ -64,11 +64,11 @@ module BimTools
 
       # export model to IFC step file
       status_message = ''
-      # begin
-      ifc_model.export(file_path)
-      # rescue StandardError => e
-      #   status_message = e.message
-      # end
+      begin
+        ifc_model.export(file_path)
+      rescue StandardError => e
+        status_message = e.message
+      end
 
       pb.update(3)
 
