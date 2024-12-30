@@ -26,19 +26,20 @@ module BimTools
     attr_accessor :shapeofproduct, :global_id
 
     def ifcx
-      product = @shapeofproduct[0] if @shapeofproduct.length > 0
+      product = @shapeofproduct[0] if @shapeofproduct && @shapeofproduct.length > 0
       return unless product
 
-      product_definition_shape_id = @global_id.ifcx || 'default-uuid'
-      product_definition_shape_path = "</#{product_definition_shape_id}>"
+      shape_representations = @representations.map do |representation|
+        "</#{representation.global_id.ifcx}>"
+      end
 
-      {
+      [{
         'def' => 'def',
         'type' => 'UsdGeom:Mesh',
         'comment' => "product definition shape: #{product.name.value}",
         'name' => 'Body',
-        'inherits' => [product_definition_shape_path]
-      }
+        'inherits' => shape_representations
+      }]
     end
   end
 end

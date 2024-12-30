@@ -29,13 +29,13 @@ module BimTools
       return nil unless @items.count > 0
       return unless @ofproduct
 
-      product_definition_shape_id = "#{@global_id.ifcx}"
+      shape_representation_id = "#{@global_id.ifcx}"
 
       {
         'def' => 'class',
         'type' => 'UsdGeom:Mesh',
         'comment' => "shape representation: #{@ofproduct.name.value}",
-        'name' => product_definition_shape_id
+        'name' => shape_representation_id
       }
     end
   end

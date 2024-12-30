@@ -541,10 +541,6 @@ module BimTools
       def add_representation(ifc_entity, definition_manager, transformation, su_material, su_layer, geometry_type = nil)
         # geometry_type = 'Brep' if ifc_entity.is_a?(@ifc_module::IfcSpace)
 
-        product_definition_shape_builder = IfcProductDefinitionShapeBuilder.build(@ifc_model) do |builder|
-          builder.add_product(ifc_entity)
-        end
-
         shape_representation = definition_manager.get_shape_representation(
           transformation,
           su_material,
@@ -552,11 +548,14 @@ module BimTools
           geometry_type,
           ifc_entity
         )
-        product_definition_shape_builder.set_global_id(shape_representation.global_id)
         if ifc_entity.representation
           ifc_entity.representation.representations.add(shape_representation)
         else
-          product_definition_shape = product_definition_shape_builder.ifc_product_definition_shape # .product_definition_shape
+          product_definition_shape = IfcProductDefinitionShapeBuilder.build(@ifc_model) do |builder|
+            builder.add_product(ifc_entity)
+            builder.set_global_id(shape_representation.global_id)
+            builder.add_representation(shape_representation)
+          end
           ifc_entity.representation = product_definition_shape
         end
       end

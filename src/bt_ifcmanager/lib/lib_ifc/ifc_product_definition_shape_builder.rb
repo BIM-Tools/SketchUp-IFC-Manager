@@ -31,7 +31,7 @@ module BimTools
       def self.build(ifc_model)
         builder = new(ifc_model)
         yield(builder)
-        builder
+        builder.ifc_product_definition_shape
       end
 
       def initialize(ifc_model)

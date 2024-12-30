@@ -130,7 +130,7 @@ module BimTools
         unformat_guid(SecureRandom.uuid)
       end
 
-      # return the full UUID
+      # return the UUID without dashes
       def ifcx
         @hex_guid
       end
