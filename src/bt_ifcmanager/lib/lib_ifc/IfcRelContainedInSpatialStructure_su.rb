@@ -34,7 +34,7 @@ module BimTools
         {
           'def' => 'def',
           'comment' => 'spatial containment:', # {relatedelement.name.value}, relating object: #{@relatedelement.name.value}",
-          'name' => relatedelement.name.ifcx,
+          'name' => "#{relatedelement.name.ifcx} - #{relatedelement.globalid.ifcx}",
           'inherits' => ["</#{relatedelement.globalid.ifcx}>"]
         }
       end

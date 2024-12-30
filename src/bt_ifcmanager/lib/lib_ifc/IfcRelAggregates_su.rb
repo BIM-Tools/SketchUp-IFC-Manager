@@ -36,7 +36,7 @@ module BimTools
           'def' => 'def',
           'comment' => "spatial aggregation: #{relatedobject.name.value}, relating object: #{@relatingobject.name.value}",
 
-          'name' => relatedobject.name.ifcx,
+          'name' => "#{relatedobject.name.ifcx} - #{relatedobject.globalid.ifcx}",
           'inherits' => ["</#{relatedobject.globalid.ifcx}>"]
         }
       end
