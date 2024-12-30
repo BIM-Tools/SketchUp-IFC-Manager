@@ -37,7 +37,9 @@ module BimTools
 
     def ifcx
       @relatedobjects.flat_map do |relatedobject|
-        @relatingpropertydefinition.hasproperties.map do |property|
+        next unless relatedobject.respond_to?(:hasproperties)
+
+        relatedobject.hasproperties.map do |property|
           {
             'def' => 'over',
             'comment' => "property: #{property.name.value}",
