@@ -23,11 +23,43 @@
 
 module BimTools
   module IfcRelDefinesByProperties_su
+    def initialize(ifc_model)
+      super
+      @ifc_module = ifc_model.ifc_module
+    end
+
     def self.required_attributes(ifc_version)
       # In IFC2X3, the attribute 'RelatedObjects' is part of its parent class 'IfcRelDecomposes'.
       return [] if ifc_version == 'IFC 2x3'
 
       [:RelatedObjects]
+    end
+
+    def ifcx
+      @relatedobjects.flat_map do |relatedobject|
+        @relatingpropertydefinition.hasproperties.map do |property|
+          {
+            'def' => 'over',
+            'comment' => "property: #{property.name.value}",
+            'name' => "#{relatedobject.globalid.ifcx}",
+
+            'attributes' => { 'ifc5:properties' => {
+              "#{property.name.value}" => ifc5_property_value(property)
+            } }
+          }
+        end
+      end
+    end
+
+    def ifc5_property_value(property)
+      case property
+      when @ifc_module::IfcPropertySingleValue
+        property.nominalvalue.value
+      when @ifc_module::IfcPropertyEnumeratedValue
+        property.enumerationvalues[0].value if property.enumerationvalues.length > 0
+      else
+        raise "Unknown property type: #{property.class}"
+      end
     end
   end
 end
