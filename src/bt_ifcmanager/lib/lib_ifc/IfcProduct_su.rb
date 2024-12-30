@@ -108,13 +108,22 @@ module BimTools
     def ifcx
       @ifc_model.summary_add(self.class.name.split('::').last)
 
-      {
+      [{
         'def' => 'class',
         'type' => 'UsdGeom:Xform',
         'comment' => "instance of: #{@name.value}",
         'name' => globalid.ifcx,
         'children' => (Array(@decomposes) + Array(@contains_elements) + Array(@representation)).compact.flatten.map(&:ifcx).flatten
-      }
+      }, {
+        'def' => 'over',
+        'name' => globalid.ifcx,
+        'attributes' => {
+          'ifc5:class' => {
+            'code' => self.class.name.split('::').last,
+            'uri' => "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3/class/#{self.class.name.split('::').last}"
+          }
+        }
+      }]
     end
 
     private
