@@ -39,14 +39,21 @@ module BimTools
         usd_mesh['faceVertexIndices'] += index_list.map { |index| index.value - 1 } # Adjust for 0-based indexing
       end
 
-      {
-        'def' => 'over',
-        'comment' => 'triangulated face set',
-        'name' => @globalid.ifcx,
-        'attributes' => {
-          'UsdGeom:Mesh' => usd_mesh
+      [
+        {
+          'def' => 'class',
+          'type' => 'UsdGeom:Mesh',
+          'comment' => 'triangulated face set class',
+          'name' => @globalid.ifcx
+        }, {
+          'def' => 'over',
+          'comment' => 'triangulated face set',
+          'name' => @globalid.ifcx,
+          'attributes' => {
+            'UsdGeom:Mesh' => usd_mesh
+          }
         }
-      }
+      ]
     end
   end
 end

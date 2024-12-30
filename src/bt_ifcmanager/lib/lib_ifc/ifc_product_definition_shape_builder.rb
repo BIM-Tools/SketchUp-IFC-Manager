@@ -52,8 +52,8 @@ module BimTools
       end
 
       # (!) this is not in the ifc schema
-      def set_global_id(globalid)
-        @ifc_product_definition_shape.global_id = globalid
+      def set_global_id(global_id)
+        @ifc_product_definition_shape.globalid = global_id
       end
     end
   end

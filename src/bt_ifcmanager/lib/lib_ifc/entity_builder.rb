@@ -553,7 +553,7 @@ module BimTools
         else
           product_definition_shape = IfcProductDefinitionShapeBuilder.build(@ifc_model) do |builder|
             builder.add_product(ifc_entity)
-            builder.set_global_id(shape_representation.global_id)
+            builder.set_global_id(shape_representation.globalid)
             builder.add_representation(shape_representation)
           end
           ifc_entity.representation = product_definition_shape

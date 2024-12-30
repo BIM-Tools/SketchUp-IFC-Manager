@@ -23,20 +23,6 @@
 
 module BimTools
   module IfcShapeRepresentation_su
-    attr_accessor :ofproductrepresentation, :ofproduct, :global_id
-
-    def ifcx
-      return nil unless @items.count > 0
-      return unless @ofproduct
-
-      shape_representation_id = "#{@global_id.ifcx}"
-
-      {
-        'def' => 'class',
-        'type' => 'UsdGeom:Mesh',
-        'comment' => "shape representation: #{@ofproduct.name.value}",
-        'name' => shape_representation_id
-      }
-    end
+    attr_accessor :ofproductrepresentation, :ofproduct, :globalid
   end
 end

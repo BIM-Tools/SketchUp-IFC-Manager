@@ -23,23 +23,29 @@
 
 module BimTools
   module IfcProductDefinitionShape_su
-    attr_accessor :shapeofproduct, :global_id
+    attr_accessor :shapeofproduct, :globalid
+
+    def initialize(ifc_model)
+      super
+      @ifc_module = ifc_model.ifc_module
+    end
 
     def ifcx
       product = @shapeofproduct[0] if @shapeofproduct && @shapeofproduct.length > 0
       return unless product
 
-      shape_representations = @representations.map do |representation|
-        "</#{representation.global_id.ifcx}>"
+      @representations.flat_map do |representation|
+        representation.items.select { |item| item.is_a?(@ifc_module::IfcTriangulatedFaceSet) }.map do |item|
+          global_id = item.globalid.ifcx
+          {
+            'def' => 'def',
+            'type' => 'UsdGeom:Mesh',
+            'comment' => "product definition shape: #{product.name.value}",
+            'name' => "#{global_id}_Body",
+            'inherits' => ["</#{global_id}>"]
+          }
+        end
       end
-
-      [{
-        'def' => 'def',
-        'type' => 'UsdGeom:Mesh',
-        'comment' => "product definition shape: #{product.name.value}",
-        'name' => 'Body',
-        'inherits' => shape_representations
-      }]
     end
   end
 end
