@@ -26,7 +26,6 @@ require_relative 'IfcGloballyUniqueId'
 require_relative 'spatial_structure'
 require_relative 'ifc_project_builder'
 require_relative '../transformation_helper'
-require_relative '../transformation_helper'
 
 module BimTools
   module IfcManager
@@ -94,6 +93,99 @@ module BimTools
         instance_path.to_a.map { |p| p.persistent_id.to_s }.join('.')
       end
 
+      def get_entity_and_type(entity_type_name)
+        if entity_type_name.nil?
+          [nil, nil]
+        elsif entity_type_name == 'IfcWallStandardCase'
+          [@ifc_module::IfcWall, @ifc_module::IfcWallType]
+        elsif @ifc_module.const_defined?(entity_type_name)
+          determine_entity_and_type(entity_type_name)
+        else # catch special cases with missing entities in IFC 2x3
+          case entity_type_name
+          when 'IfcFlowTerminal'
+            [@ifc_module::IfcFlowTerminal, @ifc_module::IfcDistributionElementType]
+          when 'IfcAirTerminalType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcAirTerminal,
+             @ifc_module::IfcAirTerminalType]
+          when 'IfcPipeSegmentType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcPipeSegment,
+             @ifc_module::IfcPipeSegmentType]
+          when 'IfcDuctSegmentType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcDuctSegment,
+             @ifc_module::IfcDuctSegmentType]
+          when 'IfcCableCarrierSegmentType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcCableCarrierSegment,
+             @ifc_module::IfcCableCarrierSegmentType]
+          when 'IfcCableSegmentType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcCableSegment,
+             @ifc_module::IfcCableSegmentType]
+          when 'IfcAudioVisualApplianceType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcAudioVisualAppliance,
+             @ifc_module::IfcAudioVisualApplianceType]
+          when 'IfcCommunicationsApplianceType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcCommunicationsAppliance,
+             @ifc_module::IfcCommunicationsApplianceType]
+          when 'IfcElectricApplianceType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcElectricAppliance,
+             @ifc_module::IfcElectricApplianceType]
+          when 'IfcFireSuppressionTerminalType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcFireSuppressionTerminal,
+             @ifc_module::IfcFireSuppressionTerminalType]
+          when 'IfcLampType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcLamp,
+             @ifc_module::IfcLampType]
+          when 'IfcLightFixtureType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcLightFixture,
+             @ifc_module::IfcLightFixtureType]
+          when 'IfcMedicalDeviceType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcMedicalDevice,
+             @ifc_module::IfcMedicalDeviceType]
+          when 'IfcOutletType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcOutlet,
+             @ifc_module::IfcOutletType]
+          when 'IfcSanitaryTerminalType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcSanitaryTerminal,
+             @ifc_module::IfcSanitaryTerminalType]
+          when 'IfcSpaceHeaterType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcSpaceHeater,
+             @ifc_module::IfcSpaceHeaterType]
+          when 'IfcStackTerminalType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcStackTerminal,
+             @ifc_module::IfcStackTerminalType]
+          when 'IfcWasteTerminalType'
+            [@ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcWasteTerminal,
+             @ifc_module::IfcWasteTerminalType]
+          else
+            determine_entity_and_type(entity_type_name)
+          end
+        end
+      end
+
+      def determine_entity_and_type(entity_type_name)
+        entity_class = nil
+        type_product_class = nil
+        if @ifc_module.const_defined?(entity_type_name)
+          ifc_class = @ifc_module.const_get(entity_type_name)
+          if ifc_class < @ifc_module::IfcTypeProduct
+            ifc_product_name = entity_type_name.chomp('Type')
+            entity_class = @ifc_module.const_defined?(ifc_product_name) ? @ifc_module.const_get(ifc_product_name) : nil
+            type_product_class = entity_class ? ifc_class : nil
+          elsif ifc_class < @ifc_module::IfcProduct
+            entity_class = ifc_class
+            ifc_type_product_name = "#{entity_type_name}Type"
+            type_product_class = @ifc_module.const_defined?(ifc_type_product_name) ? @ifc_module.const_get(ifc_type_product_name) : nil
+          else
+            entity_class = ifc_class
+            type_product_class = nil
+          end
+        elsif entity_type_name.end_with?('Type')
+          ifc_product_name = entity_type_name.chomp('Type')
+          entity_class = @ifc_module.const_get(ifc_product_name) if @ifc_module.const_defined?(ifc_product_name)
+          type_product_class = nil
+        end
+        [entity_class, type_product_class]
+      end
+
       # Creates an IFC entity from a SketchUp instance based on the IFC classification in sketchup
       # and adds it to the IFC model.
       #
@@ -106,91 +198,8 @@ module BimTools
       def create_ifc_entity(entity_type_name, su_instance, placement_parent = nil, su_material = nil, su_layer = nil)
         su_definition = su_instance.definition
 
-        case entity_type_name
-        when nil
-          entity_class = nil
-          type_product_class = nil
-        # Replace IfcWallStandardCase by IfcWall, due to geometry issues and deprecation in IFC 4
-        when 'IfcWallStandardCase'
-          entity_class = @ifc_module::IfcWall
-          type_product_class = @ifc_module::IfcWallType
-        when 'IfcFlowTerminal'
-          entity_class = @ifc_module::IfcFlowTerminal
-          type_product_class = @ifc_module::IfcDistributionElementType
-        when 'IfcAirTerminalType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcAirTerminal
-          type_product_class = @ifc_module::IfcAirTerminalType
-        when 'IfcAudioVisualApplianceType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcAudioVisualAppliance
-          type_product_class = @ifc_module::IfcAudioVisualApplianceType
-        when 'IfcCommunicationsApplianceType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcCommunicationsAppliance
-          type_product_class = @ifc_module::IfcCommunicationsApplianceType
-        when 'IfcElectricApplianceType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcElectricAppliance
-          type_product_class = @ifc_module::IfcElectricApplianceType
-        when 'IfcFireSuppressionTerminalType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcFireSuppressionTerminal
-          type_product_class = @ifc_module::IfcFireSuppressionTerminalType
-        when 'IfcLampType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcLamp
-          type_product_class = @ifc_module::IfcLampType
-        when 'IfcLightFixtureType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcLightFixture
-          type_product_class = @ifc_module::IfcLightFixtureType
-        when 'IfcMedicalDeviceType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcMedicalDevice
-          type_product_class = @ifc_module::IfcMedicalDeviceType
-        when 'IfcOutletType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcOutlet
-          type_product_class = @ifc_module::IfcOutletType
-        when 'IfcSanitaryTerminalType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcSanitaryTerminal
-          type_product_class = @ifc_module::IfcSanitaryTerminalType
-        when 'IfcSpaceHeaterType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcSpaceHeater
-          type_product_class = @ifc_module::IfcSpaceHeaterType
-        when 'IfcStackTerminalType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcStackTerminal
-          type_product_class = @ifc_module::IfcStackTerminalType
-        when 'IfcWasteTerminalType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowTerminal : @ifc_module::IfcWasteTerminal
-          type_product_class = @ifc_module::IfcWasteTerminalType
-        when 'IfcPipeSegmentType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcPipeSegment
-          type_product_class = @ifc_module::IfcPipeSegmentType
-        when 'IfcDuctSegmentType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcDuctSegment
-          type_product_class = @ifc_module::IfcDuctSegmentType
-        when 'IfcCableCarrierSegmentType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcCableCarrierSegment
-          type_product_class = @ifc_module::IfcCableCarrierSegmentType
-        when 'IfcCableSegmentType'
-          entity_class = @ifc_version == 'IFC 2x3' ? @ifc_module::IfcFlowSegment : @ifc_module::IfcCableSegment
-          type_product_class = @ifc_module::IfcCableSegmentType
-        else
-          if @ifc_module.const_defined?(entity_type_name)
-            ifc_class = @ifc_module.const_get(entity_type_name)
-            if ifc_class < @ifc_module::IfcTypeProduct
-              ifc_product_name = entity_type_name.chomp('Type')
-              entity_class = @ifc_module.const_defined?(ifc_product_name) ? @ifc_module.const_get(ifc_product_name) : nil
-              type_product_class = entity_class ? ifc_class : nil
-            elsif ifc_class < @ifc_module::IfcProduct
-              entity_class = ifc_class
-              ifc_type_product_name = "#{entity_type_name}Type"
-              if @ifc_module.const_defined?(ifc_type_product_name)
-                type_product_class = @ifc_module.const_get(ifc_type_product_name)
-              end
-            else
-              entity_class = ifc_class
-              type_product_class = nil
-            end
-          elsif entity_type_name.end_with?('Type')
-            ifc_product_name = entity_type_name.chomp('Type')
-            entity_class = @ifc_module.const_get(ifc_product_name) if @ifc_module.const_defined?(ifc_product_name)
-            type_product_class = nil
-          end
-        end
+        entity_class, type_product_class = get_entity_and_type(entity_type_name)
+
         ifc_type_product = get_type_product(type_product_class, entity_class, su_definition)
         ifc_entity = determine_ifc_entity(entity_class, su_instance, placement_parent)
         ifc_type_product.add_typed_object(ifc_entity) if ifc_type_product && ifc_entity
