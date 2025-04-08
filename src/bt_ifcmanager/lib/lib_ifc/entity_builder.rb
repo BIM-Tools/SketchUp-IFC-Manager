@@ -592,7 +592,7 @@ module BimTools
               su_material
             )
             if parent_representation.representations.first
-              parent_representation.representations.first.items += definition_representation.meshes
+              parent_representation.representations.first.items += definition_representation.representations
             end
           else
             add_representation(
