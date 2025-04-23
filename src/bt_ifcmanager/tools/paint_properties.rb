@@ -53,10 +53,10 @@ module BimTools
         UI.set_cursor(@cursor_id)
 
         # if a source object is already selected, use that and skip step 1
-        if @model.selection.length == 1 && @source = @model.selection[0]
-          @state = 1
-          Sketchup.set_status_text 'Select target object', SB_PROMPT
-        end
+        return unless @model.selection.length == 1 && @source = @model.selection[0]
+
+        @state = 1
+        Sketchup.set_status_text 'Select target object', SB_PROMPT
       end
 
       # deactivate is called when the tool is deactivated because
@@ -86,15 +86,15 @@ module BimTools
             clone_properties(@source, target)
           end
         end
-        if target.respond_to?(:definition)
-          @model.selection.clear
-          @model.selection.add target
+        return unless target.respond_to?(:definition)
 
-          # refresh edit window
-          if IfcManager::PropertiesWindow.window && IfcManager::PropertiesWindow.window.visible?
-            IfcManager::PropertiesWindow.set_html
-          end
-        end
+        @model.selection.clear
+        @model.selection.add target
+
+        # refresh edit window
+        return unless IfcManager::PropertiesWindow.window && IfcManager::PropertiesWindow.window.visible?
+
+        IfcManager::PropertiesWindow.set_html
       end
 
       # copy all properties from source to target
@@ -122,9 +122,14 @@ module BimTools
 
         # clear existing target definition attributes
         target_dicts = target.definition.attribute_dictionaries
-        unless target_dicts.nil?
-          target.definition.attribute_dictionaries.each do |dict|
-            target_dicts.delete dict unless dict.name == 'GSU_ContributorsInfo' || dict.name == 'dynamic_attributes'
+        return if target_dicts.nil?
+
+        target.definition.attribute_dictionaries.each do |dict|
+          begin
+            target_dicts.delete dict
+          rescue StandardError
+            # Ignore this error
+            # Deleting internal 'GSU_ContributorsInfo', 'dynamic_attributes' and 'SU_DefinitionSet' fails with ArgumentError
           end
         end
 
@@ -158,22 +163,22 @@ module BimTools
 
       # recursively copy all attribute dictionaries from source to target entity
       def clone_attributes(source, target)
-        unless source.attribute_dictionaries.nil? # stop if there are no child dictionaries
-          source.attribute_dictionaries.each do |source_dict|
-            if source_dict.name == 'GSU_ContributorsInfo' || source_dict.name == 'dynamic_attributes'
-              next
-            end # Not allowed to create Contributors attribute. & Don't mess up dynamic components --> skip
+        return if source.attribute_dictionaries.nil? # stop if there are no child dictionaries
 
-            source_dict.each do |key, value|
-              target.set_attribute source_dict.name, key, value # create the same dictionary in target
-            end
+        source.attribute_dictionaries.each do |source_dict|
+          if source_dict.name == 'GSU_ContributorsInfo' || source_dict.name == 'dynamic_attributes'
+            next
+          end # Not allowed to create Contributors attribute. & Don't mess up dynamic components --> skip
 
-            target_dict = target.attribute_dictionary(source_dict.name, true)
-            if target_dict
-              clone_attributes(source_dict, target_dict) # recursively check all possible child dictionaries
-            else
-              puts "Unable to copy: #{source_dict.name}"
-            end
+          source_dict.each do |key, value|
+            target.set_attribute source_dict.name, key, value # create the same dictionary in target
+          end
+
+          target_dict = target.attribute_dictionary(source_dict.name, true)
+          if target_dict
+            clone_attributes(source_dict, target_dict) # recursively check all possible child dictionaries
+          else
+            puts "Unable to copy: #{source_dict.name}"
           end
         end
       end
