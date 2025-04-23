@@ -245,7 +245,6 @@ module BimTools
         mixin_file = Pathname.new("#{PLUGIN_ROOT_PATH}/bt_ifcmanager/lib/lib_ifc/#{ifc_name}_su.rb")
         if mixin_file.exist?
           require_relative(mixin_file)
-          puts "loaded #{ifc_name}_su"
           return BimTools.const_get(ifc_name + '_su')
         end
         nil
