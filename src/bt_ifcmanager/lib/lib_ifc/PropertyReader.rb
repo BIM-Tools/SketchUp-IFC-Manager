@@ -119,6 +119,12 @@ module BimTools
         @propertyset_names.select { |name| @ifc_dict[name] }.map do |name|
           add_propertyset(@ifc_dict[name])
         end
+
+        # Add attributes from the "PropertySets" dictionary
+        if property_sets_dict = @ifc_dict['PropertySets']
+          property_sets_dict.attribute_dictionaries.each { |dictionary| add_propertyset(dictionary) }
+        end
+
         nil
       end
 
