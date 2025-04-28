@@ -440,12 +440,7 @@ module BimTools
       @attribute_type = :enumeration if ifc_type_name.start_with?('PEnum_')
       @options = value_dict['options']
 
-      # Check for IFC type
-      if ifc_type_name[0].upcase == ifc_type_name[0] && IfcManager::Types.const_defined?(ifc_type_name.to_s.sub('-',
-                                                                                                                '_'))
-        @ifc_type_name = ifc_type_name
-        @ifc_type = IfcManager::Types.const_get(ifc_type_name)
-      end
+      set_ifc_type(ifc_type_name)
 
       # Sometimes the value is even nested a level deeper
       #   like: path = ["IFC 2x3", "IfcWindow", "OverallWidth", "IfcPositiveLengthMeasure", "IfcLengthMeasure"]
@@ -462,6 +457,17 @@ module BimTools
       subtype_dict = subtype_dicts[ifc_subtype_name]
       @value = subtype_dict['value']
       @options = subtype_dict['options']
+    end
+
+    private
+
+    def set_ifc_type(ifc_type_name)
+      return unless IfcManager::Types.const_defined?(ifc_type_name)
+
+      @ifc_type_name = ifc_type_name
+      @ifc_type = IfcManager::Types.const_get(ifc_type_name)
+    rescue NameError
+      # Skip invalid constant names
     end
   end
 end
