@@ -29,7 +29,7 @@ module BimTools
       # https://technical.buildingsmart.org/wp-content/uploads/2018/05/IFC2x-Model-Implementation-Guide-V2-0b.pdf
       # page 19 and 20
       def self.replace_char(in_string)
-        out_string = +''
+        out_string = +'' # frozen string workaround
         a_char_numbers = in_string.unpack('U*')
         i = 0
         while i < a_char_numbers.length
@@ -99,10 +99,6 @@ module BimTools
         def step
           to_step_string(@value)
         end
-
-        def ifcx
-          @value
-        end
       end
 
       # TYPE IfcAbsorbedDoseMeasure = REAL;
@@ -128,21 +124,15 @@ module BimTools
       class IfcAreaMeasure < BaseType
         def initialize(ifc_model, value, long = false)
           super
-          begin
-            @value = value.to_f
-          rescue StandardError, TypeError => e
-            print value << 'cannot be converted to an area: ' << e
-          end
+          @value = value.to_f
+        rescue StandardError, TypeError => e
+          print value << 'cannot be converted to an area: ' << e
         end
 
         def step
           val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
           val = add_long(val) if @long
           val
-        end
-
-        def ifcx
-          @value
         end
       end
 
@@ -191,10 +181,6 @@ module BimTools
           value
         end
 
-        def ifcx
-          @value
-        end
-
         def true?(obj)
           obj.to_s == 'true'
         end
@@ -237,10 +223,6 @@ module BimTools
           "(#{val})"
         end
 
-        def ifcx
-          @values
-        end
-
         private
 
         def validate!
@@ -268,21 +250,15 @@ module BimTools
       class IfcCountMeasure < BaseType
         def initialize(ifc_model, value, long = false)
           super
-          begin
-            @value = value.to_f
-          rescue StandardError, TypeError => e
-            print value << 'cannot be converted to a number: ' << e
-          end
+          @value = value.to_f
+        rescue StandardError, TypeError => e
+          print value << 'cannot be converted to a number: ' << e
         end
 
         def step
           val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
           val = add_long(val) if @long
           val
-        end
-
-        def ifcx
-          @value
         end
       end
 
@@ -411,17 +387,15 @@ module BimTools
       class IfcIdentifier < BaseType
         def initialize(ifc_model, value, long = false)
           super
-          begin
-            @value = @value.to_s
+          @value = @value.to_s
 
-            # IfcIdentifier may not be longer than 255 characters
-            if @value.length > 255
-              IfcManager.add_export_message('IfcIdentifier truncated to maximum of 255 characters')
-              @value = @value[0..254]
-            end
-          rescue StandardError, TypeError => e
-            print "Value cannot be converted to a String #{e}"
+          # IfcIdentifier may not be longer than 255 characters
+          if @value.length > 255
+            IfcManager.add_export_message('IfcIdentifier truncated to maximum of 255 characters')
+            @value = @value[0..254]
           end
+        rescue StandardError, TypeError => e
+          print "Value cannot be converted to a String #{e}"
         end
 
         # generate step object output string
@@ -431,10 +405,6 @@ module BimTools
           val = "'#{str_replace}'"
           val = add_long(val) if @long
           val
-        end
-
-        def ifcx
-          @value
         end
       end
 
@@ -453,21 +423,15 @@ module BimTools
       class IfcInteger < BaseType
         def initialize(ifc_model, value, long = false)
           super
-          begin
-            @value = value.to_i
-          rescue StandardError, TypeError => e
-            print value << 'cannot be converted to a Integer' << e
-          end
+          @value = value.to_i
+        rescue StandardError, TypeError => e
+          print value << 'cannot be converted to a Integer' << e
         end
 
         def step
           val = @value.to_s
           val = add_long(val) if @long
           val
-        end
-
-        def ifcx
-          @value
         end
       end
 
@@ -492,17 +456,15 @@ module BimTools
       class IfcLabel < BaseType
         def initialize(ifc_model, value, long = false)
           super
-          begin
-            @value = @value.to_s
+          @value = @value.to_s
 
-            # IfcLabel may not be longer than 255 characters
-            if @value.length > 255
-              IfcManager.add_export_message('IfcLabel truncated to maximum of 255 characters')
-              @value = @value[0..254]
-            end
-          rescue StandardError, TypeError => e
-            print "Value cannot be converted to a String #{e}"
+          # IfcLabel may not be longer than 255 characters
+          if @value.length > 255
+            IfcManager.add_export_message('IfcLabel truncated to maximum of 255 characters')
+            @value = @value[0..254]
           end
+        rescue StandardError, TypeError => e
+          print "Value cannot be converted to a String #{e}"
         end
 
         # generate step object output string
@@ -512,10 +474,6 @@ module BimTools
           val = "'#{str_replace}'"
           val = add_long(val) if @long
           val
-        end
-
-        def ifcx
-          @value
         end
       end
 
@@ -639,10 +597,6 @@ module BimTools
           val = add_long(val) if @long
           val
         end
-
-        def ifcx
-          @value
-        end
       end
 
       # TYPE IfcLuminousFluxMeasure = REAL;
@@ -678,10 +632,6 @@ module BimTools
           val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
           val = add_long(val) if @long
           val
-        end
-
-        def ifcx
-          @value
         end
       end
 
@@ -779,10 +729,6 @@ module BimTools
             to_step_string(@value)
           end
         end
-
-        def ifcx
-          @value
-        end
       end
 
       # TYPE IfcPositivePlaneAngleMeasure = IfcPlaneAngleMeasure;
@@ -823,10 +769,6 @@ module BimTools
           val = add_long(val) if @long
           val
         end
-
-        def ifcx
-          @value
-        end
       end
 
       # TYPE IfcNormalisedRatioMeasure = IfcRatioMeasure;
@@ -839,10 +781,6 @@ module BimTools
           return unless @value < 0 || @value > 1
 
           raise 'Error creating IfcNormalisedRatioMeasure: Normalized ratio shall be a non-negative value less than or equal to 1.0'
-        end
-
-        def ifcx
-          @value
         end
       end
 
@@ -906,11 +844,9 @@ module BimTools
       class IfcText < BaseType
         def initialize(ifc_model, value, long = false)
           super
-          begin
-            @value = value.to_s
-          rescue StandardError, TypeError => e
-            puts "Value cannot be converted to a String: #{e}"
-          end
+          @value = value.to_s
+        rescue StandardError, TypeError => e
+          puts "Value cannot be converted to a String: #{e}"
         end
 
         def step
@@ -918,10 +854,6 @@ module BimTools
           val = "'#{str_replace}'"
           val = add_long(val) if @long
           val
-        end
-
-        def ifcx
-          @value
         end
       end
 
@@ -983,11 +915,9 @@ module BimTools
       class IfcURIReference < BaseType
         def initialize(ifc_model, value, long = false)
           super
-          begin
-            @value = value.to_s
-          rescue StandardError, TypeError => e
-            puts "Value cannot be converted to a String: #{e}"
-          end
+          @value = value.to_s
+        rescue StandardError, TypeError => e
+          puts "Value cannot be converted to a String: #{e}"
         end
 
         def step
@@ -995,10 +925,6 @@ module BimTools
           val = "'#{str_replace}'"
           val = add_long(val) if @long
           val
-        end
-
-        def ifcx
-          @value
         end
       end
 
@@ -1010,21 +936,15 @@ module BimTools
       class IfcVolumeMeasure < IfcReal
         def initialize(ifc_model, value, long = false)
           super
-          begin
-            @value = value.to_f
-          rescue StandardError, TypeError => e
-            puts value << 'cannot be converted to a volume: ' << e
-          end
+          @value = value.to_f
+        rescue StandardError, TypeError => e
+          puts value << 'cannot be converted to a volume: ' << e
         end
 
         def step
           val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
           val = add_long(val) if @long
           val
-        end
-
-        def ifcx
-          @value
         end
       end
 

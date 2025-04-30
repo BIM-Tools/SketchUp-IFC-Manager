@@ -268,7 +268,14 @@ module BimTools
               end
             else
 
-              ifc_value = ifc_type.new(@ifc_model, value, true) if ifc_type
+              if ifc_type
+                # Check if ifc_type is a subclass of IfcLengthMeasure
+                ifc_value = if ifc_type <= BimTools::IfcManager::Types::IfcLengthMeasure
+                              ifc_type.new(@ifc_model, value, true, false)
+                            else
+                              ifc_type.new(@ifc_model, value, true)
+                            end
+              end
 
               # Check if IFC type is set, otherwise use basic types
               if !ifc_value || !ifc_value.is_a?(IfcManager::Types::BaseType)
