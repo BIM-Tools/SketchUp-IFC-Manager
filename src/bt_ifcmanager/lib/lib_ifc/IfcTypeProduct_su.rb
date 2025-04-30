@@ -56,7 +56,7 @@ module BimTools
 
       # get attributes from su object and add them to IfcTypeProduct
       if (dicts = definition.attribute_dictionaries)
-        dict_reader = IfcManager::IfcDictionaryReader.new(ifc_model, self, dicts, instance_class)
+        dict_reader = IfcManager::EntityDictionaryReader.new(ifc_model, self, dicts, instance_class)
         dict_reader.set_attributes
         if @type_properties
           propertysets = dict_reader.get_propertysets

@@ -30,7 +30,7 @@ module BimTools
 
     # ShapeType attribute renamed to PredefinedType in IFC4
     def predefinedtype=(value)
-      # TODO: hacky fix, should be part of PropertyReader
+      # TODO: hacky fix, should be part of entity_dictionary_reader
       enum_value = if value.is_a?(String)
                      value.upcase.to_sym
                    elsif value.respond_to?(:value)
@@ -48,7 +48,7 @@ module BimTools
 
     # ShapeType attribute renamed to PredefinedType in IFC4
     def shapetype=(value)
-      # TODO: hacky fix, should be part of PropertyReader
+      # TODO: hacky fix, should be part of entity_dictionary_reader
       enum_value = if value.is_a?(String)
                      value.upcase.to_sym
                    elsif value.respond_to?(:value)

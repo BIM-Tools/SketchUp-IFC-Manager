@@ -122,13 +122,11 @@ module BimTools
       return unless value_type
 
       attribute_type = determine_attribute_type(value_type)
-      property_dict = pset_dict.attribute_dictionary(property_name, true)
+      pset_dict.attribute_dictionary(property_name, true)
       pset_dict.set_attribute(property_name, 'is_hidden', false)
-
-      value_dict = property_dict.attribute_dictionary(value_type, true)
-      property_dict.set_attribute(value_type, 'attribute_type', attribute_type)
-      property_dict.set_attribute(value_type, 'is_hidden', false)
-      property_dict.set_attribute(value_type, 'value', nil)
+      pset_dict.set_attribute(property_name, 'ifc_type', value_type)
+      pset_dict.set_attribute(property_name, 'attribute_type', attribute_type)
+      pset_dict.set_attribute(property_name, 'value', nil)
     end
 
     # Handles TypePropertyEnumeratedValue properties
@@ -143,14 +141,11 @@ module BimTools
       end
       return unless value_type && !options.empty?
 
-      property_dict = pset_dict.attribute_dictionary(property_name, true)
+      pset_dict.attribute_dictionary(property_name, true)
       pset_dict.set_attribute(property_name, 'is_hidden', false)
-
-      value_dict = property_dict.attribute_dictionary(value_type, true)
-      property_dict.set_attribute(value_type, 'attribute_type', 'enumeration')
-      property_dict.set_attribute(value_type, 'is_hidden', false)
-      property_dict.set_attribute(value_type, 'options', options)
-      property_dict.set_attribute(value_type, 'value', options.last)
+      pset_dict.set_attribute(property_name, 'attribute_type', 'enumeration')
+      pset_dict.set_attribute(property_name, 'options', options)
+      pset_dict.set_attribute(property_name, 'value', options.last)
     end
 
     # Determines the attribute type based on the value type

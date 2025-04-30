@@ -22,7 +22,7 @@
 #
 
 require_relative 'ifc_types'
-require_relative 'PropertyReader'
+require_relative 'entity_dictionary_reader'
 
 module BimTools
   module IfcManager
@@ -115,7 +115,7 @@ module BimTools
         su_definition = su_instance.definition
         return unless dicts = su_definition.attribute_dictionaries
 
-        dict_reader = BimTools::IfcManager::IfcDictionaryReader.new(@ifc_model, @ifc_entity, dicts)
+        dict_reader = BimTools::IfcManager::EntityDictionaryReader.new(@ifc_model, @ifc_entity, dicts)
         dict_reader.set_attributes
         dict_reader.add_propertysets
         dict_reader.add_sketchup_definition_properties(@ifc_model, @ifc_entity, su_definition)

@@ -22,7 +22,7 @@
 #
 
 require_relative 'ifc_types'
-require_relative 'PropertyReader'
+require_relative 'entity_dictionary_reader'
 
 module BimTools
   module CommonObjectAttributes
@@ -34,7 +34,7 @@ module BimTools
 
       return unless dictionaries
 
-      dict_reader = IfcManager::IfcDictionaryReader.new(ifc_model, self, dictionaries)
+      dict_reader = IfcManager::EntityDictionaryReader.new(ifc_model, self, dictionaries)
       dict_reader.set_attributes
 
       unless ifc_model.options[:type_properties]

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  PropertyReader.rb
+#  entity_dictionary_reader.rb
 #
 #  Copyright 2017 Jan Brouwer <jan@brewsky.nl>
 #
@@ -24,6 +24,7 @@
 require_relative 'ifc_types'
 require_relative 'ifc_property_builder'
 require_relative 'ifc_rel_defines_by_properties_builder'
+require_relative 'property_dictionary_reader'
 
 module BimTools
   module IfcManager
@@ -32,7 +33,7 @@ module BimTools
     #
     # @param [IfcEntity] ifc_entity
     # @param [Sketchup::AttributeDictionary] attr_dict
-    class IfcDictionaryReader
+    class EntityDictionaryReader
       INSTANCE_SET_NAME = 'SU_InstanceSet'
       DEFINITION_SET_NAME = 'SU_DefinitionSet'
 
@@ -107,8 +108,10 @@ module BimTools
       #
       # @return [Array<Propertyset>]
       def get_propertysets
-        @propertyset_names.select { |name| @ifc_dict[name] }.map do |name|
-          get_propertyset(@ifc_dict[name])
+        # SketchUp 2025 introduced the specific PropertySets Attribute Dictionary
+        propertysets_dict = @ifc_dict['PropertySets'] || @ifc_dict
+        propertysets_dict.keys.select { |name| propertysets_dict[name] }.map do |name|
+          get_propertyset(propertysets_dict[name])
         end
       end
 
@@ -116,6 +119,8 @@ module BimTools
       #
       # @return [nil]
       def add_propertysets
+        return unless @ifc_dict
+
         @propertyset_names.select { |name| @ifc_dict[name] }.map do |name|
           add_propertyset(@ifc_dict[name])
         end
@@ -206,7 +211,7 @@ module BimTools
       end
 
       def create_property(attr_dict, name)
-        @instance_class ? Property.new(attr_dict, name) : Property.new(attr_dict)
+        @instance_class ? PropertyDictionaryReader.new(attr_dict, name) : PropertyDictionaryReader.new(attr_dict)
       end
 
       def determine_ifc_value(property, value)
@@ -233,7 +238,7 @@ module BimTools
           # get the first dictionary (there should be only one left)
           names.each do |pset_dict_name|
             pset_dict = pset_dicts[pset_dict_name]
-            property = Property.new(pset_dict)
+            property = PropertyDictionaryReader.new(pset_dict)
             value = property.value
             ifc_type = property.ifc_type
 
@@ -385,89 +390,6 @@ module BimTools
           :length
         end
       end
-    end
-  end
-
-  # Collects the needed attributes for an IfcProperty from
-  #  a nested Sketchup AttributeDictionary structure
-  #
-  # @param [Sketchup::AttributeDictionary] attr_dict
-  #
-  class Property
-    attr_reader :name, :value, :ifc_type, :ifc_type_name, :attribute_type, :options
-
-    UNUSED_DICTS = %i[
-      href
-      ref
-      proxy
-      edo
-      instanceAttributes
-    ].freeze
-
-    def initialize(attr_dict, name = nil)
-      @name = name || attr_dict.name
-
-      # When value is set the data is stored on this level
-      @value = attr_dict['value']
-      @attribute_type = attr_dict['attribute_type'].to_sym if attr_dict['attribute_type']
-
-      # We can't be sure that the unspecified false value is meant as a boolean or
-      #  is just imported as an empty value from an IFC file
-      #  skip to prevent wrong assumptions
-      if !@attribute_type && (@value == false)
-        @value = nil
-        return false
-      end
-
-      # enumerations have options lists
-      @options = attr_dict['options']
-
-      # When no value in first level than look in the second level of attribute dictionaries
-      #   these next level attribute dictionaries normally have an IFC type as name
-      #   like: path = ["IFC 2x3", "IfcWindow", "Name", "IfcLabel"]
-      return unless !value && attr_dict.attribute_dictionaries
-
-      value_dicts = attr_dict.attribute_dictionaries
-      names = value_dicts.map { |x| x.name.to_sym }
-      names -= UNUSED_DICTS # filter out unwanted dictionaries
-
-      # there should be only one dictionary left
-      return unless ifc_type_name = names.first
-
-      value_dict = attr_dict.attribute_dictionaries[ifc_type_name.to_s]
-      @value = value_dict['value']
-      @attribute_type = value_dict['attribute_type'].to_sym if attr_dict['attribute_type']
-      @attribute_type = :enumeration if ifc_type_name.start_with?('PEnum_')
-      @options = value_dict['options']
-
-      set_ifc_type(ifc_type_name)
-
-      # Sometimes the value is even nested a level deeper
-      #   like: path = ["IFC 2x3", "IfcWindow", "OverallWidth", "IfcPositiveLengthMeasure", "IfcLengthMeasure"]
-      #   @todo: This deepest level does not contain the ifc_type we need!
-      return unless !@value && value_dict.attribute_dictionaries
-
-      subtype_dicts = value_dict.attribute_dictionaries
-      names = subtype_dicts.map { |x| x.name }
-      names -= UNUSED_DICTS # filter out unwanted dictionaries
-
-      # there should be only one dictionary left
-      return unless ifc_subtype_name = names.first
-
-      subtype_dict = subtype_dicts[ifc_subtype_name]
-      @value = subtype_dict['value']
-      @options = subtype_dict['options']
-    end
-
-    private
-
-    def set_ifc_type(ifc_type_name)
-      return unless IfcManager::Types.const_defined?(ifc_type_name)
-
-      @ifc_type_name = ifc_type_name
-      @ifc_type = IfcManager::Types.const_get(ifc_type_name)
-    rescue NameError
-      # Skip invalid constant names
     end
   end
 end
