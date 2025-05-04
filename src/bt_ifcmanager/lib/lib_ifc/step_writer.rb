@@ -114,22 +114,9 @@ module BimTools
               zos.puts step_object.encode('iso-8859-1') + ";\n"
             end
 
-            # Write textures to the ZIP file
+            # Write textures to a temporary directory and add them to the ZIP file
             Dir.mktmpdir('Sketchup-IFC-Manager-textures-') do |directory|
-              
-              # Write textures to temp location
-              texture_file_names = []
-
-              @ifc_model.materials.each_key do |material|
-                next unless material && material.texture
-
-                texture_file_name = File.basename(material.texture.filename)
-                texture_file = File.join(directory, texture_file_name)
-                material.texture.write(texture_file)
-                texture_file_names << texture_file_name
-              end
-
-              # Add textures to the ZIP file
+              texture_file_names = write_textures(@ifc_model, directory)
               texture_file_names.each do |texture_file_name|
                 file = File.join(directory, texture_file_name)
                 zos.put_next_entry File.basename(file)
@@ -151,6 +138,8 @@ module BimTools
               end
               file.write(current_chunk) unless current_chunk.empty? # Write remaining data
             end
+
+            # Write textures to the target directory
             write_textures(@ifc_model, File.dirname(file_path))
           rescue SystemCallError => e
             message = "IFC Manager is unable to save the file: #{e.message}"
