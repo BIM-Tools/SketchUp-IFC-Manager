@@ -104,26 +104,20 @@ module BimTools
 
       def write(file_path)
         step_objects = get_step_objects(file_path)
+        max_chunk_size = 10_000_000
+
         if File.extname(file_path).downcase == '.ifczip'
-          BimTools::Zip.write_zip64_support = false
+          BimTools::Zip.write_zip64_support = true # Enable ZIP64 for large files
           file_name = File.basename(file_path, File.extname(file_path)) << '.ifc'
           BimTools::Zip::OutputStream.open(file_path) do |zos|
             zos.put_next_entry(file_name)
-            zos.puts (step_objects.join(";\n") << ';').encode('iso-8859-1')
+            step_objects.each do |step_object|
+              zos.puts step_object.encode('iso-8859-1') + ";\n"
+            end
+
+            # Write textures to a temporary directory and add them to the ZIP file
             Dir.mktmpdir('Sketchup-IFC-Manager-textures-') do |directory|
-              # Write textures to temp location
-              texture_file_names = []
-
-              @ifc_model.materials.each_key do |material|
-                next unless material && material.texture
-
-                texture_file_name = File.basename(material.texture.filename)
-                texture_file = File.join(directory, texture_file_name)
-                material.texture.write(texture_file)
-                texture_file_names << texture_file_name
-              end
-
-              # add textures to zipfile
+              texture_file_names = write_textures(@ifc_model, directory)
               texture_file_names.each do |texture_file_name|
                 file = File.join(directory, texture_file_name)
                 zos.put_next_entry File.basename(file)
@@ -134,8 +128,19 @@ module BimTools
         else
           begin
             File.open(file_path, 'w:ISO-8859-1') do |file|
-              file.write(step_objects.join(";\n") << ';')
+              current_chunk = String.new
+              step_objects.each do |step_object|
+                line = step_object + ";\n"
+                if (current_chunk.size + line.size) > max_chunk_size
+                  file.write(current_chunk)
+                  current_chunk = String.new
+                end
+                current_chunk << line
+              end
+              file.write(current_chunk) unless current_chunk.empty? # Write remaining data
             end
+
+            # Write textures to the target directory
             write_textures(@ifc_model, File.dirname(file_path))
           rescue SystemCallError => e
             message = "IFC Manager is unable to save the file: #{e.message}"
