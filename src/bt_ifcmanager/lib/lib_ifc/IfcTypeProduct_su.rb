@@ -26,17 +26,17 @@ require_relative 'ifc_types'
 
 module BimTools
   module IfcTypeProduct_su
+    include BimTools::CommonObjectAttributes
+
     attr_accessor :su_object
 
     # @param [BimTools::IfcManager::IfcModel] ifc_model
-    # @param [Sketchup::ComponentDefinition] definition
-    def initialize(ifc_model, definition, instance_class = nil)
-      super(ifc_model, definition)
+    # @param [Sketchup::ComponentDefinition] su_definition
+    def initialize(ifc_model, su_definition, _instance_class = nil)
+      super(ifc_model, su_definition)
       @ifc_module = ifc_model.ifc_module
-      @definition = definition
-      @type_properties = ifc_model.options[:type_properties]
 
-      persistent_id = definition.persistent_id.to_s
+      persistent_id = su_definition.persistent_id.to_s
 
       @rel_defines_by_type = @ifc_module::IfcRelDefinesByType.new(@ifc_model)
       @rel_defines_by_type.relatingtype = self
@@ -48,23 +48,14 @@ module BimTools
       @rel_defines_by_type.globalid = IfcManager::IfcGloballyUniqueId.new(ifc_model,
                                                                           "IfcRelDefinesByType.#{persistent_id}")
 
-      @name = IfcManager::Types::IfcLabel.new(ifc_model, definition.name)
+      @name = IfcManager::Types::IfcLabel.new(ifc_model, su_definition.name)
       @globalid = IfcManager::IfcGloballyUniqueId.new(ifc_model, "IfcTypeProduct.#{persistent_id}")
 
       # Set "tag" to component persistent_id like the other BIM Authoring Tools like Revit, Archicad and Tekla do
       @tag = IfcManager::Types::IfcLabel.new(ifc_model, persistent_id)
 
       # get attributes from su object and add them to IfcTypeProduct
-      if (dicts = definition.attribute_dictionaries)
-        dict_reader = IfcManager::EntityDictionaryReader.new(ifc_model, self, dicts, instance_class)
-        dict_reader.set_attributes
-        if @type_properties
-          propertysets = dict_reader.get_propertysets
-          @haspropertysets = IfcManager::Types::Set.new(propertysets) if propertysets.length > 0
-          dict_reader.add_sketchup_definition_properties(ifc_model, self, definition, @type_properties)
-          dict_reader.add_classifications
-        end
-      end
+      add_type_data(ifc_model, su_definition)
 
       # Set PredefinedType to default value when not set
       @predefinedtype = :notdefined if defined?(predefinedtype) && @predefinedtype.nil?

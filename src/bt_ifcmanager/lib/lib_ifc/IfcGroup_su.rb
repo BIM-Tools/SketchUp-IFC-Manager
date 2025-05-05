@@ -41,7 +41,7 @@ module BimTools
       # (?) set name, here? is this a duplicate?
       @name = IfcManager::Types::IfcLabel.new(ifc_model, su_instance.definition.name)
 
-      add_common_attributes(ifc_model, su_instance)
+      add_instance_data(ifc_model, su_instance)
     end
 
     def add(entity)

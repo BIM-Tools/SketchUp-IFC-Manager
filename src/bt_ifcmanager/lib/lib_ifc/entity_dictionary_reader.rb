@@ -43,6 +43,20 @@ module BimTools
         proxy
         edo
         instanceAttributes
+        Classifications
+        PropertySets
+      ].freeze
+
+      CLASSIFICATION_ATTRIBUTES = %w[
+        Location
+        ItemReference
+        Identification
+        Name
+        ReferencedSource
+        Description
+        Sort
+        Definition
+        RelatedIfcEntityNames
       ].freeze
 
       # Define a mapping for attributes that need to be renamed
@@ -52,11 +66,11 @@ module BimTools
 
       def initialize(ifc_model, ifc_entity, entity_dict, instance_class = nil)
         @ifc_module = ifc_model.ifc_module
-        ifc_version = ifc_model.ifc_version
+        @ifc_version = ifc_model.ifc_version
         @ifc_model = ifc_model
         @ifc_entity = ifc_entity
         @instance_class = instance_class
-        @ifc_dict = entity_dict[ifc_version].attribute_dictionaries if entity_dict && entity_dict[ifc_version]
+        @ifc_dict = entity_dict[@ifc_version].attribute_dictionaries if entity_dict && entity_dict[@ifc_version]
         @entity_dict = entity_dict
         @propertyset_names = []
         return unless @ifc_dict
@@ -81,16 +95,6 @@ module BimTools
         @propertyset_names = names - @all_attributes - ifc_entity_inverse_attributes
       end
 
-      def handle_predefined_type(value)
-        if value == 'userdefined'
-          object_type_or_element_type = @ifc_dict['ObjectType'] || @ifc_dict['ElementType']
-          return :notdefined if object_type_or_element_type
-        end
-        return value if value.is_a?(Symbol)
-
-        value.is_a?(String) ? value.to_sym : value.value.to_sym # TODO: hacky fix
-      end
-
       # Set the IFC entity attributes using all combined attribute possibilitites from IfcProduct and IfcTypeProduct
       def set_attributes
         return unless @all_attributes
@@ -104,32 +108,48 @@ module BimTools
         end
       end
 
-      # Returns PropertySets and ElementQuantity's for this IFC entity
+      # Returns PropertySets for this IFC entity
       #
       # @return [Array<Propertyset>]
       def get_propertysets
-        # SketchUp 2025 introduced the specific PropertySets Attribute Dictionary
-        propertysets_dict = @ifc_dict['PropertySets'] || @ifc_dict
-        propertysets_dict.keys.select { |name| propertysets_dict[name] }.map do |name|
-          get_propertyset(propertysets_dict[name])
+        return [] unless @ifc_dict && @entity_dict && @entity_dict['AppliedSchemaTypes']
+
+        applied_schema_types = @entity_dict['AppliedSchemaTypes']
+        propertysets = []
+
+        applied_schema_types.keys.each do |schema_type|
+          next unless @entity_dict[schema_type]
+
+          schema_dict = @entity_dict[schema_type]
+          schema_dict.attribute_dictionaries.each do |attribute_dictionary|
+            if attribute_dictionary.name == 'PropertySets'
+              attribute_dictionary.attribute_dictionaries.each do |propertysets_attribute_dictionary|
+                propertysets << get_propertyset(propertysets_attribute_dictionary)
+              end
+            elsif attribute_dictionary.name == 'Classifications'
+              next
+            elsif Settings.ifc_version_names.include?(schema_dict.name)
+              if @propertyset_names.include? attribute_dictionary.name
+                propertysets << get_propertyset(attribute_dictionary)
+              end
+            else
+              next if CLASSIFICATION_ATTRIBUTES.include?(attribute_dictionary.name)
+
+              propertysets << get_propertyset(attribute_dictionary)
+            end
+          end
         end
+
+        propertysets.compact
       end
 
-      # add PropertySets and ElementQuantity's to this IFC entity through IfcRelDefinesByProperties
+      # Adds PropertySets to this IFC entity through IfcRelDefinesByProperties
       #
       # @return [nil]
       def add_propertysets
-        return unless @ifc_dict
-
-        @propertyset_names.select { |name| @ifc_dict[name] }.map do |name|
-          add_propertyset(@ifc_dict[name])
+        get_propertysets.each do |propertyset|
+          add_propertyset(propertyset)
         end
-
-        # Add attributes from the "PropertySets" dictionary
-        if property_sets_dict = @ifc_dict['PropertySets']
-          property_sets_dict.attribute_dictionaries.each { |dictionary| add_propertyset(dictionary) }
-        end
-
         nil
       end
 
@@ -185,6 +205,16 @@ module BimTools
       end
 
       private
+
+      def handle_predefined_type(value)
+        if value == 'userdefined'
+          object_type_or_element_type = @ifc_dict['ObjectType'] || @ifc_dict['ElementType']
+          return :notdefined if object_type_or_element_type
+        end
+        return value if value.is_a?(Symbol)
+
+        value.is_a?(String) ? value.to_sym : value.value.to_sym # TODO: hacky fix
+      end
 
       def set_attribute(attr_dict)
         name = determine_name(attr_dict)
@@ -324,9 +354,7 @@ module BimTools
         end
       end
 
-      def add_propertyset(attr_dict)
-        return unless propertyset = get_propertyset(attr_dict)
-
+      def add_propertyset(propertyset)
         IfcRelDefinesByPropertiesBuilder.build(@ifc_model) do |builder|
           builder.set_relatingpropertydefinition(propertyset)
           builder.add_related_object(@ifc_entity)

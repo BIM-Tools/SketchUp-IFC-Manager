@@ -77,6 +77,7 @@ module BimTools
         next unless propertyset_name
 
         pset_dict = property_sets_dict.attribute_dictionary(propertyset_name, true)
+        property_sets_dict.set_attribute(propertyset_name, 'is_hidden', false)
         process_property_definitions(property_set_element, pset_dict)
       end
     end
