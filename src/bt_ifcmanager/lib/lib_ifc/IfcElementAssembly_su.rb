@@ -32,7 +32,7 @@ module BimTools
                          value.value.to_sym
                        else
                          value.to_sym
-                       end # TODO: hacky fix, should be part of PropertyReader
+                       end # TODO: hacky fix, should be part of entity_dictionary_reader
     end
   end
 end

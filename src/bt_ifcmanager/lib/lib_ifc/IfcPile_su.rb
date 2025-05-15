@@ -43,7 +43,7 @@ module BimTools
     def constructiontype=(value)
       return unless @ifc_version == 'IFC 2x3'
 
-      # TODO: hacky fix, should be part of PropertyReader
+      # TODO: hacky fix, should be part of entity_dictionary_reader
       enum_value = if value.is_a?(String)
                      value.upcase.to_sym
                    elsif value.respond_to?(:value)

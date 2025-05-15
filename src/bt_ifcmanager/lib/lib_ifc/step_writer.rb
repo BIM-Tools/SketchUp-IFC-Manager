@@ -79,10 +79,11 @@ module BimTools
 
       def get_file_name(file_path, time)
         timestamp = time.strftime('%Y-%m-%dT%H:%M:%S')
-        version_number = Sketchup.version_number / 100_000_000.floor
-        originating_system = "SketchUp 20#{version_number} (#{Sketchup.version})"
+        sketchup_version = Sketchup.version_number / 100_000_000.floor
+        preprocessor_version = "Sketchup-IFC-manager #{VERSION} / SketchUp 20#{sketchup_version} (#{Sketchup.version})"
+        originating_system = "BIM_Tools - Sketchup_IFC_manager - #{VERSION}"
         authorization = 'None'
-        "FILE_NAME('#{IfcManager::Types.replace_char(File.basename(file_path))}','#{timestamp}',(''),(''),'IFC-manager for SketchUp (#{VERSION})','#{originating_system}','#{authorization}')"
+        "FILE_NAME('#{IfcManager::Types.replace_char(File.basename(file_path))}','#{timestamp}',(''),(''),'#{preprocessor_version}','#{originating_system}','#{authorization}')"
       end
 
       def get_file_schema

@@ -22,27 +22,48 @@
 #
 
 require_relative 'ifc_types'
-require_relative 'PropertyReader'
+require_relative 'entity_dictionary_reader'
 
 module BimTools
   module CommonObjectAttributes
     # @param [IfcManager::IfcModel] ifc_model
     # @param [Sketchup::ComponentInstance] su_instance
-    def add_common_attributes(ifc_model, su_instance)
+    def add_instance_data(ifc_model, su_instance)
       su_definition = su_instance.definition
       dictionaries = su_definition.attribute_dictionaries
+      type_properties = ifc_model.options[:type_properties]
 
       return unless dictionaries
 
-      dict_reader = IfcManager::IfcDictionaryReader.new(ifc_model, self, dictionaries)
+      dict_reader = IfcManager::EntityDictionaryReader.new(ifc_model, self, dictionaries)
       dict_reader.set_attributes
 
-      unless ifc_model.options[:type_properties]
+      unless type_properties
         dict_reader.add_propertysets
         dict_reader.add_sketchup_definition_properties(ifc_model, self, su_definition)
         dict_reader.add_classifications
       end
+
       dict_reader.add_sketchup_instance_properties(ifc_model, self, su_instance)
+    end
+
+    # @param [IfcManager::IfcModel] ifc_model
+    # @param [Sketchup::ComponentDefinition] su_definition
+    def add_type_data(ifc_model, su_definition)
+      dictionaries = su_definition.attribute_dictionaries
+      type_properties = ifc_model.options[:type_properties]
+
+      return unless dictionaries
+
+      dict_reader = IfcManager::EntityDictionaryReader.new(ifc_model, self, dictionaries)
+      dict_reader.set_attributes
+
+      if type_properties
+        propertysets = dict_reader.get_propertysets
+        @haspropertysets = IfcManager::Types::Set.new(propertysets) if propertysets.length > 0
+        dict_reader.add_sketchup_definition_properties(ifc_model, self, su_definition, type_properties)
+        dict_reader.add_classifications
+      end
     end
   end
 end

@@ -61,12 +61,10 @@ module BimTools
       @type_product = @ifc_model.product_types[definition] if @ifc_model.product_types.key?(definition)
       @type_properties = ifc_model.options[:type_properties] && @type_product
 
-      add_common_attributes(ifc_model, @su_object)
+      add_instance_data(ifc_model, @su_object)
 
       # unset ObjectType if a IfcTypeProduct is defined
-      if @type_product && defined?(predefinedtype)
-        @predefinedtype = nil
-      end
+      @predefinedtype = nil if @type_product && defined?(predefinedtype)
 
       # TODO: dont exclude on class but on relaggregates
       add_material_association if ifc_model.options[:materials] &&

@@ -34,26 +34,41 @@ module BimTools
     class DefinitionRepresentation
       attr_reader :shape_representation_builder, :meshes, :globalid
 
+      # Initializes a new DefinitionRepresentation
+      #
+      # @param ifc_model [Object] the IFC model
+      # @param geometry_type [String] the type of geometry
+      # @param _faces [Array] the faces of the geometry
+      # @param su_material [Object] the SketchUp material
+      # @param transformation [Object] the transformation matrix
       def initialize(ifc_model, geometry_type, faces, su_material, transformation)
-        @globalid = IfcManager::IfcGloballyUniqueId.new(@ifc_model)
-        @ifc_module = ifc_model.ifc_module
         @ifc_model = ifc_model
+        @ifc_module = ifc_model.ifc_module
         @ifc_version = ifc_model.ifc_version
         @geometry_type = geometry_type
-        @ifc_shape_representation_builder = nil
-        @representation = nil
-        @double_sided_faces = @ifc_model.options[:double_sided_faces]
+        @faces = faces
         @su_material = su_material
         @transformation = transformation
-        @meshes = create_meshes(ifc_model, faces, transformation, su_material)
+        @double_sided_faces = @ifc_model.options[:double_sided_faces]
+        @globalid = IfcManager::IfcGloballyUniqueId.new(@ifc_model)
+        @ifc_shape_representation_builder = nil
+        @representation = nil
+        @meshes = nil
       end
 
+      # Returns the representations of the definition
+      #
+      # @param extrusion [Array, nil] the extrusion parameters
+      # @return [Array] the meshes or extrusion
+      # TODO: Refactor this method to improve the extrusion flow
       def representations(extrusion = nil)
-        return @meshes if extrusion.nil?
+        return @meshes ||= create_meshes(@ifc_model, @faces, @transformation, @su_material) if extrusion.nil?
 
         bottom_face, direction = extrusion
         [create_extrusion(bottom_face, direction, @su_material, @transformation)]
       end
+
+      private
 
       # Set the definition-representations OWN representation using its faces
       def create_meshes(ifc_model, faces, transformation, su_material = nil)

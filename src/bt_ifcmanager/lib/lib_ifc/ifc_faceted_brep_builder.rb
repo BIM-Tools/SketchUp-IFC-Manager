@@ -41,8 +41,6 @@ module BimTools
         @vertices = {}
 
         @ifc_faceted_brep = @ifc_module::IfcFacetedBrep.new(ifc_model)
-
-        @ifc_faceted_brep
       end
 
       def validate
@@ -65,9 +63,10 @@ module BimTools
       end
 
       def set_styling(su_material)
-        if @ifc_model.options[:colors] && !@ifc_model.materials[su_material]
-          @ifc_model.materials[su_material] = IfcManager::MaterialAndStyling.new(@ifc_model, su_material)
-        end
+        return unless @ifc_model.options[:colors] && !@ifc_model.materials[su_material]
+
+        @ifc_model.materials[su_material] = IfcManager::MaterialAndStyling.new(@ifc_model, su_material)
+
         # @ifc_model.materials[su_material].add_to_styling(@ifc_faceted_brep)
       end
 
