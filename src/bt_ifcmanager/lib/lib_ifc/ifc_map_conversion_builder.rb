@@ -55,19 +55,20 @@ module BimTools
       def set_eastings(eastings)
         return unless eastings
 
-        @ifc_map_conversion.eastings = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, eastings)
+        @ifc_map_conversion.eastings = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, eastings, false, false)
       end
 
       def set_northings(northings)
         return unless northings
 
-        @ifc_map_conversion.northings = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, northings)
+        @ifc_map_conversion.northings = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, northings, false, false)
       end
 
       def set_orthogonalheight(orthogonalheight)
         return unless orthogonalheight
 
-        @ifc_map_conversion.orthogonalheight = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, orthogonalheight)
+        @ifc_map_conversion.orthogonalheight = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, orthogonalheight,
+                                                                                       false, false)
       end
 
       def set_xaxisabscissa(xaxisabscissa)
@@ -88,16 +89,6 @@ module BimTools
         @ifc_map_conversion.scale = IfcManager::Types::IfcReal.new(@ifc_model, scale)
       end
 
-      # Calculates the scale factor for the given IFC model with 1 meter as the base value
-      #
-      # @param ifc_model [Object] The IFC model to calculate the scale factor for.
-      # @return [Numeric] The scale factor calculated for the given `ifc_model`.
-      def calculate_utm_scale_factor(ifc_model)
-        length_measure = IfcManager::Types::IfcLengthMeasure.new(ifc_model, 1.0.m)
-
-        length_measure.convert
-      end
-
       def set_from_utm(representationcontext, projected_crs, utm_point, world_transformation)
         # Determine the hemisphere based on the zone letter
         hemisphere = utm_point.zone_letter >= 'N' ? 'N' : 'S'
@@ -114,15 +105,12 @@ module BimTools
         origin = transformation.origin
         xaxis = transformation.xaxis
 
-        # model_scale = calculate_utm_scale_factor(@ifc_model)
-
         set_source_crs(representationcontext)
         set_target_crs(projected_crs)
-        set_eastings(origin.x)
-        set_northings(origin.y)
+        set_eastings(origin.x.to_m)
+        set_northings(origin.y.to_m)
         set_xaxisabscissa(xaxis.x)
         set_xaxisordinate(xaxis.y)
-        set_scale(1.0)
       end
     end
   end
