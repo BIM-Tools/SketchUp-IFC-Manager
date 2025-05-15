@@ -123,6 +123,8 @@ module BimTools
           schema_dict = @entity_dict[schema_type]
           schema_dict.attribute_dictionaries.each do |attribute_dictionary|
             if attribute_dictionary.name == 'PropertySets'
+              next unless attribute_dictionary.attribute_dictionaries
+
               attribute_dictionary.attribute_dictionaries.each do |propertysets_attribute_dictionary|
                 propertysets << get_propertyset(propertysets_attribute_dictionary)
               end
