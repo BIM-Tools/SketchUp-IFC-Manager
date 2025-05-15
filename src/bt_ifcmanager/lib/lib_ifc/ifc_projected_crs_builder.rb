@@ -87,7 +87,7 @@ module BimTools
         set_name(epsg_name)
         set_description(epsg_description)
         set_geodeticdatum('WGS 84')
-        set_mapunit(@ifc_model.units.length_unit_entity)
+        set_mapunit(@ifc_model.units.ifc_unit(:Meter))
       end
     end
   end
