@@ -142,6 +142,7 @@ module BimTools
 
         elementquantity = IfcElementQuantityBuilder.build(@ifc_model) do |builder|
           builder.set_name("Qto_#{type}BaseQuantities")
+          builder.add_method_of_measurement('BaseQuantities')
           builder.set_quantities(quantities)
         end
 

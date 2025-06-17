@@ -52,6 +52,10 @@ module BimTools
         end
       end
 
+      def add_method_of_measurement(method = 'BaseQuantities')
+        @ifc_element_quantity.methodofmeasurement = IfcManager::Types::IfcLabel.new(@ifc_model, method) if method
+      end
+
       def set_quantities(quantities)
         @ifc_element_quantity.quantities = IfcManager::Types::Set.new(quantities)
       end

@@ -84,6 +84,7 @@ module BimTools
               propertyset = IfcManager::IfcElementQuantityBuilder.build(ifc_model) do |builder|
                 builder.set_name(pset_name)
                 builder.add_related_object(ifc_object)
+                builder.add_method_of_measurement('BaseQuantities')
               end
               qty_hash[pset_name] = propertyset
             end
