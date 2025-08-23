@@ -27,6 +27,8 @@ require_relative 'dynamic_attributes'
 require_relative 'material_and_styling'
 require_relative 'base_quantity_builder'
 require_relative 'ifc_rel_adheres_to_element_builder'
+require_relative '../../utils/uuid5'
+require_relative 'ifcx/ifcx_common'
 
 module BimTools
   module IfcProduct_su
@@ -61,7 +63,13 @@ module BimTools
       @type_product = @ifc_model.product_types[definition] if @ifc_model.product_types.key?(definition)
       @type_properties = ifc_model.options[:type_properties] && @type_product
 
-      add_instance_data(ifc_model, @su_object)
+      is_type_product = if @type_product
+                          true
+                        else
+                          false
+                        end
+
+      add_instance_data(ifc_model, @su_object, is_type_product)
 
       # unset ObjectType if a IfcTypeProduct is defined
       @predefinedtype = nil if @type_product && defined?(predefinedtype)
@@ -106,22 +114,68 @@ module BimTools
     def ifcx
       @ifc_model.summary_add(self.class.name.split('::').last)
 
-      [{
-        'def' => 'class',
-        'type' => 'UsdGeom:Xform',
-        'comment' => "instance of: #{@name.value}",
-        'name' => globalid.ifcx,
-        'children' => (Array(@decomposes) + Array(@contains_elements) + Array(@representation)).compact.flatten.map(&:ifcx).flatten
-      }, {
-        'def' => 'over',
-        'name' => globalid.ifcx,
-        'attributes' => {
-          'ifc5:class' => {
-            'code' => self.class.name.split('::').last,
-            'uri' => "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3/class/#{self.class.name.split('::').last}"
+      children_containment = @contains_elements.ifcx if @contains_elements && @contains_elements.relatedelements
+      children_decomposition = @decomposes.ifcx if @decomposes && @decomposes.relatedobjects
+      children_representation = @representation.ifcx if @representation
+      children_adheres_to_element = @has_surface_features.ifc_rel_adheres_to_element.ifcx if @has_surface_features
+      children = {}
+      children.merge!(children_decomposition) if children_decomposition
+      children.merge!(children_containment) if children_containment
+      children.merge!(children_representation) if children_representation
+      children.merge!(children_adheres_to_element) if children_adheres_to_element
+
+      inherits = { 'TypeProduct': @type_product.globalid.ifcx } if @type_product
+
+      ifc_class = self.class.name.split('::').last
+      unless @predefinedtype.nil? || BimTools::IfcXCommon::EXCLUDED_PREDEFINED_TYPES.include?(@predefinedtype)
+        ifc_class = "#{ifc_class}#{@predefinedtype.upcase}"
+      end
+
+      if @type_product
+        attributes = []
+      else
+        attributes = self.attributes.each_with_object([]) do |attribute_name, arr|
+          next if BimTools::IfcXCommon::EXCLUDED_ATTRIBUTES.include?(attribute_name)
+
+          attribute_method = attribute_name.downcase
+          value = begin
+            send(attribute_method.to_s)
+          rescue StandardError
+            nil
+          end
+          next if value.nil? || (value.respond_to?(:empty?) && value.empty?)
+
+          arr << {
+            path: globalid.ifcx,
+            attributes: {
+              "bsi::ifc::prop::#{attribute_name}" => value.respond_to?(:value) ? value.value : value
+              # 'uri' => "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3/prop/#{attribute_name}"
+            }
+          }
+        end
+      end
+
+      [[
+        {
+          path: globalid.ifcx,
+          children: children,
+          inherits: inherits
+        },
+        {
+          path: globalid.ifcx,
+          attributes: {
+            'bsi::ifc::class': {
+              code: ifc_class,
+              uri: "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3/class/#{ifc_class}"
+            }
           }
         }
-      }]
+      ],
+       attributes].flatten
+    end
+
+    def get_body_uuid
+      IfcManager::Utils.create_uuid5(@globalid.ifcx, 'body')
     end
 
     private

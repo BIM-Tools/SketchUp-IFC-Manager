@@ -74,8 +74,10 @@ module BimTools
 
         representation_string = get_representation_string(transformation, su_material)
         unless @representations.key?(representation_string)
-          @representations[representation_string] =
+          definition_representation =
             DefinitionRepresentation.new(@ifc_model, geometry_type, @faces, su_material, transformation)
+          definition_representation.set_globalid(@definition.persistent_id.to_s + representation_string) # only set for ifcx
+          @representations[representation_string] = definition_representation
         end
         @representations[representation_string]
       end
@@ -118,6 +120,8 @@ module BimTools
       end
 
       def determine_extrusion(geometry_type)
+        # Never create extrusions for ifcx format
+        return if @ifc_model.ifc_format == :ifcx
         return unless geometry_type == 'SweptSolid' && @definition
 
         GeometryHelpers.is_extrusion?(@definition)

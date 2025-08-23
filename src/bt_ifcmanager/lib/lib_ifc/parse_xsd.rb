@@ -28,8 +28,8 @@ require 'rexml/document'
 require 'yaml'
 require 'set'
 
-require_relative File.join('.', 'step')
-require_relative File.join('.', 'ifcx')
+require_relative File.join('.', 'step', 'step')
+require_relative File.join('.', 'ifcx', 'ifcx')
 
 module BimTools
   module IfcManager
@@ -65,6 +65,7 @@ module BimTools
         IfcProduct
         IfcProductDefinitionShape
         IfcRoot
+        IfcRelAdheresToElement
         IfcRelAggregates
         IfcRelAssociatesMaterial
         IfcRelDefinesByProperties
@@ -76,6 +77,7 @@ module BimTools
         IfcSpace
         IfcSpatialStructureElement
         IfcStyledItem
+        IfcSurfaceStyle
         IfcTriangulatedFaceSet
         IfcTypeProduct
         IfcUnitAssignment

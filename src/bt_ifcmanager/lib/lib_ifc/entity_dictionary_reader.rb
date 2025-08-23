@@ -75,24 +75,43 @@ module BimTools
         @propertyset_names = []
         return unless @ifc_dict
 
-        ifc_entity_attributes = ifc_entity.attributes.map { |x| x.to_s }
-        ifc_entity_inverse_attributes = ifc_entity.inverse_attributes.map { |x| x.to_s }
+        ifc_entity_attributes = ifc_entity.respond_to?(:attributes) ? ifc_entity.attributes.map { |x| x.to_s } : []
+        ifc_entity_inverse_attributes = if ifc_entity.respond_to?(:inverse_attributes)
+                                          ifc_entity.inverse_attributes.map do |x|
+                                            x.to_s
+                                          end
+                                        else
+                                          []
+                                        end
+
+        instance_class_attributes = if instance_class && instance_class.respond_to?(:attributes)
+                                      instance_class.attributes.map do |x|
+                                        x.to_s
+                                      end
+                                    else
+                                      []
+                                    end
+        instance_class_inverse_attributes = if instance_class && instance_class.respond_to?(:inverse_attributes)
+                                              instance_class.inverse_attributes.map do |x|
+                                                x.to_s
+                                              end
+                                            else
+                                              []
+                                            end
 
         # split attributes from properties
         names = @ifc_dict.map(&:name)
         names -= UNUSED_DICTS # filter out unwanted dictionaries
-        names -= ifc_entity_inverse_attributes # filter out inverse dictionaries
-        @attributes = names & ifc_entity_attributes
+        names -= ifc_entity_inverse_attributes # filter out inverse dictionaries from entity
+        names -= instance_class_inverse_attributes # filter out inverse dictionaries from instance_class (e.g. IfcProduct)
+        @attributes = names & (ifc_entity_attributes + instance_class_attributes)
 
-        # Skip IfcProduct-only attributes for IfcTypeProduct
-        @all_attributes = if instance_class
-                            instance_class_attributes = instance_class.attributes.map { |x| x.to_s }
-                            names & (ifc_entity_attributes + instance_class_attributes).uniq
-                          else
-                            @attributes
-                          end
+        # All attributes from both entity and instance_class
+        all_attributes = (ifc_entity_attributes + instance_class_attributes).uniq
+        all_inverse_attributes = (ifc_entity_inverse_attributes + instance_class_inverse_attributes).uniq
 
-        @propertyset_names = names - @all_attributes - ifc_entity_inverse_attributes
+        @all_attributes = names & all_attributes
+        @propertyset_names = names - all_attributes - all_inverse_attributes
       end
 
       # Set the IFC entity attributes using all combined attribute possibilitites from IfcProduct and IfcTypeProduct
@@ -108,10 +127,11 @@ module BimTools
         end
       end
 
-      # Returns PropertySets for this IFC entity
-      #
+      # Returns PropertySets and/or Quantities for this IFC entity
+      # @param include_properties [Boolean] whether to include property sets
+      # @param include_quantities [Boolean] whether to include quantities
       # @return [Array<Propertyset>]
-      def get_propertysets
+      def get_propertysets(include_properties: true, include_quantities: true)
         return [] unless @ifc_dict && @entity_dict && @entity_dict['AppliedSchemaTypes']
 
         applied_schema_types = @entity_dict['AppliedSchemaTypes']
@@ -126,18 +146,24 @@ module BimTools
               next unless attribute_dictionary.attribute_dictionaries
 
               attribute_dictionary.attribute_dictionaries.each do |propertysets_attribute_dictionary|
-                propertysets << get_propertyset(propertysets_attribute_dictionary)
+                pset = get_propertyset(propertysets_attribute_dictionary, include_properties: include_properties,
+                                                                          include_quantities: include_quantities)
+                propertysets << pset if pset
               end
             elsif attribute_dictionary.name == 'Classifications'
               next
             elsif Settings.ifc_version_names.include?(schema_dict.name)
               if @propertyset_names.include? attribute_dictionary.name
-                propertysets << get_propertyset(attribute_dictionary)
+                pset = get_propertyset(attribute_dictionary, include_properties: include_properties,
+                                                             include_quantities: include_quantities)
+                propertysets << pset if pset
               end
             else
               next if CLASSIFICATION_ATTRIBUTES.include?(attribute_dictionary.name)
 
-              propertysets << get_propertyset(attribute_dictionary)
+              pset = get_propertyset(attribute_dictionary, include_properties: include_properties,
+                                                           include_quantities: include_quantities)
+              propertysets << pset if pset
             end
           end
         end
@@ -251,15 +277,17 @@ module BimTools
         ifc_type ? ifc_type.new(@ifc_model, value) : get_ifc_property_value(value, property.attribute_type)
       end
 
-      # Creates PropertySet if there are any properties to export
+      # Creates PropertySet and/or Quantity if there are any to export
       #
+      # @param include_properties [Boolean] whether to include property sets
+      # @param include_quantities [Boolean] whether to include quantities
       # @return [IfcPropertySet, IfcElementQuantity, False]
-      def get_propertyset(attr_dict)
-        quantities = if (attr_dict.name == 'BaseQuantities') || attr_dict.name.start_with?('Qto_') # export as elementquantities
-                       true
-                     else
-                       false
-                     end
+      def get_propertyset(attr_dict, include_properties: true, include_quantities: true)
+        is_quantity = (attr_dict.name == 'BaseQuantities') || attr_dict.name.start_with?('Qto_')
+
+        # Only include if the relevant flag is set
+        return nil if is_quantity && !include_quantities
+        return nil if !is_quantity && !include_properties
 
         properties = []
 
@@ -277,12 +305,11 @@ module BimTools
             # Never set empty values
             next if value.nil? || (value.is_a?(String) && value.empty?)
 
-            if quantities
-
+            if is_quantity
               if value
                 case get_quantity_type(property.name)
                 when :length
-                  ifc_value = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, long = false, geometry = false)
+                  ifc_value = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, false, false)
                 when :area
                   ifc_value = IfcManager::Types::IfcAreaMeasure.new(@ifc_model, value)
                 when :volume
@@ -299,7 +326,6 @@ module BimTools
                 builder.set_name(property.name)
               end
             else
-
               if ifc_type
                 # Check if ifc_type is a subclass of IfcLengthMeasure
                 ifc_value = if ifc_type <= BimTools::IfcManager::Types::IfcLengthMeasure
@@ -329,21 +355,41 @@ module BimTools
             end
           end
 
-        else # Any other AttributeDictionaries like 'SU_DefinitionSet' and 'SU_InstanceSet'
+        else # Any dictionary with direct key-value pairs (including quantities)
           attr_dict.each do |key, value|
             next unless value
             next if value.is_a?(String) && value.empty?
 
-            properties << IfcPropertyBuilder.build(@ifc_model) do |builder|
-              builder.set_name(key)
-              builder.set_value(get_ifc_property_value(value, nil, true))
+            if is_quantity
+              # Guess type from key
+              case get_quantity_type(key)
+              when :length
+                ifc_value = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, value, false, false)
+              when :area
+                ifc_value = IfcManager::Types::IfcAreaMeasure.new(@ifc_model, value)
+              when :volume
+                ifc_value = IfcManager::Types::IfcVolumeMeasure.new(@ifc_model, value)
+              when :weight
+                ifc_value = IfcManager::Types::IfcMassMeasure.new(@ifc_model, value)
+              end
+              next unless ifc_value
+
+              properties << IfcQuantityBuilder.build(@ifc_model) do |builder|
+                builder.set_value(ifc_value)
+                builder.set_name(key)
+              end
+            else
+              properties << IfcPropertyBuilder.build(@ifc_model) do |builder|
+                builder.set_name(key)
+                builder.set_value(get_ifc_property_value(value, nil, true))
+              end
             end
           end
         end
 
         if properties.empty?
           false
-        elsif quantities
+        elsif is_quantity
           IfcElementQuantityBuilder.build(@ifc_model) do |builder|
             builder.set_name(attr_dict.name)
             builder.set_quantities(properties)

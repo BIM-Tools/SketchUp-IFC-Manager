@@ -27,33 +27,24 @@ module BimTools
 
     def ifcx
       usd_mesh = {
-        'faceVertexIndices' => [],
-        'points' => []
+        faceVertexIndices: [],
+        points: []
       }
 
       @coordinates.coordlist.each do |coord|
-        usd_mesh['points'] << [coord[0].ifcx, coord[1].ifcx, coord[2].ifcx]
+        usd_mesh[:points] << [coord[0].ifcx, coord[1].ifcx, coord[2].ifcx]
       end
 
       @coordindex.each do |index_list|
-        usd_mesh['faceVertexIndices'] += index_list.map { |index| index.value - 1 } # Adjust for 0-based indexing
+        usd_mesh[:faceVertexIndices] += index_list.map { |index| index.value - 1 } # Adjust for 0-based indexing
       end
 
-      [
-        {
-          'def' => 'class',
-          'type' => 'UsdGeom:Mesh',
-          'comment' => 'triangulated face set class',
-          'name' => @globalid.ifcx
-        }, {
-          'def' => 'over',
-          'comment' => 'triangulated face set',
-          'name' => @globalid.ifcx,
-          'attributes' => {
-            'UsdGeom:Mesh' => usd_mesh
-          }
+      {
+        path: @globalid, # special case globalid direct string not part of schema
+        attributes: {
+          'usd::usdgeom::mesh': usd_mesh
         }
-      ]
+      }
     end
   end
 end

@@ -31,19 +31,16 @@ module BimTools
     end
 
     def ifcx
-      product = @shapeofproduct[0] if @shapeofproduct && @shapeofproduct.length > 0
-      return unless product
+      unless @representations && @representations.any?
+        warn 'No representations defined for IfcProductDefinitionShape.'
+        return nil
+      end
 
-      @representations.flat_map do |representation|
-        representation.items.select { |item| item.is_a?(@ifc_module::IfcTriangulatedFaceSet) }.map do |item|
-          global_id = item.globalid.ifcx
-          {
-            'def' => 'def',
-            'type' => 'UsdGeom:Mesh',
-            'comment' => "product definition shape: #{product.name.value}",
-            'name' => "#{global_id}_Body",
-            'inherits' => ["</#{global_id}>"]
-          }
+      @representations.each_with_object({}) do |shape_representation, h|
+        next unless shape_representation.respond_to?(:items)
+
+        shape_representation.items.each do |item|
+          h["#{shape_representation.representationidentifier.value} - #{item.globalid}"] = item.globalid
         end
       end
     end

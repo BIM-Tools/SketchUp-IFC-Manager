@@ -21,7 +21,7 @@
 #
 #
 
-require_relative 'ifc_types'
+require_relative '../ifc_types'
 
 # create new ISO-10303-21/STEP object (the STEP object should do the formatting of the entire file, including header)
 
@@ -38,16 +38,16 @@ module BimTools
       end
 
       def get_step_objects(file_path)
-        time = Time.new
         step_objects = []
         step_objects << 'ISO-10303-21'
-        step_objects.concat(create_header_section(file_path, time))
+        step_objects.concat(create_header_section(file_path))
         step_objects.concat(create_data_section)
         step_objects << 'END-ISO-10303-21'
         step_objects
       end
 
-      def create_header_section(file_path, time)
+      def create_header_section(file_path)
+        time = Time.now
         step_objects = []
         step_objects << 'HEADER'
         step_objects << get_file_description

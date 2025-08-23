@@ -32,8 +32,8 @@ require_relative 'geolocation_builder'
 require_relative 'spatial_structure'
 require_relative 'entity_builder'
 require_relative 'definition_manager'
-require_relative 'step_writer'
-require_relative 'ifcx_writer'
+require_relative 'step/step_writer'
+require_relative 'ifcx/ifcx_writer'
 require_relative '../transformation_helper'
 
 require_relative 'classifications'
@@ -54,7 +54,7 @@ module BimTools
 
       attr_reader :owner_history, :representationcontext, :representation_sub_context_body, :layers, :materials,
                   :classifications, :classificationassociations, :groups, :product_types,
-                  :property_enumerations, :su_model, :project, :ifc_objects, :ifc_module, :ifc_version,
+                  :property_enumerations, :su_model, :project, :ifc_objects, :ifc_module, :ifc_version, :ifc_format,
                   :project_data, :export_summary, :options, :su_entities, :units, :default_location,
                   :default_axis, :default_refdirection, :default_placement, :textures
 
@@ -95,6 +95,7 @@ module BimTools
 
         @ifc_module = Settings.ifc_module
         @ifc_version = Settings.ifc_version
+        @ifc_format = :step
         @su_model = su_model
         @su_entities = @options[:export_entities]
         @ifc_id = 0
@@ -200,8 +201,10 @@ module BimTools
       # (?) could be enhanced to also accept multiple ifc types like step / ifczip / ifcxml / ifcJson / ifcx
       # (?) could be enhanced with export options hash
       def export(file_path)
-        case File.extname(file_path).downcase
-        when '.ifcx'
+        ext = File.extname(file_path).downcase
+        @ifc_format = ext == '.ifcx' ? :ifcx : :step
+        case @ifc_format
+        when :ifcx
           ifcx_writer = IfcXWriter.new(self)
           ifcx_writer.write(file_path)
         else

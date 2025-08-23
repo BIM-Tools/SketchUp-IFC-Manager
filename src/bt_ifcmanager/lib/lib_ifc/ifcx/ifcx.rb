@@ -49,12 +49,26 @@ module BimTools
       case property
       when nil
         nil
+      when IfcManager::IfcGloballyUniqueId, IfcManager::Types::List, IfcManager::Types::Set, IfcManager::Types::BaseType
+        property.ifcx
+      when IfcManager::Types::IfcLengthMeasure, IfcManager::Types::IfcAreaMeasure, IfcManager::Types::IfcVolumeMeasure, IfcManager::Types::IfcMassMeasure
+        property.ifcx
+      when @ifc_module::IfcPropertySingleValue
+        property.nominalvalue.value
+      when @ifc_module::IfcPropertyEnumeratedValue
+        property.enumerationvalues[0].value if property.enumerationvalues.length > 0
+      when @ifc_module::IfcQuantityLength
+        property.lengthvalue.ifcx
+      when @ifc_module::IfcQuantityArea
+        property.areavalue.ifcx
+      when @ifc_module::IfcQuantityVolume
+        property.volumevalue.ifcx
+      when @ifc_module::IfcQuantityWeight
+        property.weightvalue.ifcx
       when Symbol # used for enumerations
         property.to_s
       when String, Numeric, TrueClass, FalseClass
         property
-      when IfcManager::IfcGloballyUniqueId, IfcManager::Types::List, IfcManager::Types::Set, IfcManager::Types::BaseType
-        property.ifcx
       else
         property.ref
       end

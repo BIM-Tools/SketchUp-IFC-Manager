@@ -81,12 +81,22 @@ module BimTools
     def ifcx
       return unless @decomposes || @contains_elements
 
+      children_decomposition = (@decomposes.ifcx if @decomposes && @decomposes.relatedobjects)
+      children_containment = (@contains_elements.ifcx if @contains_elements && @contains_elements.relatedelements)
+
+      children = if children_decomposition && children_containment
+                   children_decomposition.merge(children_containment)
+                 elsif children_decomposition
+                   children_decomposition
+                 elsif children_containment
+                   children_containment
+                 else
+                   {}
+                 end
+
       {
-        'def' => 'class',
-        'type' => 'UsdGeom:Xform',
-        'comment' => "instance of: #{@name.value}",
-        'name' => globalid.ifcx,
-        'children' => (Array(@decomposes) + Array(@contains_elements)).compact.flatten.map(&:ifcx).flatten
+        path: globalid.ifcx,
+        children: children # ' => (Array(@decomposes) + Array(@contains_elements)).compact.flatten.map(&:ifcx).flatten
       }
     end
   end

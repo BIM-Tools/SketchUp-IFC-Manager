@@ -197,16 +197,17 @@ module BimTools
       # @return [IfcEntity] The created IFC entity.
       def create_ifc_entity(entity_type_name, su_instance, placement_parent = nil, su_material = nil, su_layer = nil)
         su_definition = su_instance.definition
+        definition_manager = @ifc_model.get_definition_manager(su_definition)
 
         entity_class, type_product_class = get_entity_and_type(entity_type_name)
 
         ifc_type_product = get_type_product(type_product_class, entity_class, su_definition)
-        ifc_entity = determine_ifc_entity(entity_class, su_instance, placement_parent)
+        ifc_entity = determine_ifc_entity(definition_manager, entity_class, su_instance, placement_parent)
         ifc_type_product.add_typed_object(ifc_entity) if ifc_type_product && ifc_entity
 
         mesh_transformation = add_object_placement(ifc_entity, @su_total_transformation)
 
-        create_geometry(su_definition, ifc_entity, placement_parent, su_material, su_layer, mesh_transformation)
+        create_geometry(definition_manager, ifc_entity, placement_parent, su_material, su_layer, mesh_transformation)
 
         add_placement_parent_relationships(ifc_entity, placement_parent)
 
@@ -260,8 +261,8 @@ module BimTools
       # @param su_instance [Sketchup::ComponentInstance] The SketchUp instance.
       # @param placement_parent [Sketchup::Group, Sketchup::ComponentInstance] The placement parent.
       # @return [Class] The determined IFC entity class or the entity type class itself.
-      def determine_ifc_entity(entity_type, su_instance, placement_parent)
-        return handle_unclassified_component(su_instance, placement_parent) if entity_type.nil?
+      def determine_ifc_entity(definition_manager, entity_type, su_instance, placement_parent)
+        return handle_unclassified_component(definition_manager, su_instance, placement_parent) if entity_type.nil?
         return handle_ifc_project(su_instance, placement_parent) if entity_type == @ifc_module::IfcProject
         return create_ifc_product(entity_type, su_instance, placement_parent) if entity_type < @ifc_module::IfcProduct
         return create_ifc_group(entity_type, su_instance, placement_parent) if entity_type < @ifc_module::IfcGroup
@@ -276,7 +277,9 @@ module BimTools
       # @param su_instance [Sketchup::ComponentInstance] The SketchUp instance of the unclassified component.
       # @param placement_parent [IFC::IfcSpatialStructureElement] The placement parent of the unclassified component.
       # @return [IFC::IfcBuildingElementProxy, nil] The created building element proxy if the placement parent is an IfcSpatialStructureElement, otherwise nil.
-      def handle_unclassified_component(su_instance, placement_parent)
+      def handle_unclassified_component(definition_manager, su_instance, placement_parent)
+        return if su_instance.is_a?(Sketchup::Group) && definition_manager.faces.empty?
+
         # Don't add unclassified components as direct geometry to spatial elements or groups
         if placement_parent.is_a?(@ifc_module::IfcSpatialStructureElement) || placement_parent.is_a?(@ifc_module::IfcGroup)
           return create_building_element_proxy(su_instance, placement_parent)
@@ -446,9 +449,8 @@ module BimTools
         )
       end
 
-      def create_geometry(definition, ifc_entity, placement_parent = nil, su_material, su_layer, mesh_transformation)
-        definition_manager = @ifc_model.get_definition_manager(definition)
-
+      def create_geometry(definition_manager, ifc_entity, placement_parent = nil, su_material, su_layer,
+                          mesh_transformation)
         # create geometry from faces
         # (!) skips any geometry placed inside objects NOT of the type IfcProduct
         return if definition_manager.faces.empty?

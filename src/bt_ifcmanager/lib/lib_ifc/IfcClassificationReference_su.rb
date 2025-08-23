@@ -40,18 +40,15 @@ module BimTools
       relatedobjects = @classificationrefforobjects.relatedobjects
       uri = @location.ifcx if @location
       code = ifc5_code
-      name = @name.ifcx
       classification_name = @referencedsource.name.ifcx
       classification_code = classification_name.gsub(/[^0-9A-Za-z]/, '')
 
       relatedobjects.map do |relatedobject|
         {
-          'def' => 'over',
-          'comment' => "Classification reference: '#{name}' for classification: '#{classification_name}'",
-          'name' => "#{relatedobject.globalid.ifcx}",
-          'attributes' => { "#{classification_code}:class" => {
-            'code' => code,
-            'uri' => uri
+          path: relatedobject.globalid.ifcx,
+          attributes: { "#{classification_code}::class": {
+            code: code,
+            uri: uri
           } }
         }
       end

@@ -85,9 +85,13 @@ module BimTools
       end
 
       def set_location(location = nil)
-        return unless location && defined?(@ifc_classification.location)
+        return unless location
 
-        @ifc_classification.location = IfcManager::Types::IfcURIReference.new(@ifc_model, location)
+        if defined?(@ifc_classification.location)
+          @ifc_classification.location = IfcManager::Types::IfcURIReference.new(@ifc_model, location)
+        elsif defined?(@ifc_classification.specification)
+          @ifc_classification.specification = IfcManager::Types::IfcURIReference.new(@ifc_model, location)
+        end
       end
     end
   end

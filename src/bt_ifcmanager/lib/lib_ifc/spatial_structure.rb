@@ -109,8 +109,12 @@ module BimTools
         # end
 
         # Set the parent to a decomposing IfcProduct if that is in the spatial structure
-        if [@ifc_module::IfcElementAssembly, @ifc_module::IfcCurtainWall,
-            @ifc_module::IfcRoof].include?(@spatial_structure.last.class) && !ifc_entity.is_a?(@ifc_module::IfcSpatialStructureElement) && ifc_entity.is_a?(@ifc_module::IfcProduct)
+        if [
+          @ifc_module::IfcElementAssembly,
+          @ifc_module::IfcCurtainWall,
+          @ifc_module::IfcRoof,
+          @ifc_module::IfcGeographicElement
+        ].include?(@spatial_structure.last.class) && !ifc_entity.is_a?(@ifc_module::IfcSpatialStructureElement) && ifc_entity.is_a?(@ifc_module::IfcProduct)
           parent = @spatial_structure.last
         end
 
@@ -124,7 +128,8 @@ module BimTools
 
         raise "No valid parent found for #{ifc_class}" if parent.nil?
 
-        if [@ifc_module::IfcElementAssembly, @ifc_module::IfcCurtainWall, @ifc_module::IfcRoof].include?(ifc_class)
+        if [@ifc_module::IfcElementAssembly, @ifc_module::IfcCurtainWall, @ifc_module::IfcRoof,
+            @ifc_module::IfcGeographicElement].include?(ifc_class)
           @spatial_structure << ifc_entity
         end
 
@@ -225,7 +230,7 @@ module BimTools
           case ifc_entity.parent
           when @ifc_module::IfcSpatialStructureElement
             ifc_entity.parent.add_contained_element(ifc_entity)
-          when @ifc_module::IfcProject, @ifc_module::IfcProduct, @ifc_module::IfcCurtainWall, @ifc_module::IfcElementAssembly
+          when @ifc_module::IfcProject, @ifc_module::IfcProduct, @ifc_module::IfcCurtainWall, @ifc_module::IfcElementAssembly, @ifc_module::IfcGeographicElement
             ifc_entity.parent.add_related_object(ifc_entity)
           end
         end

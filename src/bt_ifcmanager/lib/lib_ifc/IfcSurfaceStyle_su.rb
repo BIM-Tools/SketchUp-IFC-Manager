@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-#  IfcMaterial_su.rb
+#  IfcSurfaceStyle_su.rb
 #
-#  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
+#  Copyright 2025 Jan Brouwer <jan@brewsky.nl>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 require_relative '../../utils/uuid5'
 
 module BimTools
-  module IfcMaterial_su
+  module IfcSurfaceStyle_su
     def initialize(_ifc_model, su_material)
       @su_material = su_material
       super
@@ -32,17 +32,13 @@ module BimTools
     def ifcx
       return if @su_material.nil?
 
-      material_namespace_uri = 'https://identifier.buildingsmart.org/uri/buildingsmart-community/materials-demo/1.0/class/'
+      # material_namespace_uri = 'https://identifier.buildingsmart.org/uri/buildingsmart-community/materials-demo/1.0/class/'
 
       {
         path: get_uuid,
         attributes: {
-          'bsi::ifc::material' => {
-            code: sanitize_name(@su_material.name),
-            uri: material_namespace_uri + sanitize_name(@su_material.name)
-          }
-          # 'bsi::ifc::presentation::diffuseColor' => extract_color(@su_material.color),
-          # 'bsi::ifc::presentation::opacity' => extract_opacity(@su_material.color)
+          'bsi::ifc::presentation::diffuseColor': extract_color(@su_material.color),
+          'bsi::ifc::presentation::opacity': extract_opacity(@su_material)
         }
       }
     end
@@ -59,7 +55,7 @@ module BimTools
                             @su_material.name
                           end
 
-      IfcManager::Utils.create_uuid5('bsi::ifc::material', unique_identifier)
+      IfcManager::Utils.create_uuid5('IfcSurfaceStyle', unique_identifier)
     end
 
     private
@@ -73,7 +69,7 @@ module BimTools
     end
 
     def extract_opacity(color)
-      color.alpha / 255.0
+      color.alpha
     end
   end
 end

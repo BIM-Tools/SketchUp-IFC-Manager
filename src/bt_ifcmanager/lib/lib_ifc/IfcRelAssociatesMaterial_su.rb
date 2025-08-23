@@ -24,16 +24,13 @@
 module BimTools
   module IfcRelAssociatesMaterial_su
     def ifcx
+      return [] if @relatingmaterial.nil?
+
       @relatedobjects.map do |relatedobject|
         {
-          'def' => 'over',
-          'name' => relatedobject.globalid.ifcx,
-          'attributes' => {
-            'UsdShade:MaterialBindingAPI' => {
-              'material:binding' => {
-                'ref' => "</#{@relatingmaterial.name.value.gsub(/[^0-9A-Za-z]/, '_')}>"
-              }
-            }
+          'path' => relatedobject.globalid.ifcx,
+          "inherits": {
+            "material": @relatingmaterial.get_uuid
           }
         }
       end

@@ -138,7 +138,7 @@ module BimTools
 
       def build_surface_style(su_material, side, surface_style_rendering)
         name = su_material ? su_material.display_name : 'Default'
-        surface_style = @ifc_module::IfcSurfaceStyle.new(@ifc_model)
+        surface_style = @ifc_module::IfcSurfaceStyle.new(@ifc_model, su_material)
         surface_style.side = side
         surface_style.name = Types::IfcLabel.new(@ifc_model, name)
         surface_style.styles = Types::Set.new([surface_style_rendering])

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#  IfcRelContainedInSpatialStructure_su.rb
+#  IfcRelAdheresToElement_su.rb
 #
 #  Copyright 2024 Jan Brouwer <jan@brewsky.nl>
 #
@@ -22,16 +22,16 @@
 #
 
 module BimTools
-  module IfcRelContainedInSpatialStructure_su
+  module IfcRelAdheresToElement_su
     def self.required_attributes(_ifc_version)
-      [:RelatingStructure]
+      [:RelatingElement]
     end
 
     def ifcx
-      return unless @relatingstructure
+      return unless @relatingelement && @relatedsurfacefeatures
 
-      @relatedelements.each_with_object({}) do |related_element, h|
-        h[unique_key(related_element)] = related_element.globalid.ifcx
+      @relatedsurfacefeatures.each_with_object({}) do |related_element, h|
+        h[unique_key(related_element)] = related_element.globalid.ifcx if related_element.globalid.respond_to?(:ifcx)
       end
     end
 

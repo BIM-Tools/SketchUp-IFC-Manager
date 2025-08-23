@@ -43,6 +43,9 @@ module BimTools
     def ifcx
       @transformation ||= Geom::Transformation.new
 
+      return nil if @transformation.identity?
+      return nil if default_transformation?
+
       transform_matrix = @transformation.to_a
 
       # Convert the origin coordinates to the correct units
@@ -54,10 +57,9 @@ module BimTools
       end
 
       {
-        'def' => 'over',
-        'name' => @places_object.globalid.ifcx,
-        'attributes' => {
-          'xformOp' => { 'transform' => transform_matrix.each_slice(4).to_a }
+        path: @places_object.globalid.ifcx,
+        attributes: {
+          'usd::xformop': { 'transform': transform_matrix.each_slice(4).to_a }
         }
       }
     end

@@ -21,7 +21,7 @@
 #
 #
 
-require_relative 'step_types'
+require_relative 'step/step_types'
 
 module BimTools
   module IfcManager
@@ -122,17 +122,49 @@ module BimTools
       # TYPE IfcAreaMeasure = REAL;
       # END_TYPE;
       class IfcAreaMeasure < BaseType
-        def initialize(ifc_model, value, long = false)
-          super
+        def initialize(ifc_model, value, long = false, geometry = true)
+          super(ifc_model, value, long)
+          @geometry = geometry
           @value = value.to_f
         rescue StandardError, TypeError => e
           print value << 'cannot be converted to an area: ' << e
         end
 
+        def convert
+          case @ifc_model.units.area_unit
+          when :SquareMillimeter
+            @value / 1_000_000.0
+          when :SquareCentimeter
+            @value / 10_000.0
+          when :SquareMeter
+            @value.to_f
+          when :SquareKilometer
+            @value * 1_000_000.0
+          when :SquareFoot
+            @value * 0.09290304
+          when :SquareInch
+            @value * 0.00064516
+          else
+            @value.to_f
+          end
+        end
+
         def step
-          val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
-          val = add_long(val) if @long
-          val
+          if @geometry
+            to_step_string(convert)
+          else
+            to_step_string(@value)
+          end
+        end
+
+        def ifcx
+          if @geometry # Always output SI unit (m2) from SketchUp's square inches
+            # 1 square inch = 0.00064516 square meters
+            square_meters = @value.to_f * 0.00064516
+            format('%.6f', square_meters).to_f
+          else
+            format('%.6f', @value).to_f
+          end
         end
       end
 
@@ -559,10 +591,11 @@ module BimTools
         end
 
         def ifcx
-          if @geometry
-            convert
+          if @geometry # Always output SI unit (m) from SketchUp's inches
+            # 1 inch = 0.0254 meters
+            format('%.6f', @value.to_m).to_f
           else
-            @value
+            format('%.6f', @value).to_f
           end
         end
       end
@@ -934,17 +967,53 @@ module BimTools
       # TYPE IfcVolumeMeasure = REAL;
       # END_TYPE;
       class IfcVolumeMeasure < IfcReal
-        def initialize(ifc_model, value, long = false)
-          super
+        def initialize(ifc_model, value, long = false, geometry = true)
+          super(ifc_model, value, long)
+          @geometry = geometry
           @value = value.to_f
         rescue StandardError, TypeError => e
           puts value << 'cannot be converted to a volume: ' << e
         end
 
+        def convert
+          case @ifc_model.units.volume_unit
+          when :CubicMillimeter
+            @value / 1_000_000_000.0
+          when :CubicCentimeter
+            @value / 1_000_000.0
+          when :CubicMeter
+            @value.to_f
+          when :CubicKilometer
+            @value * 1_000_000_000.0
+          when :CubicFoot
+            @value * 0.0283168466
+          when :CubicInch
+            @value * 0.000016387064
+          else
+            @value.to_f
+          end
+        end
+
         def step
-          val = @value.to_s.upcase.gsub(/(\.)0+$/, '.')
-          val = add_long(val) if @long
-          val
+          if @geometry
+            # Always convert SketchUp cubic inches to cubic meters for STEP
+            cubic_meters = @value.to_f * 0.000016387064
+            to_step_string(cubic_meters)
+          else
+            to_step_string(@value)
+          end
+        end
+
+        def ifcx
+          if @geometry
+            # Always output SI unit (m3)
+            # SketchUp volume is always in cubic inches internally
+            # 1 cubic inch = 0.000016387064 cubic meters
+            cubic_meters = @value.to_f * 0.000016387064
+            format('%.6f', cubic_meters).to_f
+          else
+            format('%.6f', @value).to_f
+          end
         end
       end
 

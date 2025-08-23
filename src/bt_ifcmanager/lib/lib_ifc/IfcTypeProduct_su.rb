@@ -23,6 +23,7 @@
 
 require_relative 'IfcGloballyUniqueId'
 require_relative 'ifc_types'
+require_relative 'ifcx/ifcx_common'
 
 module BimTools
   module IfcTypeProduct_su
@@ -32,7 +33,7 @@ module BimTools
 
     # @param [BimTools::IfcManager::IfcModel] ifc_model
     # @param [Sketchup::ComponentDefinition] su_definition
-    def initialize(ifc_model, su_definition, _instance_class = nil)
+    def initialize(ifc_model, su_definition, instance_class = nil)
       super(ifc_model, su_definition)
       @ifc_module = ifc_model.ifc_module
 
@@ -55,7 +56,7 @@ module BimTools
       @tag = IfcManager::Types::IfcLabel.new(ifc_model, persistent_id)
 
       # get attributes from su object and add them to IfcTypeProduct
-      add_type_data(ifc_model, su_definition)
+      add_type_data(ifc_model, su_definition, instance_class)
 
       # Set PredefinedType to default value when not set
       @predefinedtype = :notdefined if defined?(predefinedtype) && @predefinedtype.nil?
@@ -80,13 +81,53 @@ module BimTools
     end
 
     def ifcx
-      {
-        'def' => 'class',
-        'type' => 'UsdGeom:Xform',
-        'comment' => "IfcTypeProduct: #{@name.value}",
-        'name' => @globalid.ifcx,
-        'inherits' => ["</#{@globalid.ifcx}_Body>"]
-      }
+      result = []
+
+      # Export every property from every property set in @haspropertysets as a separate object
+      if defined?(@haspropertysets) && @haspropertysets && @haspropertysets.respond_to?(:each)
+        @haspropertysets.each do |pset|
+          # Get the properties array (hasproperties or quantities)
+          properties = if pset.respond_to?(:hasproperties)
+                         pset.hasproperties
+                       elsif pset.respond_to?(:quantities)
+                         pset.quantities
+                       else
+                         []
+                       end
+          properties.each do |property|
+            begin
+              result << {
+                path: @globalid.ifcx,
+                attributes: {
+                  "bsi::ifc::prop::#{property.name.value}": property_to_ifcx(property)
+                }
+              }
+            rescue StandardError
+              # puts "  Error processing property: #{e.message}"
+            end
+          end
+        end
+      end
+
+      type_attributes = self.class.attributes.each_with_object([]) do |attribute_name, arr|
+        next if BimTools::IfcXCommon::EXCLUDED_ATTRIBUTES.include?(attribute_name)
+
+        attribute_method = attribute_name.downcase
+        value = begin
+          send(attribute_method.to_s)
+        rescue StandardError
+          nil
+        end
+
+        arr << {
+          path: globalid.ifcx,
+          attributes: {
+            "bsi::ifc::prop::#{attribute_name}" => value.respond_to?(:value) ? value.value : value
+          }
+        }
+      end
+
+      [result, type_attributes].flatten
     end
   end
 end

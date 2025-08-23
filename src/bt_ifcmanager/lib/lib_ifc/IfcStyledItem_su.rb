@@ -46,5 +46,14 @@ module BimTools
 
       @item = brep
     end
+
+    def ifcx
+      {
+        path: @item.globalid, # special case globalid direct string not part of schema
+        inherits: {
+          style: @styles.first.get_uuid
+        }
+      }
+    end
   end
 end

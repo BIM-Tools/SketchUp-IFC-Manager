@@ -101,31 +101,34 @@ module BimTools
         dimensions = { width: len_x, height: len_y, depth: len_z }
         length = dimensions[length_direction]
 
-        volume_in_cubic_meters = volume * 0.000016387064
-
         quantities = []
 
         quantities << IfcQuantityBuilder.build(@ifc_model) do |builder|
-          builder.set_value(IfcManager::Types::IfcVolumeMeasure.new(@ifc_model, volume_in_cubic_meters))
+          builder.set_value(IfcManager::Types::IfcVolumeMeasure.new(
+                              @ifc_model,
+                              volume,
+                              long = true,
+                              geometry = true
+                            ))
           builder.set_name('NetVolume')
         end
 
         if valid_cross_section?(dimensions, length_direction, length, comparison_method)
           cross_section_area = volume / length
-          cross_section_area_in_square_meters = cross_section_area * 0.00064516
 
           length_name = 'Length'
           length_name = 'Depth' if type == 'Slab'
           length_name = 'Width' if type == 'Wall'
 
           quantities << IfcQuantityBuilder.build(@ifc_model) do |builder|
-            builder.set_value(IfcManager::Types::IfcLengthMeasure.new(@ifc_model, length))
+            builder.set_value(IfcManager::Types::IfcLengthMeasure.new(@ifc_model, length, long = true, geometry = true))
             builder.set_name(length_name)
           end
 
           if type == 'Wall'
             quantities << IfcQuantityBuilder.build(@ifc_model) do |builder|
-              builder.set_value(IfcManager::Types::IfcLengthMeasure.new(@ifc_model, len_x))
+              builder.set_value(IfcManager::Types::IfcLengthMeasure.new(@ifc_model, len_x, long = true,
+                                                                        geometry = true))
               builder.set_name('Length')
             end
           end
@@ -135,7 +138,8 @@ module BimTools
           area_name = 'NetSideArea' if type == 'Wall'
 
           quantities << IfcQuantityBuilder.build(@ifc_model) do |builder|
-            builder.set_value(IfcManager::Types::IfcAreaMeasure.new(@ifc_model, cross_section_area_in_square_meters))
+            builder.set_value(IfcManager::Types::IfcAreaMeasure.new(@ifc_model, cross_section_area, long = true,
+                                                                    geometry = true))
             builder.set_name(area_name)
           end
         end

@@ -26,6 +26,7 @@ require_relative 'ifc_faceted_brep_builder'
 require_relative 'ifc_product_definition_shape_builder'
 require_relative 'ifc_triangulated_face_set_builder'
 require_relative 'material_and_styling'
+require_relative '../../utils/uuid5'
 
 module BimTools
   module IfcManager
@@ -50,7 +51,6 @@ module BimTools
         @su_material = su_material
         @transformation = transformation
         @double_sided_faces = @ifc_model.options[:double_sided_faces]
-        @globalid = IfcManager::IfcGloballyUniqueId.new(@ifc_model)
         @ifc_shape_representation_builder = nil
         @representation = nil
         @meshes = nil
@@ -66,6 +66,10 @@ module BimTools
 
         bottom_face, direction = extrusion
         [create_extrusion(bottom_face, direction, @su_material, @transformation)]
+      end
+
+      def set_globalid(representation_string)
+        @globalid = IfcManager::Utils.create_uuid5('DefinitionRepresentation', representation_string)
       end
 
       private

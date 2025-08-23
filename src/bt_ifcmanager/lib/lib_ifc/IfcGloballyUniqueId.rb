@@ -132,7 +132,7 @@ module BimTools
 
       # return the UUID without dashes
       def ifcx
-        @hex_guid
+        to_uuid
       end
     end
   end

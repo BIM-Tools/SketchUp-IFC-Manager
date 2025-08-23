@@ -1,2601 +1,2605 @@
 ---
 IfcCompositeCurve:
   :explicit:
-  - :Segments
-  - :SelfIntersect
+    - :Segments
+    - :SelfIntersect
 IfcCourse:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcCourseType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcRoot:
   :explicit:
-  - :GlobalId
-  - :OwnerHistory
-  - :Name
-  - :Description
+    - :GlobalId
+    - :OwnerHistory
+    - :Name
+    - :Description
 IfcObject:
   :explicit:
-  - :ObjectType
+    - :ObjectType
   :inverse:
-  - :IsDeclaredBy
-  - :Declares
-  - :IsTypedBy
-  - :IsDefinedBy
+    - :IsDeclaredBy
+    - :Declares
+    - :IsTypedBy
+    - :IsDefinedBy
 IfcActionRequest:
   :explicit:
-  - :RequestID
+    - :RequestID
 IfcActor:
   :explicit:
-  - :TheActor
+    - :TheActor
 IfcActorRole:
   :explicit:
-  - :Role
-  - :UserDefinedRole
-  - :Description
-IfcTypeObject:
-  :explicit:
-  - :ApplicableOccurrence
-  - :HasPropertySets
-IfcTypeProduct:
-  :explicit:
-  - :RepresentationMaps
-  - :Tag
+    - :Role
+    - :UserDefinedRole
+    - :Description
 IfcElementType:
   :explicit:
-  - :ElementType
+    - :ElementType
 IfcActuatorType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcAddress:
   :explicit:
-  - :Purpose
-  - :Description
-  - :UserDefinedPurpose
+    - :Purpose
+    - :Description
+    - :UserDefinedPurpose
 IfcAirTerminalBoxType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcAirTerminalType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcAirToAirHeatRecoveryType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcAlarmType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcDraughtingCallout:
   :explicit:
-  - :Contents
+    - :Contents
 IfcProduct:
   :explicit:
-  - :ObjectPlacement
-  - :Representation
+    - :ObjectPlacement
+    - :Representation
   :inverse:
-  - :ReferencedBy
-  - :PositionedRelativeTo
-  - :ReferencedInStructures
+    - :ReferencedBy
+    - :PositionedRelativeTo
+    - :ReferencedInStructures
 IfcProductDefinitionShape:
   :inverse:
-  - :ShapeOfProduct
-  - :HasShapeAspects
+    - :ShapeOfProduct
+    - :HasShapeAspects
 IfcStyledItem:
   :explicit:
-  - :Item
-  - :Styles
-  - :Name
+    - :Item
+    - :Styles
+    - :Name
 IfcAnnotationFillArea:
   :explicit:
-  - :OuterBoundary
-  - :InnerBoundaries
+    - :OuterBoundary
+    - :InnerBoundaries
 IfcAnnotationFillAreaOccurrence:
   :explicit:
-  - :FillStyleTarget
-  - :GlobalOrLocal
+    - :FillStyleTarget
+    - :GlobalOrLocal
 IfcAnnotationSurface:
   :explicit:
-  - :Item
-  - :TextureCoordinates
+    - :Item
+    - :TextureCoordinates
 IfcApplication:
   :explicit:
-  - :ApplicationDeveloper
-  - :Version
-  - :ApplicationFullName
-  - :ApplicationIdentifier
+    - :ApplicationDeveloper
+    - :Version
+    - :ApplicationFullName
+    - :ApplicationIdentifier
 IfcAppliedValue:
   :explicit:
-  - :Name
-  - :Description
-  - :AppliedValue
-  - :UnitBasis
-  - :ApplicableDate
-  - :FixedUntilDate
+    - :Name
+    - :Description
+    - :AppliedValue
+    - :UnitBasis
+    - :ApplicableDate
+    - :FixedUntilDate
 IfcAppliedValueRelationship:
   :explicit:
-  - :ComponentOfTotal
-  - :Components
-  - :ArithmeticOperator
-  - :Name
-  - :Description
+    - :ComponentOfTotal
+    - :Components
+    - :ArithmeticOperator
+    - :Name
+    - :Description
 IfcApproval:
   :explicit:
-  - :Description
-  - :ApprovalDateTime
-  - :ApprovalStatus
-  - :ApprovalLevel
-  - :ApprovalQualifier
-  - :Name
-  - :Identifier
+    - :Description
+    - :ApprovalDateTime
+    - :ApprovalStatus
+    - :ApprovalLevel
+    - :ApprovalQualifier
+    - :Name
+    - :Identifier
 IfcApprovalActorRelationship:
   :explicit:
-  - :Actor
-  - :Approval
-  - :Role
+    - :Actor
+    - :Approval
+    - :Role
 IfcApprovalPropertyRelationship:
   :explicit:
-  - :ApprovedProperties
-  - :Approval
+    - :ApprovedProperties
+    - :Approval
 IfcApprovalRelationship:
   :explicit:
-  - :RelatedApproval
-  - :RelatingApproval
-  - :Description
-  - :Name
+    - :RelatedApproval
+    - :RelatingApproval
+    - :Description
+    - :Name
 IfcProfileDef:
   :explicit:
-  - :ProfileType
-  - :ProfileName
+    - :ProfileType
+    - :ProfileName
   :inverse:
-  - :HasProperties
+    - :HasProperties
 IfcArbitraryClosedProfileDef:
   :explicit:
-  - :OuterCurve
+    - :OuterCurve
 IfcArbitraryOpenProfileDef:
   :explicit:
-  - :Curve
+    - :Curve
 IfcArbitraryProfileDefWithVoids:
   :explicit:
-  - :InnerCurves
+    - :InnerCurves
 IfcAsset:
   :explicit:
-  - :AssetID
-  - :OriginalValue
-  - :CurrentValue
-  - :TotalReplacementCost
-  - :Owner
-  - :User
-  - :ResponsiblePerson
-  - :IncorporationDate
-  - :DepreciatedValue
+    - :AssetID
+    - :OriginalValue
+    - :CurrentValue
+    - :TotalReplacementCost
+    - :Owner
+    - :User
+    - :ResponsiblePerson
+    - :IncorporationDate
+    - :DepreciatedValue
 IfcParameterizedProfileDef:
   :explicit:
-  - :Position
+    - :Position
 IfcIShapeProfileDef:
   :explicit:
-  - :OverallWidth
-  - :OverallDepth
-  - :WebThickness
-  - :FlangeThickness
-  - :FilletRadius
+    - :OverallWidth
+    - :OverallDepth
+    - :WebThickness
+    - :FlangeThickness
+    - :FilletRadius
 IfcAsymmetricIShapeProfileDef:
   :explicit:
-  - :TopFlangeWidth
-  - :TopFlangeThickness
-  - :TopFlangeFilletRadius
-  - :CentreOfGravityInY
+    - :TopFlangeWidth
+    - :TopFlangeThickness
+    - :TopFlangeFilletRadius
+    - :CentreOfGravityInY
 IfcPlacement:
   :explicit:
-  - :Location
+    - :Location
 IfcAxis1Placement:
   :explicit:
-  - :Axis
+    - :Axis
 IfcAxis2Placement2D:
   :explicit:
-  - :RefDirection
+    - :RefDirection
 IfcAxis2Placement3D:
   :explicit:
-  - :Axis
-  - :RefDirection
+    - :Axis
+    - :RefDirection
 IfcBridge:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcBridgePart:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcBSplineCurve:
   :explicit:
-  - :Degree
-  - :ControlPointsList
-  - :CurveForm
-  - :ClosedCurve
-  - :SelfIntersect
+    - :Degree
+    - :ControlPointsList
+    - :CurveForm
+    - :ClosedCurve
+    - :SelfIntersect
 IfcElement:
   :explicit:
-  - :Tag
+    - :Tag
   :inverse:
-  - :HasStructuralMember
-  - :FillsVoids
-  - :ConnectedTo
-  - :IsInterferedByElements
-  - :InterferesElements
-  - :HasProjections
-  - :ReferencedInStructures
-  - :HasPorts
-  - :HasProjections
-  - :HasOpenings
-  - :IsConnectionRealization
-  - :ProvidesBoundaries
-  - :ConnectedFrom
-  - :ContainedInStructure
-  - :HasCoverings
-  - :HasSurfaceFeatures
+    - :HasStructuralMember
+    - :FillsVoids
+    - :ConnectedTo
+    - :IsInterferedByElements
+    - :InterferesElements
+    - :HasProjections
+    - :ReferencedInStructures
+    - :HasPorts
+    - :HasProjections
+    - :HasOpenings
+    - :IsConnectionRealization
+    - :ProvidesBoundaries
+    - :ConnectedFrom
+    - :ContainedInStructure
+    - :HasCoverings
+    - :HasSurfaceFeatures
 IfcBeam:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcBeamType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcSurfaceTexture:
   :explicit:
-  - :RepeatS
-  - :RepeatT
-  - :TextureType
-  - :Mode
-  - :TextureTransform
-  - :Parameter
+    - :RepeatS
+    - :RepeatT
+    - :TextureType
+    - :Mode
+    - :TextureTransform
+    - :Parameter
 IfcSurfaceFeature:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
   :inverse:
-  - :AdheresToElement
+    - :AdheresToElement
 IfcBlobTexture:
   :explicit:
-  - :RasterFormat
-  - :RasterCode
+    - :RasterFormat
+    - :RasterCode
 IfcCsgPrimitive3D:
   :explicit:
-  - :Position
+    - :Position
 IfcBlock:
   :explicit:
-  - :XLength
-  - :YLength
-  - :ZLength
+    - :XLength
+    - :YLength
+    - :ZLength
 IfcBoilerType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcBooleanResult:
   :explicit:
-  - :Operator
-  - :FirstOperand
-  - :SecondOperand
+    - :Operator
+    - :FirstOperand
+    - :SecondOperand
 IfcBoundaryCondition:
   :explicit:
-  - :Name
+    - :Name
 IfcBoundaryEdgeCondition:
   :explicit:
-  - :LinearStiffnessByLengthX
-  - :LinearStiffnessByLengthY
-  - :LinearStiffnessByLengthZ
-  - :RotationalStiffnessByLengthX
-  - :RotationalStiffnessByLengthY
-  - :RotationalStiffnessByLengthZ
+    - :LinearStiffnessByLengthX
+    - :LinearStiffnessByLengthY
+    - :LinearStiffnessByLengthZ
+    - :RotationalStiffnessByLengthX
+    - :RotationalStiffnessByLengthY
+    - :RotationalStiffnessByLengthZ
 IfcBoundaryFaceCondition:
   :explicit:
-  - :LinearStiffnessByAreaX
-  - :LinearStiffnessByAreaY
-  - :LinearStiffnessByAreaZ
+    - :LinearStiffnessByAreaX
+    - :LinearStiffnessByAreaY
+    - :LinearStiffnessByAreaZ
 IfcBoundaryNodeCondition:
   :explicit:
-  - :LinearStiffnessX
-  - :LinearStiffnessY
-  - :LinearStiffnessZ
-  - :RotationalStiffnessX
-  - :RotationalStiffnessY
-  - :RotationalStiffnessZ
+    - :LinearStiffnessX
+    - :LinearStiffnessY
+    - :LinearStiffnessZ
+    - :RotationalStiffnessX
+    - :RotationalStiffnessY
+    - :RotationalStiffnessZ
 IfcBoundaryNodeConditionWarping:
   :explicit:
-  - :WarpingStiffness
+    - :WarpingStiffness
 IfcBoundingBox:
   :explicit:
-  - :Corner
-  - :XDim
-  - :YDim
-  - :ZDim
+    - :Corner
+    - :XDim
+    - :YDim
+    - :ZDim
 IfcHalfSpaceSolid:
   :explicit:
-  - :BaseSurface
-  - :AgreementFlag
+    - :BaseSurface
+    - :AgreementFlag
 IfcBoxedHalfSpace:
   :explicit:
-  - :Enclosure
+    - :Enclosure
 IfcSpatialElement:
   :explicit:
-  - :LongName
+    - :LongName
   :inverse:
-  - :ContainsElements
-  - :ServicedBySystems
-  - :ReferencesElements
-  - :IsInterferedByElements
-  - :InterferesElements
+    - :ContainsElements
+    - :ServicedBySystems
+    - :ReferencesElements
+    - :IsInterferedByElements
+    - :InterferesElements
 IfcSpatialStructureElement:
   :explicit:
-  - :LongName
-  - :CompositionType
+    - :LongName
+    - :CompositionType
 IfcBuilding:
   :explicit:
-  - :ElevationOfRefHeight
-  - :ElevationOfTerrain
-  - :BuildingAddress
+    - :ElevationOfRefHeight
+    - :ElevationOfTerrain
+    - :BuildingAddress
 IfcBuildingElementProxy:
   :explicit:
-  - :CompositionType
-  - :PredefinedType
+    - :CompositionType
+    - :PredefinedType
 IfcBuildingElementProxyType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcBuildingStorey:
   :explicit:
-  - :Elevation
+    - :Elevation
 IfcCShapeProfileDef:
   :explicit:
-  - :Depth
-  - :Width
-  - :WallThickness
-  - :Girth
-  - :InternalFilletRadius
-  - :CentreOfGravityInX
+    - :Depth
+    - :Width
+    - :WallThickness
+    - :Girth
+    - :InternalFilletRadius
+    - :CentreOfGravityInX
 IfcCableCarrierFittingType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcCableCarrierSegmentType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcCableSegmentType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcCalendarDate:
   :explicit:
-  - :DayComponent
-  - :MonthComponent
-  - :YearComponent
+    - :DayComponent
+    - :MonthComponent
+    - :YearComponent
 IfcCartesianPoint:
   :explicit:
-  - :Coordinates
+    - :Coordinates
 IfcCartesianPointList3D:
   :explicit:
-  - :CoordList
+    - :CoordList
 IfcCartesianTransformationOperator:
   :explicit:
-  - :Axis1
-  - :Axis2
-  - :LocalOrigin
-  - :Scale
+    - :Axis1
+    - :Axis2
+    - :LocalOrigin
+    - :Scale
 IfcCartesianTransformationOperator2DnonUniform:
   :explicit:
-  - :Scale2
+    - :Scale2
 IfcCartesianTransformationOperator3D:
   :explicit:
-  - :Axis3
+    - :Axis3
 IfcCartesianTransformationOperator3DnonUniform:
   :explicit:
-  - :Scale2
-  - :Scale3
+    - :Scale2
+    - :Scale3
 IfcCenterLineProfileDef:
   :explicit:
-  - :Thickness
+    - :Thickness
 IfcChamferEdgeFeature:
   :explicit:
-  - :Width
-  - :Height
+    - :Width
+    - :Height
 IfcChillerType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcChimney:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcChimneyType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcConic:
   :explicit:
-  - :Position
+    - :Position
 IfcCircle:
   :explicit:
-  - :Radius
+    - :Radius
 IfcCircleProfileDef:
   :explicit:
-  - :Radius
+    - :Radius
 IfcCircleHollowProfileDef:
   :explicit:
-  - :WallThickness
+    - :WallThickness
 IfcClassification:
   :explicit:
-  - :Source
-  - :Edition
-  - :EditionDate
-  - :Name
-  - :Description
-  - :Location
-  - :Specification
-  - :ReferenceTokens
+    - :Source
+    - :Edition
+    - :EditionDate
+    - :Name
+    - :Description
+    - :Location
+    - :Specification
+    - :ReferenceTokens
   :inverse:
-  - :Contains
-  - :ClassificationForObjects
-  - :HasReferences
+    - :Contains
+    - :ClassificationForObjects
+    - :HasReferences
 IfcClassificationItem:
   :explicit:
-  - :Notation
-  - :ItemOf
-  - :Title
+    - :Notation
+    - :ItemOf
+    - :Title
 IfcClassificationItemRelationship:
   :explicit:
-  - :RelatingItem
-  - :RelatedItems
+    - :RelatingItem
+    - :RelatedItems
 IfcClassificationNotation:
   :explicit:
-  - :NotationFacets
+    - :NotationFacets
 IfcClassificationNotationFacet:
   :explicit:
-  - :NotationValue
+    - :NotationValue
 IfcClassificationReference:
   :explicit:
-  - :ReferencedSource
-  - :Description
-  - :Sort
+    - :ReferencedSource
+    - :Description
+    - :Sort
   :inverse:
-  - :ClassificationRefForObjects
-  - :HasReferences
+    - :ClassificationRefForObjects
+    - :HasReferences
 IfcConnectedFaceSet:
   :explicit:
-  - :CfsFaces
+    - :CfsFaces
 IfcCoilType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcColourSpecification:
   :explicit:
-  - :Name
+    - :Name
 IfcColourRgb:
   :explicit:
-  - :Red
-  - :Green
-  - :Blue
+    - :Red
+    - :Green
+    - :Blue
 IfcColumn:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcColumnType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcPropertyAbstraction:
   :inverse:
-  - :HasExternalReferences
+    - :HasExternalReferences
 IfcProperty:
   :explicit:
-  - :Name
-  - :Description
-  - :Specification
+    - :Name
+    - :Description
+    - :Specification
   :inverse:
-  - :PartOfPset
-  - :PropertyForDependance
-  - :PropertyDependsOn
-  - :PartOfComplex
-  - :HasConstraints
-  - :HasApprovals
+    - :PartOfPset
+    - :PropertyForDependance
+    - :PropertyDependsOn
+    - :PartOfComplex
+    - :HasConstraints
+    - :HasApprovals
 IfcComplexProperty:
   :explicit:
-  - :UsageName
-  - :HasProperties
+    - :UsageName
+    - :HasProperties
 IfcCompositeCurveSegment:
   :explicit:
-  - :Transition
-  - :SameSense
-  - :ParentCurve
+    - :Transition
+    - :SameSense
+    - :ParentCurve
 IfcCompositeProfileDef:
   :explicit:
-  - :Profiles
-  - :Label
+    - :Profiles
+    - :Label
 IfcCompressorType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcCondenserType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcConditionCriterion:
   :explicit:
-  - :Criterion
-  - :CriterionDateTime
+    - :Criterion
+    - :CriterionDateTime
 IfcConnectionCurveGeometry:
   :explicit:
-  - :CurveOnRelatingElement
-  - :CurveOnRelatedElement
+    - :CurveOnRelatingElement
+    - :CurveOnRelatedElement
 IfcConnectionPointGeometry:
   :explicit:
-  - :PointOnRelatingElement
-  - :PointOnRelatedElement
+    - :PointOnRelatingElement
+    - :PointOnRelatedElement
 IfcConnectionPointEccentricity:
   :explicit:
-  - :EccentricityInX
-  - :EccentricityInY
-  - :EccentricityInZ
+    - :EccentricityInX
+    - :EccentricityInY
+    - :EccentricityInZ
 IfcConnectionPortGeometry:
   :explicit:
-  - :LocationAtRelatingElement
-  - :LocationAtRelatedElement
-  - :ProfileOfPort
+    - :LocationAtRelatingElement
+    - :LocationAtRelatedElement
+    - :ProfileOfPort
 IfcConnectionSurfaceGeometry:
   :explicit:
-  - :SurfaceOnRelatingElement
-  - :SurfaceOnRelatedElement
+    - :SurfaceOnRelatingElement
+    - :SurfaceOnRelatedElement
 IfcConstraint:
   :explicit:
-  - :Name
-  - :Description
-  - :ConstraintGrade
-  - :ConstraintSource
-  - :CreatingActor
-  - :CreationTime
-  - :UserDefinedGrade
+    - :Name
+    - :Description
+    - :ConstraintGrade
+    - :ConstraintSource
+    - :CreatingActor
+    - :CreationTime
+    - :UserDefinedGrade
 IfcConstraintAggregationRelationship:
   :explicit:
-  - :Name
-  - :Description
-  - :RelatingConstraint
-  - :RelatedConstraints
-  - :LogicalAggregator
+    - :Name
+    - :Description
+    - :RelatingConstraint
+    - :RelatedConstraints
+    - :LogicalAggregator
 IfcConstraintClassificationRelationship:
   :explicit:
-  - :ClassifiedConstraint
-  - :RelatedClassifications
+    - :ClassifiedConstraint
+    - :RelatedClassifications
 IfcConstraintRelationship:
   :explicit:
-  - :Name
-  - :Description
-  - :RelatingConstraint
-  - :RelatedConstraints
+    - :Name
+    - :Description
+    - :RelatingConstraint
+    - :RelatedConstraints
 IfcConstructionResource:
   :explicit:
-  - :ResourceIdentifier
-  - :ResourceGroup
-  - :ResourceConsumption
-  - :BaseQuantity
+    - :ResourceIdentifier
+    - :ResourceGroup
+    - :ResourceConsumption
+    - :BaseQuantity
 IfcConstructionMaterialResource:
   :explicit:
-  - :Suppliers
-  - :UsageRatio
+    - :Suppliers
+    - :UsageRatio
 IfcNamedUnit:
   :explicit:
-  - :Dimensions
-  - :UnitType
+    - :Dimensions
+    - :UnitType
 IfcContext:
   :explicit:
-  - :ObjectType
-  - :LongName
-  - :Phase
-  - :RepresentationContexts
-  - :UnitsInContext
+    - :ObjectType
+    - :LongName
+    - :Phase
+    - :RepresentationContexts
+    - :UnitsInContext
   :inverse:
-  - :IsDefinedBy
-  - :Declares
+    - :IsDefinedBy
+    - :Declares
 IfcContextDependentUnit:
   :explicit:
-  - :Name
+    - :Name
 IfcControllerType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcConversionBasedUnit:
   :explicit:
-  - :Name
-  - :ConversionFactor
+    - :Name
+    - :ConversionFactor
 IfcCooledBeamType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcCoolingTowerType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcCoordinatedUniversalTimeOffset:
   :explicit:
-  - :HourOffset
-  - :MinuteOffset
-  - :Sense
+    - :HourOffset
+    - :MinuteOffset
+    - :Sense
 IfcCostSchedule:
   :explicit:
-  - :SubmittedBy
-  - :PreparedBy
-  - :SubmittedOn
-  - :Status
-  - :TargetUsers
-  - :UpdateDate
-  - :ID
-  - :PredefinedType
+    - :SubmittedBy
+    - :PreparedBy
+    - :SubmittedOn
+    - :Status
+    - :TargetUsers
+    - :UpdateDate
+    - :ID
+    - :PredefinedType
 IfcCostValue:
   :explicit:
-  - :CostType
-  - :Condition
+    - :CostType
+    - :Condition
 IfcCovering:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcCoveringType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcCraneRailAShapeProfileDef:
   :explicit:
-  - :OverallHeight
-  - :BaseWidth2
-  - :Radius
-  - :HeadWidth
-  - :HeadDepth2
-  - :HeadDepth3
-  - :WebThickness
-  - :BaseWidth4
-  - :BaseDepth1
-  - :BaseDepth2
-  - :BaseDepth3
-  - :CentreOfGravityInY
+    - :OverallHeight
+    - :BaseWidth2
+    - :Radius
+    - :HeadWidth
+    - :HeadDepth2
+    - :HeadDepth3
+    - :WebThickness
+    - :BaseWidth4
+    - :BaseDepth1
+    - :BaseDepth2
+    - :BaseDepth3
+    - :CentreOfGravityInY
 IfcCraneRailFShapeProfileDef:
   :explicit:
-  - :OverallHeight
-  - :HeadWidth
-  - :Radius
-  - :HeadDepth2
-  - :HeadDepth3
-  - :WebThickness
-  - :BaseDepth1
-  - :BaseDepth2
-  - :CentreOfGravityInY
+    - :OverallHeight
+    - :HeadWidth
+    - :Radius
+    - :HeadDepth2
+    - :HeadDepth3
+    - :WebThickness
+    - :BaseDepth1
+    - :BaseDepth2
+    - :CentreOfGravityInY
 IfcCsgSolid:
   :explicit:
-  - :TreeRootExpression
+    - :TreeRootExpression
 IfcCurrencyRelationship:
   :explicit:
-  - :RelatingMonetaryUnit
-  - :RelatedMonetaryUnit
-  - :ExchangeRate
-  - :RateDateTime
-  - :RateSource
+    - :RelatingMonetaryUnit
+    - :RelatedMonetaryUnit
+    - :ExchangeRate
+    - :RateDateTime
+    - :RateSource
 IfcCurtainWallType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcCurveBoundedPlane:
   :explicit:
-  - :BasisSurface
-  - :OuterBoundary
-  - :InnerBoundaries
+    - :BasisSurface
+    - :OuterBoundary
+    - :InnerBoundaries
 IfcPresentationStyle:
   :explicit:
-  - :Name
+    - :Name
 IfcCurveStyle:
   :explicit:
-  - :CurveFont
-  - :CurveWidth
-  - :CurveColour
+    - :CurveFont
+    - :CurveWidth
+    - :CurveColour
 IfcCurveStyleFont:
   :explicit:
-  - :Name
-  - :PatternList
+    - :Name
+    - :PatternList
 IfcCurveStyleFontAndScaling:
   :explicit:
-  - :Name
-  - :CurveFont
-  - :CurveFontScaling
+    - :Name
+    - :CurveFont
+    - :CurveFontScaling
 IfcCurveStyleFontPattern:
   :explicit:
-  - :VisibleSegmentLength
-  - :InvisibleSegmentLength
+    - :VisibleSegmentLength
+    - :InvisibleSegmentLength
 IfcDamperType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcDateAndTime:
   :explicit:
-  - :DateComponent
-  - :TimeComponent
+    - :DateComponent
+    - :TimeComponent
 IfcDefinedSymbol:
   :explicit:
-  - :Definition
-  - :Target
+    - :Definition
+    - :Target
 IfcDerivedProfileDef:
   :explicit:
-  - :ParentProfile
-  - :Operator
-  - :Label
+    - :ParentProfile
+    - :Operator
+    - :Label
 IfcDerivedUnit:
   :explicit:
-  - :Elements
-  - :UnitType
-  - :UserDefinedType
+    - :Elements
+    - :UnitType
+    - :UserDefinedType
 IfcDerivedUnitElement:
   :explicit:
-  - :Unit
-  - :Exponent
+    - :Unit
+    - :Exponent
 IfcDraughtingCalloutRelationship:
   :explicit:
-  - :Name
-  - :Description
-  - :RelatingDraughtingCallout
-  - :RelatedDraughtingCallout
+    - :Name
+    - :Description
+    - :RelatingDraughtingCallout
+    - :RelatedDraughtingCallout
 IfcTerminatorSymbol:
   :explicit:
-  - :AnnotatedCurve
+    - :AnnotatedCurve
+IfcTypeObject:
+  :explicit:
+    - :ApplicableOccurrence
+    - :HasPropertySets
+  :inverse:
+    - :Types
+IfcTypeProduct:
+  :explicit:
+    - :RepresentationMaps
+    - :Tag
+  :inverse:
+    - :ReferencedBy
 IfcDimensionCurveTerminator:
   :explicit:
-  - :Role
+    - :Role
 IfcDimensionalExponents:
   :explicit:
-  - :LengthExponent
-  - :MassExponent
-  - :TimeExponent
-  - :ElectricCurrentExponent
-  - :ThermodynamicTemperatureExponent
-  - :AmountOfSubstanceExponent
-  - :LuminousIntensityExponent
+    - :LengthExponent
+    - :MassExponent
+    - :TimeExponent
+    - :ElectricCurrentExponent
+    - :ThermodynamicTemperatureExponent
+    - :AmountOfSubstanceExponent
+    - :LuminousIntensityExponent
 IfcDirection:
   :explicit:
-  - :DirectionRatios
+    - :DirectionRatios
 IfcDiscreteAccessory:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcDiscreteAccessoryType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcDistributionChamberElementType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcDistributionControlElement:
   :explicit:
-  - :ControlElementId
+    - :ControlElementId
 IfcDistributionPort:
   :explicit:
-  - :FlowDirection
+    - :FlowDirection
 IfcDistributionSystem:
   :explicit:
-  - :LongName
-  - :PredefinedType
+    - :LongName
+    - :PredefinedType
 IfcDocumentElectronicFormat:
   :explicit:
-  - :FileExtension
-  - :MimeContentType
-  - :MimeSubtype
+    - :FileExtension
+    - :MimeContentType
+    - :MimeSubtype
 IfcDocumentInformation:
   :explicit:
-  - :DocumentId
-  - :Name
-  - :Description
-  - :DocumentReferences
-  - :Purpose
-  - :IntendedUse
-  - :Scope
-  - :Revision
-  - :DocumentOwner
-  - :Editors
-  - :CreationTime
-  - :LastRevisionTime
-  - :ElectronicFormat
-  - :ValidFrom
-  - :ValidUntil
-  - :Confidentiality
-  - :Status
+    - :DocumentId
+    - :Name
+    - :Description
+    - :DocumentReferences
+    - :Purpose
+    - :IntendedUse
+    - :Scope
+    - :Revision
+    - :DocumentOwner
+    - :Editors
+    - :CreationTime
+    - :LastRevisionTime
+    - :ElectronicFormat
+    - :ValidFrom
+    - :ValidUntil
+    - :Confidentiality
+    - :Status
 IfcDocumentInformationRelationship:
   :explicit:
-  - :RelatingDocument
-  - :RelatedDocuments
-  - :RelationshipType
+    - :RelatingDocument
+    - :RelatedDocuments
+    - :RelationshipType
 IfcDoor:
   :explicit:
-  - :OverallHeight
-  - :OverallWidth
-  - :PredefinedType
-  - :OperationType
-  - :UserDefinedOperationType
+    - :OverallHeight
+    - :OverallWidth
+    - :PredefinedType
+    - :OperationType
+    - :UserDefinedOperationType
 IfcDoorLiningProperties:
   :explicit:
-  - :LiningDepth
-  - :LiningThickness
-  - :ThresholdDepth
-  - :ThresholdThickness
-  - :TransomThickness
-  - :TransomOffset
-  - :LiningOffset
-  - :ThresholdOffset
-  - :CasingThickness
-  - :CasingDepth
-  - :ShapeAspectStyle
+    - :LiningDepth
+    - :LiningThickness
+    - :ThresholdDepth
+    - :ThresholdThickness
+    - :TransomThickness
+    - :TransomOffset
+    - :LiningOffset
+    - :ThresholdOffset
+    - :CasingThickness
+    - :CasingDepth
+    - :ShapeAspectStyle
 IfcDoorPanelProperties:
   :explicit:
-  - :PanelDepth
-  - :PanelOperation
-  - :PanelWidth
-  - :PanelPosition
-  - :ShapeAspectStyle
+    - :PanelDepth
+    - :PanelOperation
+    - :PanelWidth
+    - :PanelPosition
+    - :ShapeAspectStyle
 IfcDoorStyle:
   :explicit:
-  - :OperationType
-  - :ConstructionType
-  - :ParameterTakesPrecedence
-  - :Sizeable
+    - :OperationType
+    - :ConstructionType
+    - :ParameterTakesPrecedence
+    - :Sizeable
 IfcPreDefinedItem:
   :explicit:
-  - :Name
+    - :Name
 IfcDuctFittingType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcDuctSegmentType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcDuctSilencerType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcEarthworksFill:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcEdge:
   :explicit:
-  - :EdgeStart
-  - :EdgeEnd
+    - :EdgeStart
+    - :EdgeEnd
 IfcEdgeCurve:
   :explicit:
-  - :EdgeGeometry
-  - :SameSense
+    - :EdgeGeometry
+    - :SameSense
 IfcEdgeLoop:
   :explicit:
-  - :EdgeList
+    - :EdgeList
 IfcEdgeFeature:
   :explicit:
-  - :FeatureLength
+    - :FeatureLength
 IfcExternalReference:
   :explicit:
-  - :Location
-  - :ItemReference
-  - :Identification
-  - :Name
+    - :Location
+    - :ItemReference
+    - :Identification
+    - :Name
 IfcElectricApplianceType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcElectricDistributionPoint:
   :explicit:
-  - :DistributionPointFunction
-  - :UserDefinedFunction
+    - :DistributionPointFunction
+    - :UserDefinedFunction
 IfcElectricFlowStorageDeviceType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcElectricGeneratorType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcElectricHeaterType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcElectricMotorType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcElectricTimeControlType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcEnergyProperties:
   :explicit:
-  - :EnergySequence
-  - :UserDefinedEnergySequence
+    - :EnergySequence
+    - :UserDefinedEnergySequence
 IfcElectricalBaseProperties:
   :explicit:
-  - :ElectricCurrentType
-  - :InputVoltage
-  - :InputFrequency
-  - :FullLoadCurrent
-  - :MinimumCircuitCurrent
-  - :MaximumPowerInput
-  - :RatedPowerInput
-  - :InputPhase
+    - :ElectricCurrentType
+    - :InputVoltage
+    - :InputFrequency
+    - :FullLoadCurrent
+    - :MinimumCircuitCurrent
+    - :MaximumPowerInput
+    - :RatedPowerInput
+    - :InputPhase
 IfcElementAssembly:
   :explicit:
-  - :AssemblyPlace
-  - :PredefinedType
+    - :AssemblyPlace
+    - :PredefinedType
 IfcElementQuantity:
   :explicit:
-  - :MethodOfMeasurement
-  - :Quantities
+    - :MethodOfMeasurement
+    - :Quantities
 IfcElementarySurface:
   :explicit:
-  - :Position
+    - :Position
 IfcEllipse:
   :explicit:
-  - :SemiAxis1
-  - :SemiAxis2
+    - :SemiAxis1
+    - :SemiAxis2
 IfcEllipseProfileDef:
   :explicit:
-  - :SemiAxis1
-  - :SemiAxis2
+    - :SemiAxis1
+    - :SemiAxis2
 IfcEnvironmentalImpactValue:
   :explicit:
-  - :ImpactType
-  - :Category
-  - :UserDefinedCategory
+    - :ImpactType
+    - :Category
+    - :UserDefinedCategory
 IfcEvaporativeCoolerType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcEvaporatorType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcMarineFacility:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcMarinePart:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcMaterialProperties:
   :explicit:
-  - :Material
+    - :Material
 IfcExtendedMaterialProperties:
   :explicit:
-  - :ExtendedProperties
-  - :Description
-  - :Name
+    - :ExtendedProperties
+    - :Description
+    - :Name
 IfcSweptAreaSolid:
   :explicit:
-  - :SweptArea
-  - :Position
+    - :SweptArea
+    - :Position
 IfcExtrudedAreaSolid:
   :explicit:
-  - :ExtrudedDirection
-  - :Depth
+    - :ExtrudedDirection
+    - :Depth
 IfcFace:
   :explicit:
-  - :Bounds
+    - :Bounds
 IfcFaceBasedSurfaceModel:
   :explicit:
-  - :FbsmFaces
+    - :FbsmFaces
 IfcFaceBound:
   :explicit:
-  - :Bound
-  - :Orientation
+    - :Bound
+    - :Orientation
 IfcFaceSurface:
   :explicit:
-  - :FaceSurface
-  - :SameSense
+    - :FaceSurface
+    - :SameSense
 IfcManifoldSolidBrep:
   :explicit:
-  - :Outer
+    - :Outer
 IfcFacetedBrepWithVoids:
   :explicit:
-  - :Voids
+    - :Voids
 IfcFacility:
 IfcFacilityPart:
   :explicit:
-  - :UsageType
+    - :UsageType
 IfcFacilityPartCommon:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcStructuralConnectionCondition:
   :explicit:
-  - :Name
+    - :Name
 IfcFailureConnectionCondition:
   :explicit:
-  - :TensionFailureX
-  - :TensionFailureY
-  - :TensionFailureZ
-  - :CompressionFailureX
-  - :CompressionFailureY
-  - :CompressionFailureZ
+    - :TensionFailureX
+    - :TensionFailureY
+    - :TensionFailureZ
+    - :CompressionFailureX
+    - :CompressionFailureY
+    - :CompressionFailureZ
 IfcFanType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcFillAreaStyle:
   :explicit:
-  - :FillStyles
+    - :FillStyles
 IfcFillAreaStyleHatching:
   :explicit:
-  - :HatchLineAppearance
-  - :StartOfNextHatchLine
-  - :PointOfReferenceHatchLine
-  - :PatternStart
-  - :HatchLineAngle
+    - :HatchLineAppearance
+    - :StartOfNextHatchLine
+    - :PointOfReferenceHatchLine
+    - :PatternStart
+    - :HatchLineAngle
 IfcFillAreaStyleTileSymbolWithStyle:
   :explicit:
-  - :Symbol
+    - :Symbol
 IfcFillAreaStyleTiles:
   :explicit:
-  - :TilingPattern
-  - :Tiles
-  - :TilingScale
+    - :TilingPattern
+    - :Tiles
+    - :TilingScale
 IfcFilterType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcFireSuppressionTerminalType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcFlowInstrumentType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcFlowMeterType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcFluidFlowProperties:
   :explicit:
-  - :PropertySource
-  - :FlowConditionTimeSeries
-  - :VelocityTimeSeries
-  - :FlowrateTimeSeries
-  - :Fluid
-  - :PressureTimeSeries
-  - :UserDefinedPropertySource
-  - :TemperatureSingleValue
-  - :WetBulbTemperatureSingleValue
-  - :WetBulbTemperatureTimeSeries
-  - :TemperatureTimeSeries
-  - :FlowrateSingleValue
-  - :FlowConditionSingleValue
-  - :VelocitySingleValue
-  - :PressureSingleValue
+    - :PropertySource
+    - :FlowConditionTimeSeries
+    - :VelocityTimeSeries
+    - :FlowrateTimeSeries
+    - :Fluid
+    - :PressureTimeSeries
+    - :UserDefinedPropertySource
+    - :TemperatureSingleValue
+    - :WetBulbTemperatureSingleValue
+    - :WetBulbTemperatureTimeSeries
+    - :TemperatureTimeSeries
+    - :FlowrateSingleValue
+    - :FlowConditionSingleValue
+    - :VelocitySingleValue
+    - :PressureSingleValue
 IfcFooting:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcFootingType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcFuelProperties:
   :explicit:
-  - :CombustionTemperature
-  - :CarbonContent
-  - :LowerHeatingValue
-  - :HigherHeatingValue
+    - :CombustionTemperature
+    - :CarbonContent
+    - :LowerHeatingValue
+    - :HigherHeatingValue
 IfcFurnitureType:
   :explicit:
-  - :AssemblyPlace
+    - :AssemblyPlace
 IfcGasTerminalType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcGeneralMaterialProperties:
   :explicit:
-  - :MolecularWeight
-  - :Porosity
-  - :MassDensity
+    - :MolecularWeight
+    - :Porosity
+    - :MassDensity
 IfcProfileProperties:
   :explicit:
-  - :ProfileName
-  - :ProfileDefinition
+    - :ProfileName
+    - :ProfileDefinition
 IfcGeneralProfileProperties:
   :explicit:
-  - :PhysicalWeight
-  - :Perimeter
-  - :MinimumPlateThickness
-  - :MaximumPlateThickness
-  - :CrossSectionArea
+    - :PhysicalWeight
+    - :Perimeter
+    - :MinimumPlateThickness
+    - :MaximumPlateThickness
+    - :CrossSectionArea
 IfcGeometricSet:
   :explicit:
-  - :Elements
+    - :Elements
 IfcGeographicElement:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcGeographicElementType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcRepresentationContext:
   :explicit:
-  - :ContextIdentifier
-  - :ContextType
+    - :ContextIdentifier
+    - :ContextType
   :inverse:
-  - :RepresentationsInContext
+    - :RepresentationsInContext
 IfcRepresentationItem:
   :inverse:
-  - :LayerAssignment
-  - :StyledByItem
+    - :LayerAssignment
+    - :StyledByItem
 IfcGeometricRepresentationContext:
   :explicit:
-  - :CoordinateSpaceDimension
-  - :Precision
-  - :WorldCoordinateSystem
-  - :TrueNorth
+    - :CoordinateSpaceDimension
+    - :Precision
+    - :WorldCoordinateSystem
+    - :TrueNorth
   :inverse:
-  - :HasSubContexts
-  - :HasCoordinateOperation
+    - :HasSubContexts
+    - :HasCoordinateOperation
 IfcGeometricRepresentationSubContext:
   :explicit:
-  - :ParentContext
-  - :TargetScale
-  - :TargetView
-  - :UserDefinedTargetView
+    - :ParentContext
+    - :TargetScale
+    - :TargetView
+    - :UserDefinedTargetView
 IfcGrid:
   :explicit:
-  - :UAxes
-  - :VAxes
-  - :WAxes
+    - :UAxes
+    - :VAxes
+    - :WAxes
 IfcGridAxis:
   :explicit:
-  - :AxisTag
-  - :AxisCurve
-  - :SameSense
+    - :AxisTag
+    - :AxisCurve
+    - :SameSense
 IfcGridPlacement:
   :explicit:
-  - :PlacementLocation
-  - :PlacementRefDirection
+    - :PlacementLocation
+    - :PlacementRefDirection
 IfcHeatExchangerType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcHumidifierType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcHygroscopicMaterialProperties:
   :explicit:
-  - :UpperVaporResistanceFactor
-  - :LowerVaporResistanceFactor
-  - :IsothermalMoistureCapacity
-  - :VaporPermeability
-  - :MoistureDiffusivity
+    - :UpperVaporResistanceFactor
+    - :LowerVaporResistanceFactor
+    - :IsothermalMoistureCapacity
+    - :VaporPermeability
+    - :MoistureDiffusivity
 IfcImageTexture:
   :explicit:
-  - :UrlReference
+    - :UrlReference
 IfcIndexedTextureMap:
   :explicit:
-  - :MappedTo
-  - :TexCoords
+    - :MappedTo
+    - :TexCoords
 IfcIndexedTriangleTextureMap:
   :explicit:
-  - :TexCoordIndex
+    - :TexCoordIndex
 IfcInventory:
   :explicit:
-  - :InventoryType
-  - :Jurisdiction
-  - :ResponsiblePersons
-  - :LastUpdateDate
-  - :CurrentValue
-  - :OriginalValue
+    - :InventoryType
+    - :Jurisdiction
+    - :ResponsiblePersons
+    - :LastUpdateDate
+    - :CurrentValue
+    - :OriginalValue
 IfcTimeSeries:
   :explicit:
-  - :Name
-  - :Description
-  - :StartTime
-  - :EndTime
-  - :TimeSeriesDataType
-  - :DataOrigin
-  - :UserDefinedDataOrigin
-  - :Unit
+    - :Name
+    - :Description
+    - :StartTime
+    - :EndTime
+    - :TimeSeriesDataType
+    - :DataOrigin
+    - :UserDefinedDataOrigin
+    - :Unit
 IfcIrregularTimeSeries:
   :explicit:
-  - :Values
+    - :Values
 IfcIrregularTimeSeriesValue:
   :explicit:
-  - :TimeStamp
-  - :ListValues
+    - :TimeStamp
+    - :ListValues
 IfcJunctionBoxType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcLShapeProfileDef:
   :explicit:
-  - :Depth
-  - :Width
-  - :Thickness
-  - :FilletRadius
-  - :EdgeRadius
-  - :LegSlope
-  - :CentreOfGravityInX
-  - :CentreOfGravityInY
+    - :Depth
+    - :Width
+    - :Thickness
+    - :FilletRadius
+    - :EdgeRadius
+    - :LegSlope
+    - :CentreOfGravityInX
+    - :CentreOfGravityInY
 IfcLaborResource:
   :explicit:
-  - :SkillSet
+    - :SkillSet
 IfcLampType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcLibraryInformation:
   :explicit:
-  - :Name
-  - :Version
-  - :Publisher
-  - :VersionDate
-  - :LibraryReference
+    - :Name
+    - :Version
+    - :Publisher
+    - :VersionDate
+    - :LibraryReference
 IfcLightDistributionData:
   :explicit:
-  - :MainPlaneAngle
-  - :SecondaryPlaneAngle
-  - :LuminousIntensity
+    - :MainPlaneAngle
+    - :SecondaryPlaneAngle
+    - :LuminousIntensity
 IfcLightFixtureType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcLightIntensityDistribution:
   :explicit:
-  - :LightDistributionCurve
-  - :DistributionData
+    - :LightDistributionCurve
+    - :DistributionData
 IfcLightSource:
   :explicit:
-  - :Name
-  - :LightColour
-  - :AmbientIntensity
-  - :Intensity
+    - :Name
+    - :LightColour
+    - :AmbientIntensity
+    - :Intensity
 IfcLightSourceDirectional:
   :explicit:
-  - :Orientation
+    - :Orientation
 IfcLightSourceGoniometric:
   :explicit:
-  - :Position
-  - :ColourAppearance
-  - :ColourTemperature
-  - :LuminousFlux
-  - :LightEmissionSource
-  - :LightDistributionDataSource
+    - :Position
+    - :ColourAppearance
+    - :ColourTemperature
+    - :LuminousFlux
+    - :LightEmissionSource
+    - :LightDistributionDataSource
 IfcLightSourcePositional:
   :explicit:
-  - :Position
-  - :Radius
-  - :ConstantAttenuation
-  - :DistanceAttenuation
-  - :QuadricAttenuation
+    - :Position
+    - :Radius
+    - :ConstantAttenuation
+    - :DistanceAttenuation
+    - :QuadricAttenuation
 IfcLightSourceSpot:
   :explicit:
-  - :Orientation
-  - :ConcentrationExponent
-  - :SpreadAngle
-  - :BeamWidthAngle
+    - :Orientation
+    - :ConcentrationExponent
+    - :SpreadAngle
+    - :BeamWidthAngle
 IfcLine:
   :explicit:
-  - :Pnt
-  - :Dir
+    - :Pnt
+    - :Dir
 IfcLocalPlacement:
   :explicit:
-  - :PlacementRelTo
-  - :RelativePlacement
+    - :PlacementRelTo
+    - :RelativePlacement
 IfcLocalTime:
   :explicit:
-  - :HourComponent
-  - :MinuteComponent
-  - :SecondComponent
-  - :Zone
-  - :DaylightSavingOffset
+    - :HourComponent
+    - :MinuteComponent
+    - :SecondComponent
+    - :Zone
+    - :DaylightSavingOffset
 IfcMappedItem:
   :explicit:
-  - :MappingSource
-  - :MappingTarget
+    - :MappingSource
+    - :MappingTarget
 IfcMaterial:
   :explicit:
-  - :Name
+    - :Name
   :inverse:
-  - :HasProperties
-  - :HasRepresentation
+    - :HasProperties
+    - :HasRepresentation
 IfcMaterialClassificationRelationship:
   :explicit:
-  - :MaterialClassifications
-  - :ClassifiedMaterial
+    - :MaterialClassifications
+    - :ClassifiedMaterial
 IfcProductRepresentation:
   :explicit:
-  - :Name
-  - :Description
-  - :Representations
+    - :Name
+    - :Description
+    - :Representations
   :inverse:
-  - :ReferencedBy
-  - :PositionedRelativeTo
-  - :ReferencedInStructures
+    - :ReferencedBy
+    - :PositionedRelativeTo
+    - :ReferencedInStructures
 IfcMaterialDefinition:
   :inverse:
-  - :HasProperties
+    - :HasProperties
 IfcMaterialDefinitionRepresentation:
   :explicit:
-  - :RepresentedMaterial
+    - :RepresentedMaterial
 IfcMaterialLayer:
   :explicit:
-  - :Material
-  - :LayerThickness
-  - :IsVentilated
+    - :Material
+    - :LayerThickness
+    - :IsVentilated
 IfcMaterialLayerSet:
   :explicit:
-  - :MaterialLayers
-  - :LayerSetName
+    - :MaterialLayers
+    - :LayerSetName
 IfcMaterialLayerSetUsage:
   :explicit:
-  - :ForLayerSet
-  - :LayerSetDirection
-  - :DirectionSense
-  - :OffsetFromReferenceLine
+    - :ForLayerSet
+    - :LayerSetDirection
+    - :DirectionSense
+    - :OffsetFromReferenceLine
 IfcMaterialList:
   :explicit:
-  - :Materials
+    - :Materials
 IfcMeasureWithUnit:
   :explicit:
-  - :ValueComponent
-  - :UnitComponent
+    - :ValueComponent
+    - :UnitComponent
 IfcMechanicalMaterialProperties:
   :explicit:
-  - :DynamicViscosity
-  - :YoungModulus
-  - :ShearModulus
-  - :PoissonRatio
-  - :ThermalExpansionCoefficient
+    - :DynamicViscosity
+    - :YoungModulus
+    - :ShearModulus
+    - :PoissonRatio
+    - :ThermalExpansionCoefficient
 IfcMechanicalConcreteMaterialProperties:
   :explicit:
-  - :CompressiveStrength
-  - :MaxAggregateSize
-  - :AdmixturesDescription
-  - :Workability
-  - :ProtectivePoreRatio
-  - :WaterImpermeability
+    - :CompressiveStrength
+    - :MaxAggregateSize
+    - :AdmixturesDescription
+    - :Workability
+    - :ProtectivePoreRatio
+    - :WaterImpermeability
 IfcMechanicalFastener:
   :explicit:
-  - :NominalDiameter
-  - :NominalLength
+    - :NominalDiameter
+    - :NominalLength
 IfcMechanicalSteelMaterialProperties:
   :explicit:
-  - :YieldStress
-  - :UltimateStress
-  - :UltimateStrain
-  - :HardeningModule
-  - :ProportionalStress
-  - :PlasticStrain
-  - :Relaxations
+    - :YieldStress
+    - :UltimateStress
+    - :UltimateStrain
+    - :HardeningModule
+    - :ProportionalStress
+    - :PlasticStrain
+    - :Relaxations
 IfcMember:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcMemberType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcMetric:
   :explicit:
-  - :Benchmark
-  - :ValueSource
-  - :DataValue
+    - :Benchmark
+    - :ValueSource
+    - :DataValue
 IfcMonetaryUnit:
   :explicit:
-  - :Currency
+    - :Currency
 IfcMotorConnectionType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcTask:
   :explicit:
-  - :TaskId
-  - :Status
-  - :WorkMethod
-  - :IsMilestone
-  - :Priority
+    - :TaskId
+    - :Status
+    - :WorkMethod
+    - :IsMilestone
+    - :Priority
 IfcMove:
   :explicit:
-  - :MoveFrom
-  - :MoveTo
-  - :PunchList
+    - :MoveFrom
+    - :MoveTo
+    - :PunchList
 IfcObjectDefinition:
   :inverse:
-  - :HasAssignments
-  - :Nests
-  - :IsNestedBy
-  - :HasContext
-  - :IsDecomposedBy
-  - :Decomposes
-  - :HasAssociations
+    - :HasAssignments
+    - :Nests
+    - :IsNestedBy
+    - :HasContext
+    - :IsDecomposedBy
+    - :Decomposes
+    - :HasAssociations
 IfcObjective:
   :explicit:
-  - :BenchmarkValues
-  - :ResultValues
-  - :ObjectiveQualifier
-  - :UserDefinedQualifier
+    - :BenchmarkValues
+    - :ResultValues
+    - :ObjectiveQualifier
+    - :UserDefinedQualifier
 IfcObjectPlacement:
   :explicit:
-  - :PlacementRelTo
+    - :PlacementRelTo
   :inverse:
-  - :PlacesObject
-  - :ReferencedByPlacements
+    - :PlacesObject
+    - :ReferencedByPlacements
 IfcOccupant:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcOffsetCurve2D:
   :explicit:
-  - :BasisCurve
-  - :Distance
-  - :SelfIntersect
+    - :BasisCurve
+    - :Distance
+    - :SelfIntersect
 IfcOffsetCurve3D:
   :explicit:
-  - :BasisCurve
-  - :Distance
-  - :SelfIntersect
-  - :RefDirection
+    - :BasisCurve
+    - :Distance
+    - :SelfIntersect
+    - :RefDirection
 IfcOneDirectionRepeatFactor:
   :explicit:
-  - :RepeatFactor
+    - :RepeatFactor
 IfcOpticalMaterialProperties:
   :explicit:
-  - :VisibleTransmittance
-  - :SolarTransmittance
-  - :ThermalIrTransmittance
-  - :ThermalIrEmissivityBack
-  - :ThermalIrEmissivityFront
-  - :VisibleReflectanceBack
-  - :VisibleReflectanceFront
-  - :SolarReflectanceFront
-  - :SolarReflectanceBack
+    - :VisibleTransmittance
+    - :SolarTransmittance
+    - :ThermalIrTransmittance
+    - :ThermalIrEmissivityBack
+    - :ThermalIrEmissivityFront
+    - :VisibleReflectanceBack
+    - :VisibleReflectanceFront
+    - :SolarReflectanceFront
+    - :SolarReflectanceBack
 IfcOrderAction:
   :explicit:
-  - :ActionID
+    - :ActionID
 IfcOrganization:
   :explicit:
-  - :Id
-  - :Identification
-  - :Name
-  - :Description
-  - :Roles
-  - :Addresses
+    - :Id
+    - :Identification
+    - :Name
+    - :Description
+    - :Roles
+    - :Addresses
 IfcOrganizationRelationship:
   :explicit:
-  - :Name
-  - :Description
-  - :RelatingOrganization
-  - :RelatedOrganizations
+    - :Name
+    - :Description
+    - :RelatingOrganization
+    - :RelatedOrganizations
 IfcOrientedEdge:
   :explicit:
-  - :EdgeElement
-  - :Orientation
+    - :EdgeElement
+    - :Orientation
 IfcOutletType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcOwnerHistory:
   :explicit:
-  - :OwningUser
-  - :OwningApplication
-  - :State
-  - :ChangeAction
-  - :LastModifiedDate
-  - :LastModifyingUser
-  - :LastModifyingApplication
-  - :CreationDate
+    - :OwningUser
+    - :OwningApplication
+    - :State
+    - :ChangeAction
+    - :LastModifiedDate
+    - :LastModifyingUser
+    - :LastModifyingApplication
+    - :CreationDate
 IfcPath:
   :explicit:
-  - :EdgeList
+    - :EdgeList
 IfcPerformanceHistory:
   :explicit:
-  - :LifeCyclePhase
+    - :LifeCyclePhase
 IfcPermeableCoveringProperties:
   :explicit:
-  - :OperationType
-  - :PanelPosition
-  - :FrameDepth
-  - :FrameThickness
-  - :ShapeAspectStyle
+    - :OperationType
+    - :PanelPosition
+    - :FrameDepth
+    - :FrameThickness
+    - :ShapeAspectStyle
 IfcPermit:
   :explicit:
-  - :PermitID
+    - :PermitID
 IfcPerson:
   :explicit:
-  - :Id
-  - :Identification
-  - :FamilyName
-  - :GivenName
-  - :MiddleNames
-  - :PrefixTitles
-  - :SuffixTitles
-  - :Roles
-  - :Addresses
+    - :Id
+    - :Identification
+    - :FamilyName
+    - :GivenName
+    - :MiddleNames
+    - :PrefixTitles
+    - :SuffixTitles
+    - :Roles
+    - :Addresses
 IfcPersonAndOrganization:
   :explicit:
-  - :ThePerson
-  - :TheOrganization
-  - :Roles
+    - :ThePerson
+    - :TheOrganization
+    - :Roles
 IfcPhysicalQuantity:
   :explicit:
-  - :Name
-  - :Description
+    - :Name
+    - :Description
 IfcPhysicalComplexQuantity:
   :explicit:
-  - :HasQuantities
-  - :Discrimination
-  - :Quality
-  - :Usage
+    - :HasQuantities
+    - :Discrimination
+    - :Quality
+    - :Usage
 IfcPhysicalSimpleQuantity:
   :explicit:
-  - :Unit
+    - :Unit
 IfcPile:
   :explicit:
-  - :PredefinedType
-  - :ConstructionType
+    - :PredefinedType
+    - :ConstructionType
 IfcPipeFittingType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcPipeSegment:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcPipeSegmentType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcPixelTexture:
   :explicit:
-  - :Width
-  - :Height
-  - :ColourComponents
-  - :Pixel
+    - :Width
+    - :Height
+    - :ColourComponents
+    - :Pixel
 IfcPlanarExtent:
   :explicit:
-  - :SizeInX
-  - :SizeInY
+    - :SizeInX
+    - :SizeInY
 IfcPlanarBox:
   :explicit:
-  - :Placement
+    - :Placement
 IfcPlateType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcPointOnCurve:
   :explicit:
-  - :BasisCurve
-  - :PointParameter
+    - :BasisCurve
+    - :PointParameter
 IfcPort:
   :inverse:
-  - :ContainedIn
-  - :ConnectedFrom
-  - :ConnectedTo
+    - :ContainedIn
+    - :ConnectedFrom
+    - :ConnectedTo
 IfcPointOnSurface:
   :explicit:
-  - :BasisSurface
-  - :PointParameterU
-  - :PointParameterV
+    - :BasisSurface
+    - :PointParameterU
+    - :PointParameterV
 IfcPolyLoop:
   :explicit:
-  - :Polygon
+    - :Polygon
 IfcPolygonalBoundedHalfSpace:
   :explicit:
-  - :Position
-  - :PolygonalBoundary
+    - :Position
+    - :PolygonalBoundary
 IfcPolyline:
   :explicit:
-  - :Points
+    - :Points
 IfcPostalAddress:
   :explicit:
-  - :InternalLocation
-  - :AddressLines
-  - :PostalBox
-  - :Town
-  - :Region
-  - :PostalCode
-  - :Country
+    - :InternalLocation
+    - :AddressLines
+    - :PostalBox
+    - :Town
+    - :Region
+    - :PostalCode
+    - :Country
 IfcPresentationLayerAssignment:
   :explicit:
-  - :Name
-  - :Description
-  - :AssignedItems
-  - :Identifier
+    - :Name
+    - :Description
+    - :AssignedItems
+    - :Identifier
 IfcPresentationLayerWithStyle:
   :explicit:
-  - :LayerOn
-  - :LayerFrozen
-  - :LayerBlocked
-  - :LayerStyles
+    - :LayerOn
+    - :LayerFrozen
+    - :LayerBlocked
+    - :LayerStyles
 IfcPresentationStyleAssignment:
   :explicit:
-  - :Styles
+    - :Styles
 IfcProcedure:
   :explicit:
-  - :ProcedureID
-  - :ProcedureType
-  - :UserDefinedProcedureType
+    - :ProcedureID
+    - :ProcedureType
+    - :UserDefinedProcedureType
 IfcProductsOfCombustionProperties:
   :explicit:
-  - :SpecificHeatCapacity
-  - :N20Content
-  - :COContent
-  - :CO2Content
+    - :SpecificHeatCapacity
+    - :N20Content
+    - :COContent
+    - :CO2Content
 IfcProject:
   :explicit:
-  - :LongName
-  - :Phase
-  - :RepresentationContexts
-  - :UnitsInContext
+    - :LongName
+    - :Phase
+    - :RepresentationContexts
+    - :UnitsInContext
 IfcProjectOrder:
   :explicit:
-  - :ID
-  - :PredefinedType
-  - :Status
+    - :ID
+    - :PredefinedType
+    - :Status
 IfcProjectOrderRecord:
   :explicit:
-  - :Records
-  - :PredefinedType
+    - :Records
+    - :PredefinedType
 IfcPropertyBoundedValue:
   :explicit:
-  - :UpperBoundValue
-  - :LowerBoundValue
-  - :Unit
+    - :UpperBoundValue
+    - :LowerBoundValue
+    - :Unit
 IfcPropertyConstraintRelationship:
   :explicit:
-  - :RelatingConstraint
-  - :RelatedProperties
-  - :Name
-  - :Description
+    - :RelatingConstraint
+    - :RelatedProperties
+    - :Name
+    - :Description
 IfcPropertyDependencyRelationship:
   :explicit:
-  - :DependingProperty
-  - :DependantProperty
-  - :Name
-  - :Description
-  - :Expression
+    - :DependingProperty
+    - :DependantProperty
+    - :Name
+    - :Description
+    - :Expression
 IfcPropertyEnumeratedValue:
   :explicit:
-  - :EnumerationValues
-  - :EnumerationReference
+    - :EnumerationValues
+    - :EnumerationReference
 IfcPropertyEnumeration:
   :explicit:
-  - :Name
-  - :EnumerationValues
-  - :Unit
+    - :Name
+    - :EnumerationValues
+    - :Unit
 IfcPropertyListValue:
   :explicit:
-  - :ListValues
-  - :Unit
+    - :ListValues
+    - :Unit
 IfcPropertyReferenceValue:
   :explicit:
-  - :UsageName
-  - :PropertyReference
+    - :UsageName
+    - :PropertyReference
 IfcPropertySet:
   :explicit:
-  - :HasProperties
+    - :HasProperties
 IfcPropertySingleValue:
   :explicit:
-  - :NominalValue
-  - :Unit
+    - :NominalValue
+    - :Unit
 IfcPropertyTableValue:
   :explicit:
-  - :DefiningValues
-  - :DefinedValues
-  - :Expression
-  - :DefiningUnit
-  - :DefinedUnit
+    - :DefiningValues
+    - :DefinedValues
+    - :Expression
+    - :DefiningUnit
+    - :DefinedUnit
 IfcProtectiveDeviceType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcProxy:
   :explicit:
-  - :ProxyType
-  - :Tag
+    - :ProxyType
+    - :Tag
 IfcPumpType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcQuantityArea:
   :explicit:
-  - :AreaValue
+    - :AreaValue
 IfcQuantityCount:
   :explicit:
-  - :CountValue
+    - :CountValue
 IfcQuantityLength:
   :explicit:
-  - :LengthValue
+    - :LengthValue
 IfcQuantityTime:
   :explicit:
-  - :TimeValue
+    - :TimeValue
 IfcQuantityVolume:
   :explicit:
-  - :VolumeValue
+    - :VolumeValue
 IfcQuantityWeight:
   :explicit:
-  - :WeightValue
+    - :WeightValue
 IfcRail:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcRailType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcRailing:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcRailingType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcRailway:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcRailwayPart:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcRamp:
   :explicit:
-  - :ShapeType
+    - :ShapeType
 IfcRampFlightType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcRationalBezierCurve:
   :explicit:
-  - :WeightsData
+    - :WeightsData
 IfcRectangleProfileDef:
   :explicit:
-  - :XDim
-  - :YDim
+    - :XDim
+    - :YDim
 IfcRectangleHollowProfileDef:
   :explicit:
-  - :WallThickness
-  - :InnerFilletRadius
-  - :OuterFilletRadius
+    - :WallThickness
+    - :InnerFilletRadius
+    - :OuterFilletRadius
 IfcRectangularPyramid:
   :explicit:
-  - :XLength
-  - :YLength
-  - :Height
+    - :XLength
+    - :YLength
+    - :Height
 IfcRectangularTrimmedSurface:
   :explicit:
-  - :BasisSurface
-  - :U1
-  - :V1
-  - :U2
-  - :V2
-  - :Usense
-  - :Vsense
+    - :BasisSurface
+    - :U1
+    - :V1
+    - :U2
+    - :V2
+    - :Usense
+    - :Vsense
 IfcReferencesValueDocument:
   :explicit:
-  - :ReferencedDocument
-  - :ReferencingValues
-  - :Name
-  - :Description
+    - :ReferencedDocument
+    - :ReferencingValues
+    - :Name
+    - :Description
 IfcRegularTimeSeries:
   :explicit:
-  - :TimeStep
-  - :Values
+    - :TimeStep
+    - :Values
 IfcReinforcementBarProperties:
   :explicit:
-  - :TotalCrossSectionArea
-  - :SteelGrade
-  - :BarSurface
-  - :EffectiveDepth
-  - :NominalBarDiameter
-  - :BarCount
+    - :TotalCrossSectionArea
+    - :SteelGrade
+    - :BarSurface
+    - :EffectiveDepth
+    - :NominalBarDiameter
+    - :BarCount
 IfcReinforcementDefinitionProperties:
   :explicit:
-  - :DefinitionType
-  - :ReinforcementSectionDefinitions
+    - :DefinitionType
+    - :ReinforcementSectionDefinitions
 IfcReinforcingElement:
   :explicit:
-  - :SteelGrade
+    - :SteelGrade
 IfcReinforcingBar:
   :explicit:
-  - :NominalDiameter
-  - :CrossSectionArea
-  - :BarLength
-  - :BarRole
-  - :BarSurface
+    - :NominalDiameter
+    - :CrossSectionArea
+    - :BarLength
+    - :BarRole
+    - :BarSurface
 IfcReinforcingMesh:
   :explicit:
-  - :MeshLength
-  - :MeshWidth
-  - :LongitudinalBarNominalDiameter
-  - :TransverseBarNominalDiameter
-  - :LongitudinalBarCrossSectionArea
-  - :TransverseBarCrossSectionArea
-  - :LongitudinalBarSpacing
-  - :TransverseBarSpacing
+    - :MeshLength
+    - :MeshWidth
+    - :LongitudinalBarNominalDiameter
+    - :TransverseBarNominalDiameter
+    - :LongitudinalBarCrossSectionArea
+    - :TransverseBarCrossSectionArea
+    - :LongitudinalBarSpacing
+    - :TransverseBarSpacing
 IfcRelAdheresToElement:
   :explicit:
-  - :RelatingElement
-  - :RelatedSurfaceFeatures
+    - :RelatingElement
+    - :RelatedSurfaceFeatures
 IfcRelAggregates:
   :explicit:
-  - :RelatingObject
-  - :RelatedObjects
+    - :RelatingObject
+    - :RelatedObjects
 IfcRelDecomposes:
   :explicit:
-  - :RelatingObject
-  - :RelatedObjects
+    - :RelatingObject
+    - :RelatedObjects
 IfcRelAssigns:
   :explicit:
-  - :RelatedObjects
-  - :RelatedObjectsType
+    - :RelatedObjects
+    - :RelatedObjectsType
 IfcRelAssignsToControl:
   :explicit:
-  - :RelatingControl
+    - :RelatingControl
 IfcRelAssignsTasks:
   :explicit:
-  - :TimeForTask
+    - :TimeForTask
 IfcRelAssignsToActor:
   :explicit:
-  - :RelatingActor
-  - :ActingRole
+    - :RelatingActor
+    - :ActingRole
 IfcRelAssignsToGroup:
   :explicit:
-  - :RelatingGroup
+    - :RelatingGroup
 IfcRelAssignsToProcess:
   :explicit:
-  - :RelatingProcess
-  - :QuantityInProcess
+    - :RelatingProcess
+    - :QuantityInProcess
 IfcRelAssignsToProduct:
   :explicit:
-  - :RelatingProduct
+    - :RelatingProduct
 IfcRelAssignsToResource:
   :explicit:
-  - :RelatingResource
+    - :RelatingResource
 IfcRelAssociates:
   :explicit:
-  - :RelatedObjects
+    - :RelatedObjects
 IfcRelAssociatesAppliedValue:
   :explicit:
-  - :RelatingAppliedValue
+    - :RelatingAppliedValue
 IfcRelAssociatesApproval:
   :explicit:
-  - :RelatingApproval
+    - :RelatingApproval
 IfcRelAssociatesClassification:
   :explicit:
-  - :RelatingClassification
+    - :RelatingClassification
 IfcRelAssociatesConstraint:
   :explicit:
-  - :Intent
-  - :RelatingConstraint
+    - :Intent
+    - :RelatingConstraint
 IfcRelAssociatesDocument:
   :explicit:
-  - :RelatingDocument
+    - :RelatingDocument
 IfcRelAssociatesLibrary:
   :explicit:
-  - :RelatingLibrary
+    - :RelatingLibrary
 IfcRelAssociatesMaterial:
   :explicit:
-  - :RelatingMaterial
+    - :RelatingMaterial
 IfcRelAssociatesProfileProperties:
   :explicit:
-  - :RelatingProfileProperties
-  - :ProfileSectionLocation
-  - :ProfileOrientation
+    - :RelatingProfileProperties
+    - :ProfileSectionLocation
+    - :ProfileOrientation
 IfcRelConnectsElements:
   :explicit:
-  - :ConnectionGeometry
-  - :RelatingElement
-  - :RelatedElement
+    - :ConnectionGeometry
+    - :RelatingElement
+    - :RelatedElement
 IfcRelConnectsPathElements:
   :explicit:
-  - :RelatingPriorities
-  - :RelatedPriorities
-  - :RelatedConnectionType
-  - :RelatingConnectionType
+    - :RelatingPriorities
+    - :RelatedPriorities
+    - :RelatedConnectionType
+    - :RelatingConnectionType
 IfcRelConnectsPortToElement:
   :explicit:
-  - :RelatingPort
-  - :RelatedElement
+    - :RelatingPort
+    - :RelatedElement
 IfcRelConnectsPorts:
   :explicit:
-  - :RelatingPort
-  - :RelatedPort
-  - :RealizingElement
+    - :RelatingPort
+    - :RelatedPort
+    - :RealizingElement
 IfcRelConnectsStructuralActivity:
   :explicit:
-  - :RelatingElement
-  - :RelatedStructuralActivity
+    - :RelatingElement
+    - :RelatedStructuralActivity
 IfcRelConnectsStructuralElement:
   :explicit:
-  - :RelatingElement
-  - :RelatedStructuralMember
+    - :RelatingElement
+    - :RelatedStructuralMember
 IfcRelConnectsStructuralMember:
   :explicit:
-  - :RelatingStructuralMember
-  - :RelatedStructuralConnection
-  - :AppliedCondition
-  - :AdditionalConditions
-  - :SupportedLength
-  - :ConditionCoordinateSystem
+    - :RelatingStructuralMember
+    - :RelatedStructuralConnection
+    - :AppliedCondition
+    - :AdditionalConditions
+    - :SupportedLength
+    - :ConditionCoordinateSystem
 IfcRelConnectsWithEccentricity:
   :explicit:
-  - :ConnectionConstraint
+    - :ConnectionConstraint
 IfcRelConnectsWithRealizingElements:
   :explicit:
-  - :RealizingElements
-  - :ConnectionType
+    - :RealizingElements
+    - :ConnectionType
 IfcRelContainedInSpatialStructure:
   :explicit:
-  - :RelatedElements
-  - :RelatingStructure
+    - :RelatedElements
+    - :RelatingStructure
 IfcRelCoversBldgElements:
   :explicit:
-  - :RelatingBuildingElement
-  - :RelatedCoverings
+    - :RelatingBuildingElement
+    - :RelatedCoverings
 IfcRelCoversSpaces:
   :explicit:
-  - :RelatedSpace
-  - :RelatedCoverings
+    - :RelatedSpace
+    - :RelatedCoverings
 IfcRelDefines:
   :explicit:
-  - :RelatedObjects
+    - :RelatedObjects
 IfcRelDefinesByProperties:
   :explicit:
-  - :RelatedObjects
-  - :RelatingPropertyDefinition
+    - :RelatedObjects
+    - :RelatingPropertyDefinition
 IfcRelDefinesByType:
   :explicit:
-  - :RelatedObjects
-  - :RelatingType
+    - :RelatedObjects
+    - :RelatingType
 IfcRelFillsElement:
   :explicit:
-  - :RelatingOpeningElement
-  - :RelatedBuildingElement
+    - :RelatingOpeningElement
+    - :RelatedBuildingElement
 IfcRelFlowControlElements:
   :explicit:
-  - :RelatedControlElements
-  - :RelatingFlowElement
+    - :RelatedControlElements
+    - :RelatingFlowElement
 IfcRelInteractionRequirements:
   :explicit:
-  - :DailyInteraction
-  - :ImportanceRating
-  - :LocationOfInteraction
-  - :RelatedSpaceProgram
-  - :RelatingSpaceProgram
+    - :DailyInteraction
+    - :ImportanceRating
+    - :LocationOfInteraction
+    - :RelatedSpaceProgram
+    - :RelatingSpaceProgram
 IfcRelOverridesProperties:
   :explicit:
-  - :OverridingProperties
+    - :OverridingProperties
 IfcRelProjectsElement:
   :explicit:
-  - :RelatingElement
-  - :RelatedFeatureElement
+    - :RelatingElement
+    - :RelatedFeatureElement
 IfcRelReferencedInSpatialStructure:
   :explicit:
-  - :RelatedElements
-  - :RelatingStructure
+    - :RelatedElements
+    - :RelatingStructure
 IfcRelSequence:
   :explicit:
-  - :RelatingProcess
-  - :RelatedProcess
-  - :TimeLag
-  - :SequenceType
+    - :RelatingProcess
+    - :RelatedProcess
+    - :TimeLag
+    - :SequenceType
 IfcRelServicesBuildings:
   :explicit:
-  - :RelatingSystem
-  - :RelatedBuildings
+    - :RelatingSystem
+    - :RelatedBuildings
 IfcRelSpaceBoundary:
   :explicit:
-  - :RelatingSpace
-  - :RelatedBuildingElement
-  - :ConnectionGeometry
-  - :PhysicalOrVirtualBoundary
-  - :InternalOrExternalBoundary
+    - :RelatingSpace
+    - :RelatedBuildingElement
+    - :ConnectionGeometry
+    - :PhysicalOrVirtualBoundary
+    - :InternalOrExternalBoundary
 IfcRelVoidsElement:
   :explicit:
-  - :RelatingBuildingElement
-  - :RelatedOpeningElement
+    - :RelatingBuildingElement
+    - :RelatedOpeningElement
 IfcRelaxation:
   :explicit:
-  - :RelaxationValue
-  - :InitialStress
+    - :RelaxationValue
+    - :InitialStress
 IfcRepresentation:
   :explicit:
-  - :ContextOfItems
-  - :RepresentationIdentifier
-  - :RepresentationType
-  - :Items
+    - :ContextOfItems
+    - :RepresentationIdentifier
+    - :RepresentationType
+    - :Items
   :inverse:
-  - :RepresentationMap
-  - :LayerAssignments
-  - :OfProductRepresentation
+    - :RepresentationMap
+    - :LayerAssignments
+    - :OfProductRepresentation
 IfcRepresentationMap:
   :explicit:
-  - :MappingOrigin
-  - :MappedRepresentation
+    - :MappingOrigin
+    - :MappedRepresentation
 IfcRevolvedAreaSolid:
   :explicit:
-  - :Axis
-  - :Angle
+    - :Axis
+    - :Angle
 IfcRibPlateProfileProperties:
   :explicit:
-  - :Thickness
-  - :RibHeight
-  - :RibWidth
-  - :RibSpacing
-  - :Direction
+    - :Thickness
+    - :RibHeight
+    - :RibWidth
+    - :RibSpacing
+    - :Direction
 IfcRightCircularCone:
   :explicit:
-  - :Height
-  - :BottomRadius
+    - :Height
+    - :BottomRadius
 IfcRightCircularCylinder:
   :explicit:
-  - :Height
-  - :Radius
+    - :Height
+    - :Radius
 IfcRoad:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcRoadPart:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcRoof:
   :explicit:
-  - :ShapeType
-  - :PredefinedType
+    - :ShapeType
+    - :PredefinedType
 IfcRoofType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcRoundedEdgeFeature:
   :explicit:
-  - :Radius
+    - :Radius
 IfcRoundedRectangleProfileDef:
   :explicit:
-  - :RoundingRadius
+    - :RoundingRadius
 IfcSign:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcSignType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcSIUnit:
   :explicit:
-  - :Prefix
-  - :Name
+    - :Prefix
+    - :Name
 IfcSanitaryTerminalType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcScheduleTimeControl:
   :explicit:
-  - :ActualStart
-  - :EarlyStart
-  - :LateStart
-  - :ScheduleStart
-  - :ActualFinish
-  - :EarlyFinish
-  - :LateFinish
-  - :ScheduleFinish
-  - :ScheduleDuration
-  - :ActualDuration
-  - :RemainingTime
-  - :FreeFloat
-  - :TotalFloat
-  - :IsCritical
-  - :StatusTime
-  - :StartFloat
-  - :FinishFloat
-  - :Completion
+    - :ActualStart
+    - :EarlyStart
+    - :LateStart
+    - :ScheduleStart
+    - :ActualFinish
+    - :EarlyFinish
+    - :LateFinish
+    - :ScheduleFinish
+    - :ScheduleDuration
+    - :ActualDuration
+    - :RemainingTime
+    - :FreeFloat
+    - :TotalFloat
+    - :IsCritical
+    - :StatusTime
+    - :StartFloat
+    - :FinishFloat
+    - :Completion
 IfcSectionProperties:
   :explicit:
-  - :SectionType
-  - :StartProfile
-  - :EndProfile
+    - :SectionType
+    - :StartProfile
+    - :EndProfile
 IfcSectionReinforcementProperties:
   :explicit:
-  - :LongitudinalStartPosition
-  - :LongitudinalEndPosition
-  - :TransversePosition
-  - :ReinforcementRole
-  - :SectionDefinition
-  - :CrossSectionReinforcementDefinitions
+    - :LongitudinalStartPosition
+    - :LongitudinalEndPosition
+    - :TransversePosition
+    - :ReinforcementRole
+    - :SectionDefinition
+    - :CrossSectionReinforcementDefinitions
 IfcSectionedSpine:
   :explicit:
-  - :SpineCurve
-  - :CrossSections
-  - :CrossSectionPositions
+    - :SpineCurve
+    - :CrossSections
+    - :CrossSectionPositions
 IfcSensorType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcServiceLife:
   :explicit:
-  - :ServiceLifeType
-  - :ServiceLifeDuration
+    - :ServiceLifeType
+    - :ServiceLifeDuration
 IfcServiceLifeFactor:
   :explicit:
-  - :PredefinedType
-  - :UpperValue
-  - :MostUsedValue
-  - :LowerValue
+    - :PredefinedType
+    - :UpperValue
+    - :MostUsedValue
+    - :LowerValue
 IfcShapeAspect:
   :explicit:
-  - :ShapeRepresentations
-  - :Name
-  - :Description
-  - :ProductDefinitional
-  - :PartOfProductDefinitionShape
+    - :ShapeRepresentations
+    - :Name
+    - :Description
+    - :ProductDefinitional
+    - :PartOfProductDefinitionShape
 IfcShapeModel:
   :inverse:
-  - :OfShapeAspect
+    - :OfShapeAspect
 IfcShapeRepresentation:
 IfcShellBasedSurfaceModel:
   :explicit:
-  - :SbsmBoundary
+    - :SbsmBoundary
 IfcSite:
   :explicit:
-  - :RefLatitude
-  - :RefLongitude
-  - :RefElevation
-  - :LandTitleNumber
-  - :SiteAddress
+    - :RefLatitude
+    - :RefLongitude
+    - :RefElevation
+    - :LandTitleNumber
+    - :SiteAddress
 IfcSlab:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcSlabType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcSlippageConnectionCondition:
   :explicit:
-  - :SlippageX
-  - :SlippageY
-  - :SlippageZ
+    - :SlippageX
+    - :SlippageY
+    - :SlippageZ
 IfcSoundProperties:
   :explicit:
-  - :IsAttenuating
-  - :SoundScale
-  - :SoundValues
+    - :IsAttenuating
+    - :SoundScale
+    - :SoundValues
 IfcSoundValue:
   :explicit:
-  - :SoundLevelTimeSeries
-  - :Frequency
-  - :SoundLevelSingleValue
+    - :SoundLevelTimeSeries
+    - :Frequency
+    - :SoundLevelSingleValue
 IfcSpace:
   :explicit:
-  - :InteriorOrExteriorSpace
-  - :PredefinedType
-  - :ElevationWithFlooring
+    - :InteriorOrExteriorSpace
+    - :PredefinedType
+    - :ElevationWithFlooring
 IfcSpaceHeaterType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcSpaceProgram:
   :explicit:
-  - :SpaceProgramIdentifier
-  - :MaxRequiredArea
-  - :MinRequiredArea
-  - :RequestedLocation
-  - :StandardRequiredArea
+    - :SpaceProgramIdentifier
+    - :MaxRequiredArea
+    - :MinRequiredArea
+    - :RequestedLocation
+    - :StandardRequiredArea
 IfcSpaceThermalLoadProperties:
   :explicit:
-  - :ApplicableValueRatio
-  - :ThermalLoadSource
-  - :PropertySource
-  - :SourceDescription
-  - :MaximumValue
-  - :MinimumValue
-  - :ThermalLoadTimeSeriesValues
-  - :UserDefinedThermalLoadSource
-  - :UserDefinedPropertySource
-  - :ThermalLoadType
+    - :ApplicableValueRatio
+    - :ThermalLoadSource
+    - :PropertySource
+    - :SourceDescription
+    - :MaximumValue
+    - :MinimumValue
+    - :ThermalLoadTimeSeriesValues
+    - :UserDefinedThermalLoadSource
+    - :UserDefinedPropertySource
+    - :ThermalLoadType
 IfcSpaceType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcSphere:
   :explicit:
-  - :Radius
+    - :Radius
 IfcStackTerminalType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcStair:
   :explicit:
-  - :ShapeType
+    - :ShapeType
 IfcStairFlight:
   :explicit:
-  - :NumberOfRiser
-  - :NumberOfTreads
-  - :RiserHeight
-  - :TreadLength
+    - :NumberOfRiser
+    - :NumberOfTreads
+    - :RiserHeight
+    - :TreadLength
 IfcStairFlightType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcStructuralActivity:
   :explicit:
-  - :AppliedLoad
-  - :GlobalOrLocal
+    - :AppliedLoad
+    - :GlobalOrLocal
 IfcStructuralAction:
   :explicit:
-  - :DestabilizingLoad
-  - :CausedBy
+    - :DestabilizingLoad
+    - :CausedBy
 IfcStructuralAnalysisModel:
   :explicit:
-  - :PredefinedType
-  - :OrientationOf2DPlane
-  - :LoadedBy
-  - :HasResults
+    - :PredefinedType
+    - :OrientationOf2DPlane
+    - :LoadedBy
+    - :HasResults
 IfcStructuralConnection:
   :explicit:
-  - :AppliedCondition
+    - :AppliedCondition
 IfcStructuralCurveMember:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcStructuralLinearAction:
   :explicit:
-  - :ProjectedOrTrue
+    - :ProjectedOrTrue
 IfcStructuralLinearActionVarying:
   :explicit:
-  - :VaryingAppliedLoadLocation
-  - :SubsequentAppliedLoads
+    - :VaryingAppliedLoadLocation
+    - :SubsequentAppliedLoads
 IfcStructuralLoad:
   :explicit:
-  - :Name
+    - :Name
 IfcStructuralLoadGroup:
   :explicit:
-  - :PredefinedType
-  - :ActionType
-  - :ActionSource
-  - :Coefficient
-  - :Purpose
+    - :PredefinedType
+    - :ActionType
+    - :ActionSource
+    - :Coefficient
+    - :Purpose
 IfcStructuralLoadLinearForce:
   :explicit:
-  - :LinearForceX
-  - :LinearForceY
-  - :LinearForceZ
-  - :LinearMomentX
-  - :LinearMomentY
-  - :LinearMomentZ
+    - :LinearForceX
+    - :LinearForceY
+    - :LinearForceZ
+    - :LinearMomentX
+    - :LinearMomentY
+    - :LinearMomentZ
 IfcStructuralLoadPlanarForce:
   :explicit:
-  - :PlanarForceX
-  - :PlanarForceY
-  - :PlanarForceZ
+    - :PlanarForceX
+    - :PlanarForceY
+    - :PlanarForceZ
 IfcStructuralLoadSingleDisplacement:
   :explicit:
-  - :DisplacementX
-  - :DisplacementY
-  - :DisplacementZ
-  - :RotationalDisplacementRX
-  - :RotationalDisplacementRY
-  - :RotationalDisplacementRZ
+    - :DisplacementX
+    - :DisplacementY
+    - :DisplacementZ
+    - :RotationalDisplacementRX
+    - :RotationalDisplacementRY
+    - :RotationalDisplacementRZ
 IfcStructuralLoadSingleDisplacementDistortion:
   :explicit:
-  - :Distortion
+    - :Distortion
 IfcStructuralLoadSingleForce:
   :explicit:
-  - :ForceX
-  - :ForceY
-  - :ForceZ
-  - :MomentX
-  - :MomentY
-  - :MomentZ
+    - :ForceX
+    - :ForceY
+    - :ForceZ
+    - :MomentX
+    - :MomentY
+    - :MomentZ
 IfcStructuralLoadSingleForceWarping:
   :explicit:
-  - :WarpingMoment
+    - :WarpingMoment
 IfcStructuralLoadTemperature:
   :explicit:
-  - :DeltaT_Constant
-  - :DeltaT_Y
-  - :DeltaT_Z
+    - :DeltaT_Constant
+    - :DeltaT_Y
+    - :DeltaT_Z
 IfcStructuralPlanarAction:
   :explicit:
-  - :ProjectedOrTrue
+    - :ProjectedOrTrue
 IfcStructuralPlanarActionVarying:
   :explicit:
-  - :VaryingAppliedLoadLocation
-  - :SubsequentAppliedLoads
+    - :VaryingAppliedLoadLocation
+    - :SubsequentAppliedLoads
 IfcStructuralProfileProperties:
   :explicit:
-  - :TorsionalConstantX
-  - :MomentOfInertiaYZ
-  - :MomentOfInertiaY
-  - :MomentOfInertiaZ
-  - :WarpingConstant
-  - :ShearCentreZ
-  - :ShearCentreY
-  - :ShearDeformationAreaZ
-  - :ShearDeformationAreaY
-  - :MaximumSectionModulusY
-  - :MinimumSectionModulusY
-  - :MaximumSectionModulusZ
-  - :MinimumSectionModulusZ
-  - :TorsionalSectionModulus
-  - :CentreOfGravityInX
-  - :CentreOfGravityInY
+    - :TorsionalConstantX
+    - :MomentOfInertiaYZ
+    - :MomentOfInertiaY
+    - :MomentOfInertiaZ
+    - :WarpingConstant
+    - :ShearCentreZ
+    - :ShearCentreY
+    - :ShearDeformationAreaZ
+    - :ShearDeformationAreaY
+    - :MaximumSectionModulusY
+    - :MinimumSectionModulusY
+    - :MaximumSectionModulusZ
+    - :MinimumSectionModulusZ
+    - :TorsionalSectionModulus
+    - :CentreOfGravityInX
+    - :CentreOfGravityInY
 IfcStructuralResultGroup:
   :explicit:
-  - :TheoryType
-  - :ResultForLoadGroup
-  - :IsLinear
+    - :TheoryType
+    - :ResultForLoadGroup
+    - :IsLinear
 IfcStructuralSteelProfileProperties:
   :explicit:
-  - :ShearAreaZ
-  - :ShearAreaY
-  - :PlasticShapeFactorY
-  - :PlasticShapeFactorZ
+    - :ShearAreaZ
+    - :ShearAreaY
+    - :PlasticShapeFactorY
+    - :PlasticShapeFactorZ
 IfcStructuralSurfaceMember:
   :explicit:
-  - :PredefinedType
-  - :Thickness
+    - :PredefinedType
+    - :Thickness
 IfcStructuralSurfaceMemberVarying:
   :explicit:
-  - :SubsequentThickness
-  - :VaryingThicknessLocation
+    - :SubsequentThickness
+    - :VaryingThicknessLocation
 IfcSubContractResource:
   :explicit:
-  - :SubContractor
-  - :JobDescription
+    - :SubContractor
+    - :JobDescription
 IfcSubedge:
   :explicit:
-  - :ParentEdge
+    - :ParentEdge
 IfcSurfaceCurveSweptAreaSolid:
   :explicit:
-  - :Directrix
-  - :StartParam
-  - :EndParam
-  - :ReferenceSurface
+    - :Directrix
+    - :StartParam
+    - :EndParam
+    - :ReferenceSurface
 IfcSweptSurface:
   :explicit:
-  - :SweptCurve
-  - :Position
+    - :SweptCurve
+    - :Position
 IfcSurfaceOfLinearExtrusion:
   :explicit:
-  - :ExtrudedDirection
-  - :Depth
+    - :ExtrudedDirection
+    - :Depth
 IfcSurfaceOfRevolution:
   :explicit:
-  - :AxisPosition
+    - :AxisPosition
 IfcSurfaceStyle:
   :explicit:
-  - :Side
-  - :Styles
+    - :Side
+    - :Styles
 IfcSurfaceStyleLighting:
   :explicit:
-  - :DiffuseTransmissionColour
-  - :DiffuseReflectionColour
-  - :TransmissionColour
-  - :ReflectanceColour
+    - :DiffuseTransmissionColour
+    - :DiffuseReflectionColour
+    - :TransmissionColour
+    - :ReflectanceColour
 IfcSurfaceStyleRefraction:
   :explicit:
-  - :RefractionIndex
-  - :DispersionFactor
+    - :RefractionIndex
+    - :DispersionFactor
 IfcSurfaceStyleShading:
   :explicit:
-  - :SurfaceColour
-  - :Transparency
+    - :SurfaceColour
+    - :Transparency
 IfcSurfaceStyleRendering:
   :explicit:
-  - :Transparency
-  - :DiffuseColour
-  - :TransmissionColour
-  - :DiffuseTransmissionColour
-  - :ReflectionColour
-  - :SpecularColour
-  - :SpecularHighlight
-  - :ReflectanceMethod
+    - :Transparency
+    - :DiffuseColour
+    - :TransmissionColour
+    - :DiffuseTransmissionColour
+    - :ReflectionColour
+    - :SpecularColour
+    - :SpecularHighlight
+    - :ReflectanceMethod
 IfcSurfaceStyleWithTextures:
   :explicit:
-  - :Textures
+    - :Textures
 IfcSweptDiskSolid:
   :explicit:
-  - :Directrix
-  - :Radius
-  - :InnerRadius
-  - :StartParam
-  - :EndParam
+    - :Directrix
+    - :Radius
+    - :InnerRadius
+    - :StartParam
+    - :EndParam
 IfcSwitchingDeviceType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcSymbolStyle:
   :explicit:
-  - :StyleOfSymbol
+    - :StyleOfSymbol
 IfcTShapeProfileDef:
   :explicit:
-  - :Depth
-  - :FlangeWidth
-  - :WebThickness
-  - :FlangeThickness
-  - :FilletRadius
-  - :FlangeEdgeRadius
-  - :WebEdgeRadius
-  - :WebSlope
-  - :FlangeSlope
-  - :CentreOfGravityInY
+    - :Depth
+    - :FlangeWidth
+    - :WebThickness
+    - :FlangeThickness
+    - :FilletRadius
+    - :FlangeEdgeRadius
+    - :WebEdgeRadius
+    - :WebSlope
+    - :FlangeSlope
+    - :CentreOfGravityInY
 IfcTable:
   :explicit:
-  - :Name
-  - :Rows
+    - :Name
+    - :Rows
 IfcTableRow:
   :explicit:
-  - :RowCells
-  - :IsHeading
+    - :RowCells
+    - :IsHeading
 IfcTankType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcTelecomAddress:
   :explicit:
-  - :TelephoneNumbers
-  - :FacsimileNumbers
-  - :PagerNumber
-  - :ElectronicMailAddresses
-  - :WWWHomePageURL
+    - :TelephoneNumbers
+    - :FacsimileNumbers
+    - :PagerNumber
+    - :ElectronicMailAddresses
+    - :WWWHomePageURL
 IfcTendon:
   :explicit:
-  - :PredefinedType
-  - :NominalDiameter
-  - :CrossSectionArea
-  - :TensionForce
-  - :PreStress
-  - :FrictionCoefficient
-  - :AnchorageSlip
-  - :MinCurvatureRadius
+    - :PredefinedType
+    - :NominalDiameter
+    - :CrossSectionArea
+    - :TensionForce
+    - :PreStress
+    - :FrictionCoefficient
+    - :AnchorageSlip
+    - :MinCurvatureRadius
 IfcTessellatedFaceSet:
   :explicit:
-  - :Coordinates
-  - :Normals
-  - :Closed
+    - :Coordinates
+    - :Normals
+    - :Closed
   :inverse:
-  - :HasColours
-  - :HasTextures
+    - :HasColours
+    - :HasTextures
 IfcTextLiteral:
   :explicit:
-  - :Literal
-  - :Placement
-  - :Path
+    - :Literal
+    - :Placement
+    - :Path
 IfcTextLiteralWithExtent:
   :explicit:
-  - :Extent
-  - :BoxAlignment
+    - :Extent
+    - :BoxAlignment
 IfcTextStyle:
   :explicit:
-  - :TextCharacterAppearance
-  - :TextStyle
-  - :TextFontStyle
+    - :TextCharacterAppearance
+    - :TextStyle
+    - :TextFontStyle
 IfcTextStyleFontModel:
   :explicit:
-  - :FontFamily
-  - :FontStyle
-  - :FontVariant
-  - :FontWeight
-  - :FontSize
+    - :FontFamily
+    - :FontStyle
+    - :FontVariant
+    - :FontWeight
+    - :FontSize
 IfcTextStyleForDefinedFont:
   :explicit:
-  - :Colour
-  - :BackgroundColour
+    - :Colour
+    - :BackgroundColour
 IfcTextStyleTextModel:
   :explicit:
-  - :TextIndent
-  - :TextAlign
-  - :TextDecoration
-  - :LetterSpacing
-  - :WordSpacing
-  - :TextTransform
-  - :LineHeight
+    - :TextIndent
+    - :TextAlign
+    - :TextDecoration
+    - :LetterSpacing
+    - :WordSpacing
+    - :TextTransform
+    - :LineHeight
 IfcTextStyleWithBoxCharacteristics:
   :explicit:
-  - :BoxHeight
-  - :BoxWidth
-  - :BoxSlantAngle
-  - :BoxRotateAngle
-  - :CharacterSpacing
+    - :BoxHeight
+    - :BoxWidth
+    - :BoxSlantAngle
+    - :BoxRotateAngle
+    - :CharacterSpacing
 IfcTextureCoordinate:
   :explicit:
-  - :Maps
+    - :Maps
 IfcTextureCoordinateGenerator:
   :explicit:
-  - :Mode
-  - :Parameter
+    - :Mode
+    - :Parameter
 IfcTextureMap:
   :explicit:
-  - :TextureMaps
-  - :Maps
-  - :Vertices
-  - :MappedTo
+    - :TextureMaps
+    - :Maps
+    - :Vertices
+    - :MappedTo
 IfcTextureVertex:
   :explicit:
-  - :Coordinates
+    - :Coordinates
 IfcThermalMaterialProperties:
   :explicit:
-  - :SpecificHeatCapacity
-  - :BoilingPoint
-  - :FreezingPoint
-  - :ThermalConductivity
+    - :SpecificHeatCapacity
+    - :BoilingPoint
+    - :FreezingPoint
+    - :ThermalConductivity
 IfcTimeSeriesReferenceRelationship:
   :explicit:
-  - :ReferencedTimeSeries
-  - :TimeSeriesReferences
+    - :ReferencedTimeSeries
+    - :TimeSeriesReferences
 IfcTimeSeriesSchedule:
   :explicit:
-  - :ApplicableDates
-  - :TimeSeriesScheduleType
-  - :TimeSeries
+    - :ApplicableDates
+    - :TimeSeriesScheduleType
+    - :TimeSeries
 IfcTimeSeriesValue:
   :explicit:
-  - :ListValues
+    - :ListValues
 IfcTrackElement:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcTrackElementType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcTransformerType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcTransportElement:
   :explicit:
-  - :OperationType
-  - :CapacityByWeight
-  - :CapacityByNumber
+    - :OperationType
+    - :CapacityByWeight
+    - :CapacityByNumber
 IfcTransportElementType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcTrapeziumProfileDef:
   :explicit:
-  - :BottomXDim
-  - :TopXDim
-  - :YDim
-  - :TopXOffset
+    - :BottomXDim
+    - :TopXDim
+    - :YDim
+    - :TopXOffset
 IfcTriangulatedFaceSet:
   :explicit:
-  - :Normals
-  - :Closed
-  - :CoordIndex
-  - :NormalIndex
-  - :PnIndex
+    - :Normals
+    - :Closed
+    - :CoordIndex
+    - :NormalIndex
+    - :PnIndex
 IfcTrimmedCurve:
   :explicit:
-  - :BasisCurve
-  - :Trim1
-  - :Trim2
-  - :SenseAgreement
-  - :MasterRepresentation
+    - :BasisCurve
+    - :Trim1
+    - :Trim2
+    - :SenseAgreement
+    - :MasterRepresentation
 IfcTubeBundleType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcTwoDirectionRepeatFactor:
   :explicit:
-  - :SecondRepeatFactor
+    - :SecondRepeatFactor
 IfcUShapeProfileDef:
   :explicit:
-  - :Depth
-  - :FlangeWidth
-  - :WebThickness
-  - :FlangeThickness
-  - :FilletRadius
-  - :EdgeRadius
-  - :FlangeSlope
-  - :CentreOfGravityInX
+    - :Depth
+    - :FlangeWidth
+    - :WebThickness
+    - :FlangeThickness
+    - :FilletRadius
+    - :EdgeRadius
+    - :FlangeSlope
+    - :CentreOfGravityInX
 IfcUnitAssignment:
   :explicit:
-  - :Units
+    - :Units
 IfcUnitaryEquipmentType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcValveType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcVector:
   :explicit:
-  - :Orientation
-  - :Magnitude
+    - :Orientation
+    - :Magnitude
 IfcVertexBasedTextureMap:
   :explicit:
-  - :TextureVertices
-  - :TexturePoints
+    - :TextureVertices
+    - :TexturePoints
 IfcVertexLoop:
   :explicit:
-  - :LoopVertex
+    - :LoopVertex
 IfcVertexPoint:
   :explicit:
-  - :VertexGeometry
+    - :VertexGeometry
 IfcVibrationIsolatorType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcVirtualGridIntersection:
   :explicit:
-  - :IntersectingAxes
-  - :OffsetDistances
+    - :IntersectingAxes
+    - :OffsetDistances
 IfcWall:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcWallType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcWasteTerminalType:
   :explicit:
-  - :PredefinedType
+    - :PredefinedType
 IfcWaterProperties:
   :explicit:
-  - :IsPotable
-  - :Hardness
-  - :AlkalinityConcentration
-  - :AcidityConcentration
-  - :ImpuritiesContent
-  - :PHLevel
-  - :DissolvedSolidsContent
+    - :IsPotable
+    - :Hardness
+    - :AlkalinityConcentration
+    - :AcidityConcentration
+    - :ImpuritiesContent
+    - :PHLevel
+    - :DissolvedSolidsContent
 IfcWindow:
   :explicit:
-  - :OverallHeight
-  - :OverallWidth
-  - :PredefinedType
-  - :PartitioningType
-  - :UserDefinedPartitioningType
+    - :OverallHeight
+    - :OverallWidth
+    - :PredefinedType
+    - :PartitioningType
+    - :UserDefinedPartitioningType
 IfcWindowLiningProperties:
   :explicit:
-  - :LiningDepth
-  - :LiningThickness
-  - :TransomThickness
-  - :MullionThickness
-  - :FirstTransomOffset
-  - :SecondTransomOffset
-  - :FirstMullionOffset
-  - :SecondMullionOffset
-  - :ShapeAspectStyle
+    - :LiningDepth
+    - :LiningThickness
+    - :TransomThickness
+    - :MullionThickness
+    - :FirstTransomOffset
+    - :SecondTransomOffset
+    - :FirstMullionOffset
+    - :SecondMullionOffset
+    - :ShapeAspectStyle
 IfcWindowPanelProperties:
   :explicit:
-  - :OperationType
-  - :PanelPosition
-  - :FrameDepth
-  - :FrameThickness
-  - :ShapeAspectStyle
+    - :OperationType
+    - :PanelPosition
+    - :FrameDepth
+    - :FrameThickness
+    - :ShapeAspectStyle
 IfcWindowStyle:
   :explicit:
-  - :ConstructionType
-  - :OperationType
-  - :ParameterTakesPrecedence
-  - :Sizeable
+    - :ConstructionType
+    - :OperationType
+    - :ParameterTakesPrecedence
+    - :Sizeable
 IfcWorkControl:
   :explicit:
-  - :Identifier
-  - :CreationDate
-  - :Creators
-  - :Purpose
-  - :Duration
-  - :TotalFloat
-  - :StartTime
-  - :FinishTime
-  - :WorkControlType
-  - :UserDefinedControlType
+    - :Identifier
+    - :CreationDate
+    - :Creators
+    - :Purpose
+    - :Duration
+    - :TotalFloat
+    - :StartTime
+    - :FinishTime
+    - :WorkControlType
+    - :UserDefinedControlType
 IfcZShapeProfileDef:
   :explicit:
-  - :Depth
-  - :FlangeWidth
-  - :WebThickness
-  - :FlangeThickness
-  - :FilletRadius
-  - :EdgeRadius
+    - :Depth
+    - :FlangeWidth
+    - :WebThickness
+    - :FlangeThickness
+    - :FilletRadius
+    - :EdgeRadius

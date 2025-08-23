@@ -23,45 +23,55 @@
 
 module BimTools
   module IfcRelDefinesByProperties_su
+    include BimTools::IfcX
     def initialize(ifc_model)
+      @relatedobjects = nil
       super
       @ifc_module = ifc_model.ifc_module
     end
 
     def self.required_attributes(ifc_version)
-      # In IFC2X3, the attribute 'RelatedObjects' is part of its parent class 'IfcRelDecomposes'.
+      # (?) Add RelatingPropertyDefinition here?
+
+      # In IFC2X3, the attribute 'RelatedObjects' is part of its parent class 'IfcRelDefines'.
       return [] if ifc_version == 'IFC 2x3'
 
       [:RelatedObjects]
     end
 
     def ifcx
-      @relatedobjects.flat_map do |relatedobject|
-        next unless relatedobject.respond_to?(:hasproperties)
+      return [] unless @relatedobjects && @relatingpropertydefinition
 
-        relatedobject.hasproperties.map do |property|
-          {
-            'def' => 'over',
-            'comment' => "property: #{property.name.value}",
-            'name' => "#{relatedobject.globalid.ifcx}",
+      case @relatingpropertydefinition
+      when @ifc_module::IfcPropertySet
+        properties = @relatingpropertydefinition.hasproperties
+      when @ifc_module::IfcElementQuantity
+        properties = @relatingpropertydefinition.quantities
+      else
+        puts "Unsupported RelatingPropertyDefinition type: #{@relatingpropertydefinition.class}"
+        return []
+      end
 
-            'attributes' => { 'ifc5:properties' => {
-              "#{property.name.value}" => ifc5_property_value(property)
-            } }
-          }
+      # Apply properties to each related object
+      results = []
+      @relatedobjects.each do |relatedobject|
+        begin
+          properties.each do |property|
+            next unless property.respond_to?(:name) && property.name && property.name.respond_to?(:value)
+
+            results << {
+              path: relatedobject.globalid.ifcx,
+              attributes: {
+                "bsi::ifc::prop::#{property.name.value}": property_to_ifcx(property)
+              }
+            }
+          end
+        rescue StandardError => e
+          puts "  Error processing object: #{e.message}"
         end
       end
-    end
 
-    def ifc5_property_value(property)
-      case property
-      when @ifc_module::IfcPropertySingleValue
-        property.nominalvalue.value
-      when @ifc_module::IfcPropertyEnumeratedValue
-        property.enumerationvalues[0].value if property.enumerationvalues.length > 0
-      else
-        raise "Unknown property type: #{property.class}"
-      end
+      results
     end
   end
 end

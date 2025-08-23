@@ -31,15 +31,25 @@ module BimTools
     end
 
     def ifcx
-      @relatedobjects.map do |relatedobject|
-        {
-          'def' => 'def',
-          'comment' => "spatial aggregation: #{relatedobject.name.value}, relating object: #{@relatingobject.name.value}",
-
-          'name' => "#{relatedobject.name.ifcx} - #{relatedobject.globalid.ifcx}",
-          'inherits' => ["</#{relatedobject.globalid.ifcx}>"]
-        }
+      @relatedobjects.each_with_object({}) do |related_object, h|
+        h[unique_key(related_object)] = related_object.globalid.ifcx
       end
+    end
+
+    private
+
+    def unique_key(related_object)
+      name = related_object.respond_to?(:name) ? related_object.name : nil
+      persistent_id =
+        if related_object.respond_to?(:globalid) && related_object.globalid && related_object.globalid.respond_to?(:ifcx)
+          related_object.globalid.ifcx
+        elsif related_object.respond_to?(:su_object) && related_object.su_object && related_object.su_object.respond_to?(:persistent_id)
+          related_object.su_object.persistent_id
+        end
+
+      key_parts = [name.value, persistent_id].compact
+
+      key_parts.join(' - ')
     end
   end
 end
