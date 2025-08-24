@@ -57,8 +57,7 @@ module BimTools
         parent_material,
         front_material = nil,
         back_material = nil,
-        double_sided_faces = false,
-        add_normals = true
+        double_sided_faces = false
       )
         ifc_model = @ifc_model
         points = []
@@ -76,6 +75,9 @@ module BimTools
         parent_texture = texture_exists?(parent_material) || false
 
         @mirrored = true if is_mirroring?(transformation)
+
+        # Use global settings directly
+        add_normals = IfcManager::Settings.export[:add_normals]
 
         meshes = faces.map { |face| [face.mesh(7), get_face_transformation(face).inverse] }
 

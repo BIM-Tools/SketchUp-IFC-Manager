@@ -167,6 +167,12 @@ module BimTools
             'Export double sided faces',
             @options[:export][:double_sided_faces]
           )
+           @export_add_normals = CheckboxOption.new(
+             'add_normals',
+             'Export normals for triangulated geometry',
+             @options[:export].key?(:add_normals) ? @options[:export][:add_normals] : true,
+             'Include vertex normals in exported triangulated geometry (recommended for most workflows)'
+           )
           @export_classification_suffix = CheckboxOption.new(
             'classification_suffix',
             "Add 'Classification' suffix to all classifications",
@@ -218,6 +224,7 @@ module BimTools
         @options[:export][:type_properties] = @export_type_properties.value
         @options[:export][:textures] = @export_textures.value
         @options[:export][:double_sided_faces] = @export_double_sided_faces.value
+    @options[:export][:add_normals] = @export_add_normals.value
         @options[:export][:classification_suffix] = @export_classification_suffix.value
         @options[:export][:model_axes] = @export_model_axes.value
         @options[:export][:base_quantities] = @export_base_quantities.value
@@ -433,6 +440,7 @@ module BimTools
           @export_type_properties.value = false
           @export_textures.value = false
           @export_double_sided_faces.value = false
+      @export_add_normals.value = true
           @export_classification_suffix.value = false
           @export_base_quantities.value = false
           @export_georeference.value = false
@@ -470,6 +478,8 @@ module BimTools
               @export_textures.value = true
             when 'double_sided_faces'
               @export_double_sided_faces.value = true
+             when 'add_normals'
+               @export_add_normals.value = true
             when 'classification_suffix'
               @export_classification_suffix.value = true
             when 'model_axes'
@@ -568,6 +578,7 @@ module BimTools
         html << @export_type_properties.html
         html << @export_textures.html
         html << @export_double_sided_faces.html
+    html << @export_add_normals.html
         html << @export_base_quantities.html
         html << @export_georeference.html
         html << @export_classification_suffix.html
