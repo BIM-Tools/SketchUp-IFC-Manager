@@ -59,38 +59,56 @@ module BimTools
         double_sided_faces = false
       )
         ifc_model = @ifc_model
+        vertex_to_index = {}
         points = []
         uv_coordinates_front = []
         uv_coordinates_back = []
-        point_total = 0
+
+        faces.each do |face|
+          face.vertices.each do |vertex|
+            unless vertex_to_index.key?(vertex)
+              vertex_to_index[vertex] = points.size
+              points << vertex.position.transform(transformation)
+            end
+          end
+        end
 
         add_parent_texture = faces.any? { |face| face.material.nil? }
         add_material_to_model(parent_material) if add_parent_texture
 
-        meshes = faces.map { |face| [face, get_face_transformation(face).inverse] }
-
-        meshes.each do |mesh|
-          face, face_transformation = mesh
+        faces.each do |face|
           front_texture = texture_exists?(front_material)
           back_texture = texture_exists?(back_material) if double_sided_faces
           parent_texture = texture_exists?(parent_material)
 
           # Calculate UV transformation for parent texture if no texture is applied to the face
           if !(front_texture || back_texture) && parent_texture
+            face_transformation = get_face_transformation(face).inverse
             uv_transformation = calculate_uv_transformation(transformation, face_transformation,
                                                             parent_material.texture)
           end
 
-          face.transform! transformation
+          # Build polygon indices using SketchUp face loops and deduplicated vertex mapping
+          outer_indices = face.outer_loop.vertices.map { |vertex| vertex_to_index[vertex] + 1 }
+          voids = face.loops.reject(&:outer?).map do |loop|
+            IfcManager::Types::List.new(loop.vertices.map do |vertex|
+                                          vertex_to_index[vertex] + 1
+                                        end)
+          end
 
-          point_total = process_faces(face, point_total, points, uv_coordinates_front, uv_coordinates_back,
-                                      front_texture, back_texture, parent_texture, uv_transformation, double_sided_faces)
+          if voids.empty?
+            @faces.add(create_indexed_polygonal_face(outer_indices))
+          else
+            @faces.add(create_indexed_polygonal_face_with_voids(outer_indices, voids))
+          end
+
+          # UVs (optional, not deduplicated here)
         end
 
         @ifc_polygonal_face_set.coordinates.coordlist = IfcManager::Types::List.new(points.map do |point|
           IfcManager::Types::List.new(point.to_a.map do |coord|
-            IfcManager::Types::IfcLengthMeasure.new(ifc_model, coord)
-          end)
+                                        IfcManager::Types::IfcLengthMeasure.new(ifc_model, coord)
+                                      end)
         end)
 
         @ifc_polygonal_face_set.closed = @closed
@@ -100,6 +118,10 @@ module BimTools
 
         process_texture_maps(ifc_model, front_material, back_material, parent_material, uv_coordinates_front,
                              uv_coordinates_back, double_sided_faces)
+      end
+
+      def set_global_id(global_id)
+        @ifc_triangulated_face_set.globalid = global_id
       end
 
       private
@@ -123,7 +145,7 @@ module BimTools
       end
 
       def get_ifc_polygon(point_total, polygon)
-        polygon.map { |pt_id| IfcManager::Types::IfcInteger.new(@ifc_model, point_total + pt_id.abs) }
+        polygon.map { |pt_id| point_total + pt_id.abs }
       end
 
       def get_uv(uvq)
@@ -154,23 +176,17 @@ module BimTools
         Geom::Transformation.axes(projected_origin, axes[0], axes[1], axes[2])
       end
 
-      def process_faces(face_mesh, point_total, points, uv_coordinates_front, uv_coordinates_back, front_texture,
-                        back_texture, parent_texture, uv_transformation, double_sided_faces)
-        (1..face_mesh.count_points).each do |mesh_point_id|
-          index = mesh_point_id + point_total - 1
-          points[index] = face_mesh.point_at(mesh_point_id)
-          if front_texture || back_texture || parent_texture
-            process_textures(front_texture, back_texture, parent_texture, face_mesh, mesh_point_id, points,
-                             uv_coordinates_front, uv_coordinates_back, uv_transformation, double_sided_faces, index)
-          end
-        end
+      def create_indexed_polygonal_face(indices)
+        face = @ifc::IfcIndexedPolygonalFace.new(@ifc_model)
+        face.coordindex = IfcManager::Types::List.new(indices)
+        face
+      end
 
-        face_mesh.polygons.each do |polygon|
-          @faces.add(IfcManager::Types::List.new(get_ifc_polygon(point_total, polygon)))
-        end
-
-        point_total += face_mesh.count_points
-        point_total
+      def create_indexed_polygonal_face_with_voids(outer, voids)
+        face_with_voids = @ifc::IfcIndexedPolygonalFaceWithVoids.new(@ifc_model)
+        face_with_voids.coordindex = IfcManager::Types::List.new(outer)
+        face_with_voids.innercoordindices = IfcManager::Types::List.new(voids)
+        face_with_voids
       end
 
       def process_textures(front_texture, back_texture, parent_texture, face_mesh, mesh_point_id, points,
