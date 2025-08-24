@@ -25,6 +25,7 @@ require_relative 'ifc_extruded_area_solid_builder'
 require_relative 'ifc_faceted_brep_builder'
 require_relative 'ifc_product_definition_shape_builder'
 require_relative 'ifc_triangulated_face_set_builder'
+require_relative 'ifc_polygonal_face_set_builder'
 require_relative 'material_and_styling'
 
 module BimTools
@@ -86,7 +87,8 @@ module BimTools
       def create_mesh(ifc_model, faces, transformation, su_material = nil, face_materials = nil)
         front_material = face_materials[0] if face_materials
         back_material = face_materials[1] if face_materials
-        mesh = if @geometry_type == 'Tessellation'
+        mesh = case @geometry_type
+               when 'Triangulated'
                  IfcTriangulatedFaceSetBuilder.build(ifc_model) do |builder|
                    builder.set_faces(
                      faces,
@@ -97,6 +99,17 @@ module BimTools
                      @double_sided_faces
                    )
                    builder.set_global_id(@globalid) # not in ifc schema
+                 end
+               when 'Polygonal'
+                 IfcPolygonalFaceSetBuilder.build(ifc_model) do |builder|
+                   builder.set_faces(
+                     faces,
+                     transformation,
+                     su_material,
+                     front_material,
+                     back_material,
+                     @double_sided_faces
+                   )
                  end
                else
                  IfcFacetedBrepBuilder.build(ifc_model) do |builder|

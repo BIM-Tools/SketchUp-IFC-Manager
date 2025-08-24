@@ -56,6 +56,8 @@ module BimTools
         '.F.'
       when IfcManager::IfcGloballyUniqueId, IfcManager::Types::List, IfcManager::Types::Set, IfcManager::Types::BaseType
         property.step
+      when Integer
+        property.to_s
       else
         property.ref
       end

@@ -192,10 +192,6 @@ module BimTools
         new_id
       end
 
-      def new_id
-        @ifc_id += 1
-      end
-
       # write the IfcModel to given filepath
       # (?) could be enhanced to also accept multiple ifc types like step / ifczip / ifcxml / ifcJson / ifcx
       # (?) could be enhanced with export options hash
@@ -216,48 +212,6 @@ module BimTools
           @export_summary[class_name] += 1
         else
           @export_summary[class_name] = 1
-        end
-      end
-
-      # Recursively create IFC objects for all given SketchUp entities and add those to the model
-      #
-      # @param [Sketchup::Entities] entities
-      def create_ifc_objects(entities, transformation)
-        faces = []
-        instance_path = Sketchup::InstancePath.new([])
-        spatial_structure = SpatialStructureHierarchy.new(self)
-        spatial_structure.add(@project)
-
-        entities.each do |entity|
-          # Skip hidden objects if skip-hidden option is set
-          next unless instance_visible?(entity, @options)
-
-          case entity
-          when Sketchup::Group, Sketchup::ComponentInstance
-            EntityBuilder.new(self, entity, transformation, @project, instance_path, spatial_structure)
-          when Sketchup::Face
-            faces << entity
-          end
-        end
-
-        # Create a single IfcBuildingelementProxy from all unassociated faces in the model
-        return if faces.empty?
-
-        create_fallback_entity(
-          spatial_structure,
-          DefinitionManager.new(self, @su_model),
-          Geom::Transformation.new,
-          nil,
-          nil,
-          'model_geometry'
-        )
-      end
-
-      def collect_component_definitions(su_model)
-        su_model.definitions
-                .select { |definition| definition.instances.any? }
-                .map do |definition|
-          [definition, DefinitionManager.new(self, definition)]
         end
       end
 
@@ -331,6 +285,54 @@ module BimTools
         materials[su_material].add_to_material(ifc_entity)
 
         ifc_entity
+      end
+
+      private
+
+      def new_id
+        @ifc_id += 1
+      end
+
+      # Recursively create IFC objects for all given SketchUp entities and add those to the model
+      #
+      # @param [Sketchup::Entities] entities
+      def create_ifc_objects(entities, transformation)
+        faces = []
+        instance_path = Sketchup::InstancePath.new([])
+        spatial_structure = SpatialStructureHierarchy.new(self)
+        spatial_structure.add(@project)
+
+        entities.each do |entity|
+          # Skip hidden objects if skip-hidden option is set
+          next unless instance_visible?(entity, @options)
+
+          case entity
+          when Sketchup::Group, Sketchup::ComponentInstance
+            EntityBuilder.new(self, entity, transformation, @project, instance_path, spatial_structure)
+          when Sketchup::Face
+            faces << entity
+          end
+        end
+
+        # Create a single IfcBuildingelementProxy from all unassociated faces in the model
+        return if faces.empty?
+
+        create_fallback_entity(
+          spatial_structure,
+          DefinitionManager.new(self, @su_model),
+          Geom::Transformation.new,
+          nil,
+          nil,
+          'model_geometry'
+        )
+      end
+
+      def collect_component_definitions(su_model)
+        su_model.definitions
+                .select { |definition| definition.instances.any? }
+                .map do |definition|
+          [definition, DefinitionManager.new(self, definition)]
+        end
       end
 
       # Add representation to the IfcProduct, transform geometry with given transformation

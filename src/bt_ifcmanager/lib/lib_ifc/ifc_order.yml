@@ -1524,6 +1524,11 @@ IfcPolygonalBoundedHalfSpace:
 IfcPolyline:
   :explicit:
   - :Points
+IfcPolygonalFaceSet:
+  :explicit:
+  - :Closed
+  - :Faces
+  - :PnIndex
 IfcPostalAddress:
   :explicit:
   - :InternalLocation

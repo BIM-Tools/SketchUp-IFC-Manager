@@ -57,7 +57,8 @@ module BimTools
         parent_material,
         front_material = nil,
         back_material = nil,
-        double_sided_faces = false
+        double_sided_faces = false,
+        add_normals = true
       )
         ifc_model = @ifc_model
         points = []
@@ -90,7 +91,7 @@ module BimTools
           face_mesh.transform! transformation
 
           point_total = process_faces(face_mesh, point_total, points, uv_coordinates_front, uv_coordinates_back,
-                                      normals_front, normals_back, front_texture, back_texture, parent_texture, uv_transformation, double_sided_faces)
+                                      normals_front, normals_back, front_texture, back_texture, parent_texture, uv_transformation, double_sided_faces, add_normals)
         end
 
         @ifc_triangulated_face_set.coordinates.coordlist = IfcManager::Types::List.new(points.map do |point|
@@ -100,11 +101,13 @@ module BimTools
         end)
 
         @ifc_triangulated_face_set.closed = @closed
-        @ifc_triangulated_face_set.normals = IfcManager::Types::List.new(normals_front.map do |normal|
-          IfcManager::Types::List.new(normal.to_a.map do |coord|
-            IfcManager::Types::IfcParameterValue.new(ifc_model, coord)
+        if add_normals
+          @ifc_triangulated_face_set.normals = IfcManager::Types::List.new(normals_front.map do |normal|
+            IfcManager::Types::List.new(normal.to_a.map do |coord|
+              IfcManager::Types::IfcParameterValue.new(ifc_model, coord)
+            end)
           end)
-        end)
+        end
         @ifc_triangulated_face_set.coordindex = @coordindex
 
         return unless ifc_model.textures && (front_texture || back_texture || parent_texture)
@@ -139,7 +142,7 @@ module BimTools
 
       def get_ifc_polygon(point_total, polygon)
         polygon.reverse! if @mirrored
-        polygon.map { |pt_id| IfcManager::Types::IfcInteger.new(@ifc_model, point_total + pt_id.abs) }
+        polygon.map { |pt_id| point_total + pt_id.abs }
       end
 
       def get_uv(uvq)
@@ -171,23 +174,29 @@ module BimTools
       end
 
       def process_faces(face_mesh, point_total, points, uv_coordinates_front, uv_coordinates_back, normals_front,
-                        normals_back, front_texture, back_texture, parent_texture, uv_transformation, double_sided_faces)
-        (1..face_mesh.count_points).each do |mesh_point_id|
-          index = mesh_point_id + point_total - 1
-          points[index] = face_mesh.point_at(mesh_point_id)
-          normals_front[index] = face_mesh.normal_at(mesh_point_id)
-          normals_back[index] = face_mesh.normal_at(mesh_point_id) if double_sided_faces
+                        normals_back, front_texture, back_texture, parent_texture, uv_transformation, double_sided_faces, add_normals)
+        count = face_mesh.count_points
+        (1..count).each do |mesh_point_id|
+          idx = mesh_point_id + point_total - 1
+          pt = face_mesh.point_at(mesh_point_id)
+          points[idx] = pt
+          if add_normals
+            normals_front[idx] = face_mesh.normal_at(mesh_point_id)
+            normals_back[idx] = face_mesh.normal_at(mesh_point_id) if double_sided_faces
+          end
           if front_texture || back_texture || parent_texture
             process_textures(front_texture, back_texture, parent_texture, face_mesh, mesh_point_id, points,
-                             uv_coordinates_front, uv_coordinates_back, uv_transformation, double_sided_faces, index)
+                             uv_coordinates_front, uv_coordinates_back, uv_transformation, double_sided_faces, idx)
           end
         end
 
-        face_mesh.polygons.each do |polygon|
-          @coordindex.add(IfcManager::Types::List.new(get_ifc_polygon(point_total, polygon)))
+        polygons = face_mesh.polygons
+        polygons.each do |polygon|
+          triangle_indices = get_ifc_polygon(point_total, polygon)
+          @coordindex.add(IfcManager::Types::List.new(triangle_indices))
         end
 
-        point_total += face_mesh.count_points
+        point_total += count
         point_total
       end
 

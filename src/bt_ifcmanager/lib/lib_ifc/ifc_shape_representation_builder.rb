@@ -41,7 +41,7 @@ module BimTools
         unless builder.ifc_shape_representation.contextofitems
           builder.set_contextofitems(ifc_model.representationcontext)
         end
-        builder.set_representationtype('Brep') unless builder.ifc_shape_representation.representationtype
+        builder.set_representationtype unless builder.ifc_shape_representation.representationtype
 
         builder.ifc_shape_representation
       end
@@ -70,8 +70,19 @@ module BimTools
       # Set IfcShapeRepresentation representationtype
       #
       # @param [String] type 'Brep', 'Tessellation' or 'SweptSolid'
-      def set_representationtype(type = 'Brep')
-        @ifc_shape_representation.representationtype = Types::IfcLabel.new(@ifc_model, type)
+      def set_representationtype(geometry_type = 'Brep')
+        # Map geometry_type to IFC representation type
+        representation_type = case geometry_type
+                              when 'Brep'
+                                'Brep'
+                              when 'Polygonal', 'Triangulated'
+                                'Tessellation'
+                              when 'SweptSolid'
+                                'SweptSolid'
+                              else
+                                'Brep'
+                              end
+        @ifc_shape_representation.representationtype = Types::IfcLabel.new(@ifc_model, representation_type)
       end
 
       # Set IfcShapeRepresentation items to the given list of meshes

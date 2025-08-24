@@ -54,10 +54,13 @@ module BimTools
       def get_geometry_type(ifc_model)
         geometry_type = ifc_model.options[:geometry]
 
-        # Fallback to Brep when Tessellation not available in current IFC schema
-        if geometry_type == 'Tessellation' && !@ifc_module.const_defined?(:IfcTriangulatedFaceSet)
-          geometry_type = 'Brep'
+        case geometry_type
+        when 'Triangulated'
+          geometry_type = 'Brep' unless @ifc_module.const_defined?(:IfcTriangulatedFaceSet)
+        when 'Polygonal'
+          geometry_type = 'Brep' unless @ifc_module.const_defined?(:IfcPolygonalFaceSet)
         end
+
         geometry_type
       end
 

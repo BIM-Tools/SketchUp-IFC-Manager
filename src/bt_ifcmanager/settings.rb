@@ -30,7 +30,7 @@
 #   layers:                true,  # create IfcPresentationLayerAssignments
 #   materials:             true,  # create IfcMaterials
 #   colors:                true,  # create IfcStyledItems
-#   geometry:              'Brep' # ['Brep','Tessellation',false]
+#   geometry:              'Brep' # ['Brep','Polygonal','Triangulated',false]
 #   fast_guid:             false, # create simplified guids
 #   dynamic_attributes:    false, # export dynamic component data
 #   types:                 true,  # create IfcTypeProducts
@@ -130,7 +130,7 @@ module BimTools
             'geometry',
             'Export geometry',
             @options[:export][:geometry],
-            ['Brep','Tessellation','None'],
+            ['Brep','Polygonal','Triangulated','None'],
             'When \'None\' NO geometry is exported, just the model structure and metadata like classifications and properties'
           )
           @export_fast_guid = CheckboxOption.new(

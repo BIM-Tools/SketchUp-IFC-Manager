@@ -61,6 +61,7 @@ module BimTools
         IfcMaterial
         IfcObjectDefinition
         IfcPile
+        IfcPolygonalFaceSet
         IfcPresentationLayerAssignment
         IfcProduct
         IfcProductDefinitionShape
