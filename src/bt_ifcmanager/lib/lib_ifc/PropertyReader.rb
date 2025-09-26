@@ -205,7 +205,11 @@ module BimTools
 
       def determine_ifc_value(property, value)
         ifc_type = property.ifc_type
-        ifc_type ? ifc_type.new(@ifc_model, value) : get_ifc_property_value(value, property.attribute_type)
+        if ifc_type && ifc_type < IfcManager::Types::BaseType
+          ifc_type.new(@ifc_model, value)
+        else
+          get_ifc_property_value(value, property.attribute_type)
+        end
       end
 
       # Creates PropertySet if there are any properties to export
@@ -235,7 +239,6 @@ module BimTools
             next if value.nil? || (value.is_a?(String) && value.empty?)
 
             if quantities
-
               if value
                 case get_quantity_type(property.name)
                 when :length
@@ -248,7 +251,6 @@ module BimTools
                   ifc_value = IfcManager::Types::IfcMassMeasure.new(@ifc_model, value)
                 end
               end
-
               next unless ifc_value
 
               properties << IfcQuantityBuilder.build(@ifc_model) do |builder|
@@ -256,14 +258,8 @@ module BimTools
                 builder.set_name(property.name)
               end
             else
-
-              ifc_value = ifc_type.new(@ifc_model, value, true) if ifc_type
-
-              # Check if IFC type is set, otherwise use basic types
-              if !ifc_value || !ifc_value.is_a?(IfcManager::Types::BaseType)
-                ifc_value = get_ifc_property_value(value, property.attribute_type, true)
-              end
-
+              ifc_value = nil
+              ifc_value = ifc_type.new(@ifc_model, value, true) if ifc_type && ifc_type < IfcManager::Types::BaseType
               next unless ifc_value
 
               properties << IfcPropertyBuilder.build(@ifc_model, property.attribute_type) do |builder|
