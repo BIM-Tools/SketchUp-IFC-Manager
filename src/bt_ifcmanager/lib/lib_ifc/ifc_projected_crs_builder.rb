@@ -22,6 +22,7 @@
 #
 
 require_relative 'ifc_types'
+require_relative 'geo_coordinate_calculator'
 
 module BimTools
   module IfcManager
@@ -62,28 +63,8 @@ module BimTools
         @ifc_projected_crs.mapunit = map_unit
       end
 
-      # Calculates the EPSG code based on the UTM point.
-      #
-      # @param utm_point [UTMPoint] The UTM point containing the zone number and zone letter.
-      # @return [String] The EPSG code in the format "EPSG:#{epsg_code}".
-      def get_epsg(utm_point)
-        zone_number = utm_point.zone_number
-        zone_letter = utm_point.zone_letter
-
-        # Determine the hemisphere based on the zone letter
-        hemisphere = zone_letter >= 'N' ? 'N' : 'S'
-
-        zone_code = hemisphere == 'N' ? 32_600 : 32_700
-        epsg_code = zone_code + zone_number.to_i
-        epsg_name = "EPSG:#{epsg_code}"
-        epsg_description = "#{epsg_name} - WGS 84 / UTM zone #{zone_number}#{hemisphere}"
-        # epsg_description = "WGS 84 / UTM zone #{zone_number}#{zone_letter}"
-
-        [epsg_name, epsg_description]
-      end
-
       def set_from_utm(utm_point)
-        epsg_name, epsg_description = get_epsg(utm_point)
+        epsg_name, epsg_description = GeoCoordinateCalculator.epsg_for_utm(utm_point)
         set_name(epsg_name)
         set_description(epsg_description)
         set_geodeticdatum('WGS 84')

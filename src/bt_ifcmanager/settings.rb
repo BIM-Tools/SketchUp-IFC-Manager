@@ -53,6 +53,7 @@ require 'cgi'
 module BimTools
   module IfcManager
     require File.join(PLUGIN_PATH_LIB, 'skc_reader')
+    require File.join(PLUGIN_PATH_LIB, 'lib_ifc', 'geo_coordinate_calculator')
     module Settings
       extend self
       attr_accessor :visible,
@@ -503,6 +504,56 @@ module BimTools
         @dialog.show
       end
 
+      # Read-only preview, in the settings dialog, of the georeference data
+      # that would actually be written to IfcSite (RefLatitude/RefLongitude/
+      # RefElevation) and IfcMapConversion (Eastings/Northings) if the model
+      # was exported right now with 'Export IFC georeference' enabled.
+      #
+      # Uses IfcManager::GeoCoordinateCalculator - the exact same math the
+      # real exporter uses (GeolocationBuilder, IfcMapConversionBuilder,
+      # IfcProjectedCRSBuilder) - so this can never show a different value
+      # than what actually ends up in the exported file.
+      #
+      # @return [String] HTML fragment, empty div wrapper when nothing to show
+      def geolocation_preview_html
+        model = Sketchup.active_model
+        title = 'Read-only preview of the georeference that will be written to the exported IFC file'
+
+        if Settings.ifc_version == 'IFC 2x3'
+          return "        <div class=\"col-md-12 row\" title=\"#{title}\">" \
+                 "<em>Geolocation preview: not available for IFC 2x3.</em></div>\n"
+        end
+
+        preview = model && GeoCoordinateCalculator.preview(model, @export_model_axes && @export_model_axes.value)
+
+        unless preview
+          return "        <div class=\"col-md-12 row\" title=\"#{title}\">" \
+                 '<em>Geolocation preview: this model has no geo-location set ' \
+                 '(Window &gt; Model Info &gt; Geo-location).</em></div>' \
+                 "\n"
+        end
+
+        lat_dms = GeoCoordinateCalculator.to_dms(preview[:latitude])
+        long_dms = GeoCoordinateCalculator.to_dms(preview[:longitude])
+
+        rows = [
+          ['RefLatitude', format('%.6f°  (%d° %d\' %d")', preview[:latitude], lat_dms[0].abs, lat_dms[1].abs, lat_dms[2].abs)],
+          ['RefLongitude', format('%.6f°  (%d° %d\' %d")', preview[:longitude], long_dms[0].abs, long_dms[1].abs, long_dms[2].abs)],
+          ['RefElevation', preview[:elevation] ? format('%.2f m', preview[:elevation]) : 'not available'],
+          ['Eastings', format('%.2f m', preview[:eastings])],
+          ['Northings', format('%.2f m', preview[:northings])],
+          ['CRS', preview[:epsg_description]]
+        ]
+
+        table_rows = rows.map do |label, value|
+          "<tr><td style=\"padding-right:8px;color:#666;\">#{label}</td><td>#{CGI.escapeHTML(value)}</td></tr>"
+        end.join
+
+        "        <div class=\"col-md-12 row\" title=\"#{title}\">\n" \
+          "          <table style=\"font-size:11px;margin:2px 0 6px 0;\">#{table_rows}</table>\n" \
+          "        </div>\n"
+      end
+
       def set_html
         html = <<~HTML
   <head>
@@ -570,6 +621,7 @@ module BimTools
         html << @export_double_sided_faces.html
         html << @export_base_quantities.html
         html << @export_georeference.html
+        html << geolocation_preview_html
         html << @export_classification_suffix.html
         html << @export_model_axes.html
         html << "      </div>\n"

@@ -175,7 +175,8 @@ module BimTools
         @units = @project.unitsincontext
 
         # Add georeference
-        GeolocationBuilder.new(self).setup_geolocation(world_transformation.inverse) if @options[:georeference]
+        geolocation_builder = GeolocationBuilder.new(self)
+        geolocation_builder.setup_geolocation(world_transformation.inverse) if @options[:georeference]
 
         # When no entities are given for export, pass all model entities to create ifc objects
         # if nested_entities option is false, pass all model entities to create ifc objects to make sure they are all seperately checked
@@ -183,6 +184,16 @@ module BimTools
           create_ifc_objects(su_model.entities, world_transformation)
         else
           create_ifc_objects(@options[:root_entities], world_transformation)
+        end
+
+        # Apply RefLatitude/RefLongitude/RefElevation to every IfcSite created
+        # during export. This has to happen after create_ifc_objects: IfcSite
+        # entities (including the auto-created "default site") only exist
+        # once the spatial structure has been built.
+        if @options[:georeference]
+          @ifc_objects.each do |ifc_object|
+            geolocation_builder.apply_to_site(ifc_object) if ifc_object.is_a?(@ifc_module::IfcSite)
+          end
         end
       end
 

@@ -22,6 +22,7 @@
 #
 
 require_relative 'ifc_types'
+require_relative 'geo_coordinate_calculator'
 
 module BimTools
   module IfcManager
@@ -90,27 +91,14 @@ module BimTools
       end
 
       def set_from_utm(representationcontext, projected_crs, utm_point, world_transformation)
-        # Determine the hemisphere based on the zone letter
-        hemisphere = utm_point.zone_letter >= 'N' ? 'N' : 'S'
-        utm_y = utm_point.y
-        utm_x = utm_point.x
-        equator_height = 10_000_000
-
-        # Adjust the y value if the hemisphere is south
-        utm_y = 2 * equator_height - utm_y if hemisphere == 'S'
-
-        # Combine the UTM and world transformations
-        utm_transformation = Geom::Transformation.translation([utm_x.m, utm_y.m, 0])
-        transformation = utm_transformation * world_transformation
-        origin = transformation.origin
-        xaxis = transformation.xaxis
+        values = GeoCoordinateCalculator.map_conversion_values(utm_point, world_transformation)
 
         set_source_crs(representationcontext)
         set_target_crs(projected_crs)
-        set_eastings(origin.x.to_m)
-        set_northings(origin.y.to_m)
-        set_xaxisabscissa(xaxis.x)
-        set_xaxisordinate(xaxis.y)
+        set_eastings(values[:eastings])
+        set_northings(values[:northings])
+        set_xaxisabscissa(values[:xaxisabscissa])
+        set_xaxisordinate(values[:xaxisordinate])
       end
     end
   end

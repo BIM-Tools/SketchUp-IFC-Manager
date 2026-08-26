@@ -31,12 +31,25 @@ module BimTools
       super
     end
 
-    def reflatitude=(_values)
-      puts "Function 'reflatitude=' for 'IfcSite' not implemented"
+    # @param decimal_degrees [Float] latitude in decimal degrees, positive north
+    def reflatitude=(decimal_degrees)
+      return unless decimal_degrees
+
+      @reflatitude = convert_to_compound_plane_angle_measure(decimal_degrees)
     end
 
-    def reflongitude=(_values)
-      puts "Function 'reflongitude=' for 'IfcSite' not implemented"
+    # @param decimal_degrees [Float] longitude in decimal degrees, positive east
+    def reflongitude=(decimal_degrees)
+      return unless decimal_degrees
+
+      @reflongitude = convert_to_compound_plane_angle_measure(decimal_degrees)
+    end
+
+    # @param elevation [Numeric] elevation in meters
+    def refelevation=(elevation)
+      return unless elevation
+
+      @refelevation = IfcManager::Types::IfcLengthMeasure.new(@ifc_model, elevation, false, false)
     end
 
     private

@@ -22,13 +22,14 @@
 #
 
 require_relative 'ifc_types'
+require_relative 'geo_coordinate_calculator'
 require_relative 'ifc_map_conversion_builder'
 require_relative 'ifc_projected_crs_builder'
 
 module BimTools
   module IfcManager
     class GeolocationBuilder
-      attr_reader :ifc_quantity
+      attr_reader :ifc_quantity, :latitude, :longitude, :elevation
 
       def self.build(ifc_model)
         builder = new(ifc_model)
@@ -77,8 +78,13 @@ module BimTools
         @geo_reference = su_model.attribute_dictionary('GeoReference')
         return unless @geo_reference
 
-        # LatLong point includes the Z value
+        # point_to_latlong returns x=longitude, y=latitude - its z is NOT
+        # elevation (SketchUp's LatLong/UTM conversion ignores Z), so
+        # elevation is read separately, see GeoCoordinateCalculator#elevation_from_geo_reference
         latlong_point = su_model.point_to_latlong(world_transformation.origin)
+        @longitude = latlong_point.x
+        @latitude = latlong_point.y
+        @elevation = IfcManager::GeoCoordinateCalculator.elevation_from_geo_reference(@geo_reference)
 
         # @TODO: what happens when the 0,0,0 is just over the edge on another UTM tile?
         # utm_point = su_model.point_to_utm(world_transformation.origin)
@@ -90,9 +96,25 @@ module BimTools
 
         IfcManager::IfcMapConversionBuilder.build(@ifc_model) do |builder|
           builder.set_from_utm(@ifc_model.representationcontext, projected_crs, utm_point, world_transformation)
-          builder.set_orthogonalheight(latlong_point.z.m)
+          builder.set_orthogonalheight(@elevation)
         end
         # add_additional_ifc_entities(@ifc_model.representationcontext, utm_point)
+      end
+
+      # Applies the latitude/longitude/elevation computed by #setup_geolocation
+      # to an IfcSite's RefLatitude/RefLongitude/RefElevation attributes.
+      #
+      # Must be called AFTER the entity has been created: IfcSite entities are
+      # only created lazily while building the spatial structure, which
+      # happens after #setup_geolocation runs (see IfcModel#initialize).
+      #
+      # @param ifc_site [IfcSite]
+      def apply_to_site(ifc_site)
+        return unless @latitude && @longitude
+
+        ifc_site.reflatitude = @latitude
+        ifc_site.reflongitude = @longitude
+        ifc_site.refelevation = @elevation if @elevation
       end
 
       private
