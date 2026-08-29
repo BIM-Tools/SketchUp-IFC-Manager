@@ -21,3 +21,5 @@
 *.ifc text eol=lf
 *.rb  text eol=lf
 *.yml text eol=lf
+Gemfile text eol=lf
+Rakefile text eol=lf

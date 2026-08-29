@@ -37,6 +37,10 @@ AllCops:
       - test/**/*
   TargetRubyVersion: 2.2
 
+Layout/EndOfLine:
+  # .gitattributes pins *.rb and *.yml to LF; 'native' would demand CRLF on Windows checkouts.
+  EnforcedStyle: lf
+
 # If DisabledByDefault is set to true then we need to enable the SketchUp
 # related departments:
 
