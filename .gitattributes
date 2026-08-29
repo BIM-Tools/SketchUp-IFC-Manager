@@ -15,3 +15,9 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
+
+# IFC golden files and Ruby sources are compared byte for byte by tests and CI.
+# Force LF so Windows checkouts and Linux runners see identical bytes.
+*.ifc text eol=lf
+*.rb  text eol=lf
+*.yml text eol=lf
