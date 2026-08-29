@@ -101,7 +101,7 @@ module BimTools
 
     def show_summary(hash, file_path, time, status_message = '')
       css = File.join(PLUGIN_PATH_CSS, 'sketchup.css')
-      html = +"<html><head><link rel='stylesheet' type='text/css' href='#{css}'></head><body><textarea readonly>"
+      html = "<html><head><link rel='stylesheet' type='text/css' href='#{css}'></head><body><textarea readonly>".dup
 
       if status_message && status_message.length == 0
         html << "#{ifc_version = Settings.ifc_version} Entities exported:\n\n"

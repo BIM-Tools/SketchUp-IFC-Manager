@@ -150,7 +150,7 @@ module BimTools
         ifc_able = ifc_classifiable?(selection)
 
         html = html_header
-        javascript = +''
+        javascript = ''.dup
 
         @form_elements.each do |form_element|
           form_element.hide unless ifc_able
