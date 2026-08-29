@@ -19,6 +19,6 @@ group :documentation do
 end
 
 group :analysis do
-  gem 'rubocop', '>= 1.30', '< 2.0'  # Static analysis of Ruby Code.
+  gem 'rubocop', '~> 1.74.0'         # Pinned: .rubocop_todo.yml was generated with 1.74, CI must match.
   gem 'rubocop-sketchup', '~> 1.3.0' # Extension Warehouse requirements and SketchUp API pitfalls.
 end
