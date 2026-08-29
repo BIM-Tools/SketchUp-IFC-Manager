@@ -34,6 +34,7 @@ AllCops:
       - profiling/
       - skippy/
       - tests/
+      - test/**/*
   TargetRubyVersion: 2.2
 
 # If DisabledByDefault is set to true then we need to enable the SketchUp
