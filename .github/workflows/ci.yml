@@ -34,18 +34,18 @@ jobs:
 
   # ruby/setup-ruby support for 2.2 on ubuntu-22.04 must be confirmed on the first real run;
   # if it is unsupported the fallback is container: ruby:2.2 on the 2.2 job.
-ruby-22:
-  name: Ruby 2.2 (tests + syntax, SketchUp 2017 floor)
-  # ruby/setup-ruby can install 2.2 but its Bundler bootstrap crashes on that old RubyGems, and
-  # this leg does not need Bundler. Running inside the ruby:2.2 image via docker run avoids both.
-  # The container: job form is not used because actions/checkout needs a newer Node than that
-  # image ships.
-  runs-on: ubuntu-latest
-  timeout-minutes: 10
-  steps:
-    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-    - name: Syntax check src/ and run unit tests on Ruby 2.2
-      run: docker run --rm -v "$PWD:/work" -w /work ruby:2.2 sh -ec 'ruby -v; find src -name "*.rb" -not -path "src/bt_ifcmanager/lib/rubyzip*" -print0 | xargs -0 -n1 ruby -c > /dev/null; ruby -Itest -e "Dir[%q(test/unit/**/*_test.rb)].sort.each { |f| require File.expand_path(f) }"'
+  ruby-22:
+    name: Ruby 2.2 (tests + syntax, SketchUp 2017 floor)
+    # ruby/setup-ruby can install 2.2 but its Bundler bootstrap crashes on that old RubyGems, and
+    # this leg does not need Bundler. Running inside the ruby:2.2 image via docker run avoids both.
+    # The container: job form is not used because actions/checkout needs a newer Node than that
+    # image ships.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Syntax check src/ and run unit tests on Ruby 2.2
+        run: docker run --rm -v "$PWD:/work" -w /work ruby:2.2 sh -ec 'ruby -v; find src -name "*.rb" -not -path "src/bt_ifcmanager/lib/rubyzip*" -print0 | xargs -0 -n1 ruby -c > /dev/null; ruby -Itest -e "Dir[%q(test/unit/**/*_test.rb)].sort.each { |f| require File.expand_path(f) }"'
 
   gate:
     name: gate
