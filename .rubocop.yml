@@ -25,6 +25,8 @@ AllCops:
   ExtraDetails: true
   Exclude:
     - src/*/vendor/**/* # Exclude skippy vendor folder
+    - src/bt_ifcmanager/lib/rubyzip/**/*
+    - src/bt_ifcmanager/lib/rubyzip-1.3.0/**/*
   SketchUp:
     SourcePath: src
     TargetSketchUpVersion: 2017

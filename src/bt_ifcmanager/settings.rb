@@ -504,7 +504,7 @@ module BimTools
       end
 
       def set_html
-        html = <<~HTML
+        html = <<-HTML
   <head>
     <link rel='stylesheet' type='text/css' href='#{@css_bootstrap}'>
     <link rel='stylesheet' type='text/css' href='#{@css_core}'>
@@ -587,7 +587,7 @@ module BimTools
                                 ''
                               end
 
-        footer = <<~HTML
+        footer = <<-HTML
         <div class='form-group' title=''>
           <h1>Modelling preferences</h1>
           <div class="col-md-12 row" title="Always create default materials on opening a model (editable in 'settings.yml' config file).">
