@@ -1,0 +1,61 @@
+# Purpose: the one merge gate. Lint plus tests on Ruby 3.2, tests plus syntax on the Ruby 2.2 floor.
+#
+# Notes for anyone editing this file:
+# - Two Ruby legs only: 3.2 (SketchUp 2024+) and 2.2 (SketchUp 2017). Intermediate versions
+#   add minutes without catching a class of bug the two ends miss.
+# - RuboCop needs Ruby >= 2.7, so the 2.2 leg runs tests and syntax only and skips Bundler.
+# - No SketchUp exists on hosted runners. In-SketchUp tests run locally.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ruby-32:
+    name: Ruby 3.2 (lint + tests)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+      - run: bundle exec rake
+
+  # ruby/setup-ruby support for 2.2 on ubuntu-22.04 must be confirmed on the first real run;
+  # if it is unsupported the fallback is container: ruby:2.2 on the 2.2 job.
+  ruby-22:
+    name: Ruby 2.2 (tests + syntax, SketchUp 2017 floor)
+    # ruby/setup-ruby can install 2.2 but its Bundler bootstrap crashes on that old RubyGems, and
+    # this leg does not need Bundler. Running inside the ruby:2.2 image via docker run avoids both.
+    # The container: job form is not used because actions/checkout needs a newer Node than that
+    # image ships.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Syntax check src/ and run unit tests on Ruby 2.2
+        run: docker run --rm -v "$PWD:/work" -w /work ruby:2.2 sh -ec 'ruby -v; find src -name "*.rb" -not -path "src/bt_ifcmanager/lib/rubyzip*" -print0 | xargs -0 -n1 ruby -c > /dev/null; ruby -Itest -e "Dir[%q(test/unit/**/*_test.rb)].sort.each { |f| require File.expand_path(f) }"'
+
+  gate:
+    name: gate
+    if: always()
+    needs: [ruby-32, ruby-22]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Fail if any leg failed or was skipped
+        run: |
+          echo '${{ toJSON(needs) }}'
+          test "${{ needs.ruby-32.result }}" = success
+          test "${{ needs.ruby-22.result }}" = success

@@ -29,7 +29,7 @@ module BimTools
       # https://technical.buildingsmart.org/wp-content/uploads/2018/05/IFC2x-Model-Implementation-Guide-V2-0b.pdf
       # page 19 and 20
       def self.replace_char(in_string)
-        out_string = +'' # frozen string workaround
+        out_string = ''.dup # mutable copy; unary plus needs Ruby 2.3
         a_char_numbers = in_string.unpack('U*')
         i = 0
         while i < a_char_numbers.length

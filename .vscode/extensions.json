@@ -10,7 +10,7 @@
     "editorconfig.editorconfig",
 
     // Essential for Ruby syntax highlighting and debugging.
-    "rebornix.ruby",
+    "Shopify.ruby-lsp",
 
     // For code insight and auto-complete.
     "castwide.solargraph"

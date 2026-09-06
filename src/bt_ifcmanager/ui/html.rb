@@ -32,7 +32,7 @@ module BimTools
         js_bootstrap = File.join(PLUGIN_PATH, 'js', 'bootstrap.min.js')
         js_jquery = File.join(PLUGIN_PATH, 'js', 'jquery.min.js')
         js_select2 = File.join(PLUGIN_PATH, 'js', 'select2.min.js')
-        <<~HTML
+        <<-HTML
 <head>
   <title>Edit IFC properties</title>
   <meta charset="utf-8">

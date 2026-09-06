@@ -58,7 +58,7 @@ module BimTools
 
       # convert unformatted hex number into IfcGloballyUniqueId
       def to_s
-        ifc_guid = +''
+        ifc_guid = ''.dup
 
         # https://www.cryptosys.net/pki/uuid-rfc4122.html
         # pack('H*'): converts the hex string to a binary number (high nibble first)
@@ -100,7 +100,7 @@ module BimTools
 
       # convert IfcGloballyUniqueId into unformatted hex number
       def ifc_guid_to_hex(ifc_guid)
-        bin = +''
+        bin = ''.dup
         length = 2
         ifc_guid.each_char do |char|
           n = GUID64.index(char.to_s)

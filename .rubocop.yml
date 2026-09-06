@@ -1,3 +1,5 @@
+inherit_from: .rubocop_todo.yml
+
 require: rubocop-sketchup
 
 Style/FrozenStringLiteralComment:
@@ -23,6 +25,9 @@ AllCops:
   ExtraDetails: true
   Exclude:
     - src/*/vendor/**/* # Exclude skippy vendor folder
+    - vendor/**/* # bundler-cache installs gems here in CI
+    - src/bt_ifcmanager/lib/rubyzip/**/*
+    - src/bt_ifcmanager/lib/rubyzip-1.3.0/**/*
   SketchUp:
     SourcePath: src
     TargetSketchUpVersion: 2017
@@ -30,7 +35,12 @@ AllCops:
       - profiling/
       - skippy/
       - tests/
+      - test/**/*
   TargetRubyVersion: 2.2
+
+Layout/EndOfLine:
+  # .gitattributes pins *.rb and *.yml to LF; 'native' would demand CRLF on Windows checkouts.
+  EnforcedStyle: lf
 
 # If DisabledByDefault is set to true then we need to enable the SketchUp
 # related departments:
