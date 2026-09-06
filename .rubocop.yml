@@ -13,6 +13,9 @@ Style/FrozenStringLiteralComment:
 # inherit_from: https://raw.githubusercontent.com/SketchUp/rubocop-sketchup/main/sketchup-style.yml
 
 AllCops:
+  # The todo file was generated with 1.74 and the Gemfile pins it; new cops enter
+  # when the todo is regenerated, not by banner.
+  NewCops: disable
   # This prevents normal RuboCop cops to run. Disable this to get full static
   # analysis of your Ruby code.
   DisabledByDefault: false

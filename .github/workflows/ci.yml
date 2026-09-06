@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Syntax check src/ and run unit tests on Ruby 2.2
-        run: docker run --rm -v "$PWD:/work" -w /work ruby:2.2 sh -ec 'ruby -v; find src -name "*.rb" -not -path "src/bt_ifcmanager/lib/rubyzip*" -print0 | xargs -0 -n1 ruby -c > /dev/null; ruby -Itest -e "Dir[%q(test/unit/**/*_test.rb)].sort.each { |f| require File.expand_path(f) }"'
+        run: docker run --rm -v "$PWD:/work" -w /work ruby:2.2 sh -ec 'ruby -v; find src -name "*.rb" -not -path "src/bt_ifcmanager/lib/rubyzip*" -print0 | xargs -0 -r -n1 ruby -c > /dev/null; test "$(find src -name "*.rb" -not -path "src/bt_ifcmanager/lib/rubyzip*" | wc -l)" -gt 90; ruby test/run.rb'
 
   gate:
     name: gate
