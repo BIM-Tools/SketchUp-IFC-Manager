@@ -49,25 +49,35 @@ module BimTools
         classification.add_classification_reference(
           ifc_entity,
           classification_value,
-          get_identification(classification_dictionary),
+          get_identification(classification_dictionary, classification_value),
           get_location(classification_dictionary),
           get_name(classification_dictionary, classification_value)
         )
       end
 
-      def get_identification(classification_dictionary)
+      # Known sub-attribute-dictionary names used by classification schemas
+      # to carry the assigned code/identification value. Schema authors are
+      # free to name this field however they like inside their own .skc/.xsd
+      # (identification/itemreference are the SketchUp/IFC-recommended
+      # defaults; class-codenotatie/din_code are historical exceptions for
+      # specific known vendor files) - any classification not using one of
+      # these known names still falls back to the raw assigned value below,
+      # so a code is never silently dropped just because the schema is new.
+      IDENTIFICATION_ATTRIBUTES = %w[identification itemreference class-codenotatie din_code].freeze
+
+      def get_identification(classification_dictionary, classification_value = nil)
         if classification_dictionary
           classification_dictionary.attribute_dictionaries.each do |dictionary|
-            if %w[identification itemreference class-codenotatie din_code].include? dictionary.name.downcase
+            if IDENTIFICATION_ATTRIBUTES.include? dictionary.name.downcase
               if value = dictionary['value']
                 return value
               elsif value_dictionary = dictionary.attribute_dictionaries[dictionary.name]
-                return value_dictionary['value']
+                return value_dictionary['value'] if value_dictionary['value']
               end
             end
           end
         end
-        nil
+        classification_value
       end
 
       def get_location(classification_dictionary)

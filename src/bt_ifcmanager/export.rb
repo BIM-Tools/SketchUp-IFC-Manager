@@ -55,19 +55,26 @@ module BimTools
       pb.update(1)
 
       # create new IfcModel
-      ifc_model = IfcModel.new(su_model, options)
+      status_message = ''
+      ifc_model = nil
+      begin
+        ifc_model = IfcModel.new(su_model, options)
+      rescue StandardError => e
+        status_message = e.message
+      end
 
       pb.update(2)
 
-      # get total time
-      puts "finished creating #{ifc_version = Settings.ifc_version} entities: #{Time.now - timer}"
+      if ifc_model
+        # get total time
+        puts "finished creating #{ifc_version = Settings.ifc_version} entities: #{Time.now - timer}"
 
-      # export model to IFC step file
-      status_message = ''
-      begin
-        ifc_model.export(file_path)
-      rescue StandardError => e
-        status_message = e.message
+        # export model to IFC step file
+        begin
+          ifc_model.export(file_path)
+        rescue StandardError => e
+          status_message = e.message
+        end
       end
 
       pb.update(3)
@@ -78,7 +85,7 @@ module BimTools
 
       pb.update(4)
 
-      show_summary(ifc_model.export_summary, file_path, time, status_message)
+      show_summary(ifc_model ? ifc_model.export_summary : {}, file_path, time, status_message)
 
       # write log
       begin

@@ -54,6 +54,11 @@ module BimTools
       # Create the HtmlDialog window and form elements
       # needs to be recreated only when settings change
       def create
+        # Re-scan the active model's loaded classifications before building
+        # the form - a different model (with different classifications
+        # already loaded) may have become active since load_settings/the
+        # last Settings dialog save.
+        Settings.read_classifications
         initialize_window
         add_title
         add_classification_selects

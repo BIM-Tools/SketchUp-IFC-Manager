@@ -44,15 +44,24 @@
 #   export_entities:       [],    # Export only the given entities
 #   root_entities:         []     # Export only the given entities and their children
 # load:
-#   classifications:       [],    # ["NL-SfB 2005, tabel 1", "DIN 276-1"]
+#   classifications:       [],    # ["NL-SfB 2005, tabel 1", "DIN 276-1"] - this list is
+#                                  # only the persisted on/off toggle per classification name.
+#                                  # The actual set of checkboxes offered in the settings dialog
+#                                  # is discovered dynamically: any classification schema (.skc
+#                                  # or .xsd) currently loaded in the active model - regardless of
+#                                  # whether it's in this list yet - is added automatically. See
+#                                  # Settings#read_classifications / #discover_classification_files.
 #   default_materials:     false  # {'beton'=>[142, 142, 142],'hout'=>[129, 90, 35],'staal'=>[198, 198, 198],'gips'=>[255, 255, 255],'zink'=>[198, 198, 198],'hsb'=>[204, 161, 0],'metselwerk'=>[102, 51, 0],'steen'=>[142, 142, 142],'zetwerk'=>[198, 198, 198],'tegel'=>[255, 255, 255],'aluminium'=>[198, 198, 198],'kunststof'=>[255, 255, 255],'rvs'=>[198, 198, 198],'pannen'=>[30, 30, 30],'bitumen'=>[30, 30, 30],'epdm'=>[30, 30, 30],'isolatie'=>[255, 255, 50],'kalkzandsteen'=>[255, 255, 255],'metalstud'=>[198, 198, 198],'gibo'=>[255, 255, 255],'glas'=>[204, 255, 255],'multiplex'=>[255, 216, 101],'cementdekvloer'=>[198, 198, 198]}
 
 require 'yaml'
 require 'cgi'
+require 'set'
 
 module BimTools
   module IfcManager
     require File.join(PLUGIN_PATH_LIB, 'skc_reader')
+    require File.join(PLUGIN_PATH_LIB, 'xsd_classification_reader')
+    require File.join(PLUGIN_PATH_LIB, 'classification_dict_filters')
     module Settings
       extend self
       attr_accessor :visible,
@@ -76,6 +85,16 @@ module BimTools
 
       # classifications shown in properties window
       @active_classifications = {}
+
+      # name => filepath map of every classification schema file discovered
+      # on disk (bundled with the plugin, or in SketchUp's own
+      # 'Classifications' support folder), refreshed by #read_classifications
+      @classification_files = {}
+
+      # classification_name => { property_set_group_name => enabled(true/false) }
+      # per-group export toggle for "other" classification systems, refreshed
+      # by #read_classification_propertysets
+      @classification_propertysets = {}
 
       @classifications = {}
       @css_bootstrap = File.join(PLUGIN_PATH_CSS, 'bootstrap.min.css')
@@ -204,6 +223,7 @@ module BimTools
       def save
         @options[:load][:ifc_classifications] = @ifc_classifications
         @options[:load][:classifications] = @active_classifications
+        @options[:load][:classification_propertysets] = @classification_propertysets
         @options[:load][:template_materials] = @template_materials
         @options[:properties][:common_psets] = @common_psets
         @options[:export][:hidden] = @export_hidden.value
@@ -305,23 +325,124 @@ module BimTools
         end
       end
 
+      # @param filepath [String]
+      # @return [SKC, XsdClassification]
+      def classification_reader_for(filepath)
+        if File.extname(filepath).downcase == '.xsd'
+          XsdClassification.new(File.basename(filepath))
+        else
+          SKC.new(File.basename(filepath))
+        end
+      end
+
+      # Scans for every '.skc'/'.xsd' classification file this SketchUp
+      # installation knows about - bundled with the plugin, or in SketchUp's
+      # own 'Classifications' support folder (the same folder
+      # Window > Model Info > Classifications > Import uses) - and returns a
+      # Hash of { declared_schema_name => filepath }.
+      #
+      # This is how a schema's declared name (all we get back from
+      # active_model_classification_names) is matched back to an actual file
+      # on disk, needed to read its available values for the properties
+      # window dropdown.
+      #
+      # @return [Hash{String => String}]
+      def discover_classification_files
+        files = {}
+        %w[skc xsd].each do |ext|
+          candidates = Dir.glob(File.join(PLUGIN_PATH_CLASSIFICATIONS, "*.#{ext}"))
+          candidates += (Sketchup.find_support_files(ext, 'Classifications') || [])
+          candidates.uniq.each do |filepath|
+            begin
+              reader = classification_reader_for(filepath)
+              files[reader.name] = filepath unless reader.name.to_s.empty?
+            rescue StandardError => e
+              puts "Skipping unreadable classification file '#{filepath}': #{e.message}"
+            end
+          end
+        end
+        files
+      end
+
+      # @return [Array<String>] Names of every classification schema
+      #   currently loaded in the active model (Window > Model Info >
+      #   Classifications), regardless of how it got there (this plugin's own
+      #   settings, or a direct SketchUp import) or whether it's known to
+      #   settings.yml yet.
+      def active_model_classification_names
+        model = Sketchup.active_model
+        return [] unless model
+
+        classifications = model.classifications
+        return [] unless classifications
+
+        if classifications.respond_to?(:keys)
+          classifications.keys
+        else
+          names = []
+          classifications.each { |schema| names << schema.name }
+          names
+        end
+      rescue StandardError => e
+        puts "Unable to read active model classifications: #{e.message}"
+        []
+      end
+
+      # Determines the full set of "other classification systems" checkboxes
+      # to offer: every classification schema currently loaded in the ACTIVE
+      # DOCUMENT only - never a name merely remembered from a previous
+      # document's settings.yml toggle. Each SketchUp document can have its
+      # own, user-invented classification system (e.g. "Classificação EBBIM"
+      # in one file, something else entirely in another) - a name toggled
+      # on/off in one document must never leak into, or get force-loaded
+      # into, a different document that never had that classification to
+      # begin with (confirmed bug, 2026-08-16: this leak caused
+      # load_classifications to try loading a stale classification's schema
+      # file into an unrelated document, raising an uncaught exception that
+      # aborted load_settings before it reached load_ifc_skc, leaving
+      # Settings.ifc_module nil and silently breaking every subsequent
+      # export for the rest of the SketchUp session).
+      #
+      # The persisted settings.yml hash is consulted ONLY to recall the
+      # on/off toggle VALUE for a classification name that IS present in
+      # this document - it never adds a name the document doesn't have.
+      # A schema seen for the first time in this document (not yet in
+      # settings.yml) defaults to enabled, so its properties are
+      # usable/exportable immediately.
       def read_classifications
         @active_classifications = {}
-        if @options[:load][:classifications].is_a? Hash
-          @options[:load][:classifications].each_pair do |classification_file, load|
-            if load == true
-              begin
-                classification = SKC.new(classification_file)
-                @filters[classification_file] = classification
-                @classifications[classification.name] = classification
-                @active_classifications[classification_file] = load
-              rescue StandardError => e
-                puts e.message
-                UI::Notification.new(IFCMANAGER_EXTENSION, e.message).show
-              end
-            elsif load == false
-              @active_classifications[classification_file] = load
-            end
+        @classification_files = discover_classification_files
+
+        persisted = @options[:load][:classifications]
+        persisted = {} unless persisted.is_a? Hash
+
+        # migrate legacy filename-keyed entries ("NL-SfB tabel 1.skc") to
+        # name-keyed ("NL-SfB tabel 1")
+        persisted = persisted.each_with_object({}) do |(key, load), normalized|
+          ext = File.extname(key)
+          name = %w[.skc .xsd].include?(ext.downcase) ? File.basename(key, ext) : key
+          normalized[name] = load
+        end
+
+        known_names = active_model_classification_names.uniq
+        known_names -= @ifc_version_names
+
+        known_names.each do |classification_name|
+          load = persisted.key?(classification_name) ? persisted[classification_name] : true
+          @active_classifications[classification_name] = load
+
+          next unless load
+
+          filepath = @classification_files[classification_name]
+          next unless filepath
+
+          begin
+            reader = classification_reader_for(filepath)
+            @filters[classification_name] = reader
+            @classifications[classification_name] = reader
+          rescue StandardError => e
+            puts e.message
+            UI::Notification.new(IFCMANAGER_EXTENSION, e.message).show
           end
         end
       end
@@ -330,31 +451,166 @@ module BimTools
         @active_classifications
       end
 
+      # Finds every property-set group name actually used, in the active
+      # model, under a given classification - i.e. the same grouping
+      # EntityDictionaryReader#get_propertysets would export for it (a
+      # top-level sub-dictionary of the classification's own attribute
+      # dictionary, or one nested under an explicit 'PropertySets' wrapper -
+      # excluding the classification's own bookkeeping fields like
+      # Identification/Location/Name).
+      #
+      # @param classification_name [String]
+      # @return [Array<String>]
+      def discover_classification_propertysets(classification_name)
+        model = Sketchup.active_model
+        return [] unless model
+
+        group_names = Set.new
+        model.definitions.each do |definition|
+          next unless definition.get_attribute('AppliedSchemaTypes', classification_name)
+
+          schema_dict = definition.attribute_dictionary(classification_name)
+          next unless schema_dict && schema_dict.attribute_dictionaries
+
+          schema_dict.attribute_dictionaries.each do |attribute_dictionary|
+            case attribute_dictionary.name
+            when 'PropertySets'
+              next unless attribute_dictionary.attribute_dictionaries
+
+              attribute_dictionary.attribute_dictionaries.each { |d| group_names << d.name }
+            when 'Classifications'
+              next
+            else
+              next if CLASSIFICATION_METADATA_ATTRIBUTES.include?(attribute_dictionary.name)
+
+              group_names << attribute_dictionary.name
+            end
+          end
+        end
+        group_names.to_a
+      rescue StandardError => e
+        puts "Unable to discover property-set groups for classification '#{classification_name}': #{e.message}"
+        []
+      end
+
+      # Determines the full set of per-group export toggles to offer for
+      # every currently active "other" classification system: the union of
+      # (a) whatever the user previously toggled on/off in settings.yml, and
+      # (b) every property-set group name actually found, in the active
+      # model, under that classification. A group discovered for the first
+      # time defaults to enabled, matching the same "already there, so
+      # usable immediately" precedent as #read_classifications.
+      def read_classification_propertysets
+        @classification_propertysets = {}
+
+        persisted = @options[:load][:classification_propertysets]
+        persisted = {} unless persisted.is_a? Hash
+
+        @active_classifications.each_pair do |classification_name, active|
+          next unless active
+
+          saved_groups = persisted[classification_name]
+          saved_groups = {} unless saved_groups.is_a? Hash
+
+          discovered = discover_classification_propertysets(classification_name)
+          group_names = (saved_groups.keys + discovered).uniq
+          next if group_names.empty?
+
+          groups = {}
+          group_names.each do |group_name|
+            groups[group_name] = saved_groups.key?(group_name) ? saved_groups[group_name] : true
+          end
+          @classification_propertysets[classification_name] = groups
+        end
+      end
+
+      # @param classification_name [String]
+      # @param group_name [String]
+      # @return [Boolean] true unless the user explicitly disabled this
+      #   property-set group for this classification. Defaults to true for
+      #   any classification/group this settings dialog never configured
+      #   (e.g. the active IFC classification itself, which is out of scope
+      #   for this per-group toggle), so behaviour is unchanged unless the
+      #   user actively unchecks something.
+      def classification_propertyset_enabled?(classification_name, group_name)
+        groups = @classification_propertysets[classification_name]
+        return true unless groups.is_a?(Hash) && groups.key?(group_name)
+
+        groups[group_name]
+      end
+
+      def set_classification_propertyset(classification_name, group_name)
+        @classification_propertysets[classification_name] ||= {}
+        @classification_propertysets[classification_name][group_name] = true
+      end
+
+      def unset_classification_propertyset(classification_name, group_name)
+        @classification_propertysets[classification_name] ||= {}
+        @classification_propertysets[classification_name][group_name] = false
+      end
+
       # Load enabled classification files from settings.yml
       #   Loads both IFC and other classifications
       #   First checks plugin classifications folder then check SketchUp support files
       def load_classifications
         model = Sketchup.active_model
         model.start_operation('Load IFC Manager classifications', true)
-        classifications = Settings.ifc_classifications.merge(@active_classifications)
-        classifications.each_pair do |classification_file, classification_active|
+
+        # IFC version classifications: keys are bundled plugin filenames
+        Settings.ifc_classifications.each_pair do |classification_file, classification_active|
           next unless classification_active
 
-          plugin_filepath = File.join(PLUGIN_PATH_CLASSIFICATIONS, classification_file)
-          filepath = if File.file?(plugin_filepath)
-                      plugin_filepath
-                    else
-                      Sketchup.find_support_file(classification_file, 'Classifications')
-                    end
+          load_classification_file(model, classification_file)
+        end
+
+        # Other classification systems: keys are schema display names,
+        # resolved through the name -> filepath map built by
+        # discover_classification_files (see #read_classifications)
+        @active_classifications.each_pair do |classification_name, classification_active|
+          next unless classification_active
+          next if model.classifications[classification_name] # already loaded in this model
+
+          filepath = @classification_files[classification_name]
           if filepath
-            model.classifications.load_schema(filepath)
+            begin
+              model.classifications.load_schema(filepath)
+            rescue StandardError => e
+              # Never let a single bad/incompatible classification schema
+              # abort the rest of #load_settings (in particular
+              # #load_ifc_skc, further down the call chain) - that previously
+              # left Settings.ifc_module unset for the whole session and
+              # broke every export silently. Surface the failure instead.
+              message = "Unable to load classification '#{classification_name}': #{e.message}"
+              puts message
+              UI::Notification.new(IFCMANAGER_EXTENSION, message).show
+            end
           else
-            message = "Unable to load classification:\r\n'#{classification_file}'"
+            message = "Unable to load classification:\r\n'#{classification_name}' (no matching .skc/.xsd file found)"
             puts message
             UI::Notification.new(IFCMANAGER_EXTENSION, message).show
           end
         end
+
         model.commit_operation
+      end
+
+      # @param model [Sketchup::Model]
+      # @param classification_file [String] filename relative to the plugin's
+      #   classifications folder, or a SketchUp support 'Classifications' folder
+      def load_classification_file(model, classification_file)
+        plugin_filepath = File.join(PLUGIN_PATH_CLASSIFICATIONS, classification_file)
+        filepath = if File.file?(plugin_filepath)
+                    plugin_filepath
+                  else
+                    Sketchup.find_support_file(classification_file, 'Classifications')
+                  end
+        if filepath
+          model.classifications.load_schema(filepath)
+        else
+          message = "Unable to load classification:\r\n'#{classification_file}'"
+          puts message
+          UI::Notification.new(IFCMANAGER_EXTENSION, message).show
+        end
       end
 
       # @return [Hash] List of materials
@@ -403,6 +659,13 @@ module BimTools
       end
 
       def create_dialog
+        # Re-scan the active model's loaded classifications every time the
+        # dialog is (re)opened, not just once at SketchUp startup - a
+        # different model (with different classifications already loaded)
+        # may well have become active since load_settings last ran.
+        read_classifications
+        read_classification_propertysets
+
         @dialog = UI::HtmlDialog.new(
           {
             dialog_title: 'IFC Manager Settings',
@@ -419,6 +682,7 @@ module BimTools
         @dialog.add_action_callback('save_settings') do |_action_context, s_form_data|
           update_classifications = []
           update_ifc_classifications = []
+          update_classification_propertysets = []
           @template_materials = false
           @common_psets = false
           @export_hidden.value = false
@@ -482,6 +746,8 @@ module BimTools
               update_ifc_classifications << value
             when 'classification'
               update_classifications << value
+            when 'classification_propertyset'
+              update_classification_propertysets << value
             end
           end
           @active_classifications.each_key do |classification_name|
@@ -496,6 +762,23 @@ module BimTools
               set_ifc_classification(ifc_classification)
             else
               unset_ifc_classification(ifc_classification)
+            end
+          end
+          # Only reconcile property-set groups for classifications that were
+          # actually active (and therefore rendered with checkboxes) this
+          # time - an inactive classification's saved group toggles are left
+          # untouched rather than wiped, since the form never offered a way
+          # to change them.
+          @classification_propertysets.each_pair do |classification_name, groups|
+            next unless @active_classifications[classification_name]
+
+            groups.each_key do |group_name|
+              combined = "#{classification_name}::#{group_name}"
+              if update_classification_propertysets.include? combined
+                set_classification_propertyset(classification_name, group_name)
+              else
+                unset_classification_propertyset(classification_name, group_name)
+              end
             end
           end
           save
@@ -542,14 +825,26 @@ module BimTools
         html << "      <div class='form-group' title='Select additional classifications that will be exported to IFC as IfcClassification'>\n"
         html << "        <h1>Other classification systems</h1>\n"
 
-        @active_classifications.each_pair do |classification, load|
+        @active_classifications.each_pair do |classification_name, load|
           checked = if load
                       ' checked'
                     else
                       ''
                     end
-          classification_name = File.basename(classification, '.skc')
-          html << "        <div class=\"col-md-12 row\"><label class=\"check-inline\"><input type=\"checkbox\" name=\"classification\" value=\"#{classification}\"#{checked}> #{classification_name}</label></div>\n"
+          html << "        <div class=\"col-md-12 row\"><label class=\"check-inline\"><input type=\"checkbox\" name=\"classification\" value=\"#{classification_name}\"#{checked}> #{classification_name}</label></div>\n"
+
+          next unless load
+
+          groups = @classification_propertysets[classification_name]
+          next unless groups && !groups.empty?
+
+          html << "        <div class=\"col-md-12\" style=\"margin-left:20px;\" title=\"Choose which property-set groups from '#{classification_name}' are exported to IFC\">\n"
+          groups.each_pair do |group_name, group_load|
+            group_checked = group_load ? ' checked' : ''
+            combined = "#{classification_name}::#{group_name}"
+            html << "          <div class=\"col-md-12 row\"><label class=\"check-inline\"><input type=\"checkbox\" name=\"classification_propertyset\" value=\"#{combined}\"#{group_checked}> #{group_name}</label></div>\n"
+          end
+          html << "        </div>\n"
         end
 
         # Export settings

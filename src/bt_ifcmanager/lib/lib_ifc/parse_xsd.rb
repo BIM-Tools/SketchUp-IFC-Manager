@@ -134,7 +134,17 @@ module BimTools
         ifc_objects = get_ifc_objects(root.elements)
 
         ifc_objects.each_pair do |ifc_name, ifc_object|
-          create_ifc_class(ifc_name, ifc_object, ifc_objects) unless Object.const_defined?(ifc_name)
+          # Must check @ifc_module (this schema's own namespace), never the
+          # global Object namespace - any OTHER installed SketchUp extension
+          # that happens to define a top-level Ruby class with the same name
+          # as an IFC entity (e.g. IfcOwnerHistory) would make Object.const_defined?
+          # true and silently skip creating this plugin's own version of that
+          # class inside @ifc_module, causing "uninitialized constant" the
+          # first time the exporter tries to use it. #create_ifc_class already
+          # re-checks @ifc_module.const_defined?(ifc_name) itself; this outer
+          # check only needs to avoid redoing that work, not duplicate it
+          # against the wrong namespace.
+          create_ifc_class(ifc_name, ifc_object, ifc_objects) unless @ifc_module.const_defined?(ifc_name)
         end
         time = Time.now - timer
         puts "finished reading IFC schema: #{time}"

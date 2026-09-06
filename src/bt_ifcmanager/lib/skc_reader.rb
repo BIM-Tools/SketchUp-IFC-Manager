@@ -138,6 +138,10 @@ module BimTools
       # Gets the filter options from the SKC file.
       #
       # @return [Array<String>] The filter options as an array of strings.
+      def get_options
+        get_skc_options
+      end
+
       def get_skc_options
         options = []
         return options unless @skc_filepath

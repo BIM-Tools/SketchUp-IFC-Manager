@@ -25,6 +25,7 @@ require_relative 'ifc_types'
 require_relative 'ifc_property_builder'
 require_relative 'ifc_rel_defines_by_properties_builder'
 require_relative 'property_dictionary_reader'
+require_relative '../classification_dict_filters'
 
 module BimTools
   module IfcManager
@@ -47,17 +48,7 @@ module BimTools
         PropertySets
       ].freeze
 
-      CLASSIFICATION_ATTRIBUTES = %w[
-        Location
-        ItemReference
-        Identification
-        Name
-        ReferencedSource
-        Description
-        Sort
-        Definition
-        RelatedIfcEntityNames
-      ].freeze
+      CLASSIFICATION_ATTRIBUTES = BimTools::IfcManager::CLASSIFICATION_METADATA_ATTRIBUTES
 
       # Define a mapping for attributes that need to be renamed
       ATTRIBUTE_MAPPING = {
@@ -126,6 +117,8 @@ module BimTools
               next unless attribute_dictionary.attribute_dictionaries
 
               attribute_dictionary.attribute_dictionaries.each do |propertysets_attribute_dictionary|
+                next unless Settings.classification_propertyset_enabled?(schema_dict.name, propertysets_attribute_dictionary.name)
+
                 propertysets << get_propertyset(propertysets_attribute_dictionary)
               end
             elsif attribute_dictionary.name == 'Classifications'
@@ -136,6 +129,7 @@ module BimTools
               end
             else
               next if CLASSIFICATION_ATTRIBUTES.include?(attribute_dictionary.name)
+              next unless Settings.classification_propertyset_enabled?(schema_dict.name, attribute_dictionary.name)
 
               propertysets << get_propertyset(attribute_dictionary)
             end
@@ -342,7 +336,7 @@ module BimTools
         end
 
         if properties.empty?
-          false
+          nil
         elsif quantities
           IfcElementQuantityBuilder.build(@ifc_model) do |builder|
             builder.set_name(attr_dict.name)

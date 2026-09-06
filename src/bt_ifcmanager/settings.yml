@@ -21,10 +21,20 @@
   :textures: false
   :double_sided_faces: false
 :load:
+  # Keyed by classification schema NAME (not filename) - this is only the
+  # persisted on/off toggle. Any classification schema (.skc or .xsd)
+  # currently loaded in the active model is discovered automatically even if
+  # it isn't listed here yet - see Settings#read_classifications.
   :classifications:
-    NL-SfB tabel 1.skc: true
-    NL-SfB 2005, tabel 1.skc: false
-    DIN 276-1.skc: false
+    NL-SfB tabel 1: true
+    NL-SfB 2005, tabel 1: false
+    DIN 276-1: false
+  # Per-classification, per-property-set-group export toggle - keyed by
+  # classification name, then by property-set group name (e.g.
+  # { "Classificador TI Lab" => { "Fabricação e garantia" => true } }).
+  # Only applies to "other" classification systems above, not the active
+  # IFC version. See Settings#read_classification_propertysets.
+  :classification_propertysets: {}
   :ifc_classifications:
     IFC 2x3.skc: false
     IFC4.skc: false

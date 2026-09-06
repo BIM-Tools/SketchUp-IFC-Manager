@@ -23,6 +23,7 @@
 
 require_relative 'IfcGloballyUniqueId'
 require_relative 'ifc_types'
+require_relative 'common_object_attributes'
 
 module BimTools
   module IfcTypeProduct_su
