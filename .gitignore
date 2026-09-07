@@ -18,8 +18,13 @@ Gemfile.lock
 /doc/
 /rdoc/
 
-# Private planning notes. Never committed.
+# Private planning notes and agent scratch. Never committed; planning lives in the private
+# plugins repository.
 /local/
+/.superpowers/
+CLAUDE.local.md
+.claude/settings.local.json
+.mcp.local.json
 
 # SketchUp backup files
 *.skb
