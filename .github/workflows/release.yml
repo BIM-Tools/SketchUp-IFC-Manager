@@ -9,6 +9,14 @@ name: Release
 on:
   push:
     tags: ['v*']
+  # Dry run: the same check and zip, an artifact instead of a release. Run it
+  # once with a wrong tag (red at the check) and once with the current VERSION
+  # (green, artifact) before trusting a real tag push.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to simulate, for example v5.5.4. Must match VERSION to pass.
+        required: true
 
 permissions:
   contents: read
@@ -26,7 +34,8 @@ jobs:
         id: version
         run: |
           set -e
-          TAG="${GITHUB_REF_NAME#v}"
+          TAG="${{ inputs.tag || github.ref_name }}"
+          TAG="${TAG#v}"
           VERSION=$(sed -n "s/.*VERSION = '\(.*\)'.*/\1/p" src/bt_ifcmanager.rb)
           echo "tag=$TAG version=$VERSION"
           if [ "$TAG" != "$VERSION" ]; then
@@ -41,7 +50,15 @@ jobs:
           cd src && zip -qr "../bt_ifcmanager-${{ steps.version.outputs.version }}.rbz" .
           ls -l ../bt_ifcmanager-*.rbz
 
+      - name: Upload the .rbz as a dry-run artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: rbz-dry-run
+          path: bt_ifcmanager-*.rbz
+
       - name: Create draft release
+        if: github.event_name == 'push'
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           draft: true
